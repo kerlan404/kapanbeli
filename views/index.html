@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kapan Beli - Shopping List Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-title">
+                <h1>Kapan Beli</h1>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn-shopping-list">Shopping List</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Summary Cards -->
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Total Products</h3>
+                    <p>24 Items</p>
+                </div>
+                <div class="card">
+                    <h3>Critical Stock</h3>
+                    <p>3 Items</p>
+                </div>
+                <div class="card">
+                    <h3>Shopping List</h3>
+                    <p>7 Items</p>
+                </div>
+            </div>
+
+            <div class="header-section">
+                <h2>Your Products</h2>
+                <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
+            </div>
+
+            <div class="product-table-container">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="soft-blue-row">
+                            <td><span class="product-name">Apple</span></td>
+                            <td>Fruits</td>
+                            <td>Rp 15,000</td>
+                            <td><span class="critical-stock">Low Stock</span></td>
+                            <td class="action-buttons">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="soft-blue-row">
+                            <td><span class="product-name">Milk</span></td>
+                            <td>Dairy</td>
+                            <td>Rp 25,000</td>
+                            <td>In Stock</td>
+                            <td class="action-buttons">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="soft-blue-row">
+                            <td><span class="product-name">Bread</span></td>
+                            <td>Bakery</td>
+                            <td>Rp 18,000</td>
+                            <td><span class="critical-stock">Critical</span></td>
+                            <td class="action-buttons">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="soft-blue-row">
+                            <td><span class="product-name">Eggs</span></td>
+                            <td>Dairy</td>
+                            <td>Rp 22,000</td>
+                            <td>In Stock</td>
+                            <td class="action-buttons">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

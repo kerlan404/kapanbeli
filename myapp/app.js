@@ -1,11 +1,16 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const path = require('path');
+const app = express();
+const port = 3000;
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Route to serve the homepage
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  res.sendFile(path.join(__dirname, '../views/index.html'));
+});
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Kapan Beli app listening on port ${port}`);
+});
