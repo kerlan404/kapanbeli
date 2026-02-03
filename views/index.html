@@ -13,24 +13,29 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #ffffff; /* White background */
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f9f9f9'/%3E%3Cline x1='0' y1='20' x2='100' y2='20' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='40' x2='100' y2='40' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='60' x2='100' y2='60' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='80' x2='100' y2='80' stroke='%23e0e0e0' stroke-width='1'/%3E%3C/svg%3E");
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
+            padding-top: 20px;
         }
 
         /* Navbar styles */
         .navbar {
-            background-color: #ffffff; /* White background */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Thin shadow */
+            background: #9CCFFF; /* Blue background */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 4px solid #FFA500; /* Orange line at bottom */
+            margin: 0;
+            width: 100%;
         }
 
         .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -38,8 +43,11 @@
         }
 
         .nav-title h1 {
-            color: #FFA500; /* Muted Orange */
-            font-size: 1.8rem;
+            color: #FFA500; /* Orange color */
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .nav-buttons {
@@ -48,121 +56,222 @@
         }
 
         .btn-shopping-list {
-            background: transparent;
+            background: white; /* White background */
             border: 2px solid #FFA500; /* Orange border */
             color: #FFA500; /* Orange text */
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .btn-shopping-list:hover {
             background-color: #FFA500;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
         }
 
         /* Main content styles */
         .main-content {
             max-width: 1200px;
-            margin: 2rem auto;
+            margin: 2rem auto 3rem;
             padding: 0 2rem;
         }
 
         .container {
-            background-color: #ffffff; /* White background */
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background-color: #fff9db; /* Yellowish paper color */
+            border-radius: 0;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #d9d9d9;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                #FFA500,
+                #FFA500 10px,
+                #9CCFFF 10px,
+                #9CCFFF 20px
+            );
         }
 
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2.5rem;
         }
 
         /* Card styling with soft blue */
         .card {
-            background-color: rgba(173, 216, 230, 0.3); /* Soft blue background */
-            border: 1px solid rgba(173, 216, 230, 0.5);
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
+            background-color: #f0f8ff; /* Light blue paper color */
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.8rem;
+            margin: 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-image: linear-gradient(#f0f8ff 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
+            background-size: 100% 24px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: #FFA500;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
 
         .card h3 {
-            color: #FF8C00; /* Orange color for headings */
-            margin-bottom: 0.5rem;
+            color: #FFA500; /* Orange color for headings */
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
         }
 
         .card p {
-            color: #FF8C00; /* Orange color for text */
-            font-size: 1.2rem;
-            font-weight: bold;
+            color: #333; /* Dark text */
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
 
         .header-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #FFA500; /* Dashed orange line */
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .header-section h2 {
             color: #333;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .header-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #FFA500;
+            border-radius: 2px;
         }
 
         .btn-add-product {
-            background-color: #FFA500; /* Orange background */
+            background: #FFA500; /* Orange background */
             color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 4px;
+            border: 2px solid #333;
+            padding: 0.9rem 1.8rem;
+            border-radius: 0;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .btn-add-product:hover {
-            background-color: #e69500;
+            background: #ffb733;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
         }
 
         /* Product cards grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
         }
 
         /* Product card styling */
         .product-card {
-            background-color: rgba(173, 216, 230, 0.2); /* Soft blue background */
-            border: 1px solid rgba(173, 216, 230, 0.3);
-            border-radius: 8px;
-            padding: 1.2rem;
+            background-color: #fff9db; /* Yellowish paper color */
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.8rem;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
+            background-size: 100% 24px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #FFA500;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 8px rgba(0,0,0, 0.1);
         }
 
         .product-card-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
         }
 
         .product-card-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
+            width: 90px;
+            height: 90px;
+            border-radius: 0;
             object-fit: cover;
+            border: 2px solid #333;
+            background: white;
+            padding: 4px;
+            box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.1);
         }
 
         .product-info {
@@ -171,79 +280,326 @@
 
         .product-name {
             color: #FF8C00; /* Orange color for product names */
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .product-category {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            background: rgba(156, 207, 255, 0.3);
+            padding: 0.2rem 0.8rem;
+            border-radius: 0;
+            display: inline-block;
+            margin-top: 0.2rem;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .product-details {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px dashed #333;
         }
 
         .price {
-            font-weight: 600;
+            font-weight: 700;
             color: #333;
+            font-size: 1.2rem;
+            background: rgba(255, 165, 0, 0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 0;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .stock-status {
             font-size: 0.9rem;
+            text-align: right;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .critical-stock {
             color: #FF4500; /* Darker orange for critical stock */
-            font-weight: 600;
-            background-color: rgba(255, 69, 0, 0.1);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            font-weight: 700;
+            background-color: rgba(255, 69, 0, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            font-size: 0.95rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .total-stock {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+            background: rgba(156, 207, 255, 0.25);
+            padding: 0.3rem 0.8rem;
+            border-radius: 0;
+            display: inline-block;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
         .product-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.8rem;
         }
 
         /* Action buttons */
         .btn-action {
             background: none;
-            border: none;
+            border: 2px solid #333;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 4px;
+            padding: 0.7rem;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
         }
 
         .btn-edit {
             color: #FFA500; /* Orange for edit */
+            background: #fff9db !important;
         }
 
         .btn-delete {
             color: #888; /* Gray for delete */
+            background: #fff9db !important;
         }
 
         .btn-action:hover {
-            background-color: #f0f0f0;
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
         }
 
         .btn-edit:hover {
-            background-color: rgba(255, 165, 0, 0.1);
+            background: #ffeaaa !important;
         }
 
         .btn-delete:hover {
-            background-color: rgba(136, 136, 136, 0.1);
+            background: #f0f0f0 !important;
+        }
+
+        /* Shopping List Styles */
+        .shopping-list-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .shopping-item {
+            background-color: #fff9db; /* Yellowish paper color */
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
+            background-size: 100% 24px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .shopping-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #FFA500;
+        }
+
+        .shopping-item-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .shopping-checkbox {
+            position: relative;
+        }
+
+        .shopping-checkbox input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 24px;
+            height: 24px;
+        }
+
+        .shopping-checkbox label {
+            display: block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #333;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
+        }
+
+        .shopping-checkbox input[type="checkbox"]:checked + label::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FFA500;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .shopping-info {
+            flex: 1;
+        }
+
+        .shopping-name {
+            color: #FF8C00; /* Orange color for product names */
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .shopping-category {
+            color: #666;
+            font-size: 1rem;
+            background: rgba(156, 207, 255, 0.3);
+            padding: 0.2rem 0.8rem;
+            border-radius: 0;
+            display: inline-block;
+            margin-top: 0.2rem;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .shopping-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px dashed #333;
+        }
+
+        .shopping-quantity {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #333;
+            background: #fff9db;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .qty-btn:hover {
+            background: #ffeaaa;
+        }
+
+        .qty-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .shopping-price {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.2rem;
+            background: rgba(255, 165, 0, 0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 0;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .shopping-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+
+        .shopping-summary {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(156, 207, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 0;
+            border: 1px solid #333;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .summary-total, .summary-price {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1.2rem;
+                padding: 0 1rem;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.2rem;
+            }
+
+            .products-grid, .shopping-list-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-card-header, .shopping-item-header {
+                flex-direction: row;
+            }
+
+            .main-content {
+                padding: 0 1rem;
+            }
+
+            .container {
+                padding: 1.8rem;
+            }
         }
 
         /* Responsive design */
@@ -284,7 +640,7 @@
     </nav>
 
     <main class="main-content">
-        <div class="container">
+        <div class="container note-paper">
             <!-- Summary Cards -->
             <div class="cards-container">
                 <div class="card">
@@ -300,12 +656,12 @@
                     <p>7 Items</p>
                 </div>
             </div>
-            
+
             <div class="header-section">
                 <h2>Your Products</h2>
                 <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
             </div>
-            
+
             <div class="products-grid">
                 <div class="product-card">
                     <div class="product-card-header">
@@ -317,14 +673,17 @@
                     </div>
                     <div class="product-details">
                         <div class="price">Rp 15,000</div>
-                        <div class="stock-status"><span class="critical-stock">Low Stock</span></div>
+                        <div class="stock-status">
+                            <div><span class="critical-stock">Low Stock</span></div>
+                            <div class="total-stock">Total: 5 pcs</div>
+                        </div>
                     </div>
                     <div class="product-actions">
                         <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
                         <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
-                
+
                 <div class="product-card">
                     <div class="product-card-header">
                         <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=M" alt="Milk" class="product-card-image">
@@ -335,14 +694,17 @@
                     </div>
                     <div class="product-details">
                         <div class="price">Rp 25,000</div>
-                        <div class="stock-status">In Stock</div>
+                        <div class="stock-status">
+                            <div>In Stock</div>
+                            <div class="total-stock">Total: 12 pcs</div>
+                        </div>
                     </div>
                     <div class="product-actions">
                         <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
                         <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
-                
+
                 <div class="product-card">
                     <div class="product-card-header">
                         <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=B" alt="Bread" class="product-card-image">
@@ -353,14 +715,17 @@
                     </div>
                     <div class="product-details">
                         <div class="price">Rp 18,000</div>
-                        <div class="stock-status"><span class="critical-stock">Critical</span></div>
+                        <div class="stock-status">
+                            <div><span class="critical-stock">Critical</span></div>
+                            <div class="total-stock">Total: 2 pcs</div>
+                        </div>
                     </div>
                     <div class="product-actions">
                         <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
                         <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
-                
+
                 <div class="product-card">
                     <div class="product-card-header">
                         <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=E" alt="Eggs" class="product-card-image">
@@ -371,11 +736,149 @@
                     </div>
                     <div class="product-details">
                         <div class="price">Rp 22,000</div>
-                        <div class="stock-status">In Stock</div>
+                        <div class="stock-status">
+                            <div>In Stock</div>
+                            <div class="total-stock">Total: 15 pcs</div>
+                        </div>
                     </div>
                     <div class="product-actions">
                         <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
                         <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopping List Section -->
+        <div class="shopping-list-container" style="display:none;">
+            <div class="container">
+                <div class="header-section">
+                    <h2>Shopping List</h2>
+                    <button class="btn-add-product"><i class="fas fa-plus"></i> Add Item</button>
+                </div>
+
+                <div class="shopping-list-grid">
+                    <div class="shopping-item">
+                        <div class="shopping-item-header">
+                            <div class="shopping-checkbox">
+                                <input type="checkbox" id="item1">
+                                <label for="item1"></label>
+                            </div>
+                            <div class="shopping-info">
+                                <h3 class="shopping-name">Apples</h3>
+                                <p class="shopping-category">Fruits</p>
+                            </div>
+                        </div>
+                        <div class="shopping-details">
+                            <div class="shopping-quantity">
+                                <span>Quantity:</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn minus">-</button>
+                                    <span class="qty-value">3</span>
+                                    <button class="qty-btn plus">+</button>
+                                </div>
+                            </div>
+                            <div class="shopping-price">Rp 45,000</div>
+                        </div>
+                        <div class="shopping-actions">
+                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="shopping-item">
+                        <div class="shopping-item-header">
+                            <div class="shopping-checkbox">
+                                <input type="checkbox" id="item2" checked>
+                                <label for="item2"></label>
+                            </div>
+                            <div class="shopping-info">
+                                <h3 class="shopping-name">Milk</h3>
+                                <p class="shopping-category">Dairy</p>
+                            </div>
+                        </div>
+                        <div class="shopping-details">
+                            <div class="shopping-quantity">
+                                <span>Quantity:</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn minus">-</button>
+                                    <span class="qty-value">2</span>
+                                    <button class="qty-btn plus">+</button>
+                                </div>
+                            </div>
+                            <div class="shopping-price">Rp 50,000</div>
+                        </div>
+                        <div class="shopping-actions">
+                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="shopping-item">
+                        <div class="shopping-item-header">
+                            <div class="shopping-checkbox">
+                                <input type="checkbox" id="item3">
+                                <label for="item3"></label>
+                            </div>
+                            <div class="shopping-info">
+                                <h3 class="shopping-name">Bread</h3>
+                                <p class="shopping-category">Bakery</p>
+                            </div>
+                        </div>
+                        <div class="shopping-details">
+                            <div class="shopping-quantity">
+                                <span>Quantity:</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn minus">-</button>
+                                    <span class="qty-value">1</span>
+                                    <button class="qty-btn plus">+</button>
+                                </div>
+                            </div>
+                            <div class="shopping-price">Rp 18,000</div>
+                        </div>
+                        <div class="shopping-actions">
+                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="shopping-item">
+                        <div class="shopping-item-header">
+                            <div class="shopping-checkbox">
+                                <input type="checkbox" id="item4">
+                                <label for="item4"></label>
+                            </div>
+                            <div class="shopping-info">
+                                <h3 class="shopping-name">Eggs</h3>
+                                <p class="shopping-category">Dairy</p>
+                            </div>
+                        </div>
+                        <div class="shopping-details">
+                            <div class="shopping-quantity">
+                                <span>Quantity:</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn minus">-</button>
+                                    <span class="qty-value">2</span>
+                                    <button class="qty-btn plus">+</button>
+                                </div>
+                            </div>
+                            <div class="shopping-price">Rp 44,000</div>
+                        </div>
+                        <div class="shopping-actions">
+                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shopping-summary">
+                    <div class="summary-total">
+                        <span>Total Items:</span>
+                        <span>8</span>
+                    </div>
+                    <div class="summary-price">
+                        <span>Total Price:</span>
+                        <span>Rp 157,000</span>
                     </div>
                 </div>
             </div>
@@ -419,11 +922,71 @@
 
             // Shopping list button functionality
             const shoppingListBtn = document.querySelector('.btn-shopping-list');
+            const mainContainer = document.querySelector('.container');
+            const shoppingListContainer = document.querySelector('.shopping-list-container');
+
             if(shoppingListBtn) {
                 shoppingListBtn.addEventListener('click', function() {
-                    alert('Shopping list functionality would be implemented here');
+                    // Toggle between main content and shopping list
+                    if(mainContainer.style.display === 'none') {
+                        mainContainer.style.display = 'block';
+                        shoppingListContainer.style.display = 'none';
+                        shoppingListBtn.textContent = 'Shopping List';
+                    } else {
+                        mainContainer.style.display = 'none';
+                        shoppingListContainer.style.display = 'block';
+                        shoppingListBtn.textContent = 'Products List';
+                    }
                 });
             }
+
+            // Quantity controls for shopping list
+            document.addEventListener('click', function(e) {
+                if(e.target.classList.contains('qty-btn')) {
+                    const qtyValue = e.target.parentElement.querySelector('.qty-value');
+                    let value = parseInt(qtyValue.textContent);
+
+                    if(e.target.classList.contains('plus')) {
+                        value++;
+                    } else if(e.target.classList.contains('minus') && value > 1) {
+                        value--;
+                    }
+
+                    qtyValue.textContent = value;
+
+                    // Update price calculation (for demo purposes)
+                    const parentItem = e.target.closest('.shopping-item');
+                    const priceElement = parentItem.querySelector('.shopping-price');
+                    const basePrice = parseInt(priceElement.textContent.replace(/[^0-9]/g, '')) / (value + (e.target.classList.contains('plus') ? -1 : e.target.classList.contains('minus') ? 1 : 0));
+                    const newPrice = Math.round(basePrice * value);
+                    priceElement.textContent = 'Rp ' + newPrice.toLocaleString();
+
+                    // Update total summary
+                    updateShoppingSummary();
+                }
+            });
+
+            // Update shopping list summary
+            function updateShoppingSummary() {
+                const items = document.querySelectorAll('.shopping-item');
+                let totalItems = 0;
+                let totalPrice = 0;
+
+                items.forEach(item => {
+                    const qty = parseInt(item.querySelector('.qty-value').textContent);
+                    const priceText = item.querySelector('.shopping-price').textContent;
+                    const price = parseInt(priceText.replace(/[^0-9]/g, ''));
+
+                    totalItems += qty;
+                    totalPrice += price;
+                });
+
+                document.querySelector('.summary-total span:last-child').textContent = totalItems;
+                document.querySelector('.summary-price span:last-child').textContent = 'Rp ' + totalPrice.toLocaleString();
+            }
+
+            // Initialize summary
+            setTimeout(updateShoppingSummary, 100);
         });
     </script>
 </body>
