@@ -134,61 +134,71 @@
             background-color: #e69500;
         }
 
-        /* Product table styles */
-        .product-table-container {
-            overflow-x: auto;
+        /* Product cards grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
 
-        .product-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
+        /* Product card styling */
+        .product-card {
+            background-color: rgba(173, 216, 230, 0.2); /* Soft blue background */
+            border: 1px solid rgba(173, 216, 230, 0.3);
+            border-radius: 8px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
         }
 
-        .product-table th,
-        .product-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .product-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #555;
-        }
-
-        /* Soft blue row styling */
-        .soft-blue-row:nth-child(even) {
-            background-color: rgba(173, 216, 230, 0.2); /* Light soft blue */
-        }
-
-        .soft-blue-row:nth-child(odd) {
-            background-color: #ffffff;
-        }
-
-        /* Product cell styling */
-        .product-cell {
+        .product-card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
-        /* Product image styling */
-        .product-image {
-            width: 40px;
-            height: 40px;
-            border-radius: 4px;
+        .product-card-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
             object-fit: cover;
         }
 
-        /* Product name styling */
-        .product-name {
-            color: #FF8C00; /* Orange color for product names */
-            font-weight: 500;
+        .product-info {
+            flex: 1;
         }
 
-        /* Critical stock styling */
+        .product-name {
+            color: #FF8C00; /* Orange color for product names */
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-category {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .price {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stock-status {
+            font-size: 0.9rem;
+        }
+
         .critical-stock {
             color: #FF4500; /* Darker orange for critical stock */
             font-weight: 600;
@@ -197,12 +207,13 @@
             border-radius: 4px;
         }
 
-        /* Action buttons */
-        .action-buttons {
+        .product-actions {
             display: flex;
+            justify-content: flex-end;
             gap: 0.5rem;
         }
 
+        /* Action buttons */
         .btn-action {
             background: none;
             border: none;
@@ -249,13 +260,12 @@
                 gap: 1rem;
             }
             
-            .product-table {
-                font-size: 0.9rem;
+            .products-grid {
+                grid-template-columns: 1fr;
             }
             
-            .product-table th,
-            .product-table td {
-                padding: 0.7rem;
+            .product-card-header {
+                flex-direction: row;
             }
         }
     </style>
@@ -296,72 +306,78 @@
                 <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
             </div>
             
-            <div class="product-table-container">
-                <table class="product-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="soft-blue-row">
-                            <td class="product-cell">
-                                <img src="https://placehold.co/50x50/FFA500/FFFFFF?text=A" alt="Apple" class="product-image">
-                                <span class="product-name">Apple</span>
-                            </td>
-                            <td>Fruits</td>
-                            <td>Rp 15,000</td>
-                            <td><span class="critical-stock">Low Stock</span></td>
-                            <td class="action-buttons">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr class="soft-blue-row">
-                            <td class="product-cell">
-                                <img src="https://placehold.co/50x50/FFA500/FFFFFF?text=M" alt="Milk" class="product-image">
-                                <span class="product-name">Milk</span>
-                            </td>
-                            <td>Dairy</td>
-                            <td>Rp 25,000</td>
-                            <td>In Stock</td>
-                            <td class="action-buttons">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr class="soft-blue-row">
-                            <td class="product-cell">
-                                <img src="https://placehold.co/50x50/FFA500/FFFFFF?text=B" alt="Bread" class="product-image">
-                                <span class="product-name">Bread</span>
-                            </td>
-                            <td>Bakery</td>
-                            <td>Rp 18,000</td>
-                            <td><span class="critical-stock">Critical</span></td>
-                            <td class="action-buttons">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr class="soft-blue-row">
-                            <td class="product-cell">
-                                <img src="https://placehold.co/50x50/FFA500/FFFFFF?text=E" alt="Eggs" class="product-image">
-                                <span class="product-name">Eggs</span>
-                            </td>
-                            <td>Dairy</td>
-                            <td>Rp 22,000</td>
-                            <td>In Stock</td>
-                            <td class="action-buttons">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=A" alt="Apple" class="product-card-image">
+                        <div class="product-info">
+                            <h3 class="product-name">Apple</h3>
+                            <p class="product-category">Fruits</p>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <div class="price">Rp 15,000</div>
+                        <div class="stock-status"><span class="critical-stock">Low Stock</span></div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=M" alt="Milk" class="product-card-image">
+                        <div class="product-info">
+                            <h3 class="product-name">Milk</h3>
+                            <p class="product-category">Dairy</p>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <div class="price">Rp 25,000</div>
+                        <div class="stock-status">In Stock</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=B" alt="Bread" class="product-card-image">
+                        <div class="product-info">
+                            <h3 class="product-name">Bread</h3>
+                            <p class="product-category">Bakery</p>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <div class="price">Rp 18,000</div>
+                        <div class="stock-status"><span class="critical-stock">Critical</span></div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=E" alt="Eggs" class="product-card-image">
+                        <div class="product-info">
+                            <h3 class="product-name">Eggs</h3>
+                            <p class="product-category">Dairy</p>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <div class="price">Rp 22,000</div>
+                        <div class="stock-status">In Stock</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -381,7 +397,8 @@
             const editButtons = document.querySelectorAll('.btn-edit');
             editButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const productName = this.closest('tr').querySelector('.product-name').textContent;
+                    const productCard = this.closest('.product-card');
+                    const productName = productCard.querySelector('.product-name').textContent;
                     alert(`Edit functionality for ${productName} would be implemented here`);
                 });
             });
@@ -390,10 +407,11 @@
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const productName = this.closest('tr').querySelector('.product-name').textContent;
+                    const productCard = this.closest('.product-card');
+                    const productName = productCard.querySelector('.product-name').textContent;
                     const confirmDelete = confirm(`Are you sure you want to delete ${productName}?`);
                     if(confirmDelete) {
-                        this.closest('tr').remove();
+                        productCard.remove();
                         alert(`${productName} has been deleted`);
                     }
                 });
