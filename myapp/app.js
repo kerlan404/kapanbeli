@@ -47,9 +47,24 @@ app.get('/', (req, res) => {
             padding: 0 2rem;
         }
 
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
         .nav-title h1 {
             color: #FFA500; /* Muted Orange */
             font-size: 1.8rem;
+        }
+
+        .nav-center {
+            flex: 1;
+            text-align: center;
+            color: #ffffff; /* White text to contrast with blue background */
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
         .nav-buttons {
@@ -293,11 +308,16 @@ app.get('/', (req, res) => {
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-title">
-                <h1>Kapan Beli</h1>
-            </div>
-            <div class="nav-buttons">
-                <button class="btn-shopping-list">Shopping List</button>
+            <div class="nav-wrapper">
+                <div class="nav-title">
+                    <h1>Kapan Beli</h1>
+                </div>
+                <div class="nav-center">
+                    Shopping List
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn-shopping-list">Shopping List</button>
+                </div>
             </div>
         </div>
     </nav>
