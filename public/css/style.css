@@ -149,6 +149,21 @@ body {
     margin: 1rem 0;
 }
 
+/* Product cell styling */
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Product image styling */
+.product-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
 /* Product name styling */
 .product-name {
     color: #FF8C00; /* Orange color for product names */
