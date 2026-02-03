@@ -105,6 +105,35 @@
             box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
         }
 
+        .btn-budget-settings {
+            background: white; /* White background */
+            border: 2px solid #4CAF50; /* Green border for budget */
+            color: #4CAF50; /* Green text */
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+        }
+
+        .btn-budget-settings:hover {
+            background-color: #4CAF50;
+            color: white;
+            transform: translateY(-2px) scale(1.1);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-budget-settings i {
+            font-size: 1.2rem;
+        }
+
         /* Main content styles */
         .main-content {
             max-width: 1200px;
@@ -668,6 +697,17 @@
             border: 2px solid #FFA500;
         }
 
+        .dark-mode-active .btn-budget-settings {
+            background: #1a1a1a;
+            color: #4CAF50; /* Green color in dark mode */
+            border: 2px solid #4CAF50;
+        }
+
+        .dark-mode-active .btn-budget-settings:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
         .dark-mode-active .search-input {
             background: #1a1a1a;
             border: 2px solid #444;
@@ -850,6 +890,126 @@
             box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
         }
 
+        /* Dark Mode Styles for Budget and Recommendations */
+        .dark-mode-active .modal-content {
+            background-color: #2a2a2a;
+            border: 2px solid #FFA500;
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .modal-content h2 {
+            color: #FFD700;
+            border-bottom: 2px dashed #FFA500;
+        }
+
+        .dark-mode-active .budget-setting label {
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .budget-setting input {
+            background: #333;
+            border: 2px solid #444;
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .budget-setting input:focus {
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .close {
+            color: #f0f0f0;
+            background: #2a2a2a;
+            border: 1px solid #FFA500;
+        }
+
+        .dark-mode-active .close:hover {
+            color: #FFD700;
+            background: #4a4a1e;
+        }
+
+        .dark-mode-active .budget-warning-banner {
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        .dark-mode-active .budget-card {
+            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+            color: #f0f0f0;
+            border: 1px solid #555;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .dark-mode-active .budget-card h3 {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .budget-card p {
+            color: #ffffff;
+        }
+
+        .dark-mode-active .budget-progress {
+            background-color: #444;
+        }
+
+        .dark-mode-active .budget-progress-bar {
+            background-color: #4CAF50;
+        }
+
+        .dark-mode-active .budget-warning {
+            background-color: #FF9800;
+        }
+
+        .dark-mode-active .budget-danger {
+            background-color: #f44336;
+        }
+
+        .dark-mode-active .recommendations-section {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .recommendations-section h2 {
+            color: #FFD700;
+            border-bottom: 2px dashed #FFA500;
+        }
+
+        .dark-mode-active .recommendation-card {
+            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+            border: 1px solid #555;
+            color: #f0f0f0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode-active .recommendation-name {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .recommendation-reason {
+            color: #aaa;
+        }
+
+        .dark-mode-active .recommendation-category {
+            color: #f0f0f0;
+            background: rgba(156, 207, 255, 0.2);
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .recommendation-price {
+            color: #ffffff;
+        }
+
+        .dark-mode-active .btn-add-recommendation {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid #444;
+        }
+
+        .dark-mode-active .btn-add-recommendation:hover {
+            background-color: #45a049;
+            color: white;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .nav-container {
@@ -881,6 +1041,282 @@
             }
         }
 
+        /* Budget Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fff9db;
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid #d9d9d9;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 0;
+            position: relative;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            border: 2px solid #333;
+        }
+
+        .modal-content h2 {
+            color: #FF8C00;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px dashed #FFA500;
+            padding-bottom: 0.5rem;
+        }
+
+        .budget-setting {
+            margin-bottom: 1.2rem;
+        }
+
+        .budget-setting label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .budget-setting input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 2px solid #333;
+            border-radius: 0;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1rem;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .budget-setting input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+            border: 2px solid #FFA500;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #333;
+            background: #fff9db;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .close:hover {
+            color: #333;
+            background: #ffeaaa;
+        }
+
+        /* Budget Warning Banner */
+        .budget-warning-banner {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #FF4500;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 2px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .budget-warning-banner .close-warning {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            padding: 0 0.5rem;
+            border: 1px solid white;
+        }
+
+        /* Budget Summary Card */
+        .budget-card {
+            background-color: #f0f8ff; /* Light blue paper color */
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.8rem;
+            margin: 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-image: linear-gradient(#f0f8ff 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
+            background-size: 100% 24px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .budget-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: #FFA500;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .budget-card h3 {
+            color: #FFA500; /* Orange color for headings */
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .budget-card p {
+            color: #333; /* Dark text */
+            font-size: 1.4rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .budget-progress {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .budget-progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .budget-warning {
+            background-color: #FF9800;
+        }
+
+        .budget-danger {
+            background-color: #f44336;
+        }
+
+        /* Recommendations Section */
+        .recommendations-section {
+            margin: 3rem 0 2rem 0;
+            padding: 1.5rem;
+            background-color: #fff9db;
+            border-radius: 0;
+            border: 1px solid #d9d9d9;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .recommendations-section h2 {
+            color: #FF8C00;
+            margin-bottom: 1rem;
+            border-bottom: 2px dashed #FFA500;
+            padding-bottom: 0.5rem;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recommendation-card {
+            background-color: #f0f8ff;
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recommendation-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-card-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 0;
+            object-fit: cover;
+            border: 2px solid #333;
+            background: white;
+            padding: 2px;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
+        }
+
+        .recommendation-info {
+            flex: 1;
+        }
+
+        .recommendation-name {
+            color: #FF8C00;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .recommendation-reason {
+            color: #666;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .recommendation-price {
+            font-weight: 600;
+            color: #333;
+            margin: 0.5rem 0;
+        }
+
+        .btn-add-recommendation {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid #333;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 0.5rem;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-add-recommendation:hover {
+            background-color: #45a049;
+            transform: translateY(-1px);
+            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .nav-container {
@@ -888,17 +1324,17 @@
                 gap: 1rem;
                 padding: 0 1rem;
             }
-            
+
             .header-section {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
             }
-            
+
             .products-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .product-card-header {
                 flex-direction: row;
             }
@@ -915,10 +1351,38 @@
             <div class="nav-buttons">
                 <input type="text" class="search-input" placeholder="Search products...">
                 <button class="dark-mode-toggle" title="Toggle Dark Mode"></button>
+                <button class="btn-budget-settings" title="Budget Settings"><i class="fas fa-wallet"></i></button>
                 <button class="btn-shopping-list">Shopping List</button>
             </div>
         </div>
     </nav>
+
+    <!-- Budget Settings Modal -->
+    <div id="budgetModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Budget Settings</h2>
+            <div class="budget-setting">
+                <label for="dailyBudget">Daily Budget (Rp):</label>
+                <input type="number" id="dailyBudget" placeholder="Enter daily budget">
+            </div>
+            <div class="budget-setting">
+                <label for="weeklyBudget">Weekly Budget (Rp):</label>
+                <input type="number" id="weeklyBudget" placeholder="Enter weekly budget">
+            </div>
+            <div class="budget-setting">
+                <label for="monthlyBudget">Monthly Budget (Rp):</label>
+                <input type="number" id="monthlyBudget" placeholder="Enter monthly budget">
+            </div>
+            <button id="saveBudgetBtn" class="btn-add-product">Save Budget</button>
+        </div>
+    </div>
+
+    <!-- Budget Warning Banner -->
+    <div id="budgetWarning" class="budget-warning-banner" style="display: none;">
+        <span id="warningMessage">You are approaching your budget limit!</span>
+        <span class="close-warning">&times;</span>
+    </div>
 
     <main class="main-content">
         <div class="container note-paper">
@@ -935,6 +1399,31 @@
                 <div class="card">
                     <h3>Shopping List</h3>
                     <p>7 Items</p>
+                </div>
+            </div>
+
+            <!-- Budget Summary Cards -->
+            <div class="cards-container">
+                <div class="budget-card">
+                    <h3>Daily Budget</h3>
+                    <p id="dailyBudgetAmount">Rp 0</p>
+                    <div class="budget-progress">
+                        <div id="dailyBudgetBar" class="budget-progress-bar"></div>
+                    </div>
+                </div>
+                <div class="budget-card">
+                    <h3>Weekly Budget</h3>
+                    <p id="weeklyBudgetAmount">Rp 0</p>
+                    <div class="budget-progress">
+                        <div id="weeklyBudgetBar" class="budget-progress-bar"></div>
+                    </div>
+                </div>
+                <div class="budget-card">
+                    <h3>Monthly Budget</h3>
+                    <p id="monthlyBudgetAmount">Rp 0</p>
+                    <div class="budget-progress">
+                        <div id="monthlyBudgetBar" class="budget-progress-bar"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1186,6 +1675,14 @@
                         <span>Rp 157,000</span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations-section">
+            <h2>Recommended For You</h2>
+            <div class="recommendations-grid" id="recommendationsGrid">
+                <!-- Recommendation cards will be added dynamically -->
             </div>
         </div>
     </main>
@@ -1448,6 +1945,251 @@
 
             // Initialize summary
             setTimeout(updateShoppingSummary, 100);
+
+            // ========== BUDGET FUNCTIONALITY ==========
+
+            // Budget Settings Modal
+            const budgetSettingsBtn = document.querySelector('.btn-budget-settings');
+            const budgetModal = document.getElementById('budgetModal');
+            const closeModalSpan = document.querySelector('.modal .close');
+            const saveBudgetBtn = document.getElementById('saveBudgetBtn');
+            const budgetWarning = document.getElementById('budgetWarning');
+            const closeWarningBtn = document.querySelector('.budget-warning-banner .close-warning');
+
+            // Open budget settings modal
+            if(budgetSettingsBtn) {
+                budgetSettingsBtn.addEventListener('click', function() {
+                    loadBudgetSettings();
+                    budgetModal.style.display = 'block';
+                });
+            }
+
+            // Close modal when clicking on 'x'
+            if(closeModalSpan) {
+                closeModalSpan.addEventListener('click', function() {
+                    budgetModal.style.display = 'none';
+                });
+            }
+
+            // Close modal when clicking outside of it
+            window.addEventListener('click', function(event) {
+                if (event.target === budgetModal) {
+                    budgetModal.style.display = 'none';
+                }
+            });
+
+            // Load budget settings from localStorage
+            function loadBudgetSettings() {
+                const budgets = JSON.parse(localStorage.getItem('budgets')) || {};
+
+                if(budgets.daily) document.getElementById('dailyBudget').value = budgets.daily;
+                if(budgets.weekly) document.getElementById('weeklyBudget').value = budgets.weekly;
+                if(budgets.monthly) document.getElementById('monthlyBudget').value = budgets.monthly;
+            }
+
+            // Save budget settings
+            if(saveBudgetBtn) {
+                saveBudgetBtn.addEventListener('click', function() {
+                    const dailyBudget = document.getElementById('dailyBudget').value || 0;
+                    const weeklyBudget = document.getElementById('weeklyBudget').value || 0;
+                    const monthlyBudget = document.getElementById('monthlyBudget').value || 0;
+
+                    const budgets = {
+                        daily: parseFloat(dailyBudget),
+                        weekly: parseFloat(weeklyBudget),
+                        monthly: parseFloat(monthlyBudget)
+                    };
+
+                    localStorage.setItem('budgets', JSON.stringify(budgets));
+                    budgetModal.style.display = 'none';
+
+                    // Update budget display
+                    updateBudgetDisplay();
+
+                    // Calculate and display spending
+                    calculateAndDisplaySpending();
+                });
+            }
+
+            // Close budget warning
+            if(closeWarningBtn) {
+                closeWarningBtn.addEventListener('click', function() {
+                    budgetWarning.style.display = 'none';
+                });
+            }
+
+            // Calculate total spending from products
+            function calculateTotalSpending() {
+                let total = 0;
+                const productCards = document.querySelectorAll('.product-card');
+
+                productCards.forEach(card => {
+                    const priceText = card.querySelector('.price').textContent;
+                    // Extract numeric value from price (remove 'Rp ' and commas)
+                    const price = parseFloat(priceText.replace(/[^\d,]/g, '').replace(',', '')) || 0;
+                    total += price;
+                });
+
+                return total;
+            }
+
+            // Calculate and display spending vs budget
+            function calculateAndDisplaySpending() {
+                const totalSpending = calculateTotalSpending();
+                const budgets = JSON.parse(localStorage.getItem('budgets')) || {};
+
+                // Update budget amounts display
+                document.getElementById('dailyBudgetAmount').textContent = `Rp ${budgets.daily || 0}`;
+                document.getElementById('weeklyBudgetAmount').textContent = `Rp ${budgets.weekly || 0}`;
+                document.getElementById('monthlyBudgetAmount').textContent = `Rp ${budgets.monthly || 0}`;
+
+                // Calculate percentages and update progress bars
+                if(budgets.daily > 0) {
+                    const dailyPercentage = Math.min((totalSpending / budgets.daily) * 100, 100);
+                    const dailyBar = document.getElementById('dailyBudgetBar');
+                    dailyBar.style.width = `${dailyPercentage}%`;
+
+                    // Apply warning/danger classes based on percentage
+                    dailyBar.className = 'budget-progress-bar';
+                    if(dailyPercentage >= 90) {
+                        dailyBar.classList.add('budget-danger');
+                    } else if(dailyPercentage >= 75) {
+                        dailyBar.classList.add('budget-warning');
+                    }
+
+                    // Show warning if approaching budget
+                    if(dailyPercentage >= 90) {
+                        document.getElementById('warningMessage').textContent = 'You are exceeding your daily budget!';
+                        budgetWarning.style.display = 'flex';
+                    } else if(dailyPercentage >= 75) {
+                        document.getElementById('warningMessage').textContent = 'You are approaching your daily budget limit!';
+                        budgetWarning.style.display = 'flex';
+                    }
+                }
+
+                if(budgets.weekly > 0) {
+                    const weeklyPercentage = Math.min((totalSpending / budgets.weekly) * 100, 100);
+                    const weeklyBar = document.getElementById('weeklyBudgetBar');
+                    weeklyBar.style.width = `${weeklyPercentage}%`;
+
+                    weeklyBar.className = 'budget-progress-bar';
+                    if(weeklyPercentage >= 90) {
+                        weeklyBar.classList.add('budget-danger');
+                    } else if(weeklyPercentage >= 75) {
+                        weeklyBar.classList.add('budget-warning');
+                    }
+                }
+
+                if(budgets.monthly > 0) {
+                    const monthlyPercentage = Math.min((totalSpending / budgets.monthly) * 100, 100);
+                    const monthlyBar = document.getElementById('monthlyBudgetBar');
+                    monthlyBar.style.width = `${monthlyPercentage}%`;
+
+                    monthlyBar.className = 'budget-progress-bar';
+                    if(monthlyPercentage >= 90) {
+                        monthlyBar.classList.add('budget-danger');
+                    } else if(monthlyPercentage >= 75) {
+                        monthlyBar.classList.add('budget-warning');
+                    }
+                }
+            }
+
+            // Update budget display when page loads
+            function updateBudgetDisplay() {
+                const budgets = JSON.parse(localStorage.getItem('budgets')) || {};
+
+                if(budgets.daily) {
+                    document.getElementById('dailyBudgetAmount').textContent = `Rp ${budgets.daily}`;
+                }
+                if(budgets.weekly) {
+                    document.getElementById('weeklyBudgetAmount').textContent = `Rp ${budgets.weekly}`;
+                }
+                if(budgets.monthly) {
+                    document.getElementById('monthlyBudgetAmount').textContent = `Rp ${budgets.monthly}`;
+                }
+            }
+
+            // Run budget calculations when DOM is loaded
+            setTimeout(calculateAndDisplaySpending, 200);
+
+            // ========== RECOMMENDATION FUNCTIONALITY ==========
+
+            // Generate recommendations based on existing products
+            function generateRecommendations() {
+                const recommendationsGrid = document.getElementById('recommendationsGrid');
+                recommendationsGrid.innerHTML = ''; // Clear existing recommendations
+
+                // Sample recommendations - in a real app, this would come from an algorithm
+                const sampleRecommendations = [
+                    {
+                        name: "Banana",
+                        category: "Fruits",
+                        price: "Rp 12,000",
+                        reason: "Similar to your Apple purchase",
+                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=B"
+                    },
+                    {
+                        name: "Orange Juice",
+                        category: "Beverages",
+                        price: "Rp 18,000",
+                        reason: "Popular beverage in your cart",
+                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=OJ"
+                    },
+                    {
+                        name: "Cheese",
+                        category: "Dairy",
+                        price: "Rp 28,000",
+                        reason: "Pairs well with your milk",
+                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=C"
+                    },
+                    {
+                        name: "Whole Wheat Bread",
+                        category: "Bakery",
+                        price: "Rp 15,000",
+                        reason: "Healthy alternative to regular bread",
+                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=WB"
+                    }
+                ];
+
+                // Add recommendation cards to the grid
+                sampleRecommendations.forEach(rec => {
+                    const recCard = document.createElement('div');
+                    recCard.className = 'recommendation-card';
+                    recCard.innerHTML = `
+                        <div class="recommendation-card-header">
+                            <img src="${rec.image}" alt="${rec.name}" class="recommendation-card-image">
+                            <div class="recommendation-info">
+                                <div class="recommendation-name">${rec.name}</div>
+                                <div class="recommendation-reason">${rec.reason}</div>
+                            </div>
+                        </div>
+                        <div class="recommendation-category">${rec.category}</div>
+                        <div class="recommendation-price">${rec.price}</div>
+                        <button class="btn-add-recommendation" data-name="${rec.name}" data-price="${rec.price}" data-category="${rec.category}">
+                            Add to List
+                        </button>
+                    `;
+                    recommendationsGrid.appendChild(recCard);
+                });
+
+                // Add event listeners to "Add to List" buttons
+                document.querySelectorAll('.btn-add-recommendation').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const name = this.getAttribute('data-name');
+                        const price = this.getAttribute('data-price');
+                        const category = this.getAttribute('data-category');
+
+                        // Add to shopping list or products - for now just show an alert
+                        alert(`Added ${name} to your shopping list!`);
+
+                        // In a real implementation, you would add this to the shopping list
+                        // or create a new product entry
+                    });
+                });
+            }
+
+            // Generate recommendations when page loads
+            setTimeout(generateRecommendations, 300);
         });
     </script>
 </body>

@@ -1,0 +1,19 @@
+const express = require('express');
+const path = require('path');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files from the 'views' directory (where index.html is located)
+app.use(express.static(path.join(__dirname, 'views')));
+
+// Route to serve the homepage (index.html from views directory)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`Kapan Beli app listening on port ${PORT}`);
+});
