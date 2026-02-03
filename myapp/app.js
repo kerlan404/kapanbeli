@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 
         /* Navbar styles */
         .navbar {
-            background-color: rgba(173, 216, 230, 0.3); /* Soft blue background */
+            background-color: #0096FF; /* Blue background */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Thin shadow */
             padding: 1rem 0;
             position: sticky;
@@ -94,10 +94,10 @@ app.get('/', (req, res) => {
             margin-bottom: 1.5rem;
         }
 
-        /* Card styling with soft blue */
+        /* Card styling with blue */
         .card {
-            background-color: rgba(173, 216, 230, 0.3); /* Soft blue background */
-            border: 1px solid rgba(173, 216, 230, 0.5);
+            background-color: rgba(0, 150, 255, 0.2); /* Blue background */
+            border: 1px solid rgba(0, 150, 255, 0.4);
             border-radius: 8px;
             padding: 1rem;
             margin: 1rem 0;
@@ -153,8 +153,8 @@ app.get('/', (req, res) => {
 
         /* Product card styling */
         .product-card {
-            background-color: rgba(173, 216, 230, 0.2); /* Soft blue background */
-            border: 1px solid rgba(173, 216, 230, 0.3);
+            background-color: rgba(0, 150, 255, 0.1); /* Blue background */
+            border: 1px solid rgba(0, 150, 255, 0.2);
             border-radius: 8px;
             padding: 1.2rem;
             display: flex;
