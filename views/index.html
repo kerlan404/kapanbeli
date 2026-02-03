@@ -53,6 +53,36 @@
         .nav-buttons {
             display: flex;
             gap: 1rem;
+            align-items: center;
+        }
+
+        .dark-mode-toggle {
+            background: #333;
+            border: 2px solid #FFA500;
+            color: white;
+            width: 50px;
+            height: 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .dark-mode-toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FFA500;
+            top: 1px;
+            left: 2px;
+            transition: 0.3s;
+        }
+
+        .dark-mode-active .dark-mode-toggle::before {
+            transform: translateX(20px);
         }
 
         .btn-shopping-list {
@@ -571,6 +601,253 @@
             gap: 1rem;
         }
 
+        .controls-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .category-filter, .category-filter-shopping {
+            background: #fff9db;
+            border: 2px solid #333;
+            border-radius: 0;
+            padding: 0.6rem 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1rem;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .category-filter:focus, .category-filter-shopping:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        .search-input {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 0;
+            padding: 0.6rem 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1rem;
+            width: 200px;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Dark Mode Styles */
+        .dark-mode-active {
+            background: #121212;
+        }
+
+        .dark-mode-active body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2980b9 100%);
+            color: #f0f0f0;
+            border-bottom: 4px solid #FFA500;
+        }
+
+        .dark-mode-active .nav-title h1 {
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .dark-mode-active .btn-shopping-list {
+            background: #1a1a1a;
+            color: #FFD700;
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .search-input {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #f0f0f0;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.2);
+        }
+
+        .dark-mode-active .search-input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .container {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
+            background-size: 100% 26px;
+        }
+
+        .dark-mode-active .container::before {
+            background: repeating-linear-gradient(
+                90deg,
+                #FFA500,
+                #FFA500 10px,
+                #2980b9 10px,
+                #2980b9 20px
+            );
+        }
+
+        .dark-mode-active .card {
+            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+            color: #f0f0f0;
+            border: 1px solid #555;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .dark-mode-active .card::after {
+            display: none;
+        }
+
+        .dark-mode-active .card h3 {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .card p {
+            color: #ffffff;
+        }
+
+        .dark-mode-active .product-card,
+        .dark-mode-active .shopping-item {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: #f0f0f0;
+            background-image: linear-gradient(#1e1e1e 22px, #333 22px, #333 24px, transparent 24px);
+            background-size: 100% 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode-active .product-card::before,
+        .dark-mode-active .shopping-item::before {
+            background: #FFA500;
+        }
+
+        .dark-mode-active .product-name,
+        .dark-mode-active .shopping-name {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .product-category,
+        .dark-mode-active .shopping-category {
+            background: rgba(156, 207, 255, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .price,
+        .dark-mode-active .shopping-price {
+            background: rgba(255, 215, 0, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .stock-status {
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .critical-stock {
+            background-color: rgba(255, 69, 0, 0.3);
+            color: #ffcccc;
+        }
+
+        .dark-mode-active .total-stock {
+            background: rgba(156, 207, 255, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .btn-action {
+            border: 2px solid #555;
+            color: #f0f0f0;
+            background: #2a2a2a !important;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
+        }
+
+        .dark-mode-active .btn-edit {
+            color: #FFD700;
+            background: #2a2a2a !important;
+        }
+
+        .dark-mode-active .btn-delete {
+            color: #aaa;
+            background: #2a2a2a !important;
+        }
+
+        .dark-mode-active .btn-action:hover {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.5);
+        }
+
+        .dark-mode-active .btn-edit:hover {
+            background: #4a4a1e !important;
+            color: #ffffff;
+        }
+
+        .dark-mode-active .btn-delete:hover {
+            background: #444 !important;
+            color: #ffffff;
+        }
+
+        .dark-mode-active .category-filter,
+        .dark-mode-active .category-filter-shopping,
+        .dark-mode-active .stock-status-filter {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #f0f0f0;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
+        }
+
+        .dark-mode-active .category-filter:focus,
+        .dark-mode-active .category-filter-shopping:focus,
+        .dark-mode-active .stock-status-filter:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .shopping-summary {
+            background: rgba(156, 207, 255, 0.1);
+            border: 1px solid #444;
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .qty-btn {
+            background: #2a2a2a;
+            border: 2px solid #555;
+            color: #f0f0f0;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
+        }
+
+        .dark-mode-active .qty-btn:hover {
+            background: #4a4a1e;
+            color: #ffffff;
+        }
+
+        .dark-mode-active .header-section {
+            border-bottom: 2px dashed #FFA500;
+        }
+
+        .dark-mode-active .btn-add-product {
+            background: #FFA500;
+            color: #333;
+            border: 2px solid #333;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.3);
+        }
+
+        .dark-mode-active .btn-add-product:hover {
+            background: #ffb733;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .nav-container {
@@ -634,6 +911,8 @@
                 <h1>Kapan Beli</h1>
             </div>
             <div class="nav-buttons">
+                <input type="text" class="search-input" placeholder="Search products...">
+                <button class="dark-mode-toggle" title="Toggle Dark Mode"></button>
                 <button class="btn-shopping-list">Shopping List</button>
             </div>
         </div>
@@ -659,7 +938,19 @@
 
             <div class="header-section">
                 <h2>Your Products</h2>
-                <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
+                <div class="controls-group">
+                    <select class="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Dairy">Dairy</option>
+                        <option value="Bakery">Bakery</option>
+                        <option value="Meat">Meat</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Snacks">Snacks</option>
+                    </select>
+                    <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
+                </div>
             </div>
 
             <div class="products-grid">
@@ -754,7 +1045,19 @@
             <div class="container">
                 <div class="header-section">
                     <h2>Shopping List</h2>
-                    <button class="btn-add-product"><i class="fas fa-plus"></i> Add Item</button>
+                    <div class="controls-group">
+                        <select class="category-filter-shopping">
+                            <option value="">All Categories</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Meat">Meat</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Snacks">Snacks</option>
+                        </select>
+                        <button class="btn-add-product"><i class="fas fa-plus"></i> Add Item</button>
+                    </div>
                 </div>
 
                 <div class="shopping-list-grid">
@@ -939,6 +1242,162 @@
                     }
                 });
             }
+
+            // Category filter functionality for products
+            const categoryFilter = document.querySelector('.category-filter');
+            if(categoryFilter) {
+                categoryFilter.addEventListener('change', function() {
+                    const selectedCategory = this.value;
+                    const productCards = document.querySelectorAll('.product-card');
+
+                    productCards.forEach(card => {
+                        const categoryElement = card.querySelector('.product-category');
+                        if(categoryElement) {
+                            const category = categoryElement.textContent.trim();
+
+                            if(selectedCategory === '' || category.includes(selectedCategory)) {
+                                card.style.display = 'flex';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Category filter functionality for shopping list
+            const categoryFilterShopping = document.querySelector('.category-filter-shopping');
+            if(categoryFilterShopping) {
+                categoryFilterShopping.addEventListener('change', function() {
+                    const selectedCategory = this.value;
+                    const shoppingItems = document.querySelectorAll('.shopping-item');
+
+                    shoppingItems.forEach(item => {
+                        const categoryElement = item.querySelector('.shopping-category');
+                        if(categoryElement) {
+                            const category = categoryElement.textContent.trim();
+
+                            if(selectedCategory === '' || category.includes(selectedCategory)) {
+                                item.style.display = 'flex';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Dark mode toggle functionality
+            const darkModeToggle = document.querySelector('.dark-mode-toggle');
+            const body = document.body;
+
+            // Check for saved theme preference or respect OS setting
+            if (localStorage.getItem('theme') === 'dark' ||
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                body.classList.add('dark-mode-active');
+                if(darkModeToggle) {
+                    darkModeToggle.classList.add('dark-mode-active');
+                }
+            } else {
+                body.classList.remove('dark-mode-active');
+                if(darkModeToggle) {
+                    darkModeToggle.classList.remove('dark-mode-active');
+                }
+            }
+
+            if(darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    body.classList.toggle('dark-mode-active');
+
+                    // Save the current theme to localStorage
+                    if(body.classList.contains('dark-mode-active')) {
+                        localStorage.setItem('theme', 'dark');
+                        this.classList.add('dark-mode-active');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                        this.classList.remove('dark-mode-active');
+                    }
+                });
+            }
+
+            // Search functionality
+            const searchInput = document.querySelector('.search-input');
+            if(searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+
+                    // Search in product cards
+                    const productCards = document.querySelectorAll('.product-card');
+                    productCards.forEach(card => {
+                        const productName = card.querySelector('.product-name').textContent.toLowerCase();
+                        const productCategory = card.querySelector('.product-category').textContent.toLowerCase();
+
+                        if(productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    // Search in shopping list items
+                    const shoppingItems = document.querySelectorAll('.shopping-item');
+                    shoppingItems.forEach(item => {
+                        const itemName = item.querySelector('.shopping-name').textContent.toLowerCase();
+                        const itemCategory = item.querySelector('.shopping-category').textContent.toLowerCase();
+
+                        if(itemName.includes(searchTerm) || itemCategory.includes(searchTerm)) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Stock status filter functionality
+            const stockStatusFilter = document.createElement('select');
+            stockStatusFilter.className = 'stock-status-filter';
+            stockStatusFilter.innerHTML = `
+                <option value="">All Stock Status</option>
+                <option value="low">Low Stock</option>
+                <option value="critical">Critical</option>
+                <option value="in">In Stock</option>
+            `;
+
+            // Insert the stock filter after the category filter
+            const headerSection = document.querySelector('.header-section');
+            if(headerSection) {
+                const controlsGroup = headerSection.querySelector('.controls-group');
+                if(controlsGroup) {
+                    controlsGroup.appendChild(stockStatusFilter);
+                }
+            }
+
+            // Add event listener for stock status filter
+            stockStatusFilter.addEventListener('change', function() {
+                const selectedStatus = this.value;
+                const productCards = document.querySelectorAll('.product-card');
+
+                productCards.forEach(card => {
+                    const statusElement = card.querySelector('.stock-status div');
+                    if(statusElement) {
+                        const statusText = statusElement.textContent.toLowerCase();
+
+                        if(selectedStatus === '') {
+                            // If "All Stock Status" is selected, show all
+                            card.style.display = 'flex';
+                        } else if(selectedStatus === 'low' && statusText.includes('low')) {
+                            card.style.display = 'flex';
+                        } else if(selectedStatus === 'critical' && statusText.includes('critical')) {
+                            card.style.display = 'flex';
+                        } else if(selectedStatus === 'in' && statusText.includes('in stock')) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
 
             // Quantity controls for shopping list
             document.addEventListener('click', function(e) {
