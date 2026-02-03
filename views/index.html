@@ -4,7 +4,246 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kapan Beli - Shopping List Manager</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff; /* White background */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #ffffff; /* White background */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Thin shadow */
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-title h1 {
+            color: #FFA500; /* Muted Orange */
+            font-size: 1.8rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-shopping-list {
+            background: transparent;
+            border: 2px solid #FFA500; /* Orange border */
+            color: #FFA500; /* Orange text */
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-shopping-list:hover {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        /* Main content styles */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .container {
+            background-color: #ffffff; /* White background */
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Card styling with soft blue */
+        .card {
+            background-color: rgba(173, 216, 230, 0.3); /* Soft blue background */
+            border: 1px solid rgba(173, 216, 230, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #FF8C00; /* Orange color for headings */
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: #FF8C00; /* Orange color for text */
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-section h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .btn-add-product {
+            background-color: #FFA500; /* Orange background */
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add-product:hover {
+            background-color: #e69500;
+        }
+
+        /* Product table styles */
+        .product-table-container {
+            overflow-x: auto;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .product-table th,
+        .product-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        /* Soft blue row styling */
+        .soft-blue-row:nth-child(even) {
+            background-color: rgba(173, 216, 230, 0.2); /* Light soft blue */
+        }
+
+        .soft-blue-row:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        /* Product name styling */
+        .product-name {
+            color: #FF8C00; /* Orange color for product names */
+            font-weight: 500;
+        }
+
+        /* Critical stock styling */
+        .critical-stock {
+            color: #FF4500; /* Darker orange for critical stock */
+            font-weight: 600;
+            background-color: rgba(255, 69, 0, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .btn-edit {
+            color: #FFA500; /* Orange for edit */
+        }
+
+        .btn-delete {
+            color: #888; /* Gray for delete */
+        }
+
+        .btn-action:hover {
+            background-color: #f0f0f0;
+        }
+
+        .btn-edit:hover {
+            background-color: rgba(255, 165, 0, 0.1);
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(136, 136, 136, 0.1);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .product-table {
+                font-size: 0.9rem;
+            }
+            
+            .product-table th,
+            .product-table td {
+                padding: 0.7rem;
+            }
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -36,12 +275,12 @@
                     <p>7 Items</p>
                 </div>
             </div>
-
+            
             <div class="header-section">
                 <h2>Your Products</h2>
                 <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
             </div>
-
+            
             <div class="product-table-container">
                 <table class="product-table">
                     <thead>
@@ -100,6 +339,47 @@
         </div>
     </main>
 
-    <script src="/js/main.js"></script>
+    <script>
+        // Add interactivity to the CRUD buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add product button functionality
+            const addProductBtn = document.querySelector('.btn-add-product');
+            if(addProductBtn) {
+                addProductBtn.addEventListener('click', function() {
+                    alert('Add new product functionality would be implemented here');
+                });
+            }
+
+            // Edit buttons functionality
+            const editButtons = document.querySelectorAll('.btn-edit');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productName = this.closest('tr').querySelector('.product-name').textContent;
+                    alert(`Edit functionality for ${productName} would be implemented here`);
+                });
+            });
+
+            // Delete buttons functionality
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productName = this.closest('tr').querySelector('.product-name').textContent;
+                    const confirmDelete = confirm(`Are you sure you want to delete ${productName}?`);
+                    if(confirmDelete) {
+                        this.closest('tr').remove();
+                        alert(`${productName} has been deleted`);
+                    }
+                });
+            });
+
+            // Shopping list button functionality
+            const shoppingListBtn = document.querySelector('.btn-shopping-list');
+            if(shoppingListBtn) {
+                shoppingListBtn.addEventListener('click', function() {
+                    alert('Shopping list functionality would be implemented here');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
