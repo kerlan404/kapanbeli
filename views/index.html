@@ -605,20 +605,22 @@
             display: flex;
             gap: 1rem;
             align-items: center;
+            flex-wrap: wrap;
         }
 
-        .category-filter, .category-filter-shopping {
+        .category-filter, .category-filter-shopping, .stock-status-filter {
             background: #fff9db;
             border: 2px solid #333;
             border-radius: 0;
-            padding: 0.6rem 1rem;
+            padding: 0.8rem 1.2rem;
             font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            font-size: 1rem;
+            font-size: 1.1rem;
             box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
             cursor: pointer;
+            min-width: 180px;
         }
 
-        .category-filter:focus, .category-filter-shopping:focus {
+        .category-filter:focus, .category-filter-shopping:focus, .stock-status-filter:focus {
             outline: none;
             box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
         }
@@ -1360,7 +1362,7 @@
             stockStatusFilter.innerHTML = `
                 <option value="">All Stock Status</option>
                 <option value="low">Low Stock</option>
-                <option value="critical">Critical</option>
+                <option value="critical">Critical Stock</option>
                 <option value="in">In Stock</option>
             `;
 
