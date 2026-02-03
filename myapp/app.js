@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 
         /* Navbar styles */
         .navbar {
-            background-color: #ffffff; /* White background */
+            background-color: rgba(173, 216, 230, 0.3); /* Soft blue background */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Thin shadow */
             padding: 1rem 0;
             position: sticky;
