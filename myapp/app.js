@@ -47,24 +47,31 @@ app.get('/', (req, res) => {
             padding: 0 2rem;
         }
 
-        .nav-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-
         .nav-title h1 {
             color: #FFA500; /* Muted Orange */
             font-size: 1.8rem;
         }
 
-        .nav-center {
-            flex: 1;
-            text-align: center;
-            color: #ffffff; /* White text to contrast with blue background */
-            font-weight: 600;
-            font-size: 1.2rem;
+        .nav-center-button {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .btn-shopping-list-centered {
+            background: transparent;
+            border: 2px solid #FFA500; /* Orange border */
+            color: #FFA500; /* Orange text */
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-shopping-list-centered:hover {
+            background-color: #FFA500;
+            color: white;
         }
 
         .nav-buttons {
@@ -308,16 +315,11 @@ app.get('/', (req, res) => {
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-wrapper">
-                <div class="nav-title">
-                    <h1>Kapan Beli</h1>
-                </div>
-                <div class="nav-center">
-                    Shopping List
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-shopping-list">Shopping List</button>
-                </div>
+            <div class="nav-title">
+                <h1>Kapan Beli</h1>
+            </div>
+            <div class="nav-center-button">
+                <button class="btn-shopping-list-centered">Shopping List</button>
             </div>
         </div>
     </nav>
