@@ -308,15 +308,15 @@ app.get('/', (req, res) => {
             <div class="cards-container">
                 <div class="card">
                     <h3>Total Products</h3>
-                    <p>24 Items</p>
+                    <p>4 Items</p>
                 </div>
                 <div class="card">
                     <h3>Critical Stock</h3>
-                    <p>3 Items</p>
+                    <p>2 Items</p>
                 </div>
                 <div class="card">
                     <h3>Shopping List</h3>
-                    <p>7 Items</p>
+                    <p>3 Items</p>
                 </div>
             </div>
             
