@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saran Toko - Kapan Beli</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/614/614645.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f9f9f9'/%3E%3Cline x1='0' y1='20' x2='100' y2='20' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='40' x2='100' y2='40' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='60' x2='100' y2='60' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='80' x2='100' y2='80' stroke='%23e0e0e0' stroke-width='1'/%3E%3C/svg%3E");
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background: #9CCFFF; /* Blue background */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 4px solid #FFA500; /* Orange line at bottom */
+            margin: 0;
+            width: 100%;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-title h1 {
+            color: #FFA500; /* Orange color */
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            background: white; /* White background */
+            border: 2px solid #FFA500; /* Orange border */
+            color: #FFA500; /* Orange text */
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-link:hover {
+            background-color: #FFA500;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+        }
+
+        .active {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        .dark-mode-toggle {
+            background: #333;
+            border: 2px solid #FFA500;
+            color: white;
+            width: 50px;
+            height: 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .dark-mode-toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FFA500;
+            top: 1px;
+            left: 2px;
+            transition: 0.3s;
+        }
+
+        .dark-mode-active .dark-mode-toggle::before {
+            transform: translateX(20px);
+        }
+
+        /* Main content styles */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .container {
+            background-color: #fff9db; /* Yellowish paper color */
+            border-radius: 0;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #d9d9d9;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                #FFA500,
+                #FFA500 10px,
+                #9CCFFF 10px,
+                #9CCFFF 20px
+            );
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #FFA500; /* Dashed orange line */
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .header-section h2 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .header-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #FFA500;
+            border-radius: 2px;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .location-filter {
+            background: #fff9db;
+            border: 2px solid #333;
+            border-radius: 0;
+            padding: 0.8rem 1.2rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1.1rem;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .location-filter:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        .search-input {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 0;
+            padding: 0.6rem 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1rem;
+            width: 200px;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Store Suggestions Styles */
+        .store-suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .store-card {
+            background-color: #fff9db; /* Yellowish paper color */
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
+            background-size: 100% 24px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .store-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #FFA500;
+        }
+
+        .store-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 8px rgba(0,0,0, 0.1);
+        }
+
+        .store-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .store-info {
+            flex: 1;
+        }
+
+        .store-name {
+            color: #FF8C00; /* Orange color for store names */
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .store-address {
+            color: #666;
+            font-size: 1rem;
+            margin: 0;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .store-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px dashed #333;
+        }
+
+        .store-distance {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.1rem;
+            background: rgba(255, 165, 0, 0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 0;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .store-rating {
+            font-size: 1.2rem;
+            color: #FFA500;
+            font-weight: bold;
+        }
+
+        .store-categories {
+            margin-bottom: 1.5rem;
+        }
+
+        .category-tag {
+            display: inline-block;
+            color: #666;
+            font-size: 0.9rem;
+            background: rgba(156, 207, 255, 0.3);
+            padding: 0.3rem 0.8rem;
+            border-radius: 0;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .store-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+        }
+
+        .btn-action {
+            background: none;
+            border: 2px solid #333;
+            cursor: pointer;
+            padding: 0.7rem;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            flex: 1;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .btn-edit {
+            color: #FFA500; /* Orange for edit */
+            background: #fff9db !important;
+        }
+
+        .btn-delete {
+            color: #888; /* Gray for delete */
+            background: #fff9db !important;
+        }
+
+        .btn-action:hover {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-edit:hover {
+            background: #ffeaaa !important;
+        }
+
+        .btn-delete:hover {
+            background: #f0f0f0 !important;
+        }
+
+        /* Dark Mode Store Card Styles */
+        .dark-mode-active {
+            background: #121212;
+        }
+
+        .dark-mode-active body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2980b9 100%);
+            color: #f0f0f0;
+            border-bottom: 4px solid #FFA500;
+        }
+
+        .dark-mode-active .nav-title h1 {
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .dark-mode-active .nav-link {
+            background: #1a1a1a;
+            color: #FFD700;
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .nav-link:hover,
+        .dark-mode-active .active {
+            background: #FFA500;
+            color: white;
+        }
+
+        .dark-mode-active .search-input {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #f0f0f0;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.2);
+        }
+
+        .dark-mode-active .search-input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .container {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
+            background-size: 100% 26px;
+        }
+
+        .dark-mode-active .container::before {
+            background: repeating-linear-gradient(
+                90deg,
+                #FFA500,
+                #FFA500 10px,
+                #2980b9 10px,
+                #2980b9 20px
+            );
+        }
+
+        .dark-mode-active .store-card {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: #f0f0f0;
+            background-image: linear-gradient(#1e1e1e 22px, #333 22px, #333 24px, transparent 24px);
+            background-size: 100% 24px;
+        }
+
+        .dark-mode-active .store-card::before {
+            background: #FFA500;
+        }
+
+        .dark-mode-active .store-name {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .store-address {
+            color: #ccc;
+        }
+
+        .dark-mode-active .store-distance {
+            background: rgba(255, 215, 0, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .store-rating {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .category-tag {
+            background: rgba(156, 207, 255, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .btn-action {
+            border: 2px solid #555;
+        }
+
+        .dark-mode-active .btn-edit {
+            color: #FFD700;
+            background: #333 !important;
+        }
+
+        .dark-mode-active .btn-delete {
+            color: #aaa;
+            background: #333 !important;
+        }
+
+        .dark-mode-active .btn-edit:hover {
+            background: #444 !important;
+        }
+
+        .dark-mode-active .btn-delete:hover {
+            background: #444 !important;
+        }
+
+        .btn-find-nearby {
+            background: #4CAF50; /* Green background */
+            color: white;
+            border: 2px solid #333;
+            padding: 0.9rem 1.8rem;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .btn-find-nearby:hover {
+            background: #45a049;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        body.morning .btn-find-nearby {
+            background: #4CAF50;
+            border: 2px solid #2E7D32;
+        }
+
+        body.afternoon .btn-find-nearby {
+            background: #2196F3;
+            border: 2px solid #0D47A1;
+        }
+
+        body.evening .btn-find-nearby {
+            background: #FF9800;
+            border: 2px solid #EF6C00;
+        }
+
+        body.night .btn-find-nearby {
+            background: #607D8B;
+            border: 2px solid #37474F;
+        }
+
+        body.morning .btn-find-nearby:hover {
+            background: #43A047;
+        }
+
+        body.afternoon .btn-find-nearby:hover {
+            background: #1E88E5;
+        }
+
+        body.evening .btn-find-nearby:hover {
+            background: #F57C00;
+        }
+
+        body.night .btn-find-nearby:hover {
+            background: #546E7A;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fff9db;
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #FFA500;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-modal:hover {
+            color: #FFA500;
+        }
+
+        .store-detail-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed #333;
+        }
+
+        .store-detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .store-detail-label {
+            font-weight: bold;
+            color: #FFA500;
+            margin-bottom: 0.2rem;
+        }
+
+        .store-detail-value {
+            margin-left: 0.5rem;
+        }
+
+        /* Dark Mode Modal */
+        .dark-mode-active .modal-content {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: #f0f0f0;
+            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
+        }
+
+        .dark-mode-active .modal-content::before {
+            background: #FFA500;
+        }
+
+        .dark-mode-active .close-modal:hover {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .store-detail-label {
+            color: #FFD700;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-title">
+                <h1>Kapan Beli</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Beranda</a>
+                <a href="products.html" class="nav-link">Bahan Saya</a>
+                <a href="suggestions.html" class="nav-link">Saran Pembelian</a>
+                <a href="stores.html" class="nav-link active">Saran Toko</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="login.html" class="nav-link">Masuk</a>
+                <input type="text" class="search-input" placeholder="Cari...">
+                <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="header-section">
+                <h2>Saran Toko Terdekat</h2>
+                <div class="controls-group">
+                    <select class="location-filter">
+                        <option value="">Semua Lokasi</option>
+                        <option value="Jakarta">Jakarta</option>
+                        <option value="Bandung">Bandung</option>
+                        <option value="Surabaya">Surabaya</option>
+                        <option value="Medan">Medan</option>
+                        <option value="Makassar">Makassar</option>
+                    </select>
+                    <button class="btn-find-nearby" id="findNearbyBtn">
+                        <i class="fas fa-location-arrow"></i> Temukan Toko Terdekat
+                    </button>
+                </div>
+            </div>
+
+            <div class="store-suggestions-grid" id="storesGrid">
+                <!-- Toko akan dimuat secara dinamis -->
+            </div>
+        </div>
+
+        <!-- Modal Detail Toko -->
+        <div id="storeModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-modal" id="closeStoreModal">&times;</span>
+                <h2 id="storeModalTitle">Detail Toko</h2>
+                <div id="storeDetails">
+                    <!-- Detail toko akan dimuat di sini -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dark mode toggle functionality
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const body = document.body;
+
+        // Check for saved theme preference or respect OS setting
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode-active');
+        } else {
+            body.classList.remove('dark-mode-active');
+        }
+
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode-active');
+
+            // Save the current theme to localStorage
+            if (body.classList.contains('dark-mode-active')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Modal functionality
+        const storeModal = document.getElementById('storeModal');
+        const closeStoreModal = document.getElementById('closeStoreModal');
+        const storeModalTitle = document.getElementById('storeModalTitle');
+        const storeDetails = document.getElementById('storeDetails');
+
+        // Close modal
+        closeStoreModal.addEventListener('click', function() {
+            storeModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === storeModal) {
+                storeModal.style.display = 'none';
+            }
+        });
+
+        // Sample stores data (in a real app, this would come from the server)
+        let stores = [
+            {
+                id: 1,
+                name: 'Toko Bahan Segar',
+                address: 'Jl. Segar No. 123, Jakarta',
+                distance: 0.5,
+                rating: 4.0,
+                categories: ['Sayuran', 'Buah-buahan', 'Bumbu'],
+                phone: '021-1234-5678',
+                hours: '06:00 - 20:00',
+                coordinates: [-6.200000, 106.816666],
+                description: 'Menyediakan bahan-bahan segar untuk masak'
+            },
+            {
+                id: 2,
+                name: 'Warung Bumbu Prima',
+                address: 'Jl. Rempah No. 45, Jakarta',
+                distance: 0.8,
+                rating: 4.8,
+                categories: ['Bumbu', 'Minyak', 'Biji-bijian'],
+                phone: '021-8765-4321',
+                hours: '07:00 - 21:00',
+                coordinates: [-6.175394, 106.827062],
+                description: 'Spesialis bumbu dan rempah segar'
+            },
+            {
+                id: 3,
+                name: 'Pasar Induk',
+                address: 'Jl. Pasar No. 67, Jakarta',
+                distance: 1.2,
+                rating: 3.5,
+                categories: ['Sayuran', 'Daging', 'Seafood', 'Buah-buahan'],
+                phone: '021-5555-5555',
+                hours: '04:00 - 18:00',
+                coordinates: [-6.180545, 106.828673],
+                description: 'Pasar tradisional dengan berbagai kebutuhan'
+            },
+            {
+                id: 4,
+                name: 'Toko Sayur Maya',
+                address: 'Jl. Tumbuh No. 89, Jakarta',
+                distance: 1.5,
+                rating: 4.2,
+                categories: ['Sayuran', 'Herbal', 'Organik'],
+                phone: '021-9999-8888',
+                hours: '06:00 - 19:00',
+                coordinates: [-6.185394, 106.837062],
+                description: 'Menyediakan sayuran organik dan herbal'
+            }
+        ];
+
+        // Function to render stores
+        function renderStores(storesToRender = stores) {
+            const storesGrid = document.getElementById('storesGrid');
+            storesGrid.innerHTML = '';
+
+            storesToRender.forEach(store => {
+                const storeCard = document.createElement('div');
+                storeCard.className = 'store-card';
+                storeCard.innerHTML = `
+                    <div class="store-card-header">
+                        <div class="store-info">
+                            <h3 class="store-name">${store.name}</h3>
+                            <p class="store-address">${store.address}</p>
+                        </div>
+                    </div>
+                    <div class="store-details">
+                        <div class="store-distance">${store.distance} km</div>
+                        <div class="store-rating">${generateStars(store.rating)}</div>
+                    </div>
+                    <div class="store-categories">
+                        ${store.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+                    </div>
+                    <div class="store-actions">
+                        <button class="btn-action btn-edit" data-id="${store.id}"><i class="fas fa-map-marker-alt"></i> Lihat di Maps</button>
+                        <button class="btn-action btn-delete" data-id="${store.id}"><i class="fas fa-phone"></i> Hubungi</button>
+                    </div>
+                `;
+                storesGrid.appendChild(storeCard);
+            });
+
+            // Add event listeners to store action buttons
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const storeId = parseInt(this.getAttribute('data-id'));
+                    openMaps(storeId);
+                });
+            });
+
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', function() {
+                    const storeId = parseInt(this.getAttribute('data-id'));
+                    showStoreDetails(storeId);
+                });
+            });
+        }
+
+        // Function to generate star rating
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+
+            let stars = '';
+            for (let i = 0; i < fullStars; i++) {
+                stars += '★';
+            }
+            if (halfStar) {
+                stars += '☆'; // Using half-star symbol
+            }
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '☆';
+            }
+            return stars;
+        }
+
+        // Function to open maps
+        function openMaps(storeId) {
+            const store = stores.find(s => s.id === storeId);
+            if (store) {
+                // In a real app, this would open Google Maps or similar
+                alert(`Membuka peta untuk ${store.name}\nAlamat: ${store.address}`);
+            }
+        }
+
+        // Function to show store details in modal
+        function showStoreDetails(storeId) {
+            const store = stores.find(s => s.id === storeId);
+            if (store) {
+                storeModalTitle.textContent = store.name;
+                storeDetails.innerHTML = `
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Alamat:</div>
+                        <div class="store-detail-value">${store.address}</div>
+                    </div>
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Jarak:</div>
+                        <div class="store-detail-value">${store.distance} km</div>
+                    </div>
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Rating:</div>
+                        <div class="store-detail-value">${generateStars(store.rating)} (${store.rating})</div>
+                    </div>
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Kategori:</div>
+                        <div class="store-detail-value">${store.categories.join(', ')}</div>
+                    </div>
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Jam Operasional:</div>
+                        <div class="store-detail-value">${store.hours}</div>
+                    </div>
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Telepon:</div>
+                        <div class="store-detail-value">${store.phone}</div>
+                    </div>
+                    <div class="store-detail-item">
+                        <div class="store-detail-label">Deskripsi:</div>
+                        <div class="store-detail-value">${store.description}</div>
+                    </div>
+                    <div class="store-actions" style="margin-top: 1.5rem;">
+                        <button class="btn-action btn-edit" onclick="openMaps(${storeId})" style="flex: 1; margin-right: 0.5rem;">
+                            <i class="fas fa-map-marker-alt"></i> Buka Maps
+                        </button>
+                        <button class="btn-action btn-delete" style="flex: 1; margin-left: 0.5rem;" onclick="callStore('${store.phone}')">
+                            <i class="fas fa-phone"></i> Hubungi
+                        </button>
+                    </div>
+                `;
+                storeModal.style.display = 'block';
+            }
+        }
+
+        // Function to call store
+        function callStore(phoneNumber) {
+            alert(`Memanggil nomor: ${phoneNumber}`);
+            // In a real app, this would initiate a phone call
+        }
+
+        // Find nearby stores button functionality
+        const findNearbyBtn = document.getElementById('findNearbyBtn');
+        findNearbyBtn.addEventListener('click', function() {
+            // In a real app, this would use geolocation API to find nearby stores
+            alert('Mencari toko terdekat berdasarkan lokasi Anda...');
+
+            // For demo purposes, we'll just show all stores
+            renderStores();
+        });
+
+        // Location filter functionality
+        const locationFilter = document.querySelector('.location-filter');
+        if(locationFilter) {
+            locationFilter.addEventListener('change', function() {
+                const selectedLocation = this.value;
+                if (selectedLocation === '') {
+                    renderStores();
+                } else {
+                    const filteredStores = stores.filter(store =>
+                        store.address.toLowerCase().includes(selectedLocation.toLowerCase())
+                    );
+                    renderStores(filteredStores);
+                }
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        if(searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredStores = stores.filter(store =>
+                    store.name.toLowerCase().includes(searchTerm) ||
+                    store.address.toLowerCase().includes(searchTerm) ||
+                    store.categories.some(cat => cat.toLowerCase().includes(searchTerm))
+                );
+                renderStores(filteredStores);
+            });
+        }
+
+        // Initialize the store list
+        renderStores();
+    </script>
+</body>
+</html>

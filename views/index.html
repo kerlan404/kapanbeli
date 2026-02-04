@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kapan Beli - Shopping List Manager</title>
+    <title>Kapan Beli - Catatan Stok Bahan Masak</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/614/614645.png" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -13,11 +14,153 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f9f9f9'/%3E%3Cline x1='0' y1='20' x2='100' y2='20' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='40' x2='100' y2='40' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='60' x2='100' y2='60' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='80' x2='100' y2='80' stroke='%23e0e0e0' stroke-width='1'/%3E%3C/svg%3E");
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
-            padding-top: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Time-based background adjustments - keeping consistent orange and blue theme */
+        body.morning {
+            background: linear-gradient(135deg, #FFE5B4 0%, #FFB347 100%); /* Light orange to orange */
+        }
+
+        body.afternoon {
+            background: linear-gradient(135deg, #B0E0E6 0%, #87CEEB 100%); /* Light blue shades */
+        }
+
+        body.evening {
+            background: linear-gradient(135deg, #FFB347 0%, #FF8C00 100%); /* Orange shades */
+        }
+
+        body.night {
+            background: linear-gradient(135deg, #2F4F4F 0%, #1E3A5F 100%); /* Dark blue shades */
+        }
+
+        /* Hero Section with strong visual background */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 2rem;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); /* Semi-transparent overlay */
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .time-greeting {
+            font-size: 1.8rem;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .current-time {
+            font-size: 1.2rem;
+            color: #E0E0E0;
+            margin-bottom: 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .cta-button {
+            background: #FFA500; /* Orange background */
+            color: white;
+            border: 2px solid #333;
+            padding: 1rem 2.5rem;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: inline-block;
+            text-decoration: none;
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            background: #ffb733;
+            transform: translate(3px, 3px);
+            box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        /* Floating ingredient icons */
+        .ingredient-icon {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatIngredient 6s infinite ease-in-out;
+            z-index: 1;
+            opacity: 0.7;
+        }
+
+        .ingredient-icon:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .ingredient-icon:nth-child(2) {
+            top: 40%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+
+        .ingredient-icon:nth-child(3) {
+            bottom: 30%;
+            left: 15%;
+            animation-delay: 2s;
+        }
+
+        .ingredient-icon:nth-child(4) {
+            bottom: 20%;
+            right: 20%;
+            animation-delay: 3s;
+        }
+
+        @keyframes floatIngredient {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
         }
 
         /* Navbar styles */
@@ -33,9 +176,29 @@
             width: 100%;
         }
 
+        body.morning .navbar {
+            background: #FFE5B4; /* Light orange for morning */
+            border-bottom: 4px solid #FFA500;
+        }
+
+        body.afternoon .navbar {
+            background: #B0E0E6; /* Light blue for afternoon */
+            border-bottom: 4px solid #87CEEB;
+        }
+
+        body.evening .navbar {
+            background: #FFB347; /* Orange for evening */
+            border-bottom: 4px solid #FF8C00;
+        }
+
+        body.night .navbar {
+            background: #2F4F4F; /* Dark blue for night */
+            border-bottom: 4px solid #4682B4;
+        }
+
         .nav-container {
-            max-width: 100%;
-            margin: 0;
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -50,10 +213,92 @@
             font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
-        .nav-buttons {
+        body.morning .nav-title h1 {
+            color: #FF8C00; /* Darker orange for morning */
+        }
+
+        body.afternoon .nav-title h1 {
+            color: #4682B4; /* Steel blue for afternoon */
+        }
+
+        body.evening .nav-title h1 {
+            color: #D2691E; /* Darker orange for evening */
+        }
+
+        body.night .nav-title h1 {
+            color: #87CEEB; /* Light blue for night */
+        }
+
+        .nav-menu {
             display: flex;
             gap: 1rem;
-            align-items: center;
+        }
+
+        .nav-link {
+            background: white; /* White background */
+            border: 2px solid #FFA500; /* Orange border */
+            color: #FFA500; /* Orange text */
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        body.morning .nav-link {
+            border: 2px solid #FF8C00;
+            color: #FF8C00;
+        }
+
+        body.afternoon .nav-link {
+            border: 2px solid #4682B4;
+            color: #4682B4;
+        }
+
+        body.evening .nav-link {
+            border: 2px solid #D2691E;
+            color: #D2691E;
+        }
+
+        body.night .nav-link {
+            border: 2px solid #87CEEB;
+            color: #87CEEB;
+        }
+
+        .nav-link:hover {
+            background-color: #FFA500;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+        }
+
+        body.morning .nav-link:hover,
+        body.evening .nav-link:hover {
+            background-color: #FF8C00;
+        }
+
+        body.afternoon .nav-link:hover,
+        body.night .nav-link:hover {
+            background-color: #4682B4;
+        }
+
+        .active {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        body.morning .active,
+        body.evening .active {
+            background-color: #FF8C00;
+        }
+
+        body.afternoon .active,
+        body.night .active {
+            background-color: #4682B4;
         }
 
         .dark-mode-toggle {
@@ -69,6 +314,16 @@
             font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
         }
 
+        body.morning .dark-mode-toggle,
+        body.evening .dark-mode-toggle {
+            border: 2px solid #FF8C00;
+        }
+
+        body.afternoon .dark-mode-toggle,
+        body.night .dark-mode-toggle {
+            border: 2px solid #4682B4;
+        }
+
         .dark-mode-toggle::before {
             content: '';
             position: absolute;
@@ -81,603 +336,842 @@
             transition: 0.3s;
         }
 
+        body.morning .dark-mode-toggle::before,
+        body.evening .dark-mode-toggle::before {
+            background: #FF8C00;
+        }
+
+        body.afternoon .dark-mode-toggle::before,
+        body.night .dark-mode-toggle::before {
+            background: #4682B4;
+        }
+
         .dark-mode-active .dark-mode-toggle::before {
             transform: translateX(20px);
         }
 
-        .btn-shopping-list {
-            background: white; /* White background */
-            border: 2px solid #FFA500; /* Orange border */
-            color: #FFA500; /* Orange text */
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        /* Stats Section */
+        .stats-section {
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            position: relative;
         }
 
-        .btn-shopping-list:hover {
-            background-color: #FFA500;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+        body.morning .stats-section,
+        body.evening .stats-section {
+            background: rgba(255, 248, 220, 0.7); /* Floral white for morning/evening */
         }
 
-        .btn-budget-settings {
-            background: white; /* White background */
-            border: 2px solid #4CAF50; /* Green border for budget */
-            color: #4CAF50; /* Green text */
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.5rem;
+        body.afternoon .stats-section,
+        body.night .stats-section {
+            background: rgba(224, 247, 250, 0.7); /* Alice blue for afternoon/night */
         }
 
-        .btn-budget-settings:hover {
-            background-color: #4CAF50;
-            color: white;
-            transform: translateY(-2px) scale(1.1);
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-
-        .btn-budget-settings i {
-            font-size: 1.2rem;
-        }
-
-        /* Main content styles */
-        .main-content {
+        .stats-container {
             max-width: 1200px;
-            margin: 2rem auto 3rem;
-            padding: 0 2rem;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
         }
 
-        .container {
-            background-color: #fff9db; /* Yellowish paper color */
+        .stat-card {
+            background: #fff9db; /* Yellowish paper color */
+            border: 1px solid #d9d9d9;
             border-radius: 0;
-            padding: 2.5rem;
+            padding: 1.5rem;
+            text-align: center;
             position: relative;
             overflow: hidden;
-            border: 1px solid #d9d9d9;
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
             background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
             background-size: 100% 26px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            transition: transform 0.3s ease;
         }
 
-        .container::before {
+        body.morning .stat-card,
+        body.evening .stat-card {
+            background: #FFF8DC; /* Cornsilk for morning/evening */
+            border: 1px solid #FFEAA7;
+            background-image: linear-gradient(#FFF8DC 24px, #FFDAB9 24px, #FFDAB9 26px, transparent 26px);
+        }
+
+        body.afternoon .stat-card,
+        body.night .stat-card {
+            background: #E0F7FA; /* Light cyan for afternoon/night */
+            border: 1px solid #B3E5FC;
+            background-image: linear-gradient(#E0F7FA 24px, #B2EBF2 24px, #B2EBF2 26px, transparent 26px);
+        }
+
+        .stat-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 6px;
-            background: repeating-linear-gradient(
-                90deg,
-                #FFA500,
-                #FFA500 10px,
-                #9CCFFF 10px,
-                #9CCFFF 20px
-            );
-        }
-
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.8rem;
-            margin-bottom: 2.5rem;
-        }
-
-        /* Card styling with soft blue */
-        .card {
-            background-color: #f0f8ff; /* Light blue paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.8rem;
-            margin: 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-image: linear-gradient(#f0f8ff 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
-            background-size: 100% 24px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 4px;
             background: #FFA500;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
+        body.morning .stat-card::before,
+        body.evening .stat-card::before {
+            background: #FF8C00;
+        }
+
+        body.afternoon .stat-card::before,
+        body.night .stat-card::before {
+            background: #4682B4;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFA500;
+            margin: 0.5rem 0;
+        }
+
+        body.morning .stat-value,
+        body.evening .stat-value {
+            color: #FF8C00;
+        }
+
+        body.afternoon .stat-value,
+        body.night .stat-value {
+            color: #4682B4;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        body.morning .stat-label,
+        body.evening .stat-label {
+            color: #8D6E63;
+        }
+
+        body.afternoon .stat-label,
+        body.night .stat-label {
+            color: #1565C0;
+        }
+
+        /* Quick Access Section */
+        .quick-access {
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        body.morning .quick-access,
+        body.evening .quick-access {
+            background: rgba(255, 248, 220, 0.7); /* Floral white for morning/evening */
+        }
+
+        body.afternoon .quick-access,
+        body.night .quick-access {
+            background: rgba(224, 247, 250, 0.7); /* Alice blue for afternoon/night */
+        }
+
+        .quick-access-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .quick-btn {
+            background: #fff9db;
+            border: 1px solid #d9d9d9;
+            border-radius: 10px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.morning .quick-btn,
+        body.evening .quick-btn {
+            background: #FFF8DC;
+            border: 1px solid #FFEAA7;
+        }
+
+        body.afternoon .quick-btn,
+        body.night .quick-btn {
+            background: #E0F7FA;
+            border: 1px solid #B3E5FC;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
 
-        .card h3 {
-            color: #FFA500; /* Orange color for headings */
-            margin-bottom: 0.8rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-
-        .card p {
-            color: #333; /* Dark text */
-            font-size: 1.8rem;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px dashed #FFA500; /* Dashed orange line */
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .header-section h2 {
-            color: #333;
-            font-size: 1.8rem;
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .header-section h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 2px;
-            background: #FFA500;
-            border-radius: 2px;
-        }
-
-        .btn-add-product {
-            background: #FFA500; /* Orange background */
-            color: white;
-            border: 2px solid #333;
-            padding: 0.9rem 1.8rem;
-            border-radius: 0;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            font-size: 1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .btn-add-product:hover {
-            background: #ffb733;
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        /* Product cards grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        /* Product card styling */
-        .product-card {
-            background-color: #fff9db; /* Yellowish paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.8rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
-            background-size: 100% 24px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .product-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #FFA500;
-        }
-
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 8px rgba(0,0,0, 0.1);
-        }
-
-        .product-card-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .product-card-image {
-            width: 90px;
-            height: 90px;
-            border-radius: 0;
-            object-fit: cover;
-            border: 2px solid #333;
-            background: white;
-            padding: 4px;
-            box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.1);
-        }
-
-        .product-info {
-            flex: 1;
-        }
-
-        .product-name {
-            color: #FF8C00; /* Orange color for product names */
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .product-category {
-            color: #666;
-            font-size: 1rem;
-            background: rgba(156, 207, 255, 0.3);
-            padding: 0.2rem 0.8rem;
-            border-radius: 0;
-            display: inline-block;
-            margin-top: 0.2rem;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .product-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.2rem;
-            padding-bottom: 1.2rem;
-            border-bottom: 1px dashed #333;
-        }
-
-        .price {
-            font-weight: 700;
-            color: #333;
-            font-size: 1.2rem;
-            background: rgba(255, 165, 0, 0.15);
-            padding: 0.4rem 1rem;
-            border-radius: 0;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .stock-status {
-            font-size: 0.9rem;
-            text-align: right;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .critical-stock {
-            color: #FF4500; /* Darker orange for critical stock */
-            font-weight: 700;
-            background-color: rgba(255, 69, 0, 0.15);
-            padding: 0.5rem 1rem;
-            border-radius: 0;
-            font-size: 0.95rem;
-            display: inline-block;
-            margin-bottom: 0.5rem;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .total-stock {
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: 500;
-            background: rgba(156, 207, 255, 0.25);
-            padding: 0.3rem 0.8rem;
-            border-radius: 0;
-            display: inline-block;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .product-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.8rem;
-        }
-
-        /* Action buttons */
-        .btn-action {
-            background: none;
-            border: 2px solid #333;
-            cursor: pointer;
-            padding: 0.7rem;
-            border-radius: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            width: 40px;
-            height: 40px;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .btn-edit {
-            color: #FFA500; /* Orange for edit */
-            background: #fff9db !important;
-        }
-
-        .btn-delete {
-            color: #888; /* Gray for delete */
-            background: #fff9db !important;
-        }
-
-        .btn-action:hover {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .btn-edit:hover {
-            background: #ffeaaa !important;
-        }
-
-        .btn-delete:hover {
-            background: #f0f0f0 !important;
-        }
-
-        /* Shopping List Styles */
-        .shopping-list-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .shopping-item {
-            background-color: #fff9db; /* Yellowish paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.8rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
-            background-size: 100% 24px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #FFA500;
-        }
-
-        .shopping-item-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .shopping-checkbox {
-            position: relative;
-        }
-
-        .shopping-checkbox input[type="checkbox"] {
-            opacity: 0;
-            position: absolute;
-            width: 24px;
-            height: 24px;
-        }
-
-        .shopping-checkbox label {
-            display: block;
-            width: 24px;
-            height: 24px;
-            border: 2px solid #333;
-            background: white;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
-        }
-
-        .shopping-checkbox input[type="checkbox"]:checked + label::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .quick-icon {
+            font-size: 2rem;
             color: #FFA500;
-            font-size: 16px;
-            font-weight: bold;
+            margin-bottom: 0.5rem;
         }
 
-        .shopping-info {
-            flex: 1;
+        body.morning .quick-icon,
+        body.evening .quick-icon {
+            color: #FF8C00;
         }
 
-        .shopping-name {
-            color: #FF8C00; /* Orange color for product names */
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        body.afternoon .quick-icon,
+        body.night .quick-icon {
+            color: #4682B4;
         }
 
-        .shopping-category {
-            color: #666;
-            font-size: 1rem;
-            background: rgba(156, 207, 255, 0.3);
-            padding: 0.2rem 0.8rem;
-            border-radius: 0;
-            display: inline-block;
-            margin-top: 0.2rem;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        .quick-label {
+            font-weight: 600;
+            color: #333;
         }
 
-        .shopping-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-            padding-bottom: 1.2rem;
-            border-bottom: 1px dashed #333;
+        body.morning .quick-label,
+        body.evening .quick-label {
+            color: #5D4037;
         }
 
-        .shopping-quantity {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
+        body.afternoon .quick-label,
+        body.night .quick-label {
+            color: #0D47A1;
         }
 
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        /* Recent Activity Section */
+        .recent-activity {
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            position: relative;
         }
 
-        .qty-btn {
-            width: 30px;
-            height: 30px;
-            border: 2px solid #333;
+        body.morning .recent-activity,
+        body.evening .recent-activity {
+            background: rgba(255, 248, 220, 0.7); /* Floral white for morning/evening */
+        }
+
+        body.afternoon .recent-activity,
+        body.night .recent-activity {
+            background: rgba(224, 247, 250, 0.7); /* Alice blue for afternoon/night */
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 2rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        body.morning .section-title,
+        body.evening .section-title {
+            color: #5D4037;
+        }
+
+        body.afternoon .section-title,
+        body.night .section-title {
+            color: #0D47A1;
+        }
+
+        .activity-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .activity-item {
             background: #fff9db;
-            cursor: pointer;
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            transition: transform 0.2s ease;
         }
 
-        .qty-btn:hover {
-            background: #ffeaaa;
+        body.morning .activity-item,
+        body.evening .activity-item {
+            background: #FFF8DC;
+            border: 1px solid #FFEAA7;
         }
 
-        .qty-value {
+        body.afternoon .activity-item,
+        body.night .activity-item {
+            background: #E0F7FA;
+            border: 1px solid #B3E5FC;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            color: #FFA500;
+            margin-right: 1rem;
             min-width: 30px;
             text-align: center;
-            font-weight: 700;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
         }
 
-        .shopping-price {
-            font-weight: 700;
-            color: #333;
-            font-size: 1.2rem;
-            background: rgba(255, 165, 0, 0.15);
-            padding: 0.4rem 1rem;
+        body.morning .activity-icon,
+        body.evening .activity-icon {
+            color: #FF8C00;
+        }
+
+        body.afternoon .activity-icon,
+        body.night .activity-icon {
+            color: #4682B4;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        body.morning .activity-time,
+        body.evening .activity-time {
+            color: #8D6E63;
+        }
+
+        body.afternoon .activity-time,
+        body.night .activity-time {
+            color: #1565C0;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        body.morning .testimonials,
+        body.evening .testimonials {
+            background: rgba(255, 248, 220, 0.7); /* Floral white for morning/evening */
+        }
+
+        body.afternoon .testimonials,
+        body.night .testimonials {
+            background: rgba(224, 247, 250, 0.7); /* Alice blue for afternoon/night */
+        }
+
+        .testimonial-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: #fff9db; /* Yellowish paper color */
+            border: 1px solid #d9d9d9;
             border-radius: 0;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.8rem;
-        }
-
-        .shopping-summary {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(156, 207, 255, 0.2);
-            padding: 1rem 1.5rem;
-            border-radius: 0;
-            border: 1px solid #333;
-            font-weight: 700;
-            font-size: 1.1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .summary-total, .summary-price {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .controls-group {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .category-filter, .category-filter-shopping, .stock-status-filter {
-            background: #fff9db;
-            border: 2px solid #333;
-            border-radius: 0;
-            padding: 0.8rem 1.2rem;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
             font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            font-size: 1.1rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        body.morning .testimonial-card,
+        body.evening .testimonial-card {
+            background: #FFF8DC; /* Cornsilk for morning/evening */
+            border: 1px solid #FFEAA7;
+            background-image: linear-gradient(#FFF8DC 24px, #FFDAB9 24px, #FFDAB9 26px, transparent 26px);
+        }
+
+        body.afternoon .testimonial-card,
+        body.night .testimonial-card {
+            background: #E0F7FA; /* Light cyan for afternoon/night */
+            border: 1px solid #B3E5FC;
+            background-image: linear-gradient(#E0F7FA 24px, #B2EBF2 24px, #B2EBF2 26px, transparent 26px);
+        }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #FFA500;
+        }
+
+        body.morning .testimonial-card::before,
+        body.evening .testimonial-card::before {
+            background: #FF8C00;
+        }
+
+        body.afternoon .testimonial-card::before,
+        body.night .testimonial-card::before {
+            background: #4682B4;
+        }
+
+        .quote {
+            font-style: italic;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .quote::before {
+            content: """;
+            position: absolute;
+            left: 0;
+            top: -0.5rem;
+            font-size: 3rem;
+            color: #FFA500;
+            opacity: 0.3;
+        }
+
+        body.morning .quote::before,
+        body.evening .quote::before {
+            color: #FF8C00;
+        }
+
+        body.afternoon .quote::before,
+        body.night .quote::before {
+            color: #4682B4;
+        }
+
+        .testimonial-author {
+            text-align: right;
+            font-weight: bold;
+            color: #FFA500;
+        }
+
+        body.morning .testimonial-author,
+        body.evening .testimonial-author {
+            color: #FF8C00;
+        }
+
+        body.afternoon .testimonial-author,
+        body.night .testimonial-author {
+            color: #4682B4;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        body.morning .footer {
+            background: #5D4037;
+        }
+
+        body.afternoon .footer {
+            background: #0D47A1;
+        }
+
+        body.evening .footer {
+            background: #BF360C;
+        }
+
+        body.night .footer {
+            background: #263238;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fff9db;
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            overflow: hidden;
+        }
+
+        body.morning .modal-content {
+            background-color: #FFF8DC;
+            border: 1px solid #FFEAA7;
+            background-image: linear-gradient(#FFF8DC 24px, #FFDAB9 24px, #FFDAB9 26px, transparent 26px);
+        }
+
+        body.afternoon .modal-content {
+            background-color: #E0F7FA;
+            border: 1px solid #B3E5FC;
+            background-image: linear-gradient(#E0F7FA 24px, #B2EBF2 24px, #B2EBF2 26px, transparent 26px);
+        }
+
+        body.evening .modal-content {
+            background-color: #FFF3E0;
+            border: 1px solid #FFE0B2;
+            background-image: linear-gradient(#FFF3E0 24px, #FFCCBC 24px, #FFCCBC 26px, transparent 26px);
+        }
+
+        body.night .modal-content {
+            background-color: #37474F;
+            border: 1px solid #78909C;
+            background-image: linear-gradient(#37474F 24px, #455A64 24px, #455A64 26px, transparent 26px);
+            color: #E0E0E0;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #FFA500;
+        }
+
+        body.morning .modal-content::before {
+            background: #FF8C00;
+        }
+
+        body.afternoon .modal-content::before {
+            background: #4682B4;
+        }
+
+        body.evening .modal-content::before {
+            background: #D2691E;
+        }
+
+        body.night .modal-content::before {
+            background: #708090;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
-            min-width: 180px;
+            z-index: 1001;
         }
 
-        .category-filter:focus, .category-filter-shopping:focus, .stock-status-filter:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        .close-modal:hover {
+            color: #FFA500;
         }
 
-        .search-input {
+        body.morning .close-modal:hover {
+            color: #FF8C00;
+        }
+
+        body.afternoon .close-modal:hover {
+            color: #4682B4;
+        }
+
+        body.evening .close-modal:hover {
+            color: #D2691E;
+        }
+
+        body.night .close-modal:hover {
+            color: #708090;
+        }
+
+        /* Flip Card Styles */
+        .flip-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .flip-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+
+        .flip-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            padding: 2rem;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .form-title {
+            color: #FFA500;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        body.morning .form-title {
+            color: #FF8C00;
+        }
+
+        body.afternoon .form-title {
+            color: #4682B4;
+        }
+
+        body.evening .form-title {
+            color: #D2691E;
+        }
+
+        body.night .form-title {
+            color: #708090;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        body.morning .input-group label {
+            color: #5D4037;
+        }
+
+        body.afternoon .input-group label {
+            color: #0D47A1;
+        }
+
+        body.evening .input-group label {
+            color: #BF360C;
+        }
+
+        body.night .input-group label {
+            color: #E0E0E0;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #333;
+            border-radius: 0;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
             background: white;
+        }
+
+        body.morning .input-group input {
+            border: 1px solid #5D4037;
+        }
+
+        body.afternoon .input-group input {
+            border: 1px solid #0D47A1;
+        }
+
+        body.evening .input-group input {
+            border: 1px solid #BF360C;
+        }
+
+        body.night .input-group input {
+            border: 1px solid #455A64;
+            background: #263238;
+            color: #E0E0E0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #FFA500;
+            color: white;
             border: 2px solid #333;
             border-radius: 0;
-            padding: 0.6rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
             font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            font-size: 1rem;
-            width: 200px;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            margin-top: 1rem;
         }
 
-        .search-input:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        body.morning .submit-btn {
+            background: #FF8C00;
+            border: 2px solid #5D4037;
+        }
+
+        body.afternoon .submit-btn {
+            background: #4682B4;
+            border: 2px solid #0D47A1;
+        }
+
+        body.evening .submit-btn {
+            background: #D2691E;
+            border: 2px solid #BF360C;
+        }
+
+        body.night .submit-btn {
+            background: #708090;
+            border: 2px solid #455A64;
+        }
+
+        .submit-btn:hover {
+            background: #ffb733;
+        }
+
+        body.morning .submit-btn:hover {
+            background: #ff9f1a;
+        }
+
+        body.afternoon .submit-btn:hover {
+            background: #5a9bd5;
+        }
+
+        body.evening .submit-btn:hover {
+            background: #e67e22;
+        }
+
+        body.night .submit-btn:hover {
+            background: #8a9ba8;
+        }
+
+        .form-switch {
+            text-align: center;
+            margin-top: 1rem;
+            color: #666;
+        }
+
+        body.morning .form-switch {
+            color: #8D6E63;
+        }
+
+        body.afternoon .form-switch {
+            color: #1565C0;
+        }
+
+        body.evening .form-switch {
+            color: #D84315;
+        }
+
+        body.night .form-switch {
+            color: #BDBDBD;
+        }
+
+        .form-switch a {
+            color: #FFA500;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        body.morning .form-switch a {
+            color: #FF8C00;
+        }
+
+        body.afternoon .form-switch a {
+            color: #4682B4;
+        }
+
+        body.evening .form-switch a {
+            color: #D2691E;
+        }
+
+        body.night .form-switch a {
+            color: #708090;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .cta-button.secondary {
+            background: white;
+            color: #FFA500;
+        }
+
+        body.morning .cta-button.secondary {
+            color: #FF8C00;
+        }
+
+        body.afternoon .cta-button.secondary {
+            color: #4682B4;
+        }
+
+        body.evening .cta-button.secondary {
+            color: #D2691E;
+        }
+
+        body.night .cta-button.secondary {
+            color: #708090;
+        }
+
+        .cta-button.secondary:hover {
+            background: #FFA500;
+            color: white;
+        }
+
+        body.morning .cta-button.secondary:hover {
+            background: #FF8C00;
+        }
+
+        body.afternoon .cta-button.secondary:hover {
+            background: #4682B4;
+        }
+
+        body.evening .cta-button.secondary:hover {
+            background: #D2691E;
+        }
+
+        body.night .cta-button.secondary:hover {
+            background: #708090;
         }
 
         /* Dark Mode Styles */
         .dark-mode-active {
-            background: #121212;
-        }
-
-        .dark-mode-active body {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #f0f0f0;
         }
 
         .dark-mode-active .navbar {
@@ -691,652 +1185,87 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
 
-        .dark-mode-active .btn-shopping-list {
+        .dark-mode-active .nav-link {
             background: #1a1a1a;
             color: #FFD700;
             border: 2px solid #FFA500;
         }
 
-        .dark-mode-active .btn-budget-settings {
-            background: #1a1a1a;
-            color: #4CAF50; /* Green color in dark mode */
-            border: 2px solid #4CAF50;
-        }
-
-        .dark-mode-active .btn-budget-settings:hover {
-            background: #4CAF50;
+        .dark-mode-active .nav-link:hover,
+        .dark-mode-active .active {
+            background: #FFA500;
             color: white;
         }
 
-        .dark-mode-active .search-input {
-            background: #1a1a1a;
-            border: 2px solid #444;
+        .dark-mode-active .section-title {
             color: #f0f0f0;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.2);
         }
 
-        .dark-mode-active .search-input:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
-            border: 2px solid #FFA500;
-        }
-
-        .dark-mode-active .container {
+        .dark-mode-active .stat-card {
             background-color: #1e1e1e;
-            color: #f0f0f0;
             border: 1px solid #444;
+            color: #f0f0f0;
             background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
-            background-size: 100% 26px;
         }
 
-        .dark-mode-active .container::before {
-            background: repeating-linear-gradient(
-                90deg,
-                #FFA500,
-                #FFA500 10px,
-                #2980b9 10px,
-                #2980b9 20px
-            );
-        }
-
-        .dark-mode-active .card {
-            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-            color: #f0f0f0;
-            border: 1px solid #555;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        .dark-mode-active .card::after {
-            display: none;
-        }
-
-        .dark-mode-active .card h3 {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .card p {
-            color: #ffffff;
-        }
-
-        .dark-mode-active .product-card,
-        .dark-mode-active .shopping-item {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: #f0f0f0;
-            background-image: linear-gradient(#1e1e1e 22px, #333 22px, #333 24px, transparent 24px);
-            background-size: 100% 24px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .dark-mode-active .product-card::before,
-        .dark-mode-active .shopping-item::before {
+        .dark-mode-active .stat-card::before {
             background: #FFA500;
         }
 
-        .dark-mode-active .product-name,
-        .dark-mode-active .shopping-name {
-            color: #FFD700;
+        .dark-mode-active .stat-label {
+            color: #ccc;
         }
 
-        .dark-mode-active .product-category,
-        .dark-mode-active .shopping-category {
-            background: rgba(156, 207, 255, 0.2);
-            color: #f0f0f0;
-            border: 1px solid #555;
-        }
-
-        .dark-mode-active .price,
-        .dark-mode-active .shopping-price {
-            background: rgba(255, 215, 0, 0.2);
-            color: #f0f0f0;
-            border: 1px solid #555;
-        }
-
-        .dark-mode-active .stock-status {
+        .dark-mode-active .quick-btn {
+            background: #1e1e1e;
+            border: 1px solid #444;
             color: #f0f0f0;
         }
 
-        .dark-mode-active .critical-stock {
-            background-color: rgba(255, 69, 0, 0.3);
-            color: #ffcccc;
-        }
-
-        .dark-mode-active .total-stock {
-            background: rgba(156, 207, 255, 0.2);
+        .dark-mode-active .activity-item {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
             color: #f0f0f0;
-            border: 1px solid #555;
         }
 
-        .dark-mode-active .btn-action {
-            border: 2px solid #555;
+        .dark-mode-active .testimonial-card {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
             color: #f0f0f0;
-            background: #2a2a2a !important;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
+            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
         }
 
-        .dark-mode-active .btn-edit {
-            color: #FFD700;
-            background: #2a2a2a !important;
+        .dark-mode-active .testimonial-card::before {
+            background: #FFA500;
         }
 
-        .dark-mode-active .btn-delete {
-            color: #aaa;
-            background: #2a2a2a !important;
-        }
-
-        .dark-mode-active .btn-action:hover {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.5);
-        }
-
-        .dark-mode-active .btn-edit:hover {
-            background: #4a4a1e !important;
-            color: #ffffff;
-        }
-
-        .dark-mode-active .btn-delete:hover {
-            background: #444 !important;
-            color: #ffffff;
-        }
-
-        .dark-mode-active .category-filter,
-        .dark-mode-active .category-filter-shopping,
-        .dark-mode-active .stock-status-filter {
+        .dark-mode-active .footer {
             background: #1a1a1a;
-            border: 2px solid #444;
-            color: #f0f0f0;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
         }
 
-        .dark-mode-active .category-filter:focus,
-        .dark-mode-active .category-filter-shopping:focus,
-        .dark-mode-active .stock-status-filter:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
-            border: 2px solid #FFA500;
-        }
-
-        .dark-mode-active .shopping-summary {
-            background: rgba(156, 207, 255, 0.1);
-            border: 1px solid #444;
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .qty-btn {
-            background: #2a2a2a;
-            border: 2px solid #555;
-            color: #f0f0f0;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
-        }
-
-        .dark-mode-active .qty-btn:hover {
-            background: #4a4a1e;
-            color: #ffffff;
-        }
-
-        .dark-mode-active .header-section {
-            border-bottom: 2px dashed #FFA500;
-        }
-
-        .dark-mode-active .btn-add-product {
-            background: #FFA500;
-            color: #333;
-            border: 2px solid #333;
-            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.3);
-        }
-
-        .dark-mode-active .btn-add-product:hover {
-            background: #ffb733;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
-        }
-
-        /* Dark Mode Styles for Budget and Recommendations */
-        .dark-mode-active .modal-content {
-            background-color: #2a2a2a;
-            border: 2px solid #FFA500;
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .modal-content h2 {
-            color: #FFD700;
-            border-bottom: 2px dashed #FFA500;
-        }
-
-        .dark-mode-active .budget-setting label {
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .budget-setting input {
-            background: #333;
-            border: 2px solid #444;
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .budget-setting input:focus {
-            border: 2px solid #FFA500;
-        }
-
-        .dark-mode-active .close {
-            color: #f0f0f0;
-            background: #2a2a2a;
-            border: 1px solid #FFA500;
-        }
-
-        .dark-mode-active .close:hover {
-            color: #FFD700;
-            background: #4a4a1e;
-        }
-
-        .dark-mode-active .budget-warning-banner {
-            background-color: #d32f2f;
-            color: white;
-        }
-
-        .dark-mode-active .budget-card {
-            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-            color: #f0f0f0;
-            border: 1px solid #555;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        .dark-mode-active .budget-card h3 {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .budget-card p {
-            color: #ffffff;
-        }
-
-        .dark-mode-active .budget-progress {
-            background-color: #444;
-        }
-
-        .dark-mode-active .budget-progress-bar {
-            background-color: #4CAF50;
-        }
-
-        .dark-mode-active .budget-warning {
-            background-color: #FF9800;
-        }
-
-        .dark-mode-active .budget-danger {
-            background-color: #f44336;
-        }
-
-        .dark-mode-active .recommendations-section {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .recommendations-section h2 {
-            color: #FFD700;
-            border-bottom: 2px dashed #FFA500;
-        }
-
-        .dark-mode-active .recommendation-card {
-            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-            border: 1px solid #555;
-            color: #f0f0f0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .dark-mode-active .recommendation-name {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .recommendation-reason {
-            color: #aaa;
-        }
-
-        .dark-mode-active .recommendation-category {
-            color: #f0f0f0;
-            background: rgba(156, 207, 255, 0.2);
-            border: 1px solid #555;
-        }
-
-        .dark-mode-active .recommendation-price {
-            color: #ffffff;
-        }
-
-        .dark-mode-active .btn-add-recommendation {
-            background-color: #4CAF50;
-            color: white;
-            border: 2px solid #444;
-        }
-
-        .dark-mode-active .btn-add-recommendation:hover {
-            background-color: #45a049;
-            color: white;
-        }
-
-        /* Responsive design */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1.2rem;
-                padding: 0 1rem;
+            .hero h1 {
+                font-size: 2.5rem;
             }
 
-            .header-section {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1.2rem;
+            .hero p {
+                font-size: 1.2rem;
             }
 
-            .products-grid, .shopping-list-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .product-card-header, .shopping-item-header {
-                flex-direction: row;
-            }
-
-            .main-content {
-                padding: 0 1rem;
-            }
-
-            .container {
-                padding: 1.8rem;
-            }
-        }
-
-        /* Budget Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: #fff9db;
-            margin: 10% auto;
-            padding: 2rem;
-            border: 1px solid #d9d9d9;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 0;
-            position: relative;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            border: 2px solid #333;
-        }
-
-        .modal-content h2 {
-            color: #FF8C00;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            border-bottom: 2px dashed #FFA500;
-            padding-bottom: 0.5rem;
-        }
-
-        .budget-setting {
-            margin-bottom: 1.2rem;
-        }
-
-        .budget-setting label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .budget-setting input {
-            width: 100%;
-            padding: 0.6rem;
-            border: 2px solid #333;
-            border-radius: 0;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            font-size: 1rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .budget-setting input:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
-            border: 2px solid #FFA500;
-        }
-
-        .close {
-            color: #aaa;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #333;
-            background: #fff9db;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .close:hover {
-            color: #333;
-            background: #ffeaaa;
-        }
-
-        /* Budget Warning Banner */
-        .budget-warning-banner {
-            position: fixed;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #FF4500;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 0;
-            z-index: 999;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 90%;
-            max-width: 800px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 2px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-        }
-
-        .budget-warning-banner .close-warning {
-            font-size: 1.5rem;
-            cursor: pointer;
-            margin-left: 1rem;
-            padding: 0 0.5rem;
-            border: 1px solid white;
-        }
-
-        /* Budget Summary Card */
-        .budget-card {
-            background-color: #f0f8ff; /* Light blue paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.8rem;
-            margin: 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-image: linear-gradient(#f0f8ff 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
-            background-size: 100% 24px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .budget-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 4px;
-            background: #FFA500;
-        }
-
-        .budget-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-
-        .budget-card h3 {
-            color: #FFA500; /* Orange color for headings */
-            margin-bottom: 0.8rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-
-        .budget-card p {
-            color: #333; /* Dark text */
-            font-size: 1.4rem;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-
-        .budget-progress {
-            height: 10px;
-            background-color: #e0e0e0;
-            border-radius: 5px;
-            margin-top: 0.5rem;
-            overflow: hidden;
-        }
-
-        .budget-progress-bar {
-            height: 100%;
-            background-color: #4CAF50;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .budget-warning {
-            background-color: #FF9800;
-        }
-
-        .budget-danger {
-            background-color: #f44336;
-        }
-
-        /* Recommendations Section */
-        .recommendations-section {
-            margin: 3rem 0 2rem 0;
-            padding: 1.5rem;
-            background-color: #fff9db;
-            border-radius: 0;
-            border: 1px solid #d9d9d9;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .recommendations-section h2 {
-            color: #FF8C00;
-            margin-bottom: 1rem;
-            border-bottom: 2px dashed #FFA500;
-            padding-bottom: 0.5rem;
-        }
-
-        .recommendations-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .recommendation-card {
-            background-color: #f0f8ff;
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.2rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .recommendation-card-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .recommendation-card-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 0;
-            object-fit: cover;
-            border: 2px solid #333;
-            background: white;
-            padding: 2px;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
-        }
-
-        .recommendation-info {
-            flex: 1;
-        }
-
-        .recommendation-name {
-            color: #FF8C00;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .recommendation-reason {
-            color: #666;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .recommendation-price {
-            font-weight: 600;
-            color: #333;
-            margin: 0.5rem 0;
-        }
-
-        .btn-add-recommendation {
-            background-color: #4CAF50;
-            color: white;
-            border: 2px solid #333;
-            padding: 0.5rem 1rem;
-            border-radius: 0;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 0.5rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .btn-add-recommendation:hover {
-            background-color: #45a049;
-            transform: translateY(-1px);
-            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
                 gap: 1rem;
-                padding: 0 1rem;
             }
 
-            .header-section {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+            .nav-menu {
+                margin-top: 1rem;
             }
 
-            .products-grid {
+            .stats-container,
+            .quick-access-container,
+            .testimonial-container {
                 grid-template-columns: 1fr;
-            }
-
-            .product-card-header {
-                flex-direction: row;
             }
         }
     </style>
@@ -1348,849 +1277,371 @@
             <div class="nav-title">
                 <h1>Kapan Beli</h1>
             </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link active">Beranda</a>
+                <a href="products.html" class="nav-link">Bahan Saya</a>
+                <a href="suggestions.html" class="nav-link">Saran Pembelian</a>
+                <a href="stores.html" class="nav-link">Saran Toko</a>
+            </div>
             <div class="nav-buttons">
-                <input type="text" class="search-input" placeholder="Search products...">
-                <button class="dark-mode-toggle" title="Toggle Dark Mode"></button>
-                <button class="btn-budget-settings" title="Budget Settings"><i class="fas fa-wallet"></i></button>
-                <button class="btn-shopping-list">Shopping List</button>
+                <a href="login.html" class="nav-link">Masuk</a>
+                <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
             </div>
         </div>
     </nav>
 
-    <!-- Budget Settings Modal -->
-    <div id="budgetModal" class="modal">
+    <section class="hero">
+        <div class="ingredient-icon">
+            <i class="fas fa-carrot"></i>
+        </div>
+        <div class="ingredient-icon">
+            <i class="fas fa-pepper-hot"></i>
+        </div>
+        <div class="ingredient-icon">
+            <i class="fas fa-apple-alt"></i>
+        </div>
+        <div class="ingredient-icon">
+            <i class="fas fa-lemon"></i>
+        </div>
+
+        <div class="hero-content">
+            <h2 class="time-greeting" id="timeGreeting">Selamat Pagi!</h2>
+            <div class="current-time" id="currentTime">Senin, 5 Februari 2026 | 08:00 WIB</div>
+            <h1>Catatan Stok Bahan Masak Anda</h1>
+            <p>Kelola bahan masak Anda dengan mudah. Pantau stok, dapatkan saran pembelian, dan temukan toko terdekat untuk bahan-bahan segar.</p>
+            <div class="hero-buttons">
+                <a href="products.html" class="cta-button">Mulai Kelola Bahan</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login/Register Modal -->
+    <div id="authModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Budget Settings</h2>
-            <div class="budget-setting">
-                <label for="dailyBudget">Daily Budget (Rp):</label>
-                <input type="number" id="dailyBudget" placeholder="Enter daily budget">
+            <div class="flip-container" id="flipContainer">
+                <!-- Login Card -->
+                <div class="flip-card">
+                    <div class="card-front">
+                        <h2 class="form-title">Masuk ke Akun</h2>
+                        <form id="loginForm">
+                            <div class="input-group">
+                                <label for="loginEmail">Email</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="loginPassword">Kata Sandi</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="submit-btn">Masuk</button>
+                            <p class="form-switch">Belum punya akun? <a href="#" id="showRegister">Daftar di sini</a></p>
+                        </form>
+                    </div>
+                    <!-- Register Card -->
+                    <div class="card-back">
+                        <h2 class="form-title">Buat Akun Baru</h2>
+                        <form id="registerForm">
+                            <div class="input-group">
+                                <label for="registerName">Nama Lengkap</label>
+                                <input type="text" id="registerName" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="registerEmail">Email</label>
+                                <input type="email" id="registerEmail" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="registerPassword">Kata Sandi</label>
+                                <input type="password" id="registerPassword" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="confirmPassword">Konfirmasi Kata Sandi</label>
+                                <input type="password" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="submit-btn">Daftar</button>
+                            <p class="form-switch">Sudah punya akun? <a href="#" id="showLogin">Masuk di sini</a></p>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="budget-setting">
-                <label for="weeklyBudget">Weekly Budget (Rp):</label>
-                <input type="number" id="weeklyBudget" placeholder="Enter weekly budget">
-            </div>
-            <div class="budget-setting">
-                <label for="monthlyBudget">Monthly Budget (Rp):</label>
-                <input type="number" id="monthlyBudget" placeholder="Enter monthly budget">
-            </div>
-            <button id="saveBudgetBtn" class="btn-add-product">Save Budget</button>
+            <span class="close-modal" id="closeModal">&times;</span>
         </div>
     </div>
 
-    <!-- Budget Warning Banner -->
-    <div id="budgetWarning" class="budget-warning-banner" style="display: none;">
-        <span id="warningMessage">You are approaching your budget limit!</span>
-        <span class="close-warning">&times;</span>
-    </div>
-
-    <main class="main-content">
-        <div class="container note-paper">
-            <!-- Summary Cards -->
-            <div class="cards-container">
-                <div class="card">
-                    <h3>Total Products</h3>
-                    <p>24 Items</p>
-                </div>
-                <div class="card">
-                    <h3>Critical Stock</h3>
-                    <p>3 Items</p>
-                </div>
-                <div class="card">
-                    <h3>Shopping List</h3>
-                    <p>7 Items</p>
-                </div>
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">42</div>
+                <div class="stat-label">Bahan Tersimpan</div>
             </div>
-
-            <!-- Budget Summary Cards -->
-            <div class="cards-container">
-                <div class="budget-card">
-                    <h3>Daily Budget</h3>
-                    <p id="dailyBudgetAmount">Rp 0</p>
-                    <div class="budget-progress">
-                        <div id="dailyBudgetBar" class="budget-progress-bar"></div>
-                    </div>
-                </div>
-                <div class="budget-card">
-                    <h3>Weekly Budget</h3>
-                    <p id="weeklyBudgetAmount">Rp 0</p>
-                    <div class="budget-progress">
-                        <div id="weeklyBudgetBar" class="budget-progress-bar"></div>
-                    </div>
-                </div>
-                <div class="budget-card">
-                    <h3>Monthly Budget</h3>
-                    <p id="monthlyBudgetAmount">Rp 0</p>
-                    <div class="budget-progress">
-                        <div id="monthlyBudgetBar" class="budget-progress-bar"></div>
-                    </div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Stok Rendah</div>
             </div>
-
-            <div class="header-section">
-                <h2>Your Products</h2>
-                <div class="controls-group">
-                    <select class="category-filter">
-                        <option value="">All Categories</option>
-                        <option value="Fruits">Fruits</option>
-                        <option value="Vegetables">Vegetables</option>
-                        <option value="Dairy">Dairy</option>
-                        <option value="Bakery">Bakery</option>
-                        <option value="Meat">Meat</option>
-                        <option value="Beverages">Beverages</option>
-                        <option value="Snacks">Snacks</option>
-                    </select>
-                    <button class="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Daftar Belanja</div>
             </div>
-
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-card-header">
-                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=A" alt="Apple" class="product-card-image">
-                        <div class="product-info">
-                            <h3 class="product-name">Apple</h3>
-                            <p class="product-category">Fruits</p>
-                        </div>
-                    </div>
-                    <div class="product-details">
-                        <div class="price">Rp 15,000</div>
-                        <div class="stock-status">
-                            <div><span class="critical-stock">Low Stock</span></div>
-                            <div class="total-stock">Total: 5 pcs</div>
-                        </div>
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-card-header">
-                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=M" alt="Milk" class="product-card-image">
-                        <div class="product-info">
-                            <h3 class="product-name">Milk</h3>
-                            <p class="product-category">Dairy</p>
-                        </div>
-                    </div>
-                    <div class="product-details">
-                        <div class="price">Rp 25,000</div>
-                        <div class="stock-status">
-                            <div>In Stock</div>
-                            <div class="total-stock">Total: 12 pcs</div>
-                        </div>
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-card-header">
-                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=B" alt="Bread" class="product-card-image">
-                        <div class="product-info">
-                            <h3 class="product-name">Bread</h3>
-                            <p class="product-category">Bakery</p>
-                        </div>
-                    </div>
-                    <div class="product-details">
-                        <div class="price">Rp 18,000</div>
-                        <div class="stock-status">
-                            <div><span class="critical-stock">Critical</span></div>
-                            <div class="total-stock">Total: 2 pcs</div>
-                        </div>
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-card-header">
-                        <img src="https://placehold.co/80x80/FFA500/FFFFFF?text=E" alt="Eggs" class="product-card-image">
-                        <div class="product-info">
-                            <h3 class="product-name">Eggs</h3>
-                            <p class="product-category">Dairy</p>
-                        </div>
-                    </div>
-                    <div class="product-details">
-                        <div class="price">Rp 22,000</div>
-                        <div class="stock-status">
-                            <div>In Stock</div>
-                            <div class="total-stock">Total: 15 pcs</div>
-                        </div>
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Toko Rekomendasi</div>
             </div>
         </div>
+    </section>
 
-        <!-- Shopping List Section -->
-        <div class="shopping-list-container" style="display:none;">
-            <div class="container">
-                <div class="header-section">
-                    <h2>Shopping List</h2>
-                    <div class="controls-group">
-                        <select class="category-filter-shopping">
-                            <option value="">All Categories</option>
-                            <option value="Fruits">Fruits</option>
-                            <option value="Vegetables">Vegetables</option>
-                            <option value="Dairy">Dairy</option>
-                            <option value="Bakery">Bakery</option>
-                            <option value="Meat">Meat</option>
-                            <option value="Beverages">Beverages</option>
-                            <option value="Snacks">Snacks</option>
-                        </select>
-                        <button class="btn-add-product"><i class="fas fa-plus"></i> Add Item</button>
-                    </div>
+    <section class="quick-access">
+        <div class="quick-access-container">
+            <div class="quick-btn" onclick="window.location.href='products.html'">
+                <div class="quick-icon">
+                    <i class="fas fa-plus-circle"></i>
                 </div>
-
-                <div class="shopping-list-grid">
-                    <div class="shopping-item">
-                        <div class="shopping-item-header">
-                            <div class="shopping-checkbox">
-                                <input type="checkbox" id="item1">
-                                <label for="item1"></label>
-                            </div>
-                            <div class="shopping-info">
-                                <h3 class="shopping-name">Apples</h3>
-                                <p class="shopping-category">Fruits</p>
-                            </div>
-                        </div>
-                        <div class="shopping-details">
-                            <div class="shopping-quantity">
-                                <span>Quantity:</span>
-                                <div class="quantity-controls">
-                                    <button class="qty-btn minus">-</button>
-                                    <span class="qty-value">3</span>
-                                    <button class="qty-btn plus">+</button>
-                                </div>
-                            </div>
-                            <div class="shopping-price">Rp 45,000</div>
-                        </div>
-                        <div class="shopping-actions">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="shopping-item">
-                        <div class="shopping-item-header">
-                            <div class="shopping-checkbox">
-                                <input type="checkbox" id="item2" checked>
-                                <label for="item2"></label>
-                            </div>
-                            <div class="shopping-info">
-                                <h3 class="shopping-name">Milk</h3>
-                                <p class="shopping-category">Dairy</p>
-                            </div>
-                        </div>
-                        <div class="shopping-details">
-                            <div class="shopping-quantity">
-                                <span>Quantity:</span>
-                                <div class="quantity-controls">
-                                    <button class="qty-btn minus">-</button>
-                                    <span class="qty-value">2</span>
-                                    <button class="qty-btn plus">+</button>
-                                </div>
-                            </div>
-                            <div class="shopping-price">Rp 50,000</div>
-                        </div>
-                        <div class="shopping-actions">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="shopping-item">
-                        <div class="shopping-item-header">
-                            <div class="shopping-checkbox">
-                                <input type="checkbox" id="item3">
-                                <label for="item3"></label>
-                            </div>
-                            <div class="shopping-info">
-                                <h3 class="shopping-name">Bread</h3>
-                                <p class="shopping-category">Bakery</p>
-                            </div>
-                        </div>
-                        <div class="shopping-details">
-                            <div class="shopping-quantity">
-                                <span>Quantity:</span>
-                                <div class="quantity-controls">
-                                    <button class="qty-btn minus">-</button>
-                                    <span class="qty-value">1</span>
-                                    <button class="qty-btn plus">+</button>
-                                </div>
-                            </div>
-                            <div class="shopping-price">Rp 18,000</div>
-                        </div>
-                        <div class="shopping-actions">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="shopping-item">
-                        <div class="shopping-item-header">
-                            <div class="shopping-checkbox">
-                                <input type="checkbox" id="item4">
-                                <label for="item4"></label>
-                            </div>
-                            <div class="shopping-info">
-                                <h3 class="shopping-name">Eggs</h3>
-                                <p class="shopping-category">Dairy</p>
-                            </div>
-                        </div>
-                        <div class="shopping-details">
-                            <div class="shopping-quantity">
-                                <span>Quantity:</span>
-                                <div class="quantity-controls">
-                                    <button class="qty-btn minus">-</button>
-                                    <span class="qty-value">2</span>
-                                    <button class="qty-btn plus">+</button>
-                                </div>
-                            </div>
-                            <div class="shopping-price">Rp 44,000</div>
-                        </div>
-                        <div class="shopping-actions">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
+                <div class="quick-label">Tambah Bahan</div>
+            </div>
+            <div class="quick-btn" onclick="window.location.href='suggestions.html'">
+                <div class="quick-icon">
+                    <i class="fas fa-shopping-cart"></i>
                 </div>
-
-                <div class="shopping-summary">
-                    <div class="summary-total">
-                        <span>Total Items:</span>
-                        <span>8</span>
-                    </div>
-                    <div class="summary-price">
-                        <span>Total Price:</span>
-                        <span>Rp 157,000</span>
-                    </div>
+                <div class="quick-label">Daftar Belanja</div>
+            </div>
+            <div class="quick-btn" onclick="window.location.href='stores.html'">
+                <div class="quick-icon">
+                    <i class="fas fa-store"></i>
                 </div>
+                <div class="quick-label">Cek Toko</div>
+            </div>
+            <div class="quick-btn" onclick="window.location.href='products.html'">
+                <div class="quick-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="quick-label">Statistik</div>
             </div>
         </div>
+    </section>
 
-        <!-- Recommendations Section -->
-        <div class="recommendations-section">
-            <h2>Recommended For You</h2>
-            <div class="recommendations-grid" id="recommendationsGrid">
-                <!-- Recommendation cards will be added dynamically -->
+    <section class="recent-activity">
+        <h2 class="section-title">Aktivitas Terbaru</h2>
+        <div class="activity-container">
+            <ul class="activity-list">
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div>Terakhir ditambah: Bawang Merah</div>
+                        <div class="activity-time">2 hari yang lalu</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-exclamation-triangle" style="color: #FF6347;"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div>Barang hampir habis: Cabai Rawit</div>
+                        <div class="activity-time">1 hari yang lalu</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div>Daftar belanja diperbarui</div>
+                        <div class="activity-time">Kemarin</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div>Stok diperbarui: Tomat</div>
+                        <div class="activity-time">3 hari yang lalu</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <h2 class="section-title">Apa Kata Pengguna</h2>
+        <div class="testimonial-container">
+            <div class="testimonial-card">
+                <div class="quote">Aplikasi ini sangat membantu saya mengelola stok bahan masak. Tidak pernah lupa belanja bumbu lagi!</div>
+                <div class="testimonial-author">- Ibu Siti, Ibu Rumah Tangga</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="quote">Fitur saran toko sangat berguna. Saya bisa menemukan bahan segar dengan harga terbaik di sekitar saya.</div>
+                <div class="testimonial-author">- Pak Joko, Koki Rumahan</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="quote">Desainnya cantik dan mudah digunakan. Seperti mencatat di buku catatan fisik tapi lebih praktis.</div>
+                <div class="testimonial-author">- Mbak Dina, Mahasiswa</div>
             </div>
         </div>
-    </main>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Kapan Beli - Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
+    </footer>
 
     <script>
-        // Add interactivity to the CRUD buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add product button functionality
-            const addProductBtn = document.querySelector('.btn-add-product');
-            if(addProductBtn) {
-                addProductBtn.addEventListener('click', function() {
-                    alert('Add new product functionality would be implemented here');
-                });
-            }
-
-            // Edit buttons functionality
-            const editButtons = document.querySelectorAll('.btn-edit');
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const productCard = this.closest('.product-card');
-                    const productName = productCard.querySelector('.product-name').textContent;
-                    alert(`Edit functionality for ${productName} would be implemented here`);
-                });
-            });
-
-            // Delete buttons functionality
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const productCard = this.closest('.product-card');
-                    const productName = productCard.querySelector('.product-name').textContent;
-                    const confirmDelete = confirm(`Are you sure you want to delete ${productName}?`);
-                    if(confirmDelete) {
-                        productCard.remove();
-                        alert(`${productName} has been deleted`);
-                    }
-                });
-            });
-
-            // Shopping list button functionality
-            const shoppingListBtn = document.querySelector('.btn-shopping-list');
-            const mainContainer = document.querySelector('.container');
-            const shoppingListContainer = document.querySelector('.shopping-list-container');
-
-            if(shoppingListBtn) {
-                shoppingListBtn.addEventListener('click', function() {
-                    // Toggle between main content and shopping list
-                    if(mainContainer.style.display === 'none') {
-                        mainContainer.style.display = 'block';
-                        shoppingListContainer.style.display = 'none';
-                        shoppingListBtn.textContent = 'Shopping List';
-                    } else {
-                        mainContainer.style.display = 'none';
-                        shoppingListContainer.style.display = 'block';
-                        shoppingListBtn.textContent = 'Products List';
-                    }
-                });
-            }
-
-            // Category filter functionality for products
-            const categoryFilter = document.querySelector('.category-filter');
-            if(categoryFilter) {
-                categoryFilter.addEventListener('change', function() {
-                    const selectedCategory = this.value;
-                    const productCards = document.querySelectorAll('.product-card');
-
-                    productCards.forEach(card => {
-                        const categoryElement = card.querySelector('.product-category');
-                        if(categoryElement) {
-                            const category = categoryElement.textContent.trim();
-
-                            if(selectedCategory === '' || category.includes(selectedCategory)) {
-                                card.style.display = 'flex';
-                            } else {
-                                card.style.display = 'none';
-                            }
-                        }
-                    });
-                });
-            }
-
-            // Category filter functionality for shopping list
-            const categoryFilterShopping = document.querySelector('.category-filter-shopping');
-            if(categoryFilterShopping) {
-                categoryFilterShopping.addEventListener('change', function() {
-                    const selectedCategory = this.value;
-                    const shoppingItems = document.querySelectorAll('.shopping-item');
-
-                    shoppingItems.forEach(item => {
-                        const categoryElement = item.querySelector('.shopping-category');
-                        if(categoryElement) {
-                            const category = categoryElement.textContent.trim();
-
-                            if(selectedCategory === '' || category.includes(selectedCategory)) {
-                                item.style.display = 'flex';
-                            } else {
-                                item.style.display = 'none';
-                            }
-                        }
-                    });
-                });
-            }
-
-            // Dark mode toggle functionality
-            const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        // Function to determine time of day and apply appropriate class
+        function updateTimeBasedTheme() {
+            const hour = new Date().getHours();
             const body = document.body;
 
-            // Check for saved theme preference or respect OS setting
-            if (localStorage.getItem('theme') === 'dark' ||
-                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                body.classList.add('dark-mode-active');
-                if(darkModeToggle) {
-                    darkModeToggle.classList.add('dark-mode-active');
-                }
+            // Remove existing time classes
+            body.classList.remove('morning', 'afternoon', 'evening', 'night');
+
+            // Determine time of day and add appropriate class
+            if (hour >= 5 && hour < 10) {
+                // Morning: 5 AM - 10 AM
+                body.classList.add('morning');
+            } else if (hour >= 10 && hour < 15) {
+                // Afternoon: 10 AM - 3 PM
+                body.classList.add('afternoon');
+            } else if (hour >= 15 && hour < 18) {
+                // Evening: 3 PM - 6 PM
+                body.classList.add('evening');
             } else {
-                body.classList.remove('dark-mode-active');
-                if(darkModeToggle) {
-                    darkModeToggle.classList.remove('dark-mode-active');
-                }
+                // Night: 6 PM - 5 AM
+                body.classList.add('night');
+            }
+        }
+
+        // Function to update the greeting and time display
+        function updateDateTimeDisplay() {
+            const now = new Date();
+            const hour = now.getHours();
+            const greetingElement = document.getElementById('timeGreeting');
+            const timeElement = document.getElementById('currentTime');
+
+            // Update greeting based on time
+            if (hour >= 5 && hour < 10) {
+                greetingElement.textContent = 'Selamat Pagi!';
+            } else if (hour >= 10 && hour < 15) {
+                greetingElement.textContent = 'Selamat Siang!';
+            } else if (hour >= 15 && hour < 18) {
+                greetingElement.textContent = 'Selamat Sore!';
+            } else {
+                greetingElement.textContent = 'Selamat Malam!';
             }
 
-            if(darkModeToggle) {
-                darkModeToggle.addEventListener('click', function() {
-                    body.classList.toggle('dark-mode-active');
+            // Format date and time
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('id-ID', options);
+            const timeString = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute:'2-digit' });
 
-                    // Save the current theme to localStorage
-                    if(body.classList.contains('dark-mode-active')) {
-                        localStorage.setItem('theme', 'dark');
-                        this.classList.add('dark-mode-active');
-                    } else {
-                        localStorage.setItem('theme', 'light');
-                        this.classList.remove('dark-mode-active');
-                    }
-                });
-            }
+            timeElement.textContent = `${dateString} | ${timeString} WIB`;
+        }
 
-            // Search functionality
-            const searchInput = document.querySelector('.search-input');
-            if(searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
+        // Modal functionality
+        const loginButton = document.getElementById('loginButton');
+        const modal = document.getElementById('authModal');
+        const closeModal = document.getElementById('closeModal');
+        const flipContainer = document.getElementById('flipContainer');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
 
-                    // Search in product cards
-                    const productCards = document.querySelectorAll('.product-card');
-                    productCards.forEach(card => {
-                        const productName = card.querySelector('.product-name').textContent.toLowerCase();
-                        const productCategory = card.querySelector('.product-category').textContent.toLowerCase();
-
-                        if(productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
-                            card.style.display = 'flex';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-
-                    // Search in shopping list items
-                    const shoppingItems = document.querySelectorAll('.shopping-item');
-                    shoppingItems.forEach(item => {
-                        const itemName = item.querySelector('.shopping-name').textContent.toLowerCase();
-                        const itemCategory = item.querySelector('.shopping-category').textContent.toLowerCase();
-
-                        if(itemName.includes(searchTerm) || itemCategory.includes(searchTerm)) {
-                            item.style.display = 'flex';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            }
-
-            // Stock status filter functionality
-            const stockStatusFilter = document.createElement('select');
-            stockStatusFilter.className = 'stock-status-filter';
-            stockStatusFilter.innerHTML = `
-                <option value="">All Stock Status</option>
-                <option value="low">Low Stock</option>
-                <option value="critical">Critical Stock</option>
-                <option value="in">In Stock</option>
-            `;
-
-            // Insert the stock filter after the category filter
-            const headerSection = document.querySelector('.header-section');
-            if(headerSection) {
-                const controlsGroup = headerSection.querySelector('.controls-group');
-                if(controlsGroup) {
-                    controlsGroup.appendChild(stockStatusFilter);
-                }
-            }
-
-            // Add event listener for stock status filter
-            stockStatusFilter.addEventListener('change', function() {
-                const selectedStatus = this.value;
-                const productCards = document.querySelectorAll('.product-card');
-
-                productCards.forEach(card => {
-                    const statusElement = card.querySelector('.stock-status div');
-                    if(statusElement) {
-                        const statusText = statusElement.textContent.toLowerCase();
-
-                        if(selectedStatus === '') {
-                            // If "All Stock Status" is selected, show all
-                            card.style.display = 'flex';
-                        } else if(selectedStatus === 'low' && statusText.includes('low')) {
-                            card.style.display = 'flex';
-                        } else if(selectedStatus === 'critical' && statusText.includes('critical')) {
-                            card.style.display = 'flex';
-                        } else if(selectedStatus === 'in' && statusText.includes('in stock')) {
-                            card.style.display = 'flex';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                });
-            });
-
-            // Quantity controls for shopping list
-            document.addEventListener('click', function(e) {
-                if(e.target.classList.contains('qty-btn')) {
-                    const qtyValue = e.target.parentElement.querySelector('.qty-value');
-                    let value = parseInt(qtyValue.textContent);
-
-                    if(e.target.classList.contains('plus')) {
-                        value++;
-                    } else if(e.target.classList.contains('minus') && value > 1) {
-                        value--;
-                    }
-
-                    qtyValue.textContent = value;
-
-                    // Update price calculation (for demo purposes)
-                    const parentItem = e.target.closest('.shopping-item');
-                    const priceElement = parentItem.querySelector('.shopping-price');
-                    const basePrice = parseInt(priceElement.textContent.replace(/[^0-9]/g, '')) / (value + (e.target.classList.contains('plus') ? -1 : e.target.classList.contains('minus') ? 1 : 0));
-                    const newPrice = Math.round(basePrice * value);
-                    priceElement.textContent = 'Rp ' + newPrice.toLocaleString();
-
-                    // Update total summary
-                    updateShoppingSummary();
-                }
-            });
-
-            // Update shopping list summary
-            function updateShoppingSummary() {
-                const items = document.querySelectorAll('.shopping-item');
-                let totalItems = 0;
-                let totalPrice = 0;
-
-                items.forEach(item => {
-                    const qty = parseInt(item.querySelector('.qty-value').textContent);
-                    const priceText = item.querySelector('.shopping-price').textContent;
-                    const price = parseInt(priceText.replace(/[^0-9]/g, ''));
-
-                    totalItems += qty;
-                    totalPrice += price;
-                });
-
-                document.querySelector('.summary-total span:last-child').textContent = totalItems;
-                document.querySelector('.summary-price span:last-child').textContent = 'Rp ' + totalPrice.toLocaleString();
-            }
-
-            // Initialize summary
-            setTimeout(updateShoppingSummary, 100);
-
-            // ========== BUDGET FUNCTIONALITY ==========
-
-            // Budget Settings Modal
-            const budgetSettingsBtn = document.querySelector('.btn-budget-settings');
-            const budgetModal = document.getElementById('budgetModal');
-            const closeModalSpan = document.querySelector('.modal .close');
-            const saveBudgetBtn = document.getElementById('saveBudgetBtn');
-            const budgetWarning = document.getElementById('budgetWarning');
-            const closeWarningBtn = document.querySelector('.budget-warning-banner .close-warning');
-
-            // Open budget settings modal
-            if(budgetSettingsBtn) {
-                budgetSettingsBtn.addEventListener('click', function() {
-                    loadBudgetSettings();
-                    budgetModal.style.display = 'block';
-                });
-            }
-
-            // Close modal when clicking on 'x'
-            if(closeModalSpan) {
-                closeModalSpan.addEventListener('click', function() {
-                    budgetModal.style.display = 'none';
-                });
-            }
-
-            // Close modal when clicking outside of it
-            window.addEventListener('click', function(event) {
-                if (event.target === budgetModal) {
-                    budgetModal.style.display = 'none';
-                }
-            });
-
-            // Load budget settings from localStorage
-            function loadBudgetSettings() {
-                const budgets = JSON.parse(localStorage.getItem('budgets')) || {};
-
-                if(budgets.daily) document.getElementById('dailyBudget').value = budgets.daily;
-                if(budgets.weekly) document.getElementById('weeklyBudget').value = budgets.weekly;
-                if(budgets.monthly) document.getElementById('monthlyBudget').value = budgets.monthly;
-            }
-
-            // Save budget settings
-            if(saveBudgetBtn) {
-                saveBudgetBtn.addEventListener('click', function() {
-                    const dailyBudget = document.getElementById('dailyBudget').value || 0;
-                    const weeklyBudget = document.getElementById('weeklyBudget').value || 0;
-                    const monthlyBudget = document.getElementById('monthlyBudget').value || 0;
-
-                    const budgets = {
-                        daily: parseFloat(dailyBudget),
-                        weekly: parseFloat(weeklyBudget),
-                        monthly: parseFloat(monthlyBudget)
-                    };
-
-                    localStorage.setItem('budgets', JSON.stringify(budgets));
-                    budgetModal.style.display = 'none';
-
-                    // Update budget display
-                    updateBudgetDisplay();
-
-                    // Calculate and display spending
-                    calculateAndDisplaySpending();
-                });
-            }
-
-            // Close budget warning
-            if(closeWarningBtn) {
-                closeWarningBtn.addEventListener('click', function() {
-                    budgetWarning.style.display = 'none';
-                });
-            }
-
-            // Calculate total spending from products
-            function calculateTotalSpending() {
-                let total = 0;
-                const productCards = document.querySelectorAll('.product-card');
-
-                productCards.forEach(card => {
-                    const priceText = card.querySelector('.price').textContent;
-                    // Extract numeric value from price (remove 'Rp ' and commas)
-                    const price = parseFloat(priceText.replace(/[^\d,]/g, '').replace(',', '')) || 0;
-                    total += price;
-                });
-
-                return total;
-            }
-
-            // Calculate and display spending vs budget
-            function calculateAndDisplaySpending() {
-                const totalSpending = calculateTotalSpending();
-                const budgets = JSON.parse(localStorage.getItem('budgets')) || {};
-
-                // Update budget amounts display
-                document.getElementById('dailyBudgetAmount').textContent = `Rp ${budgets.daily || 0}`;
-                document.getElementById('weeklyBudgetAmount').textContent = `Rp ${budgets.weekly || 0}`;
-                document.getElementById('monthlyBudgetAmount').textContent = `Rp ${budgets.monthly || 0}`;
-
-                // Calculate percentages and update progress bars
-                if(budgets.daily > 0) {
-                    const dailyPercentage = Math.min((totalSpending / budgets.daily) * 100, 100);
-                    const dailyBar = document.getElementById('dailyBudgetBar');
-                    dailyBar.style.width = `${dailyPercentage}%`;
-
-                    // Apply warning/danger classes based on percentage
-                    dailyBar.className = 'budget-progress-bar';
-                    if(dailyPercentage >= 90) {
-                        dailyBar.classList.add('budget-danger');
-                    } else if(dailyPercentage >= 75) {
-                        dailyBar.classList.add('budget-warning');
-                    }
-
-                    // Show warning if approaching budget
-                    if(dailyPercentage >= 90) {
-                        document.getElementById('warningMessage').textContent = 'You are exceeding your daily budget!';
-                        budgetWarning.style.display = 'flex';
-                    } else if(dailyPercentage >= 75) {
-                        document.getElementById('warningMessage').textContent = 'You are approaching your daily budget limit!';
-                        budgetWarning.style.display = 'flex';
-                    }
-                }
-
-                if(budgets.weekly > 0) {
-                    const weeklyPercentage = Math.min((totalSpending / budgets.weekly) * 100, 100);
-                    const weeklyBar = document.getElementById('weeklyBudgetBar');
-                    weeklyBar.style.width = `${weeklyPercentage}%`;
-
-                    weeklyBar.className = 'budget-progress-bar';
-                    if(weeklyPercentage >= 90) {
-                        weeklyBar.classList.add('budget-danger');
-                    } else if(weeklyPercentage >= 75) {
-                        weeklyBar.classList.add('budget-warning');
-                    }
-                }
-
-                if(budgets.monthly > 0) {
-                    const monthlyPercentage = Math.min((totalSpending / budgets.monthly) * 100, 100);
-                    const monthlyBar = document.getElementById('monthlyBudgetBar');
-                    monthlyBar.style.width = `${monthlyPercentage}%`;
-
-                    monthlyBar.className = 'budget-progress-bar';
-                    if(monthlyPercentage >= 90) {
-                        monthlyBar.classList.add('budget-danger');
-                    } else if(monthlyPercentage >= 75) {
-                        monthlyBar.classList.add('budget-warning');
-                    }
-                }
-            }
-
-            // Update budget display when page loads
-            function updateBudgetDisplay() {
-                const budgets = JSON.parse(localStorage.getItem('budgets')) || {};
-
-                if(budgets.daily) {
-                    document.getElementById('dailyBudgetAmount').textContent = `Rp ${budgets.daily}`;
-                }
-                if(budgets.weekly) {
-                    document.getElementById('weeklyBudgetAmount').textContent = `Rp ${budgets.weekly}`;
-                }
-                if(budgets.monthly) {
-                    document.getElementById('monthlyBudgetAmount').textContent = `Rp ${budgets.monthly}`;
-                }
-            }
-
-            // Run budget calculations when DOM is loaded
-            setTimeout(calculateAndDisplaySpending, 200);
-
-            // ========== RECOMMENDATION FUNCTIONALITY ==========
-
-            // Generate recommendations based on existing products
-            function generateRecommendations() {
-                const recommendationsGrid = document.getElementById('recommendationsGrid');
-                recommendationsGrid.innerHTML = ''; // Clear existing recommendations
-
-                // Sample recommendations - in a real app, this would come from an algorithm
-                const sampleRecommendations = [
-                    {
-                        name: "Banana",
-                        category: "Fruits",
-                        price: "Rp 12,000",
-                        reason: "Similar to your Apple purchase",
-                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=B"
-                    },
-                    {
-                        name: "Orange Juice",
-                        category: "Beverages",
-                        price: "Rp 18,000",
-                        reason: "Popular beverage in your cart",
-                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=OJ"
-                    },
-                    {
-                        name: "Cheese",
-                        category: "Dairy",
-                        price: "Rp 28,000",
-                        reason: "Pairs well with your milk",
-                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=C"
-                    },
-                    {
-                        name: "Whole Wheat Bread",
-                        category: "Bakery",
-                        price: "Rp 15,000",
-                        reason: "Healthy alternative to regular bread",
-                        image: "https://placehold.co/60x60/FFA500/FFFFFF?text=WB"
-                    }
-                ];
-
-                // Add recommendation cards to the grid
-                sampleRecommendations.forEach(rec => {
-                    const recCard = document.createElement('div');
-                    recCard.className = 'recommendation-card';
-                    recCard.innerHTML = `
-                        <div class="recommendation-card-header">
-                            <img src="${rec.image}" alt="${rec.name}" class="recommendation-card-image">
-                            <div class="recommendation-info">
-                                <div class="recommendation-name">${rec.name}</div>
-                                <div class="recommendation-reason">${rec.reason}</div>
-                            </div>
-                        </div>
-                        <div class="recommendation-category">${rec.category}</div>
-                        <div class="recommendation-price">${rec.price}</div>
-                        <button class="btn-add-recommendation" data-name="${rec.name}" data-price="${rec.price}" data-category="${rec.category}">
-                            Add to List
-                        </button>
-                    `;
-                    recommendationsGrid.appendChild(recCard);
-                });
-
-                // Add event listeners to "Add to List" buttons
-                document.querySelectorAll('.btn-add-recommendation').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const name = this.getAttribute('data-name');
-                        const price = this.getAttribute('data-price');
-                        const category = this.getAttribute('data-category');
-
-                        // Add to shopping list or products - for now just show an alert
-                        alert(`Added ${name} to your shopping list!`);
-
-                        // In a real implementation, you would add this to the shopping list
-                        // or create a new product entry
-                    });
-                });
-            }
-
-            // Generate recommendations when page loads
-            setTimeout(generateRecommendations, 300);
+        // Open modal
+        loginButton.addEventListener('click', function() {
+            modal.style.display = 'block';
+            // Reset to login form
+            flipContainer.classList.remove('flipped');
         });
+
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Show register form
+        showRegister.addEventListener('click', function(e) {
+            e.preventDefault();
+            flipContainer.classList.add('flipped');
+        });
+
+        // Show login form
+        showLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            flipContainer.classList.remove('flipped');
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // In a real application, you would send this to the server
+            // For now, just show an alert
+            alert(`Login berhasil!\nEmail: ${email}`);
+            modal.style.display = 'none';
+
+            // Here you would typically redirect to the main app or update UI
+        });
+
+        // Handle register form submission
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Kata sandi tidak cocok!');
+                return;
+            }
+
+            // In a real application, you would send this to the server
+            // For now, just show an alert
+            alert(`Registrasi berhasil!\nNama: ${name}\nEmail: ${email}`);
+            flipContainer.classList.remove('flipped');
+
+            // Here you would typically redirect to the main app or update UI
+        });
+
+        // Dark mode toggle functionality
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const body = document.body;
+
+        // Check for saved theme preference or respect OS setting
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode-active');
+        } else {
+            body.classList.remove('dark-mode-active');
+        }
+
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode-active');
+
+            // Save the current theme to localStorage
+            if (body.classList.contains('dark-mode-active')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Initialize and update time-based theme and display
+        updateTimeBasedTheme();
+        updateDateTimeDisplay();
+
+        // Update time display every minute
+        setInterval(updateDateTimeDisplay, 60000);
+
+        // Update theme periodically (every 30 minutes)
+        setInterval(updateTimeBasedTheme, 1800000);
+
     </script>
 </body>
 </html>

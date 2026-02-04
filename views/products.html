@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Bahan - Kapan Beli</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/614/614645.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f9f9f9'/%3E%3Cline x1='0' y1='20' x2='100' y2='20' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='40' x2='100' y2='40' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='60' x2='100' y2='60' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='80' x2='100' y2='80' stroke='%23e0e0e0' stroke-width='1'/%3E%3C/svg%3E");
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background: #9CCFFF; /* Blue background */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 4px solid #FFA500; /* Orange line at bottom */
+            margin: 0;
+            width: 100%;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-title h1 {
+            color: #FFA500; /* Orange color */
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            background: white; /* White background */
+            border: 2px solid #FFA500; /* Orange border */
+            color: #FFA500; /* Orange text */
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-link:hover {
+            background-color: #FFA500;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+        }
+
+        .active {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        .dark-mode-toggle {
+            background: #333;
+            border: 2px solid #FFA500;
+            color: white;
+            width: 50px;
+            height: 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+        }
+
+        .dark-mode-toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FFA500;
+            top: 1px;
+            left: 2px;
+            transition: 0.3s;
+        }
+
+        .dark-mode-active .dark-mode-toggle::before {
+            transform: translateX(20px);
+        }
+
+        /* Main content styles */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .container {
+            background-color: #fff9db; /* Yellowish paper color */
+            border-radius: 0;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #d9d9d9;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                #FFA500,
+                #FFA500 10px,
+                #9CCFFF 10px,
+                #9CCFFF 20px
+            );
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #FFA500; /* Dashed orange line */
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .header-section h2 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .header-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #FFA500;
+            border-radius: 2px;
+        }
+
+        .btn-add-product {
+            background: #FFA500; /* Orange background */
+            color: white;
+            border: 2px solid #333;
+            padding: 0.9rem 1.8rem;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .btn-add-product:hover {
+            background: #ffb733;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .category-filter {
+            background: #fff9db;
+            border: 2px solid #333;
+            border-radius: 0;
+            padding: 0.8rem 1.2rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1.1rem;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .category-filter:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        .search-input {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 0;
+            padding: 0.6rem 1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            font-size: 1rem;
+            width: 200px;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Product cards grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Product card styling */
+        .product-card {
+            background-color: #fff9db; /* Yellowish paper color */
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
+            background-size: 100% 24px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #FFA500;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 8px rgba(0,0,0, 0.1);
+        }
+
+        .product-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .product-card-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 0;
+            object-fit: cover;
+            border: 2px solid #333;
+            background: white;
+            padding: 4px;
+            box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.1);
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            color: #FF8C00; /* Orange color for product names */
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .product-category {
+            color: #666;
+            font-size: 1rem;
+            background: rgba(156, 207, 255, 0.3);
+            padding: 0.2rem 0.8rem;
+            border-radius: 0;
+            display: inline-block;
+            margin-top: 0.2rem;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px dashed #333;
+        }
+
+        .price {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.2rem;
+            background: rgba(255, 165, 0, 0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 0;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .stock-status {
+            font-size: 0.9rem;
+            text-align: right;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .critical-stock {
+            color: #FF4500; /* Darker orange for critical stock */
+            font-weight: 700;
+            background-color: rgba(255, 69, 0, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            font-size: 0.95rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .total-stock {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+            background: rgba(156, 207, 255, 0.25);
+            padding: 0.3rem 0.8rem;
+            border-radius: 0;
+            display: inline-block;
+            border: 1px solid #333;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+
+        /* Action buttons */
+        .btn-action {
+            background: none;
+            border: 2px solid #333;
+            cursor: pointer;
+            padding: 0.7rem;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-edit {
+            color: #FFA500; /* Orange for edit */
+            background: #fff9db !important;
+        }
+
+        .btn-delete {
+            color: #888; /* Gray for delete */
+            background: #fff9db !important;
+        }
+
+        .btn-action:hover {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-edit:hover {
+            background: #ffeaaa !important;
+        }
+
+        .btn-delete:hover {
+            background: #f0f0f0 !important;
+        }
+
+        /* Dark Mode Styles */
+        .dark-mode-active {
+            background: #121212;
+        }
+
+        .dark-mode-active body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2980b9 100%);
+            color: #f0f0f0;
+            border-bottom: 4px solid #FFA500;
+        }
+
+        .dark-mode-active .nav-title h1 {
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .dark-mode-active .nav-link {
+            background: #1a1a1a;
+            color: #FFD700;
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .nav-link:hover,
+        .dark-mode-active .active {
+            background: #FFA500;
+            color: white;
+        }
+
+        .dark-mode-active .search-input {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #f0f0f0;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.2);
+        }
+
+        .dark-mode-active .search-input:focus {
+            outline: none;
+            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
+            border: 2px solid #FFA500;
+        }
+
+        .dark-mode-active .container {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
+            background-size: 100% 26px;
+        }
+
+        .dark-mode-active .container::before {
+            background: repeating-linear-gradient(
+                90deg,
+                #FFA500,
+                #FFA500 10px,
+                #2980b9 10px,
+                #2980b9 20px
+            );
+        }
+
+        .dark-mode-active .product-card {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: #f0f0f0;
+            background-image: linear-gradient(#1e1e1e 22px, #333 22px, #333 24px, transparent 24px);
+            background-size: 100% 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode-active .product-card::before {
+            background: #FFA500;
+        }
+
+        .dark-mode-active .product-name {
+            color: #FFD700;
+        }
+
+        .dark-mode-active .product-category {
+            background: rgba(156, 207, 255, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .price {
+            background: rgba(255, 215, 0, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .stock-status {
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .critical-stock {
+            background-color: rgba(255, 69, 0, 0.3);
+            color: #ffcccc;
+        }
+
+        .dark-mode-active .total-stock {
+            background: rgba(156, 207, 255, 0.2);
+            color: #f0f0f0;
+            border: 1px solid #555;
+        }
+
+        .dark-mode-active .btn-action {
+            border: 2px solid #555;
+        }
+
+        .dark-mode-active .btn-edit {
+            color: #FFD700;
+            background: #333 !important;
+        }
+
+        .dark-mode-active .btn-delete {
+            color: #aaa;
+            background: #333 !important;
+        }
+
+        .dark-mode-active .btn-edit:hover {
+            background: #444 !important;
+        }
+
+        .dark-mode-active .btn-delete:hover {
+            background: #444 !important;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fff9db;
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid #d9d9d9;
+            border-radius: 0;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
+            background-size: 100% 26px;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #FFA500;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-modal:hover {
+            color: #FFA500;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #333;
+            border-radius: 0;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            background: white;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #FFA500;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: #ffb733;
+        }
+
+        /* Dark Mode Modal */
+        .dark-mode-active .modal-content {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            color: #f0f0f0;
+            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
+        }
+
+        .dark-mode-active .modal-content::before {
+            background: #FFA500;
+        }
+
+        .dark-mode-active .input-group label {
+            color: #ccc;
+        }
+
+        .dark-mode-active .input-group input,
+        .dark-mode-active .input-group select,
+        .dark-mode-active .input-group textarea {
+            border: 1px solid #555;
+            background: #333;
+            color: #f0f0f0;
+        }
+
+        .dark-mode-active .close-modal:hover {
+            color: #FFD700;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-title">
+                <h1>Kapan Beli</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Beranda</a>
+                <a href="products.html" class="nav-link active">Bahan Saya</a>
+                <a href="suggestions.html" class="nav-link">Saran Pembelian</a>
+                <a href="stores.html" class="nav-link">Saran Toko</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="login.html" class="nav-link">Masuk</a>
+                <input type="text" class="search-input" placeholder="Cari...">
+                <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="header-section">
+                <h2>Bahan Masak Saya</h2>
+                <div class="controls-group">
+                    <select class="category-filter">
+                        <option value="">Semua Kategori</option>
+                        <option value="Bumbu">Bumbu</option>
+                        <option value="Sayuran">Sayuran</option>
+                        <option value="Buah-buahan">Buah-buahan</option>
+                        <option value="Daging">Daging</option>
+                        <option value="Seafood">Seafood</option>
+                        <option value="Minyak">Minyak</option>
+                        <option value="Biji-bijian">Biji-bijian</option>
+                    </select>
+                    <button class="btn-add-product" id="addProductBtn"><i class="fas fa-plus"></i> Tambah Bahan</button>
+                </div>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <!-- Produk akan dimuat secara dinamis -->
+            </div>
+        </div>
+
+        <!-- Modal Tambah/Edit Produk -->
+        <div id="productModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-modal" id="closeProductModal">&times;</span>
+                <h2 id="modalTitle">Tambah Bahan Baru</h2>
+                <form id="productForm">
+                    <div class="input-group">
+                        <label for="productName">Nama Bahan</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="productCategory">Kategori</label>
+                        <select id="productCategory" required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="Bumbu">Bumbu</option>
+                            <option value="Sayuran">Sayuran</option>
+                            <option value="Buah-buahan">Buah-buahan</option>
+                            <option value="Daging">Daging</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Minyak">Minyak</option>
+                            <option value="Biji-bijian">Biji-bijian</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="productImage">Gambar Produk</label>
+                        <input type="file" id="productImage" accept="image/*">
+                        <small>Unggah gambar produk Anda</small>
+                    </div>
+                    <div class="input-group">
+                        <label for="productPrice">Harga per Satuan (Rp)</label>
+                        <input type="number" id="productPrice" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="productStock">Jumlah Stok</label>
+                        <input type="number" id="productStock" required min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="productMinStock">Stok Minimal</label>
+                        <input type="number" id="productMinStock" required min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="productDescription">Deskripsi (Opsional)</label>
+                        <textarea id="productDescription" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Simpan Bahan</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dark mode toggle functionality
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const body = document.body;
+
+        // Check for saved theme preference or respect OS setting
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode-active');
+        } else {
+            body.classList.remove('dark-mode-active');
+        }
+
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode-active');
+
+            // Save the current theme to localStorage
+            if (body.classList.contains('dark-mode-active')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Modal functionality
+        const addProductBtn = document.getElementById('addProductBtn');
+        const productModal = document.getElementById('productModal');
+        const closeProductModal = document.getElementById('closeProductModal');
+        const productForm = document.getElementById('productForm');
+        const modalTitle = document.getElementById('modalTitle');
+
+        // Open modal for adding new product
+        addProductBtn.addEventListener('click', function() {
+            modalTitle.textContent = 'Tambah Bahan Baru';
+            productForm.reset();
+            productModal.style.display = 'block';
+        });
+
+        // Close modal
+        closeProductModal.addEventListener('click', function() {
+            productModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === productModal) {
+                productModal.style.display = 'none';
+            }
+        });
+
+        // Sample products data (in a real app, this would come from the server)
+        let products = [
+            {
+                id: 1,
+                name: 'Bawang Merah',
+                category: 'Sayuran',
+                price: 25000,
+                stock: 0.2,
+                minStock: 0.5,
+                description: 'Bawang merah segar untuk bumbu'
+            },
+            {
+                id: 2,
+                name: 'Bawang Putih',
+                category: 'Bumbu',
+                price: 30000,
+                stock: 0.5,
+                minStock: 0.3,
+                description: 'Bawang putih segar untuk bumbu'
+            },
+            {
+                id: 3,
+                name: 'Cabai Merah',
+                category: 'Sayuran',
+                price: 40000,
+                stock: 0.3,
+                minStock: 0.2,
+                description: 'Cabai merah besar untuk masakan'
+            },
+            {
+                id: 4,
+                name: 'Tomat',
+                category: 'Sayuran',
+                price: 15000,
+                stock: 1.2,
+                minStock: 0.5,
+                description: 'Tomat segar untuk sayur'
+            }
+        ];
+
+        // Function to render products
+        function renderProducts(productsToRender = products) {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+
+            productsToRender.forEach(product => {
+                const isLowStock = product.stock <= product.minStock;
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-card-header">
+                        <img src="${product.image || 'https://placehold.co/90x90/FFA500/FFFFFF?text=' + product.name.charAt(0)}"
+                             alt="${product.name}" class="product-card-image">
+                        <div class="product-info">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-category">${product.category}</p>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <div class="price">Rp ${product.price.toLocaleString()}/kg</div>
+                        <div class="stock-status">
+                            ${isLowStock ? `<div class="critical-stock">Stok Rendah</div>` : ''}
+                            <div class="total-stock">Sisa: ${product.stock} kg</div>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-action btn-edit" data-id="${product.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-delete" data-id="${product.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    openEditProductModal(productId);
+                });
+            });
+
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    deleteProduct(productId);
+                });
+            });
+        }
+
+        // Function to open edit modal
+        function openEditProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productCategory').value = product.category;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productStock').value = product.stock;
+                document.getElementById('productMinStock').value = product.minStock;
+                document.getElementById('productDescription').value = product.description || '';
+
+                modalTitle.textContent = 'Edit Bahan';
+                productModal.style.display = 'block';
+
+                // Update form submit handler for editing
+                productForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    updateProduct(productId);
+                };
+            }
+        }
+
+        // Function to add a new product
+        function addProduct() {
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const stock = parseFloat(document.getElementById('productStock').value);
+            const minStock = parseFloat(document.getElementById('productMinStock').value);
+            const description = document.getElementById('productDescription').value;
+            const imageFile = document.getElementById('productImage').files[0];
+
+            // Handle image upload
+            let imageUrl = 'https://placehold.co/90x90/FFA500/FFFFFF?text=' + name.charAt(0).toUpperCase(); // Default placeholder
+
+            if (imageFile) {
+                // In a real application, you would upload the image to a server
+                // For now, we'll use a data URL for demonstration
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageUrl = e.target.result;
+                    createProductWithImage(imageUrl);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                createProductWithImage(imageUrl);
+            }
+
+            function createProductWithImage(imgUrl) {
+                const newProduct = {
+                    id: Math.max(...products.map(p => p.id), 0) + 1,
+                    name,
+                    category,
+                    price,
+                    stock,
+                    minStock,
+                    description,
+                    image: imgUrl
+                };
+
+                products.push(newProduct);
+                renderProducts();
+                productModal.style.display = 'none';
+                productForm.reset();
+
+                // Reset form submit handler to default
+                productForm.onsubmit = handleFormSubmit;
+
+                alert(`Bahan "${newProduct.name}" berhasil ditambahkan!`);
+            }
+        }
+
+        // Function to update a product
+        function updateProduct(productId) {
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex !== -1) {
+                const name = document.getElementById('productName').value;
+                const category = document.getElementById('productCategory').value;
+                const price = parseFloat(document.getElementById('productPrice').value);
+                const stock = parseFloat(document.getElementById('productStock').value);
+                const minStock = parseFloat(document.getElementById('productMinStock').value);
+                const description = document.getElementById('productDescription').value;
+                const imageFile = document.getElementById('productImage').files[0];
+
+                // Handle image update
+                let imageUrl = products[productIndex].image; // Keep existing image if no new image is uploaded
+
+                if (imageFile) {
+                    // In a real application, you would upload the image to a server
+                    // For now, we'll use a data URL for demonstration
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imageUrl = e.target.result;
+                        updateProductWithImage(imageUrl);
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    updateProductWithImage(imageUrl);
+                }
+
+                function updateProductWithImage(imgUrl) {
+                    products[productIndex] = {
+                        id: productId,
+                        name,
+                        category,
+                        price,
+                        stock,
+                        minStock,
+                        description,
+                        image: imgUrl
+                    };
+
+                    renderProducts();
+                    productModal.style.display = 'none';
+                    productForm.reset();
+
+                    // Reset form submit handler to default
+                    productForm.onsubmit = handleFormSubmit;
+
+                    alert(`Bahan "${products[productIndex].name}" berhasil diperbarui!`);
+                }
+            }
+        }
+
+        // Function to delete a product
+        function deleteProduct(productId) {
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex !== -1) {
+                const productName = products[productIndex].name;
+                const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus ${productName}?`);
+                if (confirmDelete) {
+                    products.splice(productIndex, 1);
+                    renderProducts();
+                    alert(`Bahan "${productName}" berhasil dihapus!`);
+                }
+            }
+        }
+
+        // Handle form submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            if (modalTitle.textContent === 'Tambah Bahan Baru') {
+                addProduct();
+            }
+        }
+
+        // Set the default form submit handler
+        productForm.onsubmit = handleFormSubmit;
+
+        // Category filter functionality
+        const categoryFilter = document.querySelector('.category-filter');
+        if(categoryFilter) {
+            categoryFilter.addEventListener('change', function() {
+                const selectedCategory = this.value;
+                if (selectedCategory === '') {
+                    renderProducts();
+                } else {
+                    const filteredProducts = products.filter(product =>
+                        product.category === selectedCategory
+                    );
+                    renderProducts(filteredProducts);
+                }
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        if(searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredProducts = products.filter(product =>
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.category.toLowerCase().includes(searchTerm)
+                );
+                renderProducts(filteredProducts);
+            });
+        }
+
+        // Initialize the product list
+        renderProducts();
+    </script>
+</body>
+</html>
