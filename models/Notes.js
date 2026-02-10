@@ -64,6 +64,13 @@ const Notes = {
         }
 
         return { id: noteId };
+    },
+
+    // Fungsi untuk mendapatkan catatan terbaru milik pengguna
+    getRecentByUserId: async (userId) => {
+        const query = 'SELECT id, title, content, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY created_at DESC LIMIT 5';
+        const [rows] = await db.execute(query, [userId]);
+        return rows;
     }
 };
 

@@ -29,4 +29,7 @@ router.put('/:id', notesController.update);
 // Endpoint untuk menghapus catatan
 router.delete('/:id', notesController.delete);
 
+// Endpoint untuk mendapatkan catatan terbaru
+router.get('/recent', notesController.getRecent);
+
 module.exports = router;

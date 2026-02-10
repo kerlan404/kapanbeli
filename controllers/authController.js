@@ -81,13 +81,7 @@ const authController = {
                 });
             }
 
-            // Periksa apakah akun sudah dikonfirmasi
-            if (!user.is_confirmed) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Akun Anda belum dikonfirmasi. Silakan cek email Anda.'
-                });
-            }
+            // Tidak perlu memeriksa konfirmasi email karena semua akun langsung dikonfirmasi saat registrasi
 
             // Bandingkan password
             const isMatch = await bcrypt.compare(password, user.password);
@@ -112,9 +106,14 @@ const authController = {
 
         } catch (error) {
             console.error('Login error:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                code: error.code
+            });
             res.status(500).json({
                 success: false,
-                message: 'Terjadi kesalahan saat login'
+                message: 'Terjadi kesalahan saat login: ' + error.message
             });
         }
     },
@@ -124,8 +123,11 @@ const authController = {
         try {
             const { name, email, password, confirmPassword } = req.body;
 
+            console.log('Registration attempt for email:', email);
+            
             // Validasi input
             if (!name || !email || !password || !confirmPassword) {
+                console.log('Validation failed: Missing required fields');
                 return res.status(400).json({
                     success: false,
                     message: 'Nama, email, password, dan konfirmasi password harus diisi'
@@ -133,6 +135,7 @@ const authController = {
             }
 
             if (password !== confirmPassword) {
+                console.log('Validation failed: Passwords do not match for email:', email);
                 return res.status(400).json({
                     success: false,
                     message: 'Password dan konfirmasi password tidak cocok'
@@ -140,9 +143,11 @@ const authController = {
             }
 
             // Periksa apakah email sudah digunakan
+            console.log('Checking if email already exists:', email);
             const existingUser = await User.findByEmail(email);
 
             if (existingUser) {
+                console.log('Registration failed: Email already exists:', email);
                 return res.status(400).json({
                     success: false,
                     message: 'Email sudah digunakan'
@@ -150,15 +155,19 @@ const authController = {
             }
 
             // Hash password
+            console.log('Hashing password for user:', email);
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-            // Simpan pengguna baru (status is_confirmed = false secara default)
+            // Simpan pengguna baru
+            console.log('Creating new user in database:', email);
             const newUser = await User.create({
                 name,
                 email,
                 password: hashedPassword
             });
+            
+            console.log('User created successfully in database:', newUser.email);
 
             // Kirim email konfirmasi
             try {
@@ -186,25 +195,64 @@ const authController = {
                 console.log(`Confirmation email sent to ${newUser.email}`);
             } catch (emailError) {
                 console.error('Failed to send confirmation email:', emailError);
-                // Jika gagal kirim email, hapus user yang baru dibuat?
-                // Tergantung kebijakan, untuk saat ini kita tetap lanjutkan
-                // karena token konfirmasi sudah disimpan di database
+                // Jika gagal kirim email, tetap lanjutkan karena user sudah dibuat
             }
 
             // Berhasil register, kembalikan pesan sukses
-            // Kita tidak menginisialisasi session di sini karena akun belum dikonfirmasi
-            // Pengguna harus login setelah konfirmasi
+            // Setelah registrasi, langsung login otomatis (tanpa perlu konfirmasi email)
+            req.session.userId = newUser.id;
+            req.session.user = {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email
+            };
+
+            // Verifikasi bahwa session telah diset
+            if (!req.session.user) {
+                console.error('Session failed to set after registration');
+                return res.status(500).json({
+                    success: false,
+                    message: 'Terjadi kesalahan saat membuat sesi pengguna'
+                });
+            }
+
+            console.log(`User registered and logged in successfully: ${newUser.email}`);
+
             res.json({
                 success: true,
-                message: 'Akun berhasil dibuat. Silakan cek email Anda untuk konfirmasi.',
-                redirect: '/auth' // Redirect ke halaman login setelah registrasi
+                message: 'Registrasi berhasil! Selamat datang di Kapan Beli.',
+                redirect: '/' // Langsung arahkan ke beranda setelah registrasi
             });
 
         } catch (error) {
             console.error('Registration error:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                code: error.code
+            });
+            
+            // Penanganan error spesifik untuk masalah database
+            if (error.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Email sudah digunakan'
+                });
+            } else if (error.code === 'ER_NO_SUCH_TABLE') {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Struktur database belum diinisialisasi. Hubungi administrator.'
+                });
+            } else if (error.code === 'ECONNREFUSED') {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Tidak dapat terhubung ke database. Pastikan database aktif.'
+                });
+            }
+            
             res.status(500).json({
                 success: false,
-                message: 'Terjadi kesalahan saat registrasi'
+                message: 'Terjadi kesalahan saat registrasi: ' + error.message
             });
         }
     },

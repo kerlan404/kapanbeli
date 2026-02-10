@@ -213,6 +213,34 @@ const notesController = {
                 message: 'Terjadi kesalahan saat menghapus catatan.'
             });
         }
+    },
+
+    // Fungsi untuk mendapatkan catatan terbaru milik pengguna
+    async getRecent(req, res) {
+        try {
+            const userId = req.session.user?.id; // Ambil ID pengguna dari session
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Akses ditolak. Silakan login terlebih dahulu.'
+                });
+            }
+
+            const recentNotes = await NotesModel.getRecentByUserId(userId);
+
+            res.status(200).json({
+                success: true,
+                notes: recentNotes
+            });
+
+        } catch (error) {
+            console.error('Get recent notes error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat mengambil catatan terbaru.'
+            });
+        }
     }
 };
 

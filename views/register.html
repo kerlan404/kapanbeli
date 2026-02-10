@@ -8,7 +8,7 @@
     <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght @300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -55,8 +55,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
             position: relative;
+        }
+        
+        body.auth-page {
+            overflow: hidden; /* Prevent scrolling on auth pages */
+            height: 100vh;
         }
 
         .bg-decoration {
@@ -85,6 +89,7 @@
             overflow: hidden;
             margin: 20px;
             min-height: 600px; /* Sedikit lebih tinggi untuk form register */
+            max-height: calc(100vh - 40px); /* Ensure it fits within viewport */
         }
 
         /* Left Panel */
@@ -201,14 +206,14 @@
         .alert-success { background: rgba(29, 209, 161, 0.1); color: #1DD1A1; border: 1px solid rgba(29, 209, 161, 0.2); }
 
         @media (max-width: 768px) {
-            .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; }
+            .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; max-height: 100vh; }
             .auth-brand-panel { display: none; }
             .auth-form-panel { padding: 30px 20px; justify-content: center; }
             .bg-decoration { display: none; }
         }
     </style>
 </head>
-<body>
+<body class="auth-page">
 
     <div class="bg-decoration"></div>
 
@@ -234,7 +239,7 @@
                 <p>Isi formulir di bawah untuk mendaftar.</p>
             </div>
             
-            <form onsubmit="handleRegister(event)">
+            <form id="registerForm">
                 <div class="input-group">
                     <label>Nama Lengkap</label>
                     <div class="input-wrapper">
@@ -247,7 +252,7 @@
                     <label>Email</label>
                     <div class="input-wrapper">
                         <i class="fas fa-envelope icon-left"></i>
-                        <input type="email" id="regEmail" placeholder="nama@email.com" required>
+                        <input type="email" id="regEmail" placeholder="nama @email.com" required>
                     </div>
                 </div>
 
@@ -255,7 +260,7 @@
                     <label>Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock icon-left"></i>
-                        <input type="password" id="regPassword" placeholder="Minimal 6 karakter" required>
+                        <input type="password" id="regPassword" placeholder="Minimal 6 karakter, termasuk huruf besar, kecil, dan angka" required minlength="6">
                         <i class="fas fa-eye icon-eye" onclick="togglePassword('regPassword', this)"></i>
                     </div>
                 </div>
@@ -273,7 +278,7 @@
             </form>
 
             <div class="form-links">
-                <p>Sudah punya akun? <a href="login.html">Masuk di sini</a></p>
+                <p>Sudah punya akun? <a href="/auth">Masuk di sini</a></p>
             </div>
         </div>
     </div>
@@ -337,8 +342,8 @@
             document.getElementById('authAlert').classList.remove('show');
         }
 
-        // --- 4. REGISTER HANDLER (SIMULASI - TANPA DATABASE) ---
-        async function handleRegister(e) {
+        // --- 4. REGISTER HANDLER (TERHUBUNG KE BACKEND) ---2
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             hideAlert();
 
@@ -358,27 +363,59 @@
                 return;
             }
 
+            // Validasi kompleksitas password
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
+            if (!passwordRegex.test(password)) {
+                showAlert('Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka.', 'error');
+                return;
+            }
+
             if (password !== confirmPassword) {
                 showAlert('Konfirmasi password tidak cocok!', 'error');
                 return;
             }
 
-            // SIMULASI: Tanpa fetch ke backend
+            // Kirim data ke server
             const btn = document.querySelector('.btn-submit');
             const originalText = btn.innerText;
-            
+
             btn.innerText = 'Mendaftar...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                showAlert('Pendaftaran Berhasil! Silakan Login.', 'success');
-                
-                setTimeout(() => {
-                    // Arahkan ke halaman login
-                    window.location.href = 'login.html'; 
-                }, 1500);
-            }, 1000);
-        }
+            try {
+                const response = await fetch('/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        password: password,
+                        confirmPassword: confirmPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+
+                    // Redirect ke beranda setelah delay
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi nanti.', 'error');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>

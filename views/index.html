@@ -634,17 +634,17 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-box-open"></i></div>
-                    <div class="stat-value">42</div>
+                    <div class="stat-value" id="totalProducts">0</div>
                     <div class="stat-label">Total Bahan</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="color: var(--accent-red); background: rgba(255, 107, 107, 0.1);"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stat-value" style="color: var(--accent-red);">8</div>
+                    <div class="stat-value" style="color: var(--accent-red);" id="lowStockCount">0</div>
                     <div class="stat-label">Stok Menipis</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="color: var(--primary-orange); background: rgba(255, 159, 67, 0.1);"><i class="fas fa-clipboard-list"></i></div>
-                    <div class="stat-value" style="color: var(--primary-orange);">12</div>
+                    <div class="stat-value" style="color: var(--primary-orange);" id="shoppingListCount">0</div>
                     <div class="stat-label">Daftar Belanja</div>
                 </div>
             </div>
@@ -677,35 +677,8 @@
         <div class="container">
             <h2 class="section-title">Aktivitas Terkini</h2>
             <div class="activity-container">
-                <ul class="activity-list" style="padding: 0;">
-                    <li class="activity-item">
-                        <div class="activity-icon"><i class="fas fa-plus"></i></div>
-                        <div class="activity-content">
-                            <div>Stok ditambahkan: <strong>Bawang Merah</strong> (500g)</div>
-                            <div class="activity-time">2 jam yang lalu</div>
-                        </div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                        <div class="activity-content">
-                            <div>Peringatan: <strong>Cabai Rawit</strong> hampir habis!</div>
-                            <div class="activity-time">Kemarin</div>
-                        </div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-icon"><i class="fas fa-shopping-cart"></i></div>
-                        <div class="activity-content">
-                            <div>Belanja selesai di <strong>Pasar Segar Jaya</strong></div>
-                            <div class="activity-time">2 hari yang lalu</div>
-                        </div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-icon"><i class="fas fa-sync-alt"></i></div>
-                        <div class="activity-content">
-                            <div>Stok diperbarui: <strong>Susu UHT</strong></div>
-                            <div class="activity-time">3 hari yang lalu</div>
-                        </div>
-                    </li>
+                <ul class="activity-list" style="padding: 0;" id="activityList">
+                    <!-- Activities will be loaded dynamically -->
                 </ul>
             </div>
         </div>
@@ -870,10 +843,124 @@
             }
         });
 
+        // --- LOGIC 5: LOAD DASHBOARD DATA ---
+        async function loadDashboardData() {
+            try {
+                // Check if user is authenticated first
+                const authResponse = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (!authResponse.ok) {
+                    console.error('User not authenticated, skipping dashboard data load');
+                    return;
+                }
+
+                const authData = await authResponse.json();
+                if (!authData.authenticated) {
+                    console.error('User not authenticated, skipping dashboard data load');
+                    return;
+                }
+
+                // Load product statistics
+                const productsResponse = await fetch('/api/products/stats', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (productsResponse.ok) {
+                    const stats = await productsResponse.json();
+                    if (stats.success) {
+                        document.getElementById('totalProducts').textContent = stats.total || 0;
+                        document.getElementById('lowStockCount').textContent = stats.lowStock || 0;
+                        document.getElementById('shoppingListCount').textContent = stats.shoppingList || 0;
+                    }
+                }
+
+                // Load recent activities
+                const activitiesResponse = await fetch('/api/notes/recent', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (activitiesResponse.ok) {
+                    const activities = await activitiesResponse.json();
+                    if (activities.success && activities.notes) {
+                        const activityList = document.getElementById('activityList');
+                        activityList.innerHTML = ''; // Clear existing activities
+                        
+                        activities.notes.forEach(activity => {
+                            const activityItem = document.createElement('li');
+                            activityItem.className = 'activity-item';
+                            
+                            // Determine icon and styling based on activity type
+                            let iconClass = 'fa-plus';
+                            let iconColor = 'var(--accent-green)';
+                            let iconBg = 'rgba(29, 209, 161, 0.15)';
+                            
+                            if (activity.title.toLowerCase().includes('peringatan') || activity.title.toLowerCase().includes('habis')) {
+                                iconClass = 'fa-exclamation-triangle';
+                                iconColor = 'var(--accent-red)';
+                                iconBg = 'rgba(255, 107, 107, 0.15)';
+                            } else if (activity.title.toLowerCase().includes('belanja')) {
+                                iconClass = 'fa-shopping-cart';
+                                iconColor = 'var(--primary-orange)';
+                                iconBg = 'rgba(253, 203, 110, 0.2)';
+                            } else if (activity.title.toLowerCase().includes('perbarui') || activity.title.toLowerCase().includes('update')) {
+                                iconClass = 'fa-sync-alt';
+                                iconColor = 'var(--primary-blue)';
+                                iconBg = 'rgba(46, 134, 222, 0.15)';
+                            }
+                            
+                            activityItem.innerHTML = `
+                                <div class="activity-icon" style="background: ${iconBg}; color: ${iconColor};">
+                                    <i class="fas ${iconClass}"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div>${activity.title || 'Aktivitas baru'}</div>
+                                    <div class="activity-time">${formatTimeAgo(activity.created_at)}</div>
+                                </div>
+                            `;
+                            
+                            activityList.appendChild(activityItem);
+                        });
+                        
+                        // If no activities, show a message
+                        if (activities.notes.length === 0) {
+                            activityList.innerHTML = '<li class="activity-item"><div class="activity-content"><div class="activity-time">Tidak ada aktivitas terbaru</div></div></li>';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Helper function to format time ago
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'Baru saja';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) return 'Baru saja';
+            if (diffMins < 60) return `${diffMins} menit yang lalu`;
+            if (diffHours < 24) return `${diffHours} jam yang lalu`;
+            return `${diffDays} hari yang lalu`;
+        }
+
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             updateGreeting();
             checkAuthStatus(); // Check auth status when page loads
+            
+            // Load dashboard data if user is authenticated
+            setTimeout(loadDashboardData, 1000); // Delay slightly to allow auth check to complete
         });
 
         setInterval(updateGreeting, 60000);

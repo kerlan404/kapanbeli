@@ -30,4 +30,7 @@ router.put('/:id', productsController.update);
 // Endpoint untuk menghapus produk
 router.delete('/:id', productsController.delete);
 
+// Endpoint untuk mendapatkan statistik produk
+router.get('/stats', productsController.getStats);
+
 module.exports = router;

@@ -55,8 +55,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
             position: relative;
+        }
+        
+        body.auth-page {
+            overflow: hidden; /* Prevent scrolling on auth pages */
+            height: 100vh;
         }
 
         /* Background Decoration Image */
@@ -86,6 +90,7 @@
             overflow: hidden;
             margin: 20px;
             min-height: 550px;
+            max-height: calc(100vh - 40px); /* Ensure it fits within viewport */
         }
 
         /* Left Panel */
@@ -202,14 +207,14 @@
         .alert-success { background: rgba(29, 209, 161, 0.1); color: #1DD1A1; border: 1px solid rgba(29, 209, 161, 0.2); }
 
         @media (max-width: 768px) {
-            .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; }
+            .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; max-height: 100vh; }
             .auth-brand-panel { display: none; }
             .auth-form-panel { padding: 30px 20px; justify-content: center; }
             .bg-decoration { display: none; }
         }
     </style>
 </head>
-<body>
+<body class="auth-page">
 
     <div class="bg-decoration"></div>
 
@@ -261,7 +266,7 @@
             </form>
 
             <div class="form-links">
-                <p>Belum punya akun? <a href="register.html">Daftar Sekarang</a></p>
+                <p>Belum punya akun? <a href="/register">Daftar Sekarang</a></p>
             </div>
         </div>
     </div>
@@ -325,7 +330,7 @@
             document.getElementById('authAlert').classList.remove('show');
         }
 
-        // --- 4. LOGIN HANDLER (SIMULASI - TANPA DATABASE) ---
+        // --- 4. LOGIN HANDLER (CONNECTED TO BACKEND) ---
         async function handleLogin(e) {
             e.preventDefault();
             hideAlert();
@@ -333,28 +338,49 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
-            // Validasi Sederhana
+            // Validasi
             if (!email || !password) {
                 showAlert('Mohon lengkapi email dan password.', 'error');
                 return;
             }
 
-            // SIMULASI: Tanpa fetch ke backend
-            // Kita anggap login selalu berhasil untuk demo ini
             const btn = document.querySelector('.btn-submit');
             const originalText = btn.innerText;
-            
+
             btn.innerText = 'Memproses...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                showAlert('Login Berhasil! Mengalihkan...', 'success');
-                
-                setTimeout(() => {
-                    // Arahkan ke halaman utama (index.html atau /)
-                    window.location.href = 'index.html'; 
-                }, 1000);
-            }, 1000);
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    
+                    // Redirect ke halaman tujuan setelah delay
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/';
+                    }, 1000);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Terjadi kesalahan saat login. Silakan coba lagi nanti.', 'error');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
     </script>
 </body>

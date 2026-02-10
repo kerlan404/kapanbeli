@@ -234,6 +234,54 @@ const productsController = {
                 message: 'Terjadi kesalahan saat menghapus produk.'
             });
         }
+    },
+
+    // Fungsi untuk mendapatkan statistik produk
+    async getStats(req, res) {
+        try {
+            const userId = req.session.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Akses ditolak. Silakan login terlebih dahulu.'
+                });
+            }
+
+            // Dapatkan semua produk milik pengguna
+            const products = await ProductModel.getAllByUserId(userId);
+
+            // Hitung total produk
+            const total = products.length;
+
+            // Hitung produk dengan stok rendah
+            const lowStock = products.filter(product => 
+                product.stock_quantity <= product.min_stock_level && product.stock_quantity > 0
+            ).length;
+
+            // Hitung produk yang stoknya habis
+            const outOfStock = products.filter(product => 
+                product.stock_quantity <= 0
+            ).length;
+
+            // Total produk yang perlu dibeli (stok rendah atau habis)
+            const shoppingList = lowStock + outOfStock;
+
+            res.status(200).json({
+                success: true,
+                total: total,
+                lowStock: lowStock,
+                outOfStock: outOfStock,
+                shoppingList: shoppingList
+            });
+
+        } catch (error) {
+            console.error('Get products stats error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat mengambil statistik produk.'
+            });
+        }
     }
 };
 

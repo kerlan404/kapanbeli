@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(express.json());
@@ -53,6 +53,11 @@ app.get('/auth', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
     // Note: We cannot pass 'confirmed' variable directly here without a view engine like EJS
     // The client-side JavaScript in login.html will handle displaying the message
+});
+
+// Serve register page
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
 // Use auth routes

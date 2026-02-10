@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saran Pembelian - Kapan Beli</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>" type="image/x-icon">
+
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --primary-orange: #FF9F43;
+            --primary-blue: #2E86DE;
+            --bg-body: #F7F9FC;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
+            --border-radius: 20px;
+            --dot-color: #E1E8ED;
+        }
+
+        body.dark-mode-active {
+            --bg-body: #1E272E;
+            --bg-card: #2C3E50;
+            --text-main: #DFE6E9;
+            --text-muted: #808E9B;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --dot-color: #34495E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- NAVIGATION BAR --- */
+        nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+            padding: 15px 5%;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+            text-decoration: none;
+        }
+
+        .logo i { font-size: 1.8rem; }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 159, 67, 0.1);
+            color: var(--primary-orange);
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-auth-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-text {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .dark-mode-toggle {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dark-mode-toggle:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background: rgba(255, 159, 67, 0.1);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title i {
+            color: var(--primary-orange);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .suggestion-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s;
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .suggestion-header {
+            background: linear-gradient(135deg, var(--primary-orange), #ffbf69);
+            padding: 20px;
+            color: white;
+        }
+
+        .suggestion-title {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .suggestion-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .suggestion-body {
+            padding: 20px;
+        }
+
+        .suggestion-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-actions {
+            padding: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e68a34;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 159, 67, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu { gap: 15px; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .nav-buttons { width: 100%; justify-content: space-between; }
+            .stats-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Kapan Beli</span>
+            </a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/notes" class="nav-link">Catatan Saya</a>
+                <a href="/products" class="nav-link">Bahan Saya</a>
+                <a href="/suggestions" class="nav-link active">Saran Pembelian</a>
+            </div>
+            <div class="nav-buttons">
+                <div class="nav-auth-section">
+                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
+                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
+                </div>
+                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-lightbulb"></i>
+                Saran Pembelian
+            </h1>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #FF9F43;"></i>
+                <div class="stat-number" id="lowStockCount">0</div>
+                <div class="stat-label">Stok Rendah</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock" style="font-size: 2rem; color: #4ECDC4;"></i>
+                <div class="stat-number" id="expiringSoonCount">0</div>
+                <div class="stat-label">Hampir Kadarluarsa</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-shopping-cart" style="font-size: 2rem; color: #1DD1A1;"></i>
+                <div class="stat-number" id="suggestedItemsCount">0</div>
+                <div class="stat-label">Item Disarankan</div>
+            </div>
+        </div>
+
+        <div class="suggestions-grid" id="suggestionsContainer">
+            <!-- Suggestions will be populated here dynamically -->
+            <div class="suggestion-card">
+                <div class="suggestion-header">
+                    <h3 class="suggestion-title">Stok Rendah</h3>
+                    <p class="suggestion-subtitle">Bahan yang perlu segera dibeli</p>
+                </div>
+                <div class="suggestion-body">
+                    <div class="suggestion-item">
+                        <span>Bawang Merah</span>
+                        <span class="badge low-stock">Stok: 0.2 kg</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Cabai Rawit</span>
+                        <span class="badge low-stock">Stok: 0.1 kg</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Garam</span>
+                        <span class="badge low-stock">Stok: 0.05 kg</span>
+                    </div>
+                </div>
+                <div class="suggestion-actions">
+                    <button class="btn btn-outline">Lihat Detail</button>
+                    <button class="btn btn-primary">Beli Sekarang</button>
+                </div>
+            </div>
+
+            <div class="suggestion-card">
+                <div class="suggestion-header">
+                    <h3 class="suggestion-title">Hampir Kadarluarsa</h3>
+                    <p class="suggestion-subtitle">Bahan yang segera habis masa berlakunya</p>
+                </div>
+                <div class="suggestion-body">
+                    <div class="suggestion-item">
+                        <span>Susu Cair</span>
+                        <span class="badge expiring">2 hari lg</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Yogurt</span>
+                        <span class="badge expiring">3 hari lg</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Bayam</span>
+                        <span class="badge expiring">1 hari lg</span>
+                    </div>
+                </div>
+                <div class="suggestion-actions">
+                    <button class="btn btn-outline">Lihat Detail</button>
+                    <button class="btn btn-primary">Gunakan Sekarang</button>
+                </div>
+            </div>
+
+            <div class="suggestion-card">
+                <div class="suggestion-header">
+                    <h3 class="suggestion-title">Rekomendasi Resep</h3>
+                    <p class="suggestion-subtitle">Ide masak berdasarkan bahan yang tersedia</p>
+                </div>
+                <div class="suggestion-body">
+                    <div class="suggestion-item">
+                        <span>Opor Ayam</span>
+                        <span class="badge recipe">Butuh 3 bahan</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Sayur Asem</span>
+                        <span class="badge recipe">Butuh 5 bahan</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Sambal Goreng</span>
+                        <span class="badge recipe">Butuh 4 bahan</span>
+                    </div>
+                </div>
+                <div class="suggestion-actions">
+                    <button class="btn btn-outline">Lihat Resep</button>
+                    <button class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. DARK MODE LOGIC ---
+        const toggleBtn = document.querySelector('.dark-mode-toggle');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark' ||
+           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            enableDarkMode();
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode-active')) {
+                disableDarkMode();
+            } else {
+                enableDarkMode();
+            }
+        });
+
+        function enableDarkMode() {
+            body.classList.add('dark-mode-active');
+            localStorage.setItem('theme', 'dark');
+        }
+
+        function disableDarkMode() {
+            body.classList.remove('dark-mode-active');
+            localStorage.setItem('theme', 'light');
+        }
+
+        // --- 2. USER INFO POPULATION ---
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/auth/status');
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    document.getElementById('userName').textContent = data.user.name;
+                } else {
+                    window.location.href = '/auth';
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                window.location.href = '/auth';
+            }
+        }
+
+        // Load user info when page loads
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+
+        // --- 3. LOGOUT FUNCTIONALITY ---
+        document.getElementById('logoutLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = data.redirect || '/auth';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/auth';
+            }
+        });
+    </script>
+</body>
+</html>
