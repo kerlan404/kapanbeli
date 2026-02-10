@@ -19,12 +19,26 @@
         .nav-title h1 {
             font-size: 1.5rem;
             margin: 0;
+            /* Warna teks akan diatur oleh script berdasarkan mode */
         }
 
         .nav-menu {
             display: flex;
             gap: 1.5rem;
             margin: 0 2rem;
+        }
+
+        .nav-link {
+            /* Warna teks akan diatur oleh script berdasarkan mode */
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .nav-buttons {
@@ -41,12 +55,13 @@
 
         .welcome-text {
             font-size: 0.9rem;
+            /* Warna teks akan diatur oleh script berdasarkan mode */
         }
 
         .dark-mode-toggle {
-            background: none;
-            border: 1px solid white;
-            color: white;
+            background: rgba(255, 255, 255, 0.1); /* Subtle background */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            /* Warna teks akan diatur oleh script berdasarkan mode */
             border-radius: 50%;
             width: 36px;
             height: 36px;
@@ -54,10 +69,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
 
         .dark-mode-toggle:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        /* Tambahkan kelas untuk mode gelap */
+        .dark-mode-active .nav-title h1,
+        .dark-mode-active .nav-link,
+        .dark-mode-active .welcome-text,
+        .dark-mode-active .dark-mode-toggle {
+            color: white;
+        }
+
+        /* Tambahkan kelas untuk mode terang */
+        .nav-title h1,
+        .nav-link,
+        .welcome-text,
+        .dark-mode-toggle {
+            color: #333; /* Warna teks default untuk mode terang */
         }
 
         @media (max-width: 768px) {
@@ -70,10 +103,13 @@
             .nav-menu {
                 margin: 0;
                 justify-content: center;
+                flex-wrap: wrap; /* Allow wrapping on small screens */
             }
 
             .nav-buttons {
                 order: -1; /* Move auth section to top on mobile */
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -97,7 +133,7 @@
                     <span class="welcome-text" id="welcomeText" style="display:none; margin-right: 1rem; color: white; font-weight: bold;"></span>
                     <a href="/auth/logout" class="nav-link" id="logoutLink" style="display:none;">Keluar</a>
                 </div>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
             </div>
         </div>
     </nav>
@@ -308,24 +344,35 @@
 
         // Dark mode toggle functionality
         const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const darkModeIcon = darkModeToggle.querySelector('i'); // Select the icon inside the button
         const body = document.body;
 
         // Check for saved theme preference or respect OS setting
         if (localStorage.getItem('theme') === 'dark' ||
             (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             body.classList.add('dark-mode-active');
+            // Set icon to sun if dark mode is active initially
+            darkModeIcon.classList.remove('fa-moon');
+            darkModeIcon.classList.add('fa-sun');
         } else {
             body.classList.remove('dark-mode-active');
+             // Set icon to moon if light mode is active initially
+             darkModeIcon.classList.remove('fa-sun');
+             darkModeIcon.classList.add('fa-moon');
         }
 
         darkModeToggle?.addEventListener('click', function() {
             body.classList.toggle('dark-mode-active');
 
-            // Save the current theme to localStorage
+            // Toggle the icon based on the new state after the class is toggled
             if (body.classList.contains('dark-mode-active')) {
                 localStorage.setItem('theme', 'dark');
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
             } else {
                 localStorage.setItem('theme', 'light');
+                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.add('fa-moon');
             }
         });
 

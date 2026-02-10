@@ -179,12 +179,19 @@ color:#aaa;
 
 .input-icon {
 position: absolute;
-right: 12px;
+right: 12px; /* Sesuaikan posisi horizontal ikon mata */
 top: 50%;
 transform: translateY(-50%);
 color: #aaa;
 cursor: pointer;
 z-index: 10;
+pointer-events: auto; /* Memastikan ikon bisa diklik */
+}
+
+/* Tambahkan padding kanan ke input agar teks tidak tertutup ikon mata */
+.input-group input[type="password"],
+.input-group input[type="text"] { /* Jika ada input teks lain di grup yang sama */
+    padding-right: 40px; /* Beri ruang untuk ikon mata */
 }
 
 button{
@@ -285,9 +292,9 @@ width:100%;
 </div>
 
 <div class="input-group">
-<i class="fas fa-lock"></i>
-<input type="password" id="loginPassword" placeholder="Password" required>
-<i class="fas fa-eye input-icon" id="toggleLoginPassword"></i>
+    <i class="fas fa-lock"></i>
+    <input type="password" id="loginPassword" placeholder="Password" required>
+    <i class="fas fa-eye input-icon" id="toggleLoginPassword"></i>
 </div>
 
 <button type="submit">Masuk</button>
@@ -312,15 +319,15 @@ width:100%;
 </div>
 
 <div class="input-group">
-<i class="fas fa-lock"></i>
-<input type="password" id="registerPassword" placeholder="Password" required>
-<i class="fas fa-eye input-icon" id="toggleRegisterPassword"></i>
+    <i class="fas fa-lock"></i>
+    <input type="password" id="registerPassword" placeholder="Password" required>
+    <i class="fas fa-eye input-icon" id="toggleRegisterPassword"></i>
 </div>
 
 <div class="input-group">
-<i class="fas fa-lock"></i>
-<input type="password" id="registerConfirmPassword" placeholder="Konfirmasi Password" required>
-<i class="fas fa-eye input-icon" id="toggleRegisterConfirmPassword"></i>
+    <i class="fas fa-lock"></i>
+    <input type="password" id="registerConfirmPassword" placeholder="Konfirmasi Password" required>
+    <i class="fas fa-eye input-icon" id="toggleRegisterConfirmPassword"></i>
 </div>
 
 <button type="submit">Daftar</button>
@@ -521,12 +528,10 @@ registerForm.onsubmit = async (e) => {
         const result = await response.json();
 
         if (response.ok && result.success) {
-            // Registrasi berhasil, tampilkan pesan dan arahkan ke login
+            // Registrasi berhasil, tampilkan pesan dan pindah ke tab login
             showAlert(result.message, false);
-            // Optionally switch to login tab after a delay
-            setTimeout(() => {
-                showLogin();
-            }, 3000);
+            // Pindah ke tab login tanpa delay
+            showLogin();
         } else {
             showAlert(result.message || 'Registrasi gagal. Silakan coba lagi.', true);
         }
