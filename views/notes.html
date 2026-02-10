@@ -4,88 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes - KapanBeli</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" type="image/x-icon">
+    <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background-color: #ffb347;
-            padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
+        /* Custom Navbar Styles (copied from index.html) */
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 0 20px;
         }
 
-        .logo h1 {
-            color: #222;
-            font-size: 1.8rem;
+        .nav-title h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: white; /* Ensure title is visible on navbar background */
         }
 
-        .user-actions {
+        .nav-menu {
             display: flex;
-            gap: 15px;
-            align-items: center;
+            gap: 1.5rem;
+            margin: 0 2rem;
         }
 
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
+        .nav-link {
+            color: white;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .btn-primary {
-            background-color: #222;
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-auth-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .welcome-text {
+            font-size: 0.9rem;
             color: white;
         }
 
-        .btn-secondary {
-            background-color: #e0e0e0;
-            color: #333;
+        .dark-mode-toggle {
+            background: rgba(255, 255, 255, 0.1); /* Subtle background */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
 
-        .btn:hover {
-            opacity: 0.9;
+        .dark-mode-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        /* Tambahkan kelas untuk mode gelap */
+        .dark-mode-active .nav-title h1,
+        .dark-mode-active .nav-link,
+        .dark-mode-active .welcome-text,
+        .dark-mode-active .dark-mode-toggle {
+            color: white;
+        }
+
+        /* Tambahkan kelas untuk mode terang */
+        .nav-title h1,
+        .nav-link,
+        .welcome-text,
+        .dark-mode-toggle {
+            color: #333; /* Warna teks default untuk mode terang */
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .nav-menu {
+                margin: 0;
+                justify-content: center;
+                flex-wrap: wrap; /* Allow wrapping on small screens */
+            }
+
+            .nav-buttons {
+                order: -1; /* Move auth section to top on mobile */
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Main Content Styles */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
         }
 
         .notes-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 20px 0;
+            margin-bottom: 2rem;
         }
 
         .notes-header h2 {
-            font-size: 1.5rem;
-            color: #222;
+            font-size: 1.8rem;
+            color: #333;
         }
 
         .add-note-btn {
@@ -280,17 +324,27 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="logo">
-                <h1>KapanBeli</h1>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="nav-title">
+                <h1>Kapan Beli</h1>
             </div>
-            <div class="user-actions">
-                <span id="welcomeMessage">Halo, <strong id="userName">Pengguna</strong>!</span>
-                <a href="/auth/logout" class="btn btn-secondary">Keluar</a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/notes" class="nav-link active">Catatan Saya</a>
+                <a href="/products" class="nav-link">Bahan Saya</a>
+                <a href="/suggestions" class="nav-link">Saran Pembelian</a>
+                <a href="/stores" class="nav-link">Saran Toko</a>
+            </div>
+            <div class="nav-buttons">
+                <div class="nav-auth-section">
+                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
+                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
+                </div>
+                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
             </div>
         </div>
-    </header>
+    </nav>
 
     <div class="container">
         <div class="notes-header">
@@ -338,6 +392,276 @@
     <footer>
         <p>&copy; 2026 Kapan Beli - Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
     </footer>
+
+    <script>
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        document.getElementById('userName').textContent = data.user.name;
+                    } else {
+                        window.location.href = '/auth';
+                    }
+                } else {
+                    window.location.href = '/auth';
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                window.location.href = '/auth';
+            }
+        }
+
+        // Dark mode toggle functionality (copied from index.html)
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const darkModeIcon = darkModeToggle.querySelector('i'); // Select the icon inside the button
+        const body = document.body;
+
+        // Check for saved theme preference or respect OS setting
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode-active');
+            // Set icon to sun if dark mode is active initially
+            darkModeIcon.classList.remove('fa-moon');
+            darkModeIcon.classList.add('fa-sun');
+        } else {
+            body.classList.remove('dark-mode-active');
+             // Set icon to moon if light mode is active initially
+             darkModeIcon.classList.remove('fa-sun');
+             darkModeIcon.classList.add('fa-moon');
+        }
+
+        darkModeToggle?.addEventListener('click', function() {
+            body.classList.toggle('dark-mode-active');
+
+            // Toggle the icon based on the new state after the class is toggled
+            if (body.classList.contains('dark-mode-active')) {
+                localStorage.setItem('theme', 'dark');
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Show alert message
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            alertContainer.firstChild.style.display = 'block';
+
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Show loading indicator
+        function showLoading(show) {
+            const loader = document.getElementById('loadingIndicator');
+            loader.style.display = show ? 'block' : 'none';
+        }
+
+        // Load notes from API
+        async function loadNotes() {
+            showLoading(true);
+            try {
+                const response = await fetch('/api/notes', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const notesGrid = document.getElementById('notesGrid');
+
+                    if (data.notes && data.notes.length > 0) {
+                        notesGrid.innerHTML = '';
+                        data.notes.forEach(note => {
+                            const noteCard = document.createElement('div');
+                            noteCard.className = 'note-card';
+                            noteCard.innerHTML = `
+                                <div class="note-actions">
+                                    <button class="action-btn edit-note" data-id="${note.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete-note" data-id="${note.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="note-title">${note.title}</div>
+                                <div class="note-content">${note.content || ''}</div>
+                                <div class="note-meta">Dibuat: ${new Date(note.created_at).toLocaleString('id-ID')}</div>
+                                ${note.updated_at && note.updated_at !== note.created_at ? 
+                                    `<div class="note-meta">Diubah: ${new Date(note.updated_at).toLocaleString('id-ID')}</div>` : ''}
+                            `;
+                            notesGrid.appendChild(noteCard);
+                        });
+
+                        // Add event listeners for edit and delete buttons
+                        document.querySelectorAll('.edit-note').forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                const noteId = e.target.closest('.edit-note').dataset.id;
+                                openEditModal(noteId);
+                            });
+                        });
+
+                        document.querySelectorAll('.delete-note').forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                const noteId = e.target.closest('.delete-note').dataset.id;
+                                deleteNote(noteId);
+                            });
+                        });
+                    } else {
+                        notesGrid.innerHTML = '<div class="empty-state"><p>Tidak ada catatan ditemukan. Buat catatan pertama Anda!</p></div>';
+                    }
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.message || 'Gagal memuat catatan.', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                showAlert('Terjadi kesalahan saat memuat catatan.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Open modal for adding a new note
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah Catatan Baru';
+            document.getElementById('noteForm').reset();
+            document.getElementById('noteId').value = '';
+            document.getElementById('noteModal').style.display = 'block';
+        }
+
+        // Open modal for editing an existing note
+        async function openEditModal(noteId) {
+            try {
+                const response = await fetch(\`/api/notes/\${noteId}\`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('modalTitle').textContent = 'Edit Catatan';
+                    document.getElementById('noteId').value = data.note.id;
+                    document.getElementById('noteTitle').value = data.note.title;
+                    document.getElementById('noteContent').value = data.note.content || '';
+
+                    document.getElementById('noteModal').style.display = 'block';
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.message || 'Gagal mengambil detail catatan.', 'error');
+                }
+            } catch (error) {
+                console.error('Error fetching note for edit:', error);
+                showAlert('Terjadi kesalahan saat mengambil detail catatan.', 'error');
+            }
+        }
+
+        // Submit form for adding/editing a note
+        async function submitNoteForm(event) {
+            event.preventDefault();
+
+            const noteId = document.getElementById('noteId').value;
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value;
+
+            if (!title) {
+                showAlert('Judul catatan harus diisi.', 'error');
+                return;
+            }
+
+            const url = noteId ? \`/api/notes/\${noteId}\` : '/api/notes';
+            const method = noteId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, content }),
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showAlert(data.message, 'success');
+                    document.getElementById('noteModal').style.display = 'none';
+                    loadNotes(); // Reload notes after successful submission
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.message || \`Gagal \${noteId ? 'memperbarui' : 'menyimpan'} catatan.\`, 'error');
+                }
+            } catch (error) {
+                console.error(\`Error \${noteId ? 'updating' : 'saving'} note:\`, error);
+                showAlert(\`Terjadi kesalahan saat \${noteId ? 'memperbarui' : 'menyimpan'} catatan.\`, 'error');
+            }
+        }
+
+        // Delete a note
+        async function deleteNote(noteId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus catatan ini?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(\`/api/notes/\${noteId}\`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showAlert(data.message, 'success');
+                    loadNotes(); // Reload notes after successful deletion
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.message || 'Gagal menghapus catatan.', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting note:', error);
+                showAlert('Terjadi kesalahan saat menghapus catatan.', 'error');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('noteModal').style.display = 'none';
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            loadNotes();
+
+            document.getElementById('openAddModal').addEventListener('click', openAddModal);
+            document.getElementById('noteForm').addEventListener('submit', submitNoteForm);
+            document.querySelector('.close').addEventListener('click', closeModal);
+            document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+            // Close modal if clicked outside content
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('noteModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
 
     <script>
         // Check authentication status on page load

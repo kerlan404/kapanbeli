@@ -30,6 +30,7 @@ app.use(session({
 // Import routes
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
+const productRoutes = require('./routes/products');
 
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
@@ -60,6 +61,9 @@ app.use('/auth', authRoutes);
 // Use notes routes (protected)
 app.use('/api/notes', notesRoutes);
 
+// Use product routes (protected)
+app.use('/api/products', productRoutes);
+
 // Protected routes
 app.get('/notes', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'notes.html'));
@@ -73,20 +77,22 @@ app.get('/products/add', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'products-add.html'));
 });
 
-app.post('/products/add', isAuthenticated, (req, res) => {
-    // In a real application, this would save the product to a database
-    // For now, we'll just return a success response
-    const product = req.body;
-
-    // Simulate saving to database
-    console.log('New product added:', product);
-
-    res.json({
-        message: 'Produk berhasil ditambahkan',
-        success: true,
-        product: product
-    });
-});
+// Legacy route for adding products (can be removed later if using API route exclusively)
+// This route is now handled by the API route /api/products POST
+// app.post('/products/add', isAuthenticated, (req, res) => {
+//     // In a real application, this would save the product to a database
+//     // For now, we'll just return a success response
+//     const product = req.body;
+//
+//     // Simulate saving to database
+//     console.log('New product added:', product);
+//
+//     res.json({
+//         message: 'Produk berhasil ditambahkan',
+//         success: true,
+//         product: product
+//     });
+// });
 
 app.get('/suggestions', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'suggestions.html'));

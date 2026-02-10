@@ -62,7 +62,6 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
-            /* Pola titik-titik halus seperti buku tulis */
             background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
             background-size: 24px 24px;
             color: var(--text-main);
@@ -70,22 +69,21 @@
             overflow-x: hidden;
         }
 
-        /* Highlight selection color */
         ::selection {
             background: var(--primary-orange);
             color: white;
         }
 
-        a { text-decoration: none; color: inherit; }
+        a { text-decoration: none; color: inherit; cursor: pointer; }
         ul { list-style: none; }
 
-        /* --- NAVBAR (Polished Glass) --- */
+        /* --- NAVBAR --- */
         .navbar {
             position: sticky;
             top: 0;
             z-index: 1000;
             background-color: var(--nav-bg);
-            backdrop-filter: blur(16px); /* Blur lebih kuat */
+            backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             box-shadow: 0 4px 20px rgba(0,0,0,0.02);
             padding: 1rem 0;
@@ -155,18 +153,16 @@
             font-weight: 600;
             color: var(--primary-blue);
             font-size: 0.9rem;
-            cursor: pointer;
         }
         .btn-text:hover { color: var(--primary-orange); }
 
-        /* Dark Mode Toggle Refined */
         .dark-mode-toggle {
             background: transparent;
             border: 2px solid var(--text-muted);
             color: var(--text-main);
             width: 38px;
             height: 38px;
-            border-radius: 12px; /* Sedikit kotak rounded, modern */
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -180,10 +176,10 @@
             opacity: 1;
             border-color: var(--primary-orange);
             color: var(--primary-orange);
-            transform: rotate(90deg); /* Putar sedikit saat hover */
+            transform: rotate(90deg);
         }
 
-        /* --- HERO SECTION --- */
+        /* --- HERO SECTION (Dengan Search Bar) --- */
         .hero {
             max-width: 1200px;
             margin: 4rem auto;
@@ -228,7 +224,6 @@
             position: relative;
         }
         
-        /* Garis bawah dekoratif pada kata Span */
         .hero h1 span::after {
             content: '';
             position: absolute;
@@ -244,11 +239,52 @@
         .hero p {
             font-size: 1.15rem;
             color: var(--text-muted);
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             max-width: 480px;
             line-height: 1.8;
         }
 
+        /* --- SEARCH BAR STYLE --- */
+        .search-container {
+            position: relative;
+            max-width: 480px;
+            margin-bottom: 2.5rem;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 18px 25px 18px 55px;
+            border: none;
+            border-radius: 50px;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-card);
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            box-shadow: 0 0 0 4px rgba(255, 159, 67, 0.2); /* Orange focus ring */
+            transform: translateY(-2px);
+        }
+
+        .search-container input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-orange);
+            font-size: 1.1rem;
+        }
+
+        /* --- BUTTONS --- */
         .hero-buttons {
             display: flex;
             gap: 1rem;
@@ -266,6 +302,8 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            border: none;
+            cursor: pointer;
         }
 
         .cta-button:hover {
@@ -295,13 +333,11 @@
             position: relative;
         }
 
-        /* Efek Gambar Polaroid Modern */
         .hero-image img {
             width: 100%;
             border-radius: 30px;
-            /* Shadow offset biru yang artistik */
             box-shadow: 20px 20px 0px var(--primary-blue); 
-            transform: rotate(-2deg); /* Sedikit miring agar natural */
+            transform: rotate(-2deg);
             transition: transform 0.5s ease;
             object-fit: cover;
         }
@@ -336,10 +372,10 @@
             border-radius: 2px;
         }
 
-        /* --- STATS --- */
+        /* --- STATS (Updated: 3 Columns) --- */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
         }
 
@@ -375,7 +411,7 @@
         .stat-value { font-size: 2.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem; }
         .stat-label { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- QUICK ACCESS --- */
+        /* --- QUICK ACCESS (Updated: 3 Columns) --- */
         .quick-access-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -419,7 +455,7 @@
         .quick-btn:hover .quick-icon {
             background-color: var(--primary-orange);
             color: white;
-            border-radius: 50%; /* Jadi bulat saat hover */
+            border-radius: 50%;
         }
 
         .quick-label { font-weight: 600; color: var(--text-main); font-size: 1.05rem; }
@@ -436,7 +472,7 @@
             display: flex;
             align-items: center;
             padding: 1.2rem 0;
-            border-bottom: 1px dashed rgba(0,0,0,0.1); /* Garis putus-putus seperti checklist */
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
         }
 
         .activity-item:last-child { border-bottom: none; }
@@ -452,7 +488,6 @@
             font-size: 1.2rem;
         }
 
-        /* Warna Icon berbeda per tipe */
         .activity-item:nth-child(1) .activity-icon { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
         .activity-item:nth-child(2) .activity-icon { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
         .activity-item:nth-child(3) .activity-icon { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
@@ -480,10 +515,11 @@
                 gap: 3rem;
                 margin-top: 2rem;
             }
-            .hero p { margin: 0 auto 2.5rem; }
+            .hero p { margin: 0 auto 2rem; }
             .hero-buttons { justify-content: center; }
+            .search-container { margin: 0 auto 2.5rem; }
             
-            .nav-menu { display: none; } /* Sederhana untuk mobile */
+            .nav-menu { display: none; }
             .hero-image img {
                 width: 90%;
                 box-shadow: 15px 15px 0px var(--primary-blue);
@@ -494,7 +530,7 @@
 </head>
 <body>
 
-    <!-- NAVBAR: Clean, Glass, No Borders -->
+    <!-- NAVBAR: Menu 'Saran Toko' dihapus -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
@@ -506,7 +542,7 @@
                 <a href="/" class="nav-link active">Beranda</a>
                 <a href="/notes" class="nav-link">Catatan</a>
                 <a href="/products" class="nav-link">Bahan Saya</a>
-                <a href="/suggestions" class="nav-link">Saran</a>
+                <a href="/suggestions" class="nav-link">Saran Belanja</a>
             </div>
 
             <div class="nav-actions">
@@ -516,7 +552,6 @@
                     <a href="/auth/logout" class="btn-text" id="logoutLink" style="display:none; color: var(--accent-red);">Keluar</a>
                 </div>
                 
-                <!-- Toggle Button -->
                 <button class="dark-mode-toggle" title="Ganti Mode">
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
@@ -524,7 +559,7 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
+    <!-- HERO SECTION: Search Bar Ditambahkan -->
     <section class="hero">
         <div class="hero-text">
             <span class="greeting-badge" id="greetingBadge">
@@ -533,8 +568,15 @@
             <h1>Catat Stok, <br><span>Matang Tanpa Ribet.</span></h1>
             <p>
                 Asisten cerdas untuk mengelola stok dapur Anda. 
-                Dapatkan notifikasi bahan habis, rekap belanja otomatis, dan temukan toko terbaik di sekitar.
+                Dapatkan notifikasi bahan habis, rekap belanja otomatis, dan temukan resep dengan mudah.
             </p>
+            
+            <!-- NEW: SEARCH BAR -->
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="heroSearch" placeholder="Cari bahan, resep, atau catatan...">
+            </div>
+
             <div class="hero-buttons">
                 <a href="/auth" class="cta-button" id="mainActionBtn">
                     Mulai Catat <i class="fas fa-arrow-right"></i>
@@ -550,7 +592,7 @@
         </div>
     </section>
 
-    <!-- STATS SECTION -->
+    <!-- STATS SECTION: 'Toko Favorit' Dihapus -->
     <section class="section" id="features">
         <div class="container">
             <h2 class="section-title">Ringkasan Dapur</h2>
@@ -570,16 +612,12 @@
                     <div class="stat-value" style="color: var(--primary-orange);">12</div>
                     <div class="stat-label">Daftar Belanja</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: #9B59B6; background: rgba(155, 89, 182, 0.1);"><i class="fas fa-map-marked-alt"></i></div>
-                    <div class="stat-value">5</div>
-                    <div class="stat-label">Toko Favorit</div>
-                </div>
+                <!-- Toko Favorit Card Removed -->
             </div>
         </div>
     </section>
 
-    <!-- QUICK ACCESS -->
+    <!-- QUICK ACCESS: 'Cari Toko' Dihapus -->
     <section class="section" style="background-color: rgba(0,0,0,0.02);">
         <div class="container">
             <h2 class="section-title">Akses Cepat</h2>
@@ -592,14 +630,11 @@
                     <div class="quick-icon"><i class="fas fa-shopping-cart"></i></div>
                     <div class="quick-label">Cek Belanja</div>
                 </div>
-                <div class="quick-btn" onclick="window.location.href='/stores'">
-                    <div class="quick-icon"><i class="fas fa-store"></i></div>
-                    <div class="quick-label">Cari Toko</div>
-                </div>
                 <div class="quick-btn" onclick="window.location.href='/notes'">
                     <div class="quick-icon"><i class="fas fa-utensils"></i></div>
                     <div class="quick-label">Resep Saya</div>
                 </div>
+                <!-- Cari Toko Button Removed -->
             </div>
         </div>
     </section>
@@ -656,7 +691,7 @@
     </footer>
 
     <script>
-        // --- LOGIC 1: WAKTU & SALAM (Tetap Dipertahankan) ---
+        // --- LOGIC 1: WAKTU & SALAM ---
         function updateGreeting() {
             const hour = new Date().getHours();
             const greetingText = document.getElementById('greetingText');
@@ -664,25 +699,24 @@
             
             if (hour >= 5 && hour < 11) {
                 greetingText.textContent = "Selamat Pagi";
-                greetingIcon.className = "fas fa-sun"; // Matahari pagi
+                greetingIcon.className = "fas fa-sun"; 
             } else if (hour >= 11 && hour < 15) {
                 greetingText.textContent = "Selamat Siang";
-                greetingIcon.className = "fas fa-cloud-sun"; // Awan panas
+                greetingIcon.className = "fas fa-cloud-sun"; 
             } else if (hour >= 15 && hour < 18) {
                 greetingText.textContent = "Selamat Sore";
-                greetingIcon.className = "fas fa-cloud-sun-rain"; // Sore gerimis (optional) or just sun
+                greetingIcon.className = "fas fa-cloud-sun-rain"; 
             } else {
                 greetingText.textContent = "Selamat Malam";
-                greetingIcon.className = "fas fa-moon"; // Bulan malam
+                greetingIcon.className = "fas fa-moon"; 
             }
         }
 
-        // --- LOGIC 2: DARK MODE TOGGLE (Tetap Dipertahankan & Dipoles) ---
+        // --- LOGIC 2: DARK MODE TOGGLE ---
         const toggleBtn = document.querySelector('.dark-mode-toggle');
         const themeIcon = document.getElementById('themeIcon');
         const body = document.body;
 
-        // Cek LocalStorage saat load
         if (localStorage.getItem('theme') === 'dark') {
             enableDarkMode();
         }
@@ -700,7 +734,7 @@
             localStorage.setItem('theme', 'dark');
             themeIcon.classList.remove('fa-moon');
             themeIcon.classList.add('fa-sun');
-            themeIcon.style.color = "#F1C40F"; // Warna kuning untuk icon matahari di dark mode
+            themeIcon.style.color = "#F1C40F"; 
         }
 
         function disableDarkMode() {
@@ -708,29 +742,68 @@
             localStorage.setItem('theme', 'light');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
-            themeIcon.style.color = ""; // Reset warna
+            themeIcon.style.color = ""; 
         }
 
-        // --- LOGIC 3: AUTH SIMULATION (Tetap Dipertahankan) ---
+        // --- LOGIC 3: SEARCH BAR (New Feature) ---
+        const searchInput = document.getElementById('heroSearch');
+        
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const query = this.value;
+                if(query.trim() !== "") {
+                    // Simulasi pencarian
+                    alert(`Mencari: "${query}" \n(Ini adalah simulasi fitur pencarian)`);
+                    this.value = ""; // Reset input
+                }
+            }
+        });
+
+        // --- LOGIC 4: AUTH CHECK (Connected to Database via Server API) ---
         const authLink = document.getElementById('authLink');
         const logoutLink = document.getElementById('logoutLink');
         const welcomeText = document.getElementById('welcomeText');
         const mainActionBtn = document.getElementById('mainActionBtn');
 
-        function checkAuth() {
-            // Simulasi sederhana menggunakan localStorage
-            const user = localStorage.getItem('kapanbeli_user');
-            
-            if (user) {
-                // State: Login
-                authLink.style.display = 'none';
-                logoutLink.style.display = 'inline-block';
-                welcomeText.style.display = 'inline-block';
-                welcomeText.textContent = `Halo, ${user}!`;
-                mainActionBtn.innerHTML = 'Buka Catatan <i class="fas fa-book"></i>';
-                mainActionBtn.href = '/products';
-            } else {
-                // State: Belum Login
+        // Function to check authentication status from the server
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin' // Important to include session cookies
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        // User is logged in
+                        authLink.style.display = 'none';
+                        logoutLink.style.display = 'inline-block';
+                        welcomeText.style.display = 'inline-block';
+                        welcomeText.textContent = `Halo, ${data.user.name}!`;
+                        mainActionBtn.innerHTML = 'Buka Catatan <i class="fas fa-book"></i>';
+                        mainActionBtn.href = '/products'; // Or '/notes' or wherever the main dashboard is
+                    } else {
+                        // User is not logged in
+                        authLink.style.display = 'inline-block';
+                        logoutLink.style.display = 'none';
+                        welcomeText.style.display = 'none';
+                        mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
+                        mainActionBtn.href = '/auth';
+                    }
+                } else {
+                    // Handle unexpected response status
+                    console.error('Error checking auth status:', response.status);
+                    // Default to logged out state on error
+                    authLink.style.display = 'inline-block';
+                    logoutLink.style.display = 'none';
+                    welcomeText.style.display = 'none';
+                    mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
+                    mainActionBtn.href = '/auth';
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                // Default to logged out state on error
                 authLink.style.display = 'inline-block';
                 logoutLink.style.display = 'none';
                 welcomeText.style.display = 'none';
@@ -739,31 +812,37 @@
             }
         }
 
-        // Event Listener untuk Demo Login (Hapus ini jika pakai backend asli)
-        authLink.addEventListener('click', (e) => {
+        // Add event listener for logout link to call server API
+        logoutLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            const name = prompt("Masukkan nama Anda (Simulasi):", "Budi");
-            if(name) {
-                localStorage.setItem('kapanbeli_user', name);
-                checkAuth();
+
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'GET', // Or 'POST' depending on your server setup
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    // Redirect to auth page or reload current page to reflect logged-out state
+                    window.location.href = '/auth';
+                } else {
+                    // Handle error if logout fails
+                    const result = await response.json();
+                    console.error('Logout failed:', result.message);
+                    alert('Gagal logout. Silakan coba lagi.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('Terjadi kesalahan saat logout. Silakan coba lagi.');
             }
         });
 
-        logoutLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('kapanbeli_user');
-            checkAuth();
-            alert("Anda berhasil keluar.");
-        });
-
-        // --- INISIALISASI ---
-        // Jalankan saat halaman dimuat
+        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             updateGreeting();
-            checkAuth();
+            checkAuthStatus(); // Check auth status when page loads
         });
 
-        // Update setiap menit
         setInterval(updateGreeting, 60000);
     </script>
 </body>

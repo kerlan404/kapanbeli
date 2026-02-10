@@ -4,56 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Produk - KapanBeli</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>➕</text></svg>" type="image/x-icon">
+    <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #FFE5B4 0%, #FFB347 100%);
-            min-height: 100vh;
+        /* Custom Navbar Styles (copied from index.html) */
+        .nav-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            padding: 0 20px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+        .nav-title h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: white; /* Ensure title is visible on navbar background */
         }
 
-        .header {
-            background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+        .nav-menu {
+            display: flex;
+            gap: 1.5rem;
+            margin: 0 2rem;
+        }
+
+        .nav-link {
             color: white;
-            padding: 30px;
-            text-align: center;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .header p {
-            opacity: 0.9;
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-auth-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .welcome-text {
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255, 255, 255, 0.1); /* Subtle background */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        /* Tambahkan kelas untuk mode gelap */
+        .dark-mode-active .nav-title h1,
+        .dark-mode-active .nav-link,
+        .dark-mode-active .welcome-text,
+        .dark-mode-active .dark-mode-toggle {
+            color: white;
+        }
+
+        /* Tambahkan kelas untuk mode terang */
+        .nav-title h1,
+        .nav-link,
+        .welcome-text,
+        .dark-mode-toggle {
+            color: #333; /* Warna teks default untuk mode terang */
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .nav-menu {
+                margin: 0;
+                justify-content: center;
+                flex-wrap: wrap; /* Allow wrapping on small screens */
+            }
+
+            .nav-buttons {
+                order: -1; /* Move auth section to top on mobile */
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Main Content Styles */
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 20px;
         }
 
         .form-container {
-            padding: 40px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            color: #333;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-label {
@@ -65,19 +150,17 @@
 
         .form-input {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: #fafafa;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #FFA500;
-            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
-            background: white;
+            border-color: #ffb347;
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
         }
 
         .input-with-icon {
@@ -90,30 +173,27 @@
             top: 50%;
             transform: translateY(-50%);
             color: #999;
-            cursor: pointer;
         }
 
         .form-select {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             font-size: 1rem;
-            background: #fafafa;
+            background-color: white;
             cursor: pointer;
         }
 
         .form-select:focus {
             outline: none;
-            border-color: #FFA500;
-            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
-            background: white;
+            border-color: #ffb347;
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
         }
 
         .form-row {
             display: flex;
             gap: 20px;
-            margin-bottom: 25px;
         }
 
         .form-col {
@@ -122,85 +202,40 @@
 
         .form-button {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
-            color: white;
+            padding: 14px;
+            background-color: #ffb347;
+            color: #222;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+            transition: background-color 0.3s;
         }
 
         .form-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
-            background: linear-gradient(135deg, #FF8C00 0%, #FF7700 100%);
-        }
-
-        .form-button:active {
-            transform: translateY(0);
+            background-color: #ffa200;
         }
 
         .back-link {
             display: block;
             text-align: center;
             margin-top: 20px;
-            color: #FFA500;
+            color: #ffb347;
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.3s ease;
         }
 
         .back-link:hover {
-            color: #FF8C00;
             text-decoration: underline;
         }
 
-        .dark-mode {
-            background: linear-gradient(135deg, #2F4F4F 0%, #1E3A5F 100%);
-        }
-
-        .dark-mode .container {
-            background: #2a2a2a;
-        }
-
-        .dark-mode .header {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-        }
-
-        .dark-mode .form-input {
-            background: #333;
-            border: 2px solid #444;
-            color: #f0f0f0;
-        }
-
-        .dark-mode .form-input:focus {
-            border-color: #FFD700;
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
-            background: #3a3a3a;
-        }
-
-        .dark-mode .form-label {
-            color: #ddd;
-        }
-
-        .dark-mode .form-select {
-            background: #333;
-            border: 2px solid #444;
-            color: #f0f0f0;
-        }
-
-        .dark-mode .form-select:focus {
-            border-color: #FFD700;
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
-            background: #3a3a3a;
-        }
-
-        .dark-mode .input-icon {
-            color: #777;
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
@@ -208,28 +243,42 @@
                 flex-direction: column;
                 gap: 15px;
             }
-            
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .form-container {
-                padding: 30px 20px;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-plus-circle"></i> Tambah Produk Baru</h1>
-            <p>Isi data produk yang ingin Anda tambahkan</p>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="nav-title">
+                <h1>Kapan Beli</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/notes" class="nav-link">Catatan Saya</a>
+                <a href="/products" class="nav-link active">Bahan Saya</a>
+                <a href="/suggestions" class="nav-link">Saran Pembelian</a>
+                <a href="/stores" class="nav-link">Saran Toko</a>
+            </div>
+            <div class="nav-buttons">
+                <div class="nav-auth-section">
+                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
+                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
+                </div>
+                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+            </div>
         </div>
+    </nav>
 
+    <div class="container">
         <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-plus-circle"></i> Tambah Produk Baru</h2>
+                <p>Isi data produk yang ingin Anda tambahkan</p>
+            </div>
+
             <form id="productForm">
                 <div class="form-group">
-                    <label class="form-label" for="productName">Nama Produk</label>
+                    <label class="form-label" for="productName">Nama Produk *</label>
                     <div class="input-with-icon">
                         <input type="text" id="productName" class="form-input" placeholder="Contoh: Bawang Merah" required>
                         <i class="fas fa-tag input-icon"></i>
@@ -269,7 +318,7 @@
                 <div class="form-row">
                     <div class="form-col">
                         <div class="form-group">
-                            <label class="form-label" for="productQuantity">Jumlah</label>
+                            <label class="form-label" for="productQuantity">Jumlah *</label>
                             <div class="input-with-icon">
                                 <input type="number" id="productQuantity" class="form-input" placeholder="Contoh: 5" min="1" required>
                                 <i class="fas fa-calculator input-icon"></i>
@@ -278,7 +327,7 @@
                     </div>
                     <div class="form-col">
                         <div class="form-group">
-                            <label class="form-label" for="productPrice">Harga (Rp)</label>
+                            <label class="form-label" for="productPrice">Harga (Rp) *</label>
                             <div class="input-with-icon">
                                 <input type="number" id="productPrice" class="form-input" placeholder="Contoh: 15000" min="0" required>
                                 <i class="fas fa-money-bill-wave input-icon"></i>
@@ -298,7 +347,6 @@
                 <div class="form-group">
                     <label class="form-label" for="productNotes">Catatan Tambahan (Opsional)</label>
                     <textarea id="productNotes" class="form-input" rows="3" placeholder="Catatan tentang produk ini..."></textarea>
-                    <i class="fas fa-sticky-note input-icon" style="top: 35px; right: 15px;"></i>
                 </div>
 
                 <button type="submit" class="form-button">
@@ -312,11 +360,73 @@
         </div>
     </div>
 
+    <footer>
+        <p>&copy; 2026 Kapan Beli - Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
+    </footer>
+
     <script>
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        document.getElementById('userName').textContent = data.user.name;
+                    } else {
+                        window.location.href = '/auth';
+                    }
+                } else {
+                    window.location.href = '/auth';
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                window.location.href = '/auth';
+            }
+        }
+
+        // Dark mode toggle functionality (copied from index.html)
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const darkModeIcon = darkModeToggle.querySelector('i'); // Select the icon inside the button
+        const body = document.body;
+
+        // Check for saved theme preference or respect OS setting
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode-active');
+            // Set icon to sun if dark mode is active initially
+            darkModeIcon.classList.remove('fa-moon');
+            darkModeIcon.classList.add('fa-sun');
+        } else {
+            body.classList.remove('dark-mode-active');
+             // Set icon to moon if light mode is active initially
+             darkModeIcon.classList.remove('fa-sun');
+             darkModeIcon.classList.add('fa-moon');
+        }
+
+        darkModeToggle?.addEventListener('click', function() {
+            body.classList.toggle('dark-mode-active');
+
+            // Toggle the icon based on the new state after the class is toggled
+            if (body.classList.contains('dark-mode-active')) {
+                localStorage.setItem('theme', 'dark');
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.add('fa-moon');
+            }
+        });
+
         // Form submission handler
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             // Get form values
             const productName = document.getElementById('productName').value;
             const productCategory = document.getElementById('productCategory').value;
@@ -325,7 +435,7 @@
             const productPrice = document.getElementById('productPrice').value;
             const productExpiry = document.getElementById('productExpiry').value;
             const productNotes = document.getElementById('productNotes').value;
-            
+
             // Prepare product data
             const productData = {
                 name: productName,
@@ -336,37 +446,39 @@
                 expiryDate: productExpiry || null,
                 notes: productNotes || ''
             };
-            
+
             try {
-                // Send product data to server
-                const response = await fetch('/products/add', {
+                // Send product data to server API
+                const response = await fetch('/api/products', { // Ganti ke endpoint API produk
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(productData)
+                    body: JSON.stringify(productData),
+                    credentials: 'same-origin' // Important for session
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (response.ok) {
                     alert('Produk berhasil ditambahkan!');
                     // Reset form
                     document.getElementById('productForm').reset();
                     // Optionally redirect to products page
-                    // window.location.href = '/products';
+                    window.location.href = '/products';
                 } else {
                     alert(result.message || 'Gagal menambahkan produk. Silakan coba lagi.');
                 }
             } catch (error) {
+                console.error('Error adding product:', error);
                 alert('Terjadi kesalahan saat menambahkan produk. Silakan coba lagi.');
             }
         });
 
-        // Set up dark mode toggle if needed
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
     </script>
 </body>
 </html>
