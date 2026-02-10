@@ -4,1048 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saran Pembelian - Kapan Beli</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/614/614645.png" type="image/x-icon">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f9f9f9'/%3E%3Cline x1='0' y1='20' x2='100' y2='20' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='40' x2='100' y2='40' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='60' x2='100' y2='60' stroke='%23e0e0e0' stroke-width='1'/%3E%3Cline x1='0' y1='80' x2='100' y2='80' stroke='%23e0e0e0' stroke-width='1'/%3E%3C/svg%3E");
-            color: #333;
-            line-height: 1.6;
-            min-height: 100vh;
-            padding-top: 20px;
-        }
-
-        /* Navbar styles */
-        .navbar {
-            background: #9CCFFF; /* Blue background */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 4px solid #FFA500; /* Orange line at bottom */
-            margin: 0;
-            width: 100%;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-
-        .nav-title h1 {
-            color: #FFA500; /* Orange color */
-            font-size: 2rem;
-            font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .nav-link {
-            background: white; /* White background */
-            border: 2px solid #FFA500; /* Orange border */
-            color: #FFA500; /* Orange text */
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .nav-link:hover {
-            background-color: #FFA500;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
-        }
-
-        .active {
-            background-color: #FFA500;
-            color: white;
-        }
-
-        .dark-mode-toggle {
-            background: #333;
-            border: 2px solid #FFA500;
-            color: white;
-            width: 50px;
-            height: 30px;
-            border-radius: 20px;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-        }
-
-        .dark-mode-toggle::before {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #FFA500;
-            top: 1px;
-            left: 2px;
-            transition: 0.3s;
-        }
-
-        .dark-mode-active .dark-mode-toggle::before {
-            transform: translateX(20px);
-        }
-
-        /* Main content styles */
-        .main-content {
-            max-width: 1200px;
-            margin: 2rem auto 3rem;
-            padding: 0 2rem;
-        }
-
-        .container {
-            background-color: #fff9db; /* Yellowish paper color */
-            border-radius: 0;
-            padding: 2.5rem;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #d9d9d9;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
-            background-size: 100% 26px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: repeating-linear-gradient(
-                90deg,
-                #FFA500,
-                #FFA500 10px,
-                #9CCFFF 10px,
-                #9CCFFF 20px
-            );
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px dashed #FFA500; /* Dashed orange line */
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .header-section h2 {
-            color: #333;
-            font-size: 1.8rem;
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .header-section h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 2px;
-            background: #FFA500;
-            border-radius: 2px;
-        }
-
-        .controls-group {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .category-filter-shopping {
-            background: #fff9db;
-            border: 2px solid #333;
-            border-radius: 0;
-            padding: 0.8rem 1.2rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            font-size: 1.1rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-            cursor: pointer;
-            min-width: 180px;
-        }
-
-        .category-filter-shopping:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
-        }
-
-        .search-input {
-            background: white;
-            border: 2px solid #333;
-            border-radius: 0;
-            padding: 0.6rem 1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            font-size: 1rem;
-            width: 200px;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .search-input:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
-        }
-
-        /* Shopping List Styles */
-        .shopping-list-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .shopping-item {
-            background-color: #fff9db; /* Yellowish paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.8rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
-            background-size: 100% 24px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #FFA500;
-        }
-
-        .shopping-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 8px rgba(0,0,0, 0.1);
-        }
-
-        .shopping-item-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .shopping-checkbox {
-            position: relative;
-        }
-
-        .shopping-checkbox input[type="checkbox"] {
-            opacity: 0;
-            position: absolute;
-            width: 24px;
-            height: 24px;
-        }
-
-        .shopping-checkbox label {
-            display: block;
-            width: 24px;
-            height: 24px;
-            border: 2px solid #333;
-            background: white;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
-        }
-
-        .shopping-checkbox input[type="checkbox"]:checked + label::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #FFA500;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .shopping-info {
-            flex: 1;
-        }
-
-        .shopping-name {
-            color: #FF8C00; /* Orange color for product names */
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-category {
-            color: #666;
-            font-size: 1rem;
-            background: rgba(156, 207, 255, 0.3);
-            padding: 0.2rem 0.8rem;
-            border-radius: 0;
-            display: inline-block;
-            margin-top: 0.2rem;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-            padding-bottom: 1.2rem;
-            border-bottom: 1px dashed #333;
-        }
-
-        .shopping-quantity {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .qty-btn {
-            width: 30px;
-            height: 30px;
-            border: 2px solid #333;
-            background: #fff9db;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .qty-btn:hover {
-            background: #ffeaaa;
-        }
-
-        .qty-value {
-            min-width: 30px;
-            text-align: center;
-            font-weight: 700;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-price {
-            font-weight: 700;
-            color: #333;
-            font-size: 1.2rem;
-            background: rgba(255, 165, 0, 0.15);
-            padding: 0.4rem 1rem;
-            border-radius: 0;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .shopping-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.8rem;
-        }
-
-        .shopping-summary {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(156, 207, 255, 0.2);
-            padding: 1rem 1.5rem;
-            border-radius: 0;
-            border: 1px solid #333;
-            font-weight: 700;
-            font-size: 1.1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .summary-total, .summary-price {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn-action {
-            background: none;
-            border: 2px solid #333;
-            cursor: pointer;
-            padding: 0.7rem;
-            border-radius: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            width: 40px;
-            height: 40px;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .btn-edit {
-            color: #FFA500; /* Orange for edit */
-            background: #fff9db !important;
-        }
-
-        .btn-delete {
-            color: #888; /* Gray for delete */
-            background: #fff9db !important;
-        }
-
-        .btn-action:hover {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        .btn-edit:hover {
-            background: #ffeaaa !important;
-        }
-
-        .btn-delete:hover {
-            background: #f0f0f0 !important;
-        }
-
-        /* Recommendations Section */
-        .recommendations-section {
-            margin-top: 2rem;
-        }
-
-        .recommendations-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        .recommendation-card {
-            background-color: #fff9db; /* Yellowish paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.8rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            background-image: linear-gradient(#fff9db 22px, #ffd500 22px, #ffd500 24px, transparent 24px);
-            background-size: 100% 24px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .recommendation-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #FFA500;
-        }
-
-        .recommendation-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 8px rgba(0,0,0, 0.1);
-        }
-
-        .recommendation-card-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .recommendation-card-image {
-            width: 90px;
-            height: 90px;
-            border-radius: 0;
-            object-fit: cover;
-            border: 2px solid #333;
-            background: white;
-            padding: 4px;
-            box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.1);
-        }
-
-        .recommendation-info {
-            flex: 1;
-        }
-
-        .recommendation-name {
-            color: #FF8C00; /* Orange color for product names */
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .recommendation-reason {
-            color: #666;
-            font-size: 1rem;
-            margin: 0;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .recommendation-category {
-            color: #666;
-            font-size: 1rem;
-            background: rgba(156, 207, 255, 0.3);
-            padding: 0.2rem 0.8rem;
-            border-radius: 0;
-            display: inline-block;
-            margin-bottom: 1rem;
-            border: 1px solid #333;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .recommendation-price {
-            font-weight: 700;
-            color: #333;
-            font-size: 1.2rem;
-            background: rgba(255, 165, 0, 0.15);
-            padding: 0.4rem 1rem;
-            border-radius: 0;
-            border: 1px solid #333;
-            margin-bottom: 1.2rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .btn-add-recommendation {
-            background: #4CAF50; /* Green background */
-            color: white;
-            border: 2px solid #333;
-            padding: 0.9rem 1.8rem;
-            border-radius: 0;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            font-size: 1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-            width: 100%;
-        }
-
-        .btn-add-recommendation:hover {
-            background: #45a049;
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        /* Dark Mode Styles */
-        .dark-mode-active {
-            background: #121212;
-        }
-
-        .dark-mode-active body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .navbar {
-            background: linear-gradient(135deg, #1e3c72 0%, #2980b9 100%);
-            color: #f0f0f0;
-            border-bottom: 4px solid #FFA500;
-        }
-
-        .dark-mode-active .nav-title h1 {
-            color: #FFD700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .dark-mode-active .nav-link {
-            background: #1a1a1a;
-            color: #FFD700;
-            border: 2px solid #FFA500;
-        }
-
-        .dark-mode-active .nav-link:hover,
-        .dark-mode-active .active {
-            background: #FFA500;
-            color: white;
-        }
-
-        .dark-mode-active .search-input {
-            background: #1a1a1a;
-            border: 2px solid #444;
-            color: #f0f0f0;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.2);
-        }
-
-        .dark-mode-active .search-input:focus {
-            outline: none;
-            box-shadow: 2px 2px 0px 0px rgba(255, 165, 0, 0.5);
-            border: 2px solid #FFA500;
-        }
-
-        .dark-mode-active .container {
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-            border: 1px solid #444;
-            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
-            background-size: 100% 26px;
-        }
-
-        .dark-mode-active .container::before {
-            background: repeating-linear-gradient(
-                90deg,
-                #FFA500,
-                #FFA500 10px,
-                #2980b9 10px,
-                #2980b9 20px
-            );
-        }
-
-        .dark-mode-active .shopping-item,
-        .dark-mode-active .recommendation-card {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: #f0f0f0;
-            background-image: linear-gradient(#1e1e1e 22px, #333 22px, #333 24px, transparent 24px);
-            background-size: 100% 24px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .dark-mode-active .shopping-item::before,
-        .dark-mode-active .recommendation-card::before {
-            background: #FFA500;
-        }
-
-        .dark-mode-active .shopping-name,
-        .dark-mode-active .recommendation-name {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .shopping-category,
-        .dark-mode-active .recommendation-category {
-            background: rgba(156, 207, 255, 0.2);
-            color: #f0f0f0;
-            border: 1px solid #555;
-        }
-
-        .dark-mode-active .shopping-price,
-        .dark-mode-active .recommendation-price {
-            background: rgba(255, 215, 0, 0.2);
-            color: #f0f0f0;
-            border: 1px solid #555;
-        }
-
-        .dark-mode-active .shopping-checkbox label {
-            background: #333;
-            border: 2px solid #555;
-        }
-
-        .dark-mode-active .shopping-checkbox input[type="checkbox"]:checked + label::after {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .btn-action {
-            border: 2px solid #555;
-        }
-
-        .dark-mode-active .btn-edit {
-            color: #FFD700;
-            background: #333 !important;
-        }
-
-        .dark-mode-active .btn-delete {
-            color: #aaa;
-            background: #333 !important;
-        }
-
-        .dark-mode-active .btn-edit:hover {
-            background: #444 !important;
-        }
-
-        .dark-mode-active .btn-delete:hover {
-            background: #444 !important;
-        }
-
-        .dark-mode-active .btn-add-recommendation {
-            background: #45a049;
-            color: white;
-            border: 2px solid #555;
-        }
-
-        .dark-mode-active .btn-add-recommendation:hover {
-            background: #3d8b40;
-        }
-
-        .btn-add-shopping-item {
-            background: #4CAF50; /* Green background */
-            color: white;
-            border: 2px solid #333;
-            padding: 0.9rem 1.8rem;
-            border-radius: 0;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            font-size: 1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .btn-add-shopping-item:hover {
-            background: #45a049;
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        body.morning .btn-add-shopping-item {
-            background: #4CAF50;
-            border: 2px solid #2E7D32;
-        }
-
-        body.afternoon .btn-add-shopping-item {
-            background: #2196F3;
-            border: 2px solid #0D47A1;
-        }
-
-        body.evening .btn-add-shopping-item {
-            background: #FF9800;
-            border: 2px solid #EF6C00;
-        }
-
-        body.night .btn-add-shopping-item {
-            background: #607D8B;
-            border: 2px solid #37474F;
-        }
-
-        body.morning .btn-add-shopping-item:hover {
-            background: #43A047;
-        }
-
-        body.afternoon .btn-add-shopping-item:hover {
-            background: #1E88E5;
-        }
-
-        body.evening .btn-add-shopping-item:hover {
-            background: #F57C00;
-        }
-
-        body.night .btn-add-shopping-item:hover {
-            background: #546E7A;
-        }
-
-        .btn-refresh-recommendations {
-            background: #2196F3; /* Blue background */
-            color: white;
-            border: 2px solid #333;
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif; /* Handwritten-style font */
-        }
-
-        .btn-refresh-recommendations:hover {
-            background: #1E88E5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
-        }
-
-        body.morning .btn-refresh-recommendations {
-            background: #4CAF50;
-            border: 2px solid #2E7D32;
-        }
-
-        body.afternoon .btn-refresh-recommendations {
-            background: #2196F3;
-            border: 2px solid #0D47A1;
-        }
-
-        body.evening .btn-refresh-recommendations {
-            background: #FF9800;
-            border: 2px solid #EF6C00;
-        }
-
-        body.night .btn-refresh-recommendations {
-            background: #607D8B;
-            border: 2px solid #37474F;
-        }
-
-        body.morning .btn-refresh-recommendations:hover {
-            background: #43A047;
-        }
-
-        body.afternoon .btn-refresh-recommendations:hover {
-            background: #1E88E5;
-        }
-
-        body.evening .btn-refresh-recommendations:hover {
-            background: #F57C00;
-        }
-
-        body.night .btn-refresh-recommendations:hover {
-            background: #546E7A;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            position: relative;
-            background-color: #fff9db;
-            margin: 5% auto;
-            padding: 0;
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            background-image: linear-gradient(#fff9db 24px, #ffd500 24px, #ffd500 26px, transparent 26px);
-            background-size: 100% 26px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            overflow: hidden;
-        }
-
-        .modal-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: #FFA500;
-        }
-
-        .close-modal {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .close-modal:hover {
-            color: #FFA500;
-        }
-
-        .input-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.3rem;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            padding: 0.7rem;
-            border: 1px solid #333;
-            border-radius: 0;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            background: white;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 0.8rem;
-            background: #FFA500;
-            color: white;
-            border: 2px solid #333;
-            border-radius: 0;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            margin-top: 1rem;
-        }
-
-        .submit-btn:hover {
-            background: #ffb733;
-        }
-
-        /* Dark Mode Modal */
-        .dark-mode-active .modal-content {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: #f0f0f0;
-            background-image: linear-gradient(#1e1e1e 24px, #333 24px, #333 26px, transparent 26px);
-        }
-
-        .dark-mode-active .modal-content::before {
-            background: #FFA500;
-        }
-
-        .dark-mode-active .input-group label {
-            color: #ccc;
-        }
-
-        .dark-mode-active .input-group input,
-        .dark-mode-active .input-group select {
-            border: 1px solid #555;
-            background: #333;
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .close-modal:hover {
-            color: #FFD700;
-        }
-    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
+    <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-container">
+        <div class="container nav-container">
             <div class="nav-title">
                 <h1>Kapan Beli</h1>
             </div>
             <div class="nav-menu">
-                <a href="index.html" class="nav-link">Beranda</a>
-                <a href="products.html" class="nav-link">Bahan Saya</a>
-                <a href="suggestions.html" class="nav-link active">Saran Pembelian</a>
-                <a href="stores.html" class="nav-link">Saran Toko</a>
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/products" class="nav-link">Bahan Saya</a>
+                <a href="/suggestions" class="nav-link active">Saran Pembelian</a>
+                <a href="/stores" class="nav-link">Saran Toko</a>
             </div>
             <div class="nav-buttons">
-                <a href="login.html" class="nav-link">Masuk</a>
-                <input type="text" class="search-input" placeholder="Cari...">
+                <span class="welcome-text" id="welcomeText" style="margin-right: 1rem; color: white; font-weight: bold;"></span>
+                <a href="/auth/logout" class="nav-link">Keluar</a>
                 <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
             </div>
         </div>
     </nav>
 
-    <main class="main-content">
+    <section class="section" style="padding: 2rem 0;">
         <div class="container">
-            <div class="header-section">
-                <h2>Daftar Belanja</h2>
-                <div class="controls-group">
-                    <select class="category-filter-shopping">
-                        <option value="">Semua Kategori</option>
-                        <option value="Bumbu">Bumbu</option>
-                        <option value="Sayuran">Sayuran</option>
-                        <option value="Buah-buahan">Buah-buahan</option>
-                        <option value="Daging">Daging</option>
-                        <option value="Seafood">Seafood</option>
-                        <option value="Minyak">Minyak</option>
-                        <option value="Biji-bijian">Biji-bijian</option>
-                    </select>
-                    <button class="btn-add-shopping-item" id="addShoppingItemBtn">
-                        <i class="fas fa-plus"></i> Tambah Item
-                    </button>
+            <h1 class="section-title">Saran Pembelian</h1>
+            
+            <div class="quick-access-container mb-lg">
+                <div class="quick-btn" style="background: #e8f4f8; border-color: #4682b4;" onclick="generateShoppingList()">
+                    <div class="quick-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="quick-label">Buat Daftar Belanja</div>
+                </div>
+                <div class="quick-btn" style="background: #fff9db; border-color: #FFA500;" onclick="checkLowStock()">
+                    <div class="quick-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="quick-label">Stok Rendah</div>
+                </div>
+                <div class="quick-btn" style="background: #e8f5e9; border-color: #4caf50;" onclick="suggestRecipes()">
+                    <div class="quick-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="quick-label">Saran Resep</div>
                 </div>
             </div>
 
-            <div class="shopping-list-grid" id="shoppingListGrid">
-                <!-- Item belanja akan dimuat secara dinamis -->
+            <!-- Shopping List Section -->
+            <div class="section">
+                <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 1.5rem;">Daftar Belanja Minggu Ini</h2>
+                <div class="activity-container">
+                    <div class="stat-card" style="margin-bottom: 1.5rem; text-align: left;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 1rem;"><i class="fas fa-shopping-cart"></i> Barang yang Perlu Dibeli</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox" id="item1" style="margin-right: 10px;">
+                                <label for="item1">Bawang Merah - 5 bh</label>
+                                <span style="float: right; color: #666;">Prioritas Tinggi</span>
+                            </li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox" id="item2" style="margin-right: 10px;">
+                                <label for="item2">Cabai Rawit - 1 ons</label>
+                                <span style="float: right; color: #666;">Prioritas Sedang</span>
+                            </li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox" id="item3" style="margin-right: 10px;">
+                                <label for="item3">Tomat - 3 bh</label>
+                                <span style="float: right; color: #666;">Prioritas Rendah</span>
+                            </li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox" id="item4" style="margin-right: 10px;">
+                                <label for="item4">Bawang Putih - 3 bh</label>
+                                <span style="float: right; color: #666;">Prioritas Sedang</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
-            <div class="shopping-summary">
-                <div class="summary-total">
-                    <span>Total Item:</span>
-                    <span id="totalItems">0</span>
-                </div>
-                <div class="summary-price">
-                    <span>Total Harga:</span>
-                    <span id="totalPrice">Rp 0</span>
+            <!-- Low Stock Items -->
+            <div class="section">
+                <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 1.5rem;">Item dengan Stok Rendah</h2>
+                <div class="activity-container">
+                    <div class="activity-list">
+                        <div class="activity-item" style="margin-bottom: 1rem;">
+                            <div class="activity-icon">
+                                <i class="fas fa-exclamation-triangle" style="color: #FF6347;"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div><strong>Bawang Merah</strong> - Tersisa 1 bh</div>
+                                <div class="activity-time">Perlu dibeli segera</div>
+                            </div>
+                        </div>
+                        <div class="activity-item" style="margin-bottom: 1rem;">
+                            <div class="activity-icon">
+                                <i class="fas fa-exclamation-triangle" style="color: #FFA500;"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div><strong>Cabai Rawit</strong> - Tersisa 2 bh</div>
+                                <div class="activity-time">Akan habis minggu depan</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-exclamation-triangle" style="color: #FFA500;"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div><strong>Tomat</strong> - Tersisa 1 bh</div>
+                                <div class="activity-time">Akan habis akhir pekan ini</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="recommendations-section">
-                <div class="header-section">
-                    <h2>Saran Pembelian</h2>
-                    <button class="btn-refresh-recommendations" id="refreshRecommendationsBtn">
-                        <i class="fas fa-sync-alt"></i> Perbarui Saran
-                    </button>
-                </div>
-                <div class="recommendations-grid" id="recommendationsGrid">
-                    <!-- Rekomendasi akan dimuat secara dinamis -->
+            <!-- Recipe Suggestions -->
+            <div class="section">
+                <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 1.5rem;">Saran Resep Minggu Ini</h2>
+                <div class="testimonial-container">
+                    <div class="testimonial-card" style="text-align: left;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 0.5rem;"><i class="fas fa-utensils"></i> Tumis Buncis Telur</h3>
+                        <p>Resep ini menggunakan bahan-bahan yang umum dan cocok untuk menu sehari-hari.</p>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <span style="background: #e8f4f8; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">Vegetarian</span>
+                            <span style="background: #fff9db; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">Mudah</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card" style="text-align: left;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 0.5rem;"><i class="fas fa-utensils"></i> Sambal Terasi</h3>
+                        <p>Sambal pedas yang cocok untuk pelengkap berbagai hidangan.</p>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <span style="background: #ffccbc; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">Pedas</span>
+                            <span style="background: #fff9db; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">Cepat</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Modal Tambah Item Belanja -->
-        <div id="shoppingItemModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span class="close-modal" id="closeShoppingItemModal">&times;</span>
-                <h2 id="shoppingModalTitle">Tambah Item Belanja</h2>
-                <form id="shoppingItemForm">
-                    <div class="input-group">
-                        <label for="shoppingItemName">Nama Item</label>
-                        <input type="text" id="shoppingItemName" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="shoppingItemCategory">Kategori</label>
-                        <select id="shoppingItemCategory" required>
-                            <option value="">Pilih Kategori</option>
-                            <option value="Bumbu">Bumbu</option>
-                            <option value="Sayuran">Sayuran</option>
-                            <option value="Buah-buahan">Buah-buahan</option>
-                            <option value="Daging">Daging</option>
-                            <option value="Seafood">Seafood</option>
-                            <option value="Minyak">Minyak</option>
-                            <option value="Biji-bijian">Biji-bijian</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="shoppingItemPrice">Harga (Rp)</label>
-                        <input type="number" id="shoppingItemPrice" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="shoppingItemQuantity">Jumlah</label>
-                        <input type="number" id="shoppingItemQuantity" value="1" min="1">
-                    </div>
-                    <button type="submit" class="submit-btn">Tambah ke Daftar</button>
-                </form>
-            </div>
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Kapan Beli - Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
         </div>
-    </main>
+    </footer>
 
     <script>
         // Dark mode toggle functionality
@@ -1060,7 +165,7 @@
             body.classList.remove('dark-mode-active');
         }
 
-        darkModeToggle.addEventListener('click', function() {
+        darkModeToggle?.addEventListener('click', function() {
             body.classList.toggle('dark-mode-active');
 
             // Save the current theme to localStorage
@@ -1071,380 +176,48 @@
             }
         });
 
-        // Modal functionality
-        const shoppingItemModal = document.getElementById('shoppingItemModal');
-        const closeShoppingItemModal = document.getElementById('closeShoppingItemModal');
-        const shoppingItemForm = document.getElementById('shoppingItemForm');
-        const shoppingModalTitle = document.getElementById('shoppingModalTitle');
-        const addShoppingItemBtn = document.getElementById('addShoppingItemBtn');
-        const refreshRecommendationsBtn = document.getElementById('refreshRecommendationsBtn');
+        // Function to generate shopping list
+        function generateShoppingList() {
+            alert('Daftar belanja telah diperbarui berdasarkan stok saat ini!');
+        }
 
-        // Open modal for adding new shopping item
-        addShoppingItemBtn.addEventListener('click', function() {
-            shoppingModalTitle.textContent = 'Tambah Item Belanja';
-            shoppingItemForm.reset();
-            document.getElementById('shoppingItemQuantity').value = 1;
-            shoppingItemModal.style.display = 'block';
+        // Function to check low stock items
+        function checkLowStock() {
+            alert('Memeriksa item dengan stok rendah...');
+        }
+
+        // Function to suggest recipes
+        function suggestRecipes() {
+            alert('Menampilkan saran resep berdasarkan bahan yang tersedia...');
+        }
+
+        // Check auth status
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        document.getElementById('welcomeText').textContent = `Halo, ${data.user.name}!`;
+                        document.getElementById('welcomeText').style.display = 'inline';
+                    } else {
+                        window.location.href = '/auth';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                window.location.href = '/auth';
+            }
+        }
+
+        // Check auth status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
         });
-
-        // Close modal
-        closeShoppingItemModal.addEventListener('click', function() {
-            shoppingItemModal.style.display = 'none';
-        });
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target === shoppingItemModal) {
-                shoppingItemModal.style.display = 'none';
-            }
-        });
-
-        // Sample shopping list data (in a real app, this would come from the server)
-        let shoppingList = [
-            {
-                id: 1,
-                name: 'Bawang Merah',
-                category: 'Sayuran',
-                price: 25000,
-                quantity: 1,
-                checked: false
-            },
-            {
-                id: 2,
-                name: 'Tomat',
-                category: 'Sayuran',
-                price: 15000,
-                quantity: 2,
-                checked: false
-            },
-            {
-                id: 3,
-                name: 'Cabai Merah',
-                category: 'Sayuran',
-                price: 20000,
-                quantity: 1,
-                checked: false
-            }
-        ];
-
-        // Sample recommendations data
-        let recommendations = [
-            {
-                id: 1,
-                name: 'Beras',
-                category: 'Biji-bijian',
-                price: 15000,
-                reason: 'Sering digunakan dalam masakan Indonesia'
-            },
-            {
-                id: 2,
-                name: 'Gula Jawa',
-                category: 'Bumbu',
-                price: 20000,
-                reason: 'Untuk memberikan rasa manis alami pada masakan'
-            },
-            {
-                id: 3,
-                name: 'Kecap Manis',
-                category: 'Bumbu',
-                price: 18000,
-                reason: 'Pewarna dan penambah rasa pada banyak masakan'
-            }
-        ];
-
-        // Function to render shopping list
-        function renderShoppingList(itemsToRender = shoppingList) {
-            const shoppingListGrid = document.getElementById('shoppingListGrid');
-            shoppingListGrid.innerHTML = '';
-
-            itemsToRender.forEach(item => {
-                const shoppingItem = document.createElement('div');
-                shoppingItem.className = 'shopping-item';
-                if (item.checked) {
-                    shoppingItem.style.opacity = '0.6';
-                }
-                shoppingItem.innerHTML = `
-                    <div class="shopping-item-header">
-                        <div class="shopping-checkbox">
-                            <input type="checkbox" id="item${item.id}" ${item.checked ? 'checked' : ''}>
-                            <label for="item${item.id}"></label>
-                        </div>
-                        <div class="shopping-info">
-                            <h3 class="shopping-name">${item.name}</h3>
-                            <p class="shopping-category">${item.category}</p>
-                        </div>
-                    </div>
-                    <div class="shopping-details">
-                        <div class="shopping-quantity">
-                            <span>Jumlah:</span>
-                            <div class="quantity-controls">
-                                <button class="qty-btn minus" data-id="${item.id}">-</button>
-                                <span class="qty-value" id="qty-${item.id}">${item.quantity}</span>
-                                <button class="qty-btn plus" data-id="${item.id}">+</button>
-                            </div>
-                        </div>
-                        <div class="shopping-price">Rp ${(item.price * item.quantity).toLocaleString()}</div>
-                    </div>
-                    <div class="shopping-actions">
-                        <button class="btn-action btn-edit" data-id="${item.id}"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-delete" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-                shoppingListGrid.appendChild(shoppingItem);
-            });
-
-            // Add event listeners to quantity buttons
-            document.querySelectorAll('.qty-btn.plus').forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemId = parseInt(this.getAttribute('data-id'));
-                    updateQuantity(itemId, 1);
-                });
-            });
-
-            document.querySelectorAll('.qty-btn.minus').forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemId = parseInt(this.getAttribute('data-id'));
-                    updateQuantity(itemId, -1);
-                });
-            });
-
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.btn-edit').forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemId = parseInt(this.getAttribute('data-id'));
-                    openEditShoppingItemModal(itemId);
-                });
-            });
-
-            document.querySelectorAll('.btn-delete').forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemId = parseInt(this.getAttribute('data-id'));
-                    deleteShoppingItem(itemId);
-                });
-            });
-
-            // Add event listeners to checkboxes
-            document.querySelectorAll('.shopping-checkbox input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const itemId = parseInt(this.id.replace('item', ''));
-                    toggleCheckedStatus(itemId, this.checked);
-                });
-            });
-
-            updateSummary();
-        }
-
-        // Function to render recommendations
-        function renderRecommendations(recsToRender = recommendations) {
-            const recommendationsGrid = document.getElementById('recommendationsGrid');
-            recommendationsGrid.innerHTML = '';
-
-            recsToRender.forEach(rec => {
-                const recommendationCard = document.createElement('div');
-                recommendationCard.className = 'recommendation-card';
-                recommendationCard.innerHTML = `
-                    <div class="recommendation-card-header">
-                        <img src="https://placehold.co/90x90/4CAF50/FFFFFF?text=${rec.name.charAt(0)}"
-                             alt="${rec.name}" class="recommendation-card-image">
-                        <div class="recommendation-info">
-                            <div class="recommendation-name">${rec.name}</div>
-                            <div class="recommendation-reason">${rec.reason}</div>
-                        </div>
-                    </div>
-                    <div class="recommendation-category">${rec.category}</div>
-                    <div class="recommendation-price">Rp ${rec.price.toLocaleString()}</div>
-                    <button class="btn-add-recommendation" data-id="${rec.id}">
-                        Tambah ke Daftar
-                    </button>
-                `;
-                recommendationsGrid.appendChild(recommendationCard);
-            });
-
-            // Add event listeners to "Add to list" buttons
-            document.querySelectorAll('.btn-add-recommendation').forEach(button => {
-                button.addEventListener('click', function() {
-                    const recId = parseInt(this.getAttribute('data-id'));
-                    addToShoppingList(recId);
-                });
-            });
-        }
-
-        // Function to update quantity
-        function updateQuantity(itemId, change) {
-            const itemIndex = shoppingList.findIndex(item => item.id === itemId);
-            if (itemIndex !== -1) {
-                const newQuantity = shoppingList[itemIndex].quantity + change;
-                if (newQuantity > 0) {
-                    shoppingList[itemIndex].quantity = newQuantity;
-                    renderShoppingList();
-                }
-            }
-        }
-
-        // Function to toggle checked status
-        function toggleCheckedStatus(itemId, checked) {
-            const itemIndex = shoppingList.findIndex(item => item.id === itemId);
-            if (itemIndex !== -1) {
-                shoppingList[itemIndex].checked = checked;
-                renderShoppingList();
-            }
-        }
-
-        // Function to open edit modal
-        function openEditShoppingItemModal(itemId) {
-            const item = shoppingList.find(i => i.id === itemId);
-            if (item) {
-                document.getElementById('shoppingItemName').value = item.name;
-                document.getElementById('shoppingItemCategory').value = item.category;
-                document.getElementById('shoppingItemPrice').value = item.price;
-                document.getElementById('shoppingItemQuantity').value = item.quantity;
-
-                shoppingModalTitle.textContent = 'Edit Item Belanja';
-                shoppingItemModal.style.display = 'block';
-
-                // Update form submit handler for editing
-                shoppingItemForm.onsubmit = function(e) {
-                    e.preventDefault();
-                    updateShoppingItem(itemId);
-                };
-            }
-        }
-
-        // Function to add a new shopping item
-        function addShoppingItem() {
-            const newItem = {
-                id: Math.max(...shoppingList.map(i => i.id), 0) + 1,
-                name: document.getElementById('shoppingItemName').value,
-                category: document.getElementById('shoppingItemCategory').value,
-                price: parseFloat(document.getElementById('shoppingItemPrice').value),
-                quantity: parseInt(document.getElementById('shoppingItemQuantity').value),
-                checked: false
-            };
-
-            shoppingList.push(newItem);
-            renderShoppingList();
-            shoppingItemModal.style.display = 'none';
-            shoppingItemForm.reset();
-            document.getElementById('shoppingItemQuantity').value = 1;
-
-            // Reset form submit handler to default
-            shoppingItemForm.onsubmit = handleShoppingItemFormSubmit;
-
-            alert(`Item "${newItem.name}" berhasil ditambahkan ke daftar belanja!`);
-        }
-
-        // Function to update a shopping item
-        function updateShoppingItem(itemId) {
-            const itemIndex = shoppingList.findIndex(i => i.id === itemId);
-            if (itemIndex !== -1) {
-                shoppingList[itemIndex] = {
-                    id: itemId,
-                    name: document.getElementById('shoppingItemName').value,
-                    category: document.getElementById('shoppingItemCategory').value,
-                    price: parseFloat(document.getElementById('shoppingItemPrice').value),
-                    quantity: parseInt(document.getElementById('shoppingItemQuantity').value),
-                    checked: shoppingList[itemIndex].checked
-                };
-
-                renderShoppingList();
-                shoppingItemModal.style.display = 'none';
-                shoppingItemForm.reset();
-                document.getElementById('shoppingItemQuantity').value = 1;
-
-                // Reset form submit handler to default
-                shoppingItemForm.onsubmit = handleShoppingItemFormSubmit;
-
-                alert(`Item "${shoppingList[itemIndex].name}" berhasil diperbarui!`);
-            }
-        }
-
-        // Function to delete a shopping item
-        function deleteShoppingItem(itemId) {
-            const itemIndex = shoppingList.findIndex(i => i.id === itemId);
-            if (itemIndex !== -1) {
-                const itemName = shoppingList[itemIndex].name;
-                const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus ${itemName} dari daftar belanja?`);
-                if (confirmDelete) {
-                    shoppingList.splice(itemIndex, 1);
-                    renderShoppingList();
-                    alert(`Item "${itemName}" berhasil dihapus dari daftar belanja!`);
-                }
-            }
-        }
-
-        // Function to add recommendation to shopping list
-        function addToShoppingList(recId) {
-            const rec = recommendations.find(r => r.id === recId);
-            if (rec) {
-                // Check if item already exists in shopping list
-                const existingItem = shoppingList.find(item => item.name === rec.name);
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    const newItem = {
-                        id: Math.max(...shoppingList.map(i => i.id), 0) + 1,
-                        name: rec.name,
-                        category: rec.category,
-                        price: rec.price,
-                        quantity: 1,
-                        checked: false
-                    };
-                    shoppingList.push(newItem);
-                }
-
-                renderShoppingList();
-                alert(`"${rec.name}" telah ditambahkan ke daftar belanja!`);
-            }
-        }
-
-        // Refresh recommendations
-        refreshRecommendationsBtn.addEventListener('click', function() {
-            // In a real app, this would fetch new recommendations from the server
-            // For demo, we'll just regenerate the list
-            alert('Memperbarui saran pembelian...');
-            renderRecommendations();
-        });
-
-        // Handle shopping item form submission
-        function handleShoppingItemFormSubmit(e) {
-            e.preventDefault();
-            if (shoppingModalTitle.textContent === 'Tambah Item Belanja') {
-                addShoppingItem();
-            }
-        }
-
-        // Set the default form submit handler
-        shoppingItemForm.onsubmit = handleShoppingItemFormSubmit;
-
-        // Category filter functionality
-        const categoryFilterShopping = document.querySelector('.category-filter-shopping');
-        if(categoryFilterShopping) {
-            categoryFilterShopping.addEventListener('change', function() {
-                const selectedCategory = this.value;
-                if (selectedCategory === '') {
-                    renderShoppingList();
-                } else {
-                    const filteredItems = shoppingList.filter(item =>
-                        item.category === selectedCategory
-                    );
-                    renderShoppingList(filteredItems);
-                }
-            });
-        }
-
-        // Update summary function
-        function updateSummary() {
-            const totalItems = shoppingList.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('totalItems').textContent = totalItems;
-
-            // Calculate total price
-            const totalPrice = shoppingList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('totalPrice').textContent = `Rp ${totalPrice.toLocaleString()}`;
-        }
-
-        // Initialize the lists
-        renderShoppingList();
-        renderRecommendations();
     </script>
 </body>
 </html>

@@ -2,29 +2,35 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
-// Route untuk halaman login
-router.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/../views/login.html');
-});
+// Route untuk halaman login dan register (akan ditangani oleh server.js atau view engine)
+// Kita fokus pada API routes di sini
 
-// Route untuk halaman register
-router.get('/register', (req, res) => {
-    res.sendFile(__dirname + '/../views/register.html');
-});
-
-// Route untuk proses login
+// Route untuk login
 router.post('/login', authController.login);
 
-// Route untuk proses register
-router.post('/register', authController.register);
+// Route untuk register
+router.post('/signup', authController.register);
 
 // Route untuk logout
 router.get('/logout', authController.logout);
 
-// Route untuk profile
-router.get('/profile', authController.authenticateToken, authController.getProfile);
+// Route untuk konfirmasi akun
+router.get('/confirm/:token', authController.confirmAccount);
 
-// Route untuk update profile
-router.put('/profile', authController.authenticateToken, authController.updateProfile);
+// Route untuk memeriksa status otentikasi
+router.get('/status', (req, res) => {
+    if (req.session.user) {
+        res.json({
+            authenticated: true,
+            user: {
+                id: req.session.user.id,
+                name: req.session.user.name,
+                email: req.session.user.email
+            }
+        });
+    } else {
+        res.json({ authenticated: false });
+    }
+});
 
 module.exports = router;

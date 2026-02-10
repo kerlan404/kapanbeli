@@ -13,6 +13,8 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') DEFAULT 'user',
+    is_confirmed BOOLEAN DEFAULT FALSE,
+    confirmation_token VARCHAR(255) UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -128,12 +130,24 @@ CREATE TABLE user_statistics (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Tabel catatan (notes)
+CREATE TABLE notes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Menambahkan indeks untuk performa
 CREATE INDEX idx_products_user_id ON products(user_id);
 CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_wishlist_user_id ON wishlist(user_id);
 CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_vendors_location ON vendors(latitude, longitude);
+CREATE INDEX idx_notes_user_id ON notes(user_id);
 
 -- Menambahkan data awal untuk kategori
 INSERT INTO categories (name, description) VALUES

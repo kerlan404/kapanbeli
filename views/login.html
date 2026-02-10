@@ -1,583 +1,540 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Kapan Beli</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/614/614645.png" type="image/x-icon">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            color: #333;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow: hidden;
-        }
-
-        /* Time-based background adjustments */
-        body.morning {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        }
-
-        body.afternoon {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        }
-
-        body.evening {
-            background: linear-gradient(135deg, #533c00 0%, #e9e0af 100%);
-        }
-
-        body.night {
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-        }
-
-        .login-container {
-            background: #fff9db; /* Yellowish paper color */
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 3rem;
-            width: 100%;
-            max-width: 450px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            background-image: linear-gradient(#fff9db 30px, #ffd500 30px, #ffd500 32px, transparent 32px);
-            background-size: 100% 32px;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        body.morning .login-container {
-            background: #FFF8DC; /* Cornsilk for morning */
-            border: 1px solid #FFEAA7;
-            background-image: linear-gradient(#FFF8DC 30px, #FFDAB9 30px, #FFDAB9 32px, transparent 32px);
-        }
-
-        body.afternoon .login-container {
-            background: #E0F7FA; /* Light cyan for afternoon */
-            border: 1px solid #B3E5FC;
-            background-image: linear-gradient(#E0F7FA 30px, #B2EBF2 30px, #B2EBF2 32px, transparent 32px);
-        }
-
-        body.evening .login-container {
-            background: #FFF3E0; /* Orange light for evening */
-            border: 1px solid #FFE0B2;
-            background-image: linear-gradient(#FFF3E0 30px, #FFCCBC 30px, #FFCCBC 32px, transparent 32px);
-        }
-
-        body.night .login-container {
-            background: #37474F; /* Dark slate for night */
-            border: 1px solid #78909C;
-            background-image: linear-gradient(#37474F 30px, #455A64 30px, #455A64 32px, transparent 32px);
-            color: #E0E0E0;
-        }
-
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: #FFA500;
-        }
-
-        body.morning .login-container::before {
-            background: #FF8C00;
-        }
-
-        body.afternoon .login-container::before {
-            background: #4682B4;
-        }
-
-        body.evening .login-container::before {
-            background: #D2691E;
-        }
-
-        body.night .login-container::before {
-            background: #708090;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .login-header h1 {
-            color: #FFA500;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        body.morning .login-header h1 {
-            color: #FF8C00;
-        }
-
-        body.afternoon .login-header h1 {
-            color: #4682B4;
-        }
-
-        body.evening .login-header h1 {
-            color: #D2691E;
-        }
-
-        body.night .login-header h1 {
-            color: #708090;
-        }
-
-        .login-header p {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        body.morning .login-header p {
-            color: #8D6E63;
-        }
-
-        body.afternoon .login-header p {
-            color: #1565C0;
-        }
-
-        body.evening .login-header p {
-            color: #D84315;
-        }
-
-        body.night .login-header p {
-            color: #BDBDBD;
-        }
-
-        .input-group {
-            margin-bottom: 1.8rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 600;
-        }
-
-        body.morning .input-group label {
-            color: #5D4037;
-        }
-
-        body.afternoon .input-group label {
-            color: #0D47A1;
-        }
-
-        body.evening .input-group label {
-            color: #BF360C;
-        }
-
-        body.night .input-group label {
-            color: #E0E0E0;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 0.9rem 1.2rem;
-            border: 2px solid #333;
-            border-radius: 0;
-            font-size: 1.1rem;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            background: white;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #FFA500;
-        }
-
-        body.morning .input-group input {
-            border: 2px solid #5D4037;
-        }
-
-        body.afternoon .input-group input {
-            border: 2px solid #0D47A1;
-        }
-
-        body.evening .input-group input {
-            border: 2px solid #BF360C;
-        }
-
-        body.night .input-group input {
-            border: 2px solid #455A64;
-            background: #263238;
-            color: #E0E0E0;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 1rem;
-            background: #FFA500; /* Orange background */
-            color: white;
-            border: 2px solid #333;
-            border-radius: 0;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.2rem;
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-        }
-
-        body.morning .login-btn {
-            background: #FF8C00;
-            border: 2px solid #5D4037;
-        }
-
-        body.afternoon .login-btn {
-            background: #4682B4;
-            border: 2px solid #0D47A1;
-        }
-
-        body.evening .login-btn {
-            background: #D2691E;
-            border: 2px solid #BF360C;
-        }
-
-        body.night .login-btn {
-            background: #708090;
-            border: 2px solid #455A64;
-        }
-
-        .login-btn:hover {
-            background: #ffb733;
-            transform: translate(3px, 3px);
-            box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.2);
-        }
-
-        body.morning .login-btn:hover {
-            background: #ff9f1a;
-        }
-
-        body.afternoon .login-btn:hover {
-            background: #5a9bd5;
-        }
-
-        body.evening .login-btn:hover {
-            background: #e67e22;
-        }
-
-        body.night .login-btn:hover {
-            background: #8a9ba8;
-        }
-
-        .form-links {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #666;
-            font-size: 1rem;
-        }
-
-        body.morning .form-links {
-            color: #8D6E63;
-        }
-
-        body.afternoon .form-links {
-            color: #1565C0;
-        }
-
-        body.evening .form-links {
-            color: #D84315;
-        }
-
-        body.night .form-links {
-            color: #BDBDBD;
-        }
-
-        .form-links a {
-            color: #FFA500;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        body.morning .form-links a {
-            color: #FF8C00;
-        }
-
-        body.afternoon .form-links a {
-            color: #4682B4;
-        }
-
-        body.evening .form-links a {
-            color: #D2691E;
-        }
-
-        body.night .form-links a {
-            color: #708090;
-        }
-
-        .form-links a:hover {
-            text-decoration: underline;
-        }
-
-        /* Paper floating animation */
-        .paper-float {
-            position: fixed;
-            background: #fff9db;
-            border: 1px solid #d9d9d9;
-            border-radius: 0;
-            padding: 1.5rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard SE', sans-serif;
-            animation: floatAnimation 8s infinite ease-in-out;
-            z-index: 1;
-            opacity: 0.7;
-        }
-
-        .paper-float:nth-child(1) {
-            top: 15%;
-            left: 5%;
-            width: 120px;
-            height: 160px;
-            animation-delay: 0s;
-        }
-
-        .paper-float:nth-child(2) {
-            top: 60%;
-            right: 7%;
-            width: 100px;
-            height: 140px;
-            animation-delay: 2s;
-        }
-
-        .paper-float:nth-child(3) {
-            bottom: 20%;
-            left: 10%;
-            width: 90px;
-            height: 130px;
-            animation-delay: 4s;
-        }
-
-        @keyframes floatAnimation {
-            0%, 100% { transform: translateY(0) rotate(2deg); }
-            50% { transform: translateY(-20px) rotate(-2deg); }
-        }
-
-        body.morning .paper-float {
-            background: #FFF8DC;
-            border: 1px solid #FFEAA7;
-        }
-
-        body.afternoon .paper-float {
-            background: #E0F7FA;
-            border: 1px solid #B3E5FC;
-        }
-
-        body.evening .paper-float {
-            background: #FFF3E0;
-            border: 1px solid #FFE0B2;
-        }
-
-        body.night .paper-float {
-            background: #37474F;
-            border: 1px solid #78909C;
-            color: #E0E0E0;
-        }
-
-        /* Dark Mode Styles */
-        .dark-mode-active {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-        }
-
-        .dark-mode-active .login-container {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: #f0f0f0;
-            background-image: linear-gradient(#1e1e1e 30px, #333 30px, #333 32px, transparent 32px);
-        }
-
-        .dark-mode-active .login-container::before {
-            background: #FFA500;
-        }
-
-        .dark-mode-active .login-header h1 {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .login-header p {
-            color: #ccc;
-        }
-
-        .dark-mode-active .input-group label {
-            color: #ccc;
-        }
-
-        .dark-mode-active .input-group input {
-            border: 2px solid #555;
-            background: #333;
-            color: #f0f0f0;
-        }
-
-        .dark-mode-active .form-links {
-            color: #ccc;
-        }
-
-        .dark-mode-active .form-links a {
-            color: #FFD700;
-        }
-
-        .dark-mode-active .paper-float {
-            background: #1e1e1e;
-            border: 1px solid #444;
-            color: #f0f0f0;
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KapanBeli - Login & Register</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght @300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins;
+}
+
+body{
+height:100vh;
+background:linear-gradient(135deg,#ffe3a3,#ffb347);
+display:flex;
+align-items:center;
+justify-content:center;
+transition:.4s;
+}
+
+.container{
+width:100%;
+display:flex;
+justify-content:center;
+}
+
+.card{
+width:900px;
+height:520px;
+background:white;
+border-radius:20px;
+display:flex;
+overflow:hidden;
+box-shadow:0 20px 40px rgba(0,0,0,.2);
+}
+
+/* LEFT PANEL */
+.left-panel{
+width:50%;
+background:linear-gradient(135deg,#ffd27f,#ffb347);
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+padding:40px;
+}
+
+.left-panel i{
+font-size:90px;
+color:white;
+margin-bottom:20px;
+animation:float 4s ease-in-out infinite;
+}
+
+.left-panel h1{
+font-size:36px;
+color:white;
+}
+
+.left-panel p{
+margin-top:10px;
+color:white;
+opacity:.9;
+}
+
+/* RIGHT PANEL */
+.right-panel{
+width:50%;
+background:#222;
+padding:40px;
+position:relative;
+overflow:hidden;
+}
+
+/* DARK TOGGLE */
+.dark-toggle{
+position:absolute;
+top:15px;
+right:15px;
+width:45px;
+height:25px;
+background:#ffb347;
+border-radius:20px;
+cursor:pointer;
+}
+
+.dark-toggle::before{
+content:"";
+width:21px;
+height:21px;
+background:white;
+border-radius:50%;
+position:absolute;
+top:2px;
+left:2px;
+transition:.3s;
+}
+
+.dark-mode .dark-toggle::before{
+transform:translateX(20px);
+}
+
+/* TABS */
+.tabs{
+display:flex;
+justify-content:center;
+gap:50px;
+margin-bottom:25px;
+color:#aaa;
+font-weight:600;
+}
+
+.tab{
+cursor:pointer;
+}
+
+.tab.active{
+color:#ffb347;
+border-bottom:2px solid #ffb347;
+padding-bottom:5px;
+}
+
+/* WRAPPER */
+.forms-wrapper{
+width:200%;
+display:flex;
+transition:.6s;
+}
+
+.form-box{
+width:50%;
+padding:0 10px;
+opacity:0;
+transform:translateY(10px);
+transition:.4s;
+}
+
+.form-box.active{
+opacity:1;
+transform:translateY(0);
+}
+
+/* FORM */
+h2{
+text-align:center;
+color:white;
+margin-bottom:25px;
+}
+
+.input-group{
+position:relative;
+margin-bottom:18px;
+}
+
+.input-group input{
+width:100%;
+padding:13px 40px;
+border:none;
+border-radius:8px;
+background:#333;
+color:white;
+}
+
+.input-group i{
+position:absolute;
+left:12px;
+top:50%;
+transform:translateY(-50%);
+color:#aaa;
+}
+
+.input-icon {
+position: absolute;
+right: 12px;
+top: 50%;
+transform: translateY(-50%);
+color: #aaa;
+cursor: pointer;
+z-index: 10;
+}
+
+button{
+width:100%;
+padding:13px;
+border:none;
+border-radius:8px;
+background:#ffb347;
+color:black;
+font-weight:600;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#ffa200;
+}
+
+small{
+color:#aaa;
+display:block;
+text-align:center;
+margin-top:15px;
+}
+
+small span{
+color:#ffb347;
+cursor:pointer;
+}
+
+/* DARK MODE */
+.dark-mode{
+background:linear-gradient(135deg,#111,#000);
+}
+
+.dark-mode .card{
+background:#1c1c1c;
+}
+
+.dark-mode .right-panel{
+background:#111;
+}
+
+.dark-mode input{
+background:#222;
+}
+
+/* ANIMATION */
+ @keyframes float{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-15px);}
+}
+
+ @media (max-width:768px){
+.card{
+flex-direction:column;
+height:auto;
+}
+.left-panel,.right-panel{
+width:100%;
+}
+}
+</style>
 </head>
+
 <body>
-    <!-- Floating paper elements -->
-    <div class="paper-float">
-        <h3>Bawang</h3>
-        <p>Stok: 0.5 kg</p>
-    </div>
-    <div class="paper-float">
-        <h3>Cabai</h3>
-        <p>Stok: 0.2 kg</p>
-    </div>
-    <div class="paper-float">
-        <h3>Tomat</h3>
-        <p>Stok: 1.0 kg</p>
-    </div>
 
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Masuk</h1>
-            <p>Lanjutkan ke akun Anda</p>
-        </div>
+<div class="container">
+<div class="card">
 
-        <form id="loginForm">
-            <div class="input-group">
-                <input type="email" id="email" placeholder="Email" required>
-            </div>
+<!-- LEFT -->
+<div class="left-panel">
+<i class="fas fa-book"></i>
+<h1>KapanBeli</h1>
+<p>Catat semua barang yang ingin kamu beli</p>
+</div>
 
-            <div class="input-group">
-                <input type="password" id="password" placeholder="Kata Sandi" required>
-            </div>
+<!-- RIGHT -->
+<div class="right-panel">
 
-            <button type="submit" class="login-btn">Masuk</button>
-        </form>
+<div class="dark-toggle" id="darkToggle"></div>
 
-        <div class="form-links">
-            <p>Belum punya akun? <a href="register.html">Daftar</a></p>
-        </div>
+<div class="tabs">
+<div class="tab active" id="loginTab">Masuk</div>
+<div class="tab" id="registerTab">Daftar</div>
+</div>
 
-        <button class="dark-mode-toggle" title="Toggle Dark Mode" style="position: absolute; top: 20px; right: 20px; background: #333; border: 2px solid #FFA500; color: white; width: 50px; height: 30px; border-radius: 20px; cursor: pointer; z-index: 1000;">🌙</button>
-    </div>
+<div class="forms-wrapper" id="wrapper">
 
-    <script>
-        // Function to determine time of day and apply appropriate class
-        function updateTimeBasedTheme() {
-            const hour = new Date().getHours();
-            const body = document.body;
-            
-            // Remove existing time classes
-            body.classList.remove('morning', 'afternoon', 'evening', 'night');
-            
-            // Determine time of day and add appropriate class
-            if (hour >= 5 && hour < 10) {
-                // Morning: 5 AM - 10 AM
-                body.classList.add('morning');
-            } else if (hour >= 10 && hour < 15) {
-                // Afternoon: 10 AM - 3 PM
-                body.classList.add('afternoon');
-            } else if (hour >= 15 && hour < 18) {
-                // Evening: 3 PM - 6 PM
-                body.classList.add('evening');
-            } else {
-                // Night: 6 PM - 5 AM
-                body.classList.add('night');
-            }
-        }
+<!-- LOGIN -->
+<form class="form-box active" id="loginForm">
 
-        // Function to update the greeting and time display
-        function updateDateTimeDisplay() {
-            const now = new Date();
-            const hour = now.getHours();
-            
-            // Format date and time
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateString = now.toLocaleDateString('id-ID', options);
-            const timeString = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute:'2-digit' });
-            
-            document.getElementById('currentTime')?.textContent = `${dateString} | ${timeString} WIB`;
-        }
+<h2>Login</h2>
 
-        // Dark mode toggle functionality
-        const darkModeToggle = document.querySelector('.dark-mode-toggle');
-        const body = document.body;
+<div class="input-group">
+<i class="fas fa-envelope"></i>
+<input type="email" id="loginEmail" placeholder="Email" required>
+</div>
 
-        // Check for saved theme preference or respect OS setting
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            body.classList.add('dark-mode-active');
+<div class="input-group">
+<i class="fas fa-lock"></i>
+<input type="password" id="loginPassword" placeholder="Password" required>
+<i class="fas fa-eye input-icon" id="toggleLoginPassword"></i>
+</div>
+
+<button type="submit">Masuk</button>
+
+<small>Belum punya akun? <span id="toRegister">Daftar</span></small>
+
+</form>
+
+<!-- REGISTER -->
+<form class="form-box" id="registerForm">
+
+<h2>Register</h2>
+
+<div class="input-group">
+<i class="fas fa-user"></i>
+<input type="text" id="registerName" placeholder="Nama Lengkap" required>
+</div>
+
+<div class="input-group">
+<i class="fas fa-envelope"></i>
+<input type="email" id="registerEmail" placeholder="Email" required>
+</div>
+
+<div class="input-group">
+<i class="fas fa-lock"></i>
+<input type="password" id="registerPassword" placeholder="Password" required>
+<i class="fas fa-eye input-icon" id="toggleRegisterPassword"></i>
+</div>
+
+<div class="input-group">
+<i class="fas fa-lock"></i>
+<input type="password" id="registerConfirmPassword" placeholder="Konfirmasi Password" required>
+<i class="fas fa-eye input-icon" id="toggleRegisterConfirmPassword"></i>
+</div>
+
+<button type="submit">Daftar</button>
+
+<small>Sudah punya akun? <span id="toLogin">Masuk</span></small>
+
+</form>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const wrapper=document.getElementById("wrapper");
+const loginForm=document.getElementById("loginForm");
+const registerForm=document.getElementById("registerForm");
+
+const loginTab=document.getElementById("loginTab");
+const registerTab=document.getElementById("registerTab");
+
+const toRegister=document.getElementById("toRegister");
+const toLogin=document.getElementById("toLogin");
+
+function showLogin(){
+wrapper.style.transform="translateX(0)";
+loginForm.classList.add("active");
+registerForm.classList.remove("active");
+loginTab.classList.add("active");
+registerTab.classList.remove("active");
+// Clear any alerts when switching to login
+clearAlerts();
+}
+
+function showRegister(){
+wrapper.style.transform="translateX(-50%)";
+registerForm.classList.add("active");
+loginForm.classList.remove("active");
+registerTab.classList.add("active");
+loginTab.classList.remove("active");
+// Clear any alerts when switching to register
+clearAlerts();
+}
+
+loginTab.onclick=showLogin;
+registerTab.onclick=showRegister;
+toRegister.onclick=showRegister;
+toLogin.onclick=showLogin;
+
+/* DARK MODE */
+const toggle=document.getElementById("darkToggle");
+toggle.onclick=()=>{
+document.body.classList.toggle("dark-mode");
+}
+
+/* PASSWORD VISIBILITY TOGGLE */
+const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+const loginPassword = document.getElementById('loginPassword');
+
+toggleLoginPassword.onclick = () => {
+    if (loginPassword.type === 'password') {
+        loginPassword.type = 'text';
+        toggleLoginPassword.classList.remove('fa-eye');
+        toggleLoginPassword.classList.add('fa-eye-slash');
+    } else {
+        loginPassword.type = 'password';
+        toggleLoginPassword.classList.remove('fa-eye-slash');
+        toggleLoginPassword.classList.add('fa-eye');
+    }
+};
+
+const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+const registerPassword = document.getElementById('registerPassword');
+
+toggleRegisterPassword.onclick = () => {
+    if (registerPassword.type === 'password') {
+        registerPassword.type = 'text';
+        toggleRegisterPassword.classList.remove('fa-eye');
+        toggleRegisterPassword.classList.add('fa-eye-slash');
+    } else {
+        registerPassword.type = 'password';
+        toggleRegisterPassword.classList.remove('fa-eye-slash');
+        toggleRegisterPassword.classList.add('fa-eye');
+    }
+};
+
+const toggleRegisterConfirmPassword = document.getElementById('toggleRegisterConfirmPassword');
+const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+
+toggleRegisterConfirmPassword.onclick = () => {
+    if (registerConfirmPassword.type === 'password') {
+        registerConfirmPassword.type = 'text';
+        toggleRegisterConfirmPassword.classList.remove('fa-eye');
+        toggleRegisterConfirmPassword.classList.add('fa-eye-slash');
+    } else {
+        registerConfirmPassword.type = 'password';
+        toggleRegisterConfirmPassword.classList.remove('fa-eye-slash');
+        toggleRegisterConfirmPassword.classList.add('fa-eye');
+    }
+};
+
+// Function to show alert messages
+function showAlert(message, isError = false) {
+    // Remove any existing alerts
+    clearAlerts();
+
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert ${isError ? 'alert-error' : 'alert-success'}`;
+    alertDiv.textContent = message;
+    alertDiv.style.marginTop = '10px';
+    alertDiv.style.textAlign = 'center';
+    alertDiv.style.padding = '10px';
+    alertDiv.style.borderRadius = '5px';
+    alertDiv.style.color = isError ? '#721c24' : '#155724';
+    alertDiv.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
+    alertDiv.style.border = `1px solid ${isError ? '#f5c6cb' : '#c3e6cb'}`;
+
+    // Insert alert before the form buttons
+    const loginButton = document.querySelector('#loginForm button[type="submit"]');
+    const registerButton = document.querySelector('#registerForm button[type="submit"]');
+    
+    if (loginForm.classList.contains('active')) {
+        loginButton.parentNode.insertBefore(alertDiv, loginButton.nextSibling);
+    } else {
+        registerButton.parentNode.insertBefore(alertDiv, registerButton.nextSibling);
+    }
+}
+
+// Function to clear alerts
+function clearAlerts() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => alert.remove());
+}
+
+// Check for confirmation message on page load
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('confirmed') === 'true') {
+        showAlert('Akun Anda telah berhasil dikonfirmasi! Silakan login.', false);
+    }
+};
+
+/* LOGIN FUNCTIONALITY */
+loginForm.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            // Login berhasil, arahkan ke halaman beranda
+            window.location.href = result.redirect || '/';
         } else {
-            body.classList.remove('dark-mode-active');
+            showAlert(result.message || 'Login gagal. Silakan coba lagi.', true);
         }
+    } catch (error) {
+        showAlert('Terjadi kesalahan saat login. Silakan coba lagi.', true);
+    }
+};
 
-        // Add event listener for dark mode toggle
-        darkModeToggle?.addEventListener('click', function() {
-            body.classList.toggle('dark-mode-active');
+/* REGISTER FUNCTIONALITY */
+registerForm.onsubmit = async (e) => {
+    e.preventDefault();
 
-            // Save the current theme to localStorage
-            if (body.classList.contains('dark-mode-active')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+    // Validasi konfirmasi password
+    if (password !== confirmPassword) {
+        showAlert('Password tidak cocok!', true);
+        return;
+    }
+
+    try {
+        const response = await fetch('/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, email, password })
         });
 
-        // Initialize and update time-based theme and display
-        updateTimeBasedTheme();
-        updateDateTimeDisplay();
-        
-        // Update time display every minute
-        setInterval(updateDateTimeDisplay, 60000);
-        
-        // Update theme periodically (every 30 minutes)
-        setInterval(updateTimeBasedTheme, 1800000);
+        const result = await response.json();
 
-        // Form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // In a real application, you would send this to the server
-            // For now, just show an alert
-            alert(`Login berhasil!\nEmail: ${email}`);
-            
-            // Redirect to main application page
-            window.location.href = 'index.html';
-        });
-    </script>
+        if (response.ok && result.success) {
+            // Registrasi berhasil, tampilkan pesan dan arahkan ke login
+            showAlert(result.message, false);
+            // Optionally switch to login tab after a delay
+            setTimeout(() => {
+                showLogin();
+            }, 3000);
+        } else {
+            showAlert(result.message || 'Registrasi gagal. Silakan coba lagi.', true);
+        }
+    } catch (error) {
+        showAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi.', true);
+    }
+};
+</script>
+
 </body>
 </html>

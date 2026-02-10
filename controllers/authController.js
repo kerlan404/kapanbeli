@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 // Middleware untuk otentikasi token
 const authenticateToken = (req, res, next) => {
@@ -21,10 +22,37 @@ const authenticateToken = (req, res, next) => {
                 message: 'Token tidak valid'
             });
         }
-        
+
         req.user = decoded;
         next();
     });
+};
+
+// Fungsi untuk membuat transporter email (gunakan konfigurasi SMTP Anda)
+const createTransporter = () => {
+    // Contoh konfigurasi untuk Gmail
+    // Pastikan untuk mengaktifkan "Less Secure App Access" atau "App Passwords" di akun Gmail Anda
+    // Atau gunakan layanan email lain seperti SendGrid, Mailgun, dll.
+    return nodemailer.createTransporter({
+        service: 'gmail', // Gunakan layanan email Anda
+        auth: {
+            user: process.env.EMAIL_USER, // Alamat email pengirim
+            pass: process.env.EMAIL_PASS  // Password atau App Password
+        }
+    });
+
+    // Contoh alternatif untuk SMTP server kustom:
+    /*
+    return nodemailer.createTransporter({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
+    */
 };
 
 const authController = {
@@ -45,7 +73,7 @@ const authController = {
 
             // Cari pengguna berdasarkan email
             const user = await User.findByEmail(email);
-            
+
             if (!user) {
                 return res.status(401).json({
                     success: false,
@@ -53,9 +81,17 @@ const authController = {
                 });
             }
 
+            // Periksa apakah akun sudah dikonfirmasi
+            if (!user.is_confirmed) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Akun Anda belum dikonfirmasi. Silakan cek email Anda.'
+                });
+            }
+
             // Bandingkan password
             const isMatch = await bcrypt.compare(password, user.password);
-            
+
             if (!isMatch) {
                 return res.status(401).json({
                     success: false,
@@ -63,27 +99,16 @@ const authController = {
                 });
             }
 
-            // Buat token JWT
-            const token = jwt.sign(
-                { userId: user.id, email: user.email },
-                process.env.JWT_SECRET || 'fallback_secret_key',
-                { expiresIn: '24h' }
-            );
-
             // Simpan token ke session (jika menggunakan session)
             req.session.userId = user.id;
-            req.session.token = token;
+            req.session.user = {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            };
 
-            res.status(200).json({
-                success: true,
-                message: 'Login berhasil',
-                token: token,
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
-                }
-            });
+            // Redirect ke halaman utama setelah login berhasil
+            res.json({ success: true, message: 'Login berhasil', redirect: '/' });
 
         } catch (error) {
             console.error('Login error:', error);
@@ -97,19 +122,26 @@ const authController = {
     // Fungsi untuk register
     async register(req, res) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, confirmPassword } = req.body;
 
             // Validasi input
-            if (!name || !email || !password) {
+            if (!name || !email || !password || !confirmPassword) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Nama, email, dan password harus diisi'
+                    message: 'Nama, email, password, dan konfirmasi password harus diisi'
+                });
+            }
+
+            if (password !== confirmPassword) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Password dan konfirmasi password tidak cocok'
                 });
             }
 
             // Periksa apakah email sudah digunakan
             const existingUser = await User.findByEmail(email);
-            
+
             if (existingUser) {
                 return res.status(400).json({
                     success: false,
@@ -121,33 +153,49 @@ const authController = {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-            // Simpan pengguna baru
+            // Simpan pengguna baru (status is_confirmed = false secara default)
             const newUser = await User.create({
                 name,
                 email,
                 password: hashedPassword
             });
 
-            // Buat token JWT
-            const token = jwt.sign(
-                { userId: newUser.id, email: newUser.email },
-                process.env.JWT_SECRET || 'fallback_secret_key',
-                { expiresIn: '24h' }
-            );
+            // Kirim email konfirmasi
+            try {
+                const transporter = createTransporter();
+                const confirmationUrl = `${req.protocol}://${req.get('host')}/auth/confirm/${newUser.confirmation_token}`;
 
-            // Simpan token ke session
-            req.session.userId = newUser.id;
-            req.session.token = token;
+                const mailOptions = {
+                    from: process.env.EMAIL_USER || 'noreply@kapanbeli.com',
+                    to: newUser.email,
+                    subject: 'Konfirmasi Akun KapanBeli',
+                    html: `
+                        <h2>Selamat Datang di KapanBeli, ${newUser.name}!</h2>
+                        <p>Terima kasih telah mendaftar. Untuk mengaktifkan akun Anda, silakan klik tombol di bawah ini:</p>
+                        <a href="${confirmationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #ffb347; color: black; text-decoration: none; border-radius: 5px;">Konfirmasi Akun</a>
+                        <p>Atau salin dan tempel tautan berikut ke browser Anda:</p>
+                        <p>${confirmationUrl}</p>
+                        <p>Tautan ini akan kadaluarsa setelah 24 jam.</p>
+                        <br>
+                        <p>Hormat kami,</p>
+                        <p>Tim KapanBeli</p>
+                    `
+                };
 
-            res.status(201).json({
+                await transporter.sendMail(mailOptions);
+                console.log(`Confirmation email sent to ${newUser.email}`);
+            } catch (emailError) {
+                console.error('Failed to send confirmation email:', emailError);
+                // Jika gagal kirim email, hapus user yang baru dibuat?
+                // Tergantung kebijakan, untuk saat ini kita tetap lanjutkan
+                // karena token konfirmasi sudah disimpan di database
+            }
+
+            // Berhasil register, kembalikan pesan sukses
+            res.json({
                 success: true,
-                message: 'Registrasi berhasil',
-                token: token,
-                user: {
-                    id: newUser.id,
-                    name: newUser.name,
-                    email: newUser.email
-                }
+                message: 'Akun berhasil dibuat. Silakan cek email Anda untuk konfirmasi.',
+                redirect: '/auth' // Redirect ke halaman login setelah registrasi
             });
 
         } catch (error) {
@@ -155,6 +203,43 @@ const authController = {
             res.status(500).json({
                 success: false,
                 message: 'Terjadi kesalahan saat registrasi'
+            });
+        }
+    },
+
+    // Fungsi untuk konfirmasi akun
+    async confirmAccount(req, res) {
+        try {
+            const { token } = req.params;
+
+            if (!token) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Token konfirmasi tidak valid.'
+                });
+            }
+
+            // Cari pengguna berdasarkan token konfirmasi
+            const user = await User.findByConfirmationToken(token);
+
+            if (!user) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Token konfirmasi tidak valid atau sudah digunakan.'
+                });
+            }
+
+            // Konfirmasi akun pengguna
+            await User.confirmUser(token);
+
+            // Redirect ke halaman login dengan pesan sukses
+            res.redirect(`/auth?confirmed=true`);
+
+        } catch (error) {
+            console.error('Account confirmation error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat konfirmasi akun.'
             });
         }
     },
@@ -171,14 +256,12 @@ const authController = {
                         message: 'Gagal logout'
                     });
                 }
-                
+
                 // Hapus cookie jika ada
                 res.clearCookie('connect.sid'); // Nama cookie default untuk express-session
-                
-                res.status(200).json({
-                    success: true,
-                    message: 'Logout berhasil'
-                });
+
+                // Redirect ke halaman login setelah logout berhasil
+                res.json({ success: true, message: 'Logout berhasil', redirect: '/auth' });
             });
         } catch (error) {
             console.error('Logout error:', error);
@@ -193,7 +276,7 @@ const authController = {
     async getProfile(req, res) {
         try {
             const user = await User.findById(req.user.userId);
-            
+
             if (!user) {
                 return res.status(404).json({
                     success: false,
@@ -207,6 +290,7 @@ const authController = {
                     id: user.id,
                     name: user.name,
                     email: user.email,
+                    is_confirmed: user.is_confirmed,
                     created_at: user.created_at
                 }
             });

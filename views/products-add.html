@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Produk - KapanBeli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FFE5B4 0%, #FFB347 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FFA500;
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
+            background: white;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            cursor: pointer;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #fafafa;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #FFA500;
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
+            background: white;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .form-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
+            background: linear-gradient(135deg, #FF8C00 0%, #FF7700 100%);
+        }
+
+        .form-button:active {
+            transform: translateY(0);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #FFA500;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #FF8C00;
+            text-decoration: underline;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #2F4F4F 0%, #1E3A5F 100%);
+        }
+
+        .dark-mode .container {
+            background: #2a2a2a;
+        }
+
+        .dark-mode .header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+
+        .dark-mode .form-input {
+            background: #333;
+            border: 2px solid #444;
+            color: #f0f0f0;
+        }
+
+        .dark-mode .form-input:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+            background: #3a3a3a;
+        }
+
+        .dark-mode .form-label {
+            color: #ddd;
+        }
+
+        .dark-mode .form-select {
+            background: #333;
+            border: 2px solid #444;
+            color: #f0f0f0;
+        }
+
+        .dark-mode .form-select:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+            background: #3a3a3a;
+        }
+
+        .dark-mode .input-icon {
+            color: #777;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-plus-circle"></i> Tambah Produk Baru</h1>
+            <p>Isi data produk yang ingin Anda tambahkan</p>
+        </div>
+
+        <div class="form-container">
+            <form id="productForm">
+                <div class="form-group">
+                    <label class="form-label" for="productName">Nama Produk</label>
+                    <div class="input-with-icon">
+                        <input type="text" id="productName" class="form-input" placeholder="Contoh: Bawang Merah" required>
+                        <i class="fas fa-tag input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label" for="productCategory">Kategori</label>
+                            <select id="productCategory" class="form-select">
+                                <option value="">Pilih Kategori</option>
+                                <option value="bumbu">Bumbu Dapur</option>
+                                <option value="sayur">Sayuran</option>
+                                <option value="buah">Buah-buahan</option>
+                                <option value="rempah">Rempah-rempah</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label" for="productUnit">Satuan</label>
+                            <select id="productUnit" class="form-select">
+                                <option value="">Pilih Satuan</option>
+                                <option value="bh">Buah</option>
+                                <option value="kg">Kilogram</option>
+                                <option value="gr">Gram</option>
+                                <option value="ons">Ons</option>
+                                <option value="ltr">Liter</option>
+                                <option value="ml">Mililiter</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label" for="productQuantity">Jumlah</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="productQuantity" class="form-input" placeholder="Contoh: 5" min="1" required>
+                                <i class="fas fa-calculator input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label" for="productPrice">Harga (Rp)</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="productPrice" class="form-input" placeholder="Contoh: 15000" min="0" required>
+                                <i class="fas fa-money-bill-wave input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="productExpiry">Tanggal Kadaluarsa (Opsional)</label>
+                    <div class="input-with-icon">
+                        <input type="date" id="productExpiry" class="form-input">
+                        <i class="fas fa-calendar input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="productNotes">Catatan Tambahan (Opsional)</label>
+                    <textarea id="productNotes" class="form-input" rows="3" placeholder="Catatan tentang produk ini..."></textarea>
+                    <i class="fas fa-sticky-note input-icon" style="top: 35px; right: 15px;"></i>
+                </div>
+
+                <button type="submit" class="form-button">
+                    <i class="fas fa-save"></i> Simpan Produk
+                </button>
+            </form>
+
+            <a href="/products" class="back-link">
+                <i class="fas fa-arrow-left"></i> Kembali ke Daftar Produk
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Form submission handler
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const productName = document.getElementById('productName').value;
+            const productCategory = document.getElementById('productCategory').value;
+            const productUnit = document.getElementById('productUnit').value;
+            const productQuantity = document.getElementById('productQuantity').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const productExpiry = document.getElementById('productExpiry').value;
+            const productNotes = document.getElementById('productNotes').value;
+            
+            // Prepare product data
+            const productData = {
+                name: productName,
+                category: productCategory,
+                unit: productUnit,
+                quantity: parseInt(productQuantity),
+                price: parseInt(productPrice),
+                expiryDate: productExpiry || null,
+                notes: productNotes || ''
+            };
+            
+            try {
+                // Send product data to server
+                const response = await fetch('/products/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Produk berhasil ditambahkan!');
+                    // Reset form
+                    document.getElementById('productForm').reset();
+                    // Optionally redirect to products page
+                    // window.location.href = '/products';
+                } else {
+                    alert(result.message || 'Gagal menambahkan produk. Silakan coba lagi.');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan saat menambahkan produk. Silakan coba lagi.');
+            }
+        });
+
+        // Set up dark mode toggle if needed
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
