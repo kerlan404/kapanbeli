@@ -192,6 +192,8 @@ const authController = {
             }
 
             // Berhasil register, kembalikan pesan sukses
+            // Kita tidak menginisialisasi session di sini karena akun belum dikonfirmasi
+            // Pengguna harus login setelah konfirmasi
             res.json({
                 success: true,
                 message: 'Akun berhasil dibuat. Silakan cek email Anda untuk konfirmasi.',
