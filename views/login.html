@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Kapan Beli</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
+
+    <style>
+        /* --- CSS VARIABLES (Sama dengan Tema Utama) --- */
+        :root {
+            --primary-orange: #FF9F43;
+            --primary-blue: #2E86DE;
+            --bg-body: #F7F9FC;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
+            --border-radius: 20px;
+            --dot-color: #E1E8ED;
+        }
+
+        body.dark-mode-active {
+            --bg-body: #1E272E;
+            --bg-card: #2C3E50;
+            --text-main: #DFE6E9;
+            --text-muted: #808E9B;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --dot-color: #34495E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Decoration Image */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 40%;
+            height: 100%;
+            background-image: url('https://z-cdn-media.chatglm.cn/files/3aaa6c94-c363-47e0-886e-817084f4b407.jpeg?auth_key=1870694353-37fd08f5dca94279b617d21318047ad0-0-84c2bb20f2aedb79ed770e63f95cd4fe');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: -1;
+            mask-image: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0));
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0));
+        }
+
+        /* --- AUTH CONTAINER --- */
+        .auth-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            display: flex;
+            overflow: hidden;
+            margin: 20px;
+            min-height: 550px;
+        }
+
+        /* Left Panel */
+        .auth-brand-panel {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-orange), #ffbf69);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-brand-panel::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            top: -50%;
+            left: -50%;
+            animation: rotateBg 20s linear infinite;
+        }
+
+        @keyframes rotateBg {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auth-brand-panel i { font-size: 5rem; margin-bottom: 20px; position: relative; z-index: 2; }
+        .auth-brand-panel h2 { font-size: 2rem; margin-bottom: 10px; position: relative; z-index: 2; }
+        .auth-brand-panel p { opacity: 0.9; position: relative; z-index: 2; }
+
+        /* Right Panel */
+        .auth-form-panel {
+            flex: 1.5;
+            padding: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .dark-mode-toggle:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
+
+        /* Form Styling */
+        .form-header { margin-bottom: 30px; }
+        .form-header h3 { font-size: 1.8rem; color: var(--text-main); }
+        .form-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-main); }
+        
+        .input-wrapper { position: relative; }
+        .input-wrapper i.icon-left {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);
+        }
+        .input-wrapper input {
+            width: 100%; padding: 14px 45px 14px 45px;
+            border: 2px solid rgba(0,0,0,0.05); border-radius: 12px;
+            background: var(--bg-body); color: var(--text-main);
+            font-size: 1rem; outline: none; font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        .input-wrapper input:focus {
+            border-color: var(--primary-blue); background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+        }
+        .input-wrapper i.icon-eye {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); cursor: pointer;
+        }
+        .input-wrapper i.icon-eye:hover { color: var(--primary-orange); }
+
+        .btn-submit {
+            width: 100%; padding: 15px; background: var(--primary-orange); color: white;
+            border: none; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3); margin-top: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4); background: #f08c38; }
+
+        .form-links { text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; }
+        .form-links a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .form-links a:hover { text-decoration: underline; }
+
+        /* Alert Box */
+        .alert-box {
+            padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;
+            display: none; align-items: center; gap: 10px;
+        }
+        .alert-box.show { display: flex; animation: fadeIn 0.3s; }
+        .alert-error { background: rgba(255, 107, 107, 0.1); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.2); }
+        .alert-success { background: rgba(29, 209, 161, 0.1); color: #1DD1A1; border: 1px solid rgba(29, 209, 161, 0.2); }
+
+        @media (max-width: 768px) {
+            .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; }
+            .auth-brand-panel { display: none; }
+            .auth-form-panel { padding: 30px 20px; justify-content: center; }
+            .bg-decoration { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-decoration"></div>
+
+    <div class="auth-container">
+        <!-- Panel Kiri: Branding -->
+        <div class="auth-brand-panel">
+            <i class="fas fa-carrot"></i>
+            <h2>Kapan Beli</h2>
+            <p>Kelola stok dapur dengan cerdas.<br>Masak jadi lebih mudah.</p>
+        </div>
+
+        <!-- Panel Kanan: Form Login -->
+        <div class="auth-form-panel">
+            
+            <button class="dark-mode-toggle" title="Ganti Mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+
+            <div id="authAlert" class="alert-box"></div>
+
+            <div class="form-header">
+                <h3>Selamat Datang Kembali!</h3>
+                <p>Silakan masuk untuk melanjutkan.</p>
+            </div>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope icon-left"></i>
+                        <input type="email" id="loginEmail" placeholder="nama@email.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon-left"></i>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <i class="fas fa-eye icon-eye" onclick="togglePassword('loginPassword', this)"></i>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <a href="#" style="font-size: 0.85rem; color: var(--primary-blue);">Lupa Password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Masuk</button>
+            </form>
+
+            <div class="form-links">
+                <p>Belum punya akun? <a href="register.html">Daftar Sekarang</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. DARK MODE LOGIC ---
+        const toggleBtn = document.querySelector('.dark-mode-toggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark' || 
+           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            enableDarkMode();
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode-active')) {
+                disableDarkMode();
+            } else {
+                enableDarkMode();
+            }
+        });
+
+        function enableDarkMode() {
+            body.classList.add('dark-mode-active');
+            localStorage.setItem('theme', 'dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+            themeIcon.style.color = "#F1C40F"; 
+        }
+
+        function disableDarkMode() {
+            body.classList.remove('dark-mode-active');
+            localStorage.setItem('theme', 'light');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+            themeIcon.style.color = ""; 
+        }
+
+        // --- 2. PASSWORD TOGGLE ---
+        function togglePassword(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconElement.classList.remove('fa-eye');
+                iconElement.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                iconElement.classList.remove('fa-eye-slash');
+                iconElement.classList.add('fa-eye');
+            }
+        }
+
+        // --- 3. ALERT LOGIC ---
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('authAlert');
+            alertBox.className = `alert-box show ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+            alertBox.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> <span>${message}</span>`;
+        }
+        function hideAlert() {
+            document.getElementById('authAlert').classList.remove('show');
+        }
+
+        // --- 4. LOGIN HANDLER (SIMULASI - TANPA DATABASE) ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            hideAlert();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            // Validasi Sederhana
+            if (!email || !password) {
+                showAlert('Mohon lengkapi email dan password.', 'error');
+                return;
+            }
+
+            // SIMULASI: Tanpa fetch ke backend
+            // Kita anggap login selalu berhasil untuk demo ini
+            const btn = document.querySelector('.btn-submit');
+            const originalText = btn.innerText;
+            
+            btn.innerText = 'Memproses...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                showAlert('Login Berhasil! Mengalihkan...', 'success');
+                
+                setTimeout(() => {
+                    // Arahkan ke halaman utama (index.html atau /)
+                    window.location.href = 'index.html'; 
+                }, 1000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
