@@ -1,262 +1,640 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kapan Beli - Catatan Stok Bahan Masak</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* Custom Navbar Styles */
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
+        /* --- VARIABEL & TEMA --- */
+        :root {
+            /* Warna: Oranye Segar & Biru Profesional */
+            --primary-orange: #FF9F43;
+            --primary-blue: #2E86DE;
+            --accent-green: #1DD1A1;
+            --accent-red: #FF6B6B;
+            
+            /* Light Mode (Notebook Paper) */
+            --bg-body: #F7F9FC;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --nav-bg: rgba(255, 255, 255, 0.75);
+            --shadow-card: 0 8px 24px rgba(149, 157, 165, 0.1);
+            --shadow-hover: 0 12px 32px rgba(149, 157, 165, 0.2);
+            --border-radius: 20px;
+            
+            /* Pattern Dot Grid */
+            --dot-color: #E1E8ED;
         }
 
-        .nav-title h1 {
-            font-size: 1.5rem;
+        /* Dark Mode */
+        body.dark-mode-active {
+            --bg-body: #1E272E;
+            --bg-card: #2C3E50;
+            --text-main: #DFE6E9;
+            --text-muted: #808E9B;
+            --nav-bg: rgba(30, 39, 46, 0.85);
+            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --dot-color: #34495E;
+        }
+
+        /* --- RESET & GLOBAL --- */
+        * {
+            box-sizing: border-box;
             margin: 0;
-            /* Warna teks akan diatur oleh script berdasarkan mode */
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
-        .nav-menu {
-            display: flex;
-            gap: 1.5rem;
-            margin: 0 2rem;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            /* Pola titik-titik halus seperti buku tulis */
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
         }
 
-        .nav-link {
-            /* Warna teks akan diatur oleh script berdasarkan mode */
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-auth-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .welcome-text {
-            font-size: 0.9rem;
-            /* Warna teks akan diatur oleh script berdasarkan mode */
-        }
-
-        .dark-mode-toggle {
-            background: rgba(255, 255, 255, 0.1); /* Subtle background */
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            /* Warna teks akan diatur oleh script berdasarkan mode */
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-        }
-
-        .dark-mode-toggle:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-color: white;
-        }
-
-        /* Tambahkan kelas untuk mode gelap */
-        .dark-mode-active .nav-title h1,
-        .dark-mode-active .nav-link,
-        .dark-mode-active .welcome-text,
-        .dark-mode-active .dark-mode-toggle {
+        /* Highlight selection color */
+        ::selection {
+            background: var(--primary-orange);
             color: white;
         }
 
-        /* Tambahkan kelas untuk mode terang */
-        .nav-title h1,
-        .nav-link,
-        .welcome-text,
-        .dark-mode-toggle {
-            color: #333; /* Warna teks default untuk mode terang */
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- NAVBAR (Polished Glass) --- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--nav-bg);
+            backdrop-filter: blur(16px); /* Blur lebih kuat */
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            padding: 1rem 0;
         }
 
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 10px;
-                padding: 10px;
-            }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-            .nav-menu {
-                margin: 0;
-                justify-content: center;
-                flex-wrap: wrap; /* Allow wrapping on small screens */
-            }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
 
-            .nav-buttons {
-                order: -1; /* Move auth section to top on mobile */
-                width: 100%;
-                justify-content: center;
+        .nav-brand i { color: var(--primary-orange); font-size: 1.6rem; }
+        .nav-brand span { color: var(--text-main); }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-link {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary-orange);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .btn-text {
+            font-weight: 600;
+            color: var(--primary-blue);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn-text:hover { color: var(--primary-orange); }
+
+        /* Dark Mode Toggle Refined */
+        .dark-mode-toggle {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: 12px; /* Sedikit kotak rounded, modern */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .dark-mode-toggle:hover {
+            opacity: 1;
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            transform: rotate(90deg); /* Putar sedikit saat hover */
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 5rem;
+            min-height: 75vh;
+        }
+
+        .hero-text {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .greeting-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(46, 134, 222, 0.1);
+            color: var(--primary-blue);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(46, 134, 222, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            letter-spacing: -1.5px;
+            font-weight: 800;
+        }
+
+        .hero h1 span { 
+            color: var(--primary-orange);
+            display: inline-block;
+            position: relative;
+        }
+        
+        /* Garis bawah dekoratif pada kata Span */
+        .hero h1 span::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 5px;
+            width: 100%;
+            height: 12px;
+            background-color: rgba(255, 159, 67, 0.2);
+            z-index: -1;
+            border-radius: 4px;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 480px;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .cta-button {
+            background-color: var(--primary-orange);
+            color: white;
+            padding: 16px 36px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 10px 25px rgba(255, 159, 67, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(255, 159, 67, 0.5);
+            background-color: #f08c38;
+        }
+
+        .secondary-button {
+            background-color: var(--bg-card);
+            border: 2px solid rgba(0,0,0,0.05);
+            color: var(--text-main);
+            padding: 14px 32px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: var(--shadow-card);
+        }
+        
+        .secondary-button:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .hero-image {
+            flex: 1;
+            position: relative;
+        }
+
+        /* Efek Gambar Polaroid Modern */
+        .hero-image img {
+            width: 100%;
+            border-radius: 30px;
+            /* Shadow offset biru yang artistik */
+            box-shadow: 20px 20px 0px var(--primary-blue); 
+            transform: rotate(-2deg); /* Sedikit miring agar natural */
+            transition: transform 0.5s ease;
+            object-fit: cover;
+        }
+
+        .hero-image:hover img {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        /* --- SECTIONS UMUM --- */
+        .section { padding: 5rem 24px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            font-size: 2.2rem;
+            color: var(--text-main);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--primary-orange);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* --- STATS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 2.5rem 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 159, 67, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary-blue);
+            background: rgba(46, 134, 222, 0.1);
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-value { font-size: 2.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem; }
+        .stat-label { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- QUICK ACCESS --- */
+        .quick-access-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .quick-btn {
+            background: var(--bg-card);
+            padding: 2.5rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--primary-orange);
+            background-color: var(--bg-body);
+            transform: translateY(-5px);
+        }
+
+        .quick-icon {
+            width: 65px;
+            height: 65px;
+            background-color: rgba(46, 134, 222, 0.08);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--primary-blue);
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover .quick-icon {
+            background-color: var(--primary-orange);
+            color: white;
+            border-radius: 50%; /* Jadi bulat saat hover */
+        }
+
+        .quick-label { font-weight: 600; color: var(--text-main); font-size: 1.05rem; }
+
+        /* --- ACTIVITY LIST --- */
+        .activity-container {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1.2rem 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.1); /* Garis putus-putus seperti checklist */
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+
+        .activity-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Warna Icon berbeda per tipe */
+        .activity-item:nth-child(1) .activity-icon { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
+        .activity-item:nth-child(2) .activity-icon { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+        .activity-item:nth-child(3) .activity-icon { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
+        .activity-item:nth-child(4) .activity-icon { background: rgba(253, 203, 110, 0.2); color: #f39c12; }
+
+        .activity-content { flex: 1; }
+        .activity-content > div:first-child { font-weight: 600; font-size: 1rem; color: var(--text-main); }
+        .activity-time { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+
+        /* --- FOOTER --- */
+        .footer {
+            text-align: center;
+            padding: 4rem 0;
+            margin-top: 4rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            background-color: var(--bg-card);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 968px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+                gap: 3rem;
+                margin-top: 2rem;
             }
+            .hero p { margin: 0 auto 2.5rem; }
+            .hero-buttons { justify-content: center; }
+            
+            .nav-menu { display: none; } /* Sederhana untuk mobile */
+            .hero-image img {
+                width: 90%;
+                box-shadow: 15px 15px 0px var(--primary-blue);
+            }
+            .section-title { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
+
+    <!-- NAVBAR: Clean, Glass, No Borders -->
     <nav class="navbar">
-        <div class="container nav-container">
-            <div class="nav-title">
-                <h1>Kapan Beli</h1>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-book-open"></i>
+                <span>Kapan Beli</span>
             </div>
+
             <div class="nav-menu">
                 <a href="/" class="nav-link active">Beranda</a>
-                <a href="/notes" class="nav-link">Catatan Saya</a>
+                <a href="/notes" class="nav-link">Catatan</a>
                 <a href="/products" class="nav-link">Bahan Saya</a>
-                <a href="/suggestions" class="nav-link">Saran Pembelian</a>
-                <a href="/stores" class="nav-link">Saran Toko</a>
+                <a href="/suggestions" class="nav-link">Saran</a>
             </div>
-            <div class="nav-buttons">
-                <div class="nav-auth-section">
-                    <a href="/auth" class="nav-link" id="authLink">Masuk</a>
-                    <span class="welcome-text" id="welcomeText" style="display:none; margin-right: 1rem; color: white; font-weight: bold;"></span>
-                    <a href="/auth/logout" class="nav-link" id="logoutLink" style="display:none;">Keluar</a>
+
+            <div class="nav-actions">
+                <div id="authContainer">
+                    <a href="/auth" class="btn-text" id="authLink">Masuk</a>
+                    <span id="welcomeText" style="display:none; font-weight: 600; margin-right: 10px; color: var(--text-main);"></span>
+                    <a href="/auth/logout" class="btn-text" id="logoutLink" style="display:none; color: var(--accent-red);">Keluar</a>
                 </div>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+                
+                <!-- Toggle Button -->
+                <button class="dark-mode-toggle" title="Ganti Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
             </div>
         </div>
     </nav>
 
+    <!-- HERO SECTION -->
     <section class="hero">
-        <div class="ingredient-icon">
-            <i class="fas fa-carrot"></i>
-        </div>
-        <div class="ingredient-icon">
-            <i class="fas fa-pepper-hot"></i>
-        </div>
-        <div class="ingredient-icon">
-            <i class="fas fa-apple-alt"></i>
-        </div>
-        <div class="ingredient-icon">
-            <i class="fas fa-lemon"></i>
-        </div>
-
-        <div class="hero-content">
-            <h2 class="time-greeting" id="timeGreeting">Selamat Pagi!</h2>
-            <div class="current-time" id="currentTime">Senin, 5 Februari 2026 | 08:00 WIB</div>
-            <h1>Catatan Stok Bahan Masak Anda</h1>
-            <p>Kelola bahan masak Anda dengan mudah. Pantau stok, dapatkan saran pembelian, dan temukan toko terdekat untuk bahan-bahan segar.</p>
+        <div class="hero-text">
+            <span class="greeting-badge" id="greetingBadge">
+                <i class="fas fa-sun"></i> <span id="greetingText">Selamat Pagi</span>
+            </span>
+            <h1>Catat Stok, <br><span>Matang Tanpa Ribet.</span></h1>
+            <p>
+                Asisten cerdas untuk mengelola stok dapur Anda. 
+                Dapatkan notifikasi bahan habis, rekap belanja otomatis, dan temukan toko terbaik di sekitar.
+            </p>
             <div class="hero-buttons">
-                <a href="/auth" class="cta-button" id="mainActionBtn">Masuk untuk Mulai</a>
+                <a href="/auth" class="cta-button" id="mainActionBtn">
+                    Mulai Catat <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#features" class="secondary-button">Pelajari</a>
             </div>
+        </div>
+        
+        <div class="hero-image">
+            <!-- Gambar Sesuai Request -->
+            <img src="https://z-cdn-media.chatglm.cn/files/3aaa6c94-c363-47e0-886e-817084f4b407.jpeg?auth_key=1870694353-37fd08f5dca94279b617d21318047ad0-0-84c2bb20f2aedb79ed770e63f95cd4fe" 
+                 alt="Aneka Buah dan Sayur Segar di Meja Kayu">
         </div>
     </section>
 
-    <section class="section stats-section">
+    <!-- STATS SECTION -->
+    <section class="section" id="features">
         <div class="container">
-            <h2 class="section-title">Statistik Bahan Masak</h2>
-            <div class="stats-container">
+            <h2 class="section-title">Ringkasan Dapur</h2>
+            <div class="stats-grid">
                 <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-box-open"></i></div>
                     <div class="stat-value">42</div>
-                    <div class="stat-label">Bahan Tersimpan</div>
+                    <div class="stat-label">Total Bahan</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">8</div>
-                    <div class="stat-label">Stok Rendah</div>
+                    <div class="stat-icon" style="color: var(--accent-red); background: rgba(255, 107, 107, 0.1);"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-value" style="color: var(--accent-red);">8</div>
+                    <div class="stat-label">Stok Menipis</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">3</div>
+                    <div class="stat-icon" style="color: var(--primary-orange); background: rgba(255, 159, 67, 0.1);"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="stat-value" style="color: var(--primary-orange);">12</div>
                     <div class="stat-label">Daftar Belanja</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon" style="color: #9B59B6; background: rgba(155, 89, 182, 0.1);"><i class="fas fa-map-marked-alt"></i></div>
                     <div class="stat-value">5</div>
-                    <div class="stat-label">Toko Rekomendasi</div>
+                    <div class="stat-label">Toko Favorit</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section quick-access">
+    <!-- QUICK ACCESS -->
+    <section class="section" style="background-color: rgba(0,0,0,0.02);">
         <div class="container">
             <h2 class="section-title">Akses Cepat</h2>
             <div class="quick-access-container">
-                <div class="quick-btn" data-page="products">
-                    <div class="quick-icon">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <div class="quick-label">Tambah Bahan</div>
+                <div class="quick-btn" onclick="window.location.href='/products'">
+                    <div class="quick-icon"><i class="fas fa-plus-circle"></i></div>
+                    <div class="quick-label">Tambah Stok</div>
                 </div>
-                <div class="quick-btn" data-page="suggestions">
-                    <div class="quick-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="quick-label">Daftar Belanja</div>
+                <div class="quick-btn" onclick="window.location.href='/suggestions'">
+                    <div class="quick-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="quick-label">Cek Belanja</div>
                 </div>
-                <div class="quick-btn" data-page="stores">
-                    <div class="quick-icon">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <div class="quick-label">Cek Toko</div>
+                <div class="quick-btn" onclick="window.location.href='/stores'">
+                    <div class="quick-icon"><i class="fas fa-store"></i></div>
+                    <div class="quick-label">Cari Toko</div>
                 </div>
-                <div class="quick-btn" data-page="products">
-                    <div class="quick-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="quick-label">Statistik</div>
+                <div class="quick-btn" onclick="window.location.href='/notes'">
+                    <div class="quick-icon"><i class="fas fa-utensils"></i></div>
+                    <div class="quick-label">Resep Saya</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section recent-activity">
+    <!-- ACTIVITY LIST -->
+    <section class="section">
         <div class="container">
-            <h2 class="section-title">Aktivitas Terbaru</h2>
+            <h2 class="section-title">Aktivitas Terkini</h2>
             <div class="activity-container">
-                <ul class="activity-list">
+                <ul class="activity-list" style="padding: 0;">
                     <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-plus"></i>
-                        </div>
+                        <div class="activity-icon"><i class="fas fa-plus"></i></div>
                         <div class="activity-content">
-                            <div>Terakhir ditambah: Bawang Merah</div>
-                            <div class="activity-time">2 hari yang lalu</div>
+                            <div>Stok ditambahkan: <strong>Bawang Merah</strong> (500g)</div>
+                            <div class="activity-time">2 jam yang lalu</div>
                         </div>
                     </li>
                     <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-exclamation-triangle" style="color: #FF6347;"></i>
-                        </div>
+                        <div class="activity-icon"><i class="fas fa-exclamation-triangle"></i></div>
                         <div class="activity-content">
-                            <div>Barang hampir habis: Cabai Rawit</div>
-                            <div class="activity-time">1 hari yang lalu</div>
-                        </div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div>Daftar belanja diperbarui</div>
+                            <div>Peringatan: <strong>Cabai Rawit</strong> hampir habis!</div>
                             <div class="activity-time">Kemarin</div>
                         </div>
                     </li>
                     <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-sync-alt"></i>
-                        </div>
+                        <div class="activity-icon"><i class="fas fa-shopping-cart"></i></div>
                         <div class="activity-content">
-                            <div>Stok diperbarui: Tomat</div>
+                            <div>Belanja selesai di <strong>Pasar Segar Jaya</strong></div>
+                            <div class="activity-time">2 hari yang lalu</div>
+                        </div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-sync-alt"></i></div>
+                        <div class="activity-content">
+                            <div>Stok diperbarui: <strong>Susu UHT</strong></div>
                             <div class="activity-time">3 hari yang lalu</div>
                         </div>
                     </li>
@@ -265,209 +643,128 @@
         </div>
     </section>
 
-    <section class="section testimonials">
-        <div class="container">
-            <h2 class="section-title">Apa Kata Pengguna</h2>
-            <div class="testimonial-container">
-                <div class="testimonial-card">
-                    <div class="quote">Aplikasi ini sangat membantu saya mengelola stok bahan masak. Tidak pernah lupa belanja bumbu lagi!</div>
-                    <div class="testimonial-author">- Ibu Siti, Ibu Rumah Tangga</div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="quote">Fitur saran toko sangat berguna. Saya bisa menemukan bahan segar dengan harga terbaik di sekitar saya.</div>
-                    <div class="testimonial-author">- Pak Joko, Koki Rumahan</div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="quote">Desainnya cantik dan mudah digunakan. Seperti mencatat di buku catatan fisik tapi lebih praktis.</div>
-                    <div class="testimonial-author">- Mbak Dina, Mahasiswa</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 Kapan Beli - Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
+            <p style="font-weight: 500; margin-bottom: 10px;">Kapan Beli</p>
+            <p style="font-size: 0.9rem;">&copy; 2026 Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
+            <div style="margin-top: 15px; font-size: 1.2rem; color: var(--primary-blue);">
+                <i class="fab fa-instagram" style="margin: 0 10px; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-orange)'" onmouseout="this.style.color='var(--primary-blue)'"></i>
+                <i class="fab fa-twitter" style="margin: 0 10px; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-orange)'" onmouseout="this.style.color='var(--primary-blue)'"></i>
+                <i class="fab fa-facebook" style="margin: 0 10px; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-orange)'" onmouseout="this.style.color='var(--primary-blue)'"></i>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Function to determine time of day and apply appropriate class
-        function updateTimeBasedTheme() {
+        // --- LOGIC 1: WAKTU & SALAM (Tetap Dipertahankan) ---
+        function updateGreeting() {
             const hour = new Date().getHours();
-            const body = document.body;
-
-            // Remove existing time classes
-            body.classList.remove('morning', 'afternoon', 'evening', 'night');
-
-            // Determine time of day and add appropriate class
-            if (hour >= 5 && hour < 10) {
-                // Morning: 5 AM - 10 AM
-                body.classList.add('morning');
-            } else if (hour >= 10 && hour < 15) {
-                // Afternoon: 10 AM - 3 PM
-                body.classList.add('afternoon');
+            const greetingText = document.getElementById('greetingText');
+            const greetingIcon = document.querySelector('.greeting-badge i');
+            
+            if (hour >= 5 && hour < 11) {
+                greetingText.textContent = "Selamat Pagi";
+                greetingIcon.className = "fas fa-sun"; // Matahari pagi
+            } else if (hour >= 11 && hour < 15) {
+                greetingText.textContent = "Selamat Siang";
+                greetingIcon.className = "fas fa-cloud-sun"; // Awan panas
             } else if (hour >= 15 && hour < 18) {
-                // Evening: 3 PM - 6 PM
-                body.classList.add('evening');
+                greetingText.textContent = "Selamat Sore";
+                greetingIcon.className = "fas fa-cloud-sun-rain"; // Sore gerimis (optional) or just sun
             } else {
-                // Night: 6 PM - 5 AM
-                body.classList.add('night');
+                greetingText.textContent = "Selamat Malam";
+                greetingIcon.className = "fas fa-moon"; // Bulan malam
             }
         }
 
-        // Function to update the greeting and time display
-        function updateDateTimeDisplay() {
-            const now = new Date();
-            const hour = now.getHours();
-            const greetingElement = document.getElementById('timeGreeting');
-            const timeElement = document.getElementById('currentTime');
-
-            // Update greeting based on time
-            if (hour >= 5 && hour < 10) {
-                greetingElement.textContent = 'Selamat Pagi!';
-            } else if (hour >= 10 && hour < 15) {
-                greetingElement.textContent = 'Selamat Siang!';
-            } else if (hour >= 15 && hour < 18) {
-                greetingElement.textContent = 'Selamat Sore!';
-            } else {
-                greetingElement.textContent = 'Selamat Malam!';
-            }
-
-            // Format date and time
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateString = now.toLocaleDateString('id-ID', options);
-            const timeString = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute:'2-digit' });
-
-            timeElement.textContent = `${dateString} | ${timeString} WIB`;
-        }
-
-        // Dark mode toggle functionality
-        const darkModeToggle = document.querySelector('.dark-mode-toggle');
-        const darkModeIcon = darkModeToggle.querySelector('i'); // Select the icon inside the button
+        // --- LOGIC 2: DARK MODE TOGGLE (Tetap Dipertahankan & Dipoles) ---
+        const toggleBtn = document.querySelector('.dark-mode-toggle');
+        const themeIcon = document.getElementById('themeIcon');
         const body = document.body;
 
-        // Check for saved theme preference or respect OS setting
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            body.classList.add('dark-mode-active');
-            // Set icon to sun if dark mode is active initially
-            darkModeIcon.classList.remove('fa-moon');
-            darkModeIcon.classList.add('fa-sun');
-        } else {
-            body.classList.remove('dark-mode-active');
-             // Set icon to moon if light mode is active initially
-             darkModeIcon.classList.remove('fa-sun');
-             darkModeIcon.classList.add('fa-moon');
+        // Cek LocalStorage saat load
+        if (localStorage.getItem('theme') === 'dark') {
+            enableDarkMode();
         }
 
-        darkModeToggle?.addEventListener('click', function() {
-            body.classList.toggle('dark-mode-active');
-
-            // Toggle the icon based on the new state after the class is toggled
+        toggleBtn.addEventListener('click', () => {
             if (body.classList.contains('dark-mode-active')) {
-                localStorage.setItem('theme', 'dark');
-                darkModeIcon.classList.remove('fa-moon');
-                darkModeIcon.classList.add('fa-sun');
+                disableDarkMode();
             } else {
-                localStorage.setItem('theme', 'light');
-                darkModeIcon.classList.remove('fa-sun');
-                darkModeIcon.classList.add('fa-moon');
+                enableDarkMode();
             }
         });
 
-        // Initialize and update time-based theme and display
-        updateTimeBasedTheme();
-        updateDateTimeDisplay();
-
-        // Update time display every minute
-        setInterval(updateDateTimeDisplay, 60000);
-
-        // Update theme periodically (every 30 minutes)
-        setInterval(updateTimeBasedTheme, 1800000);
-
-        // Function to check authentication status
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.authenticated) {
-                        // User is logged in
-                        document.getElementById('authLink').style.display = 'none';
-                        document.getElementById('logoutLink').style.display = 'inline-block';
-                        document.getElementById('welcomeText').textContent = `Halo, ${data.user.name}!`;
-                        document.getElementById('welcomeText').style.display = 'inline';
-                        document.getElementById('mainActionBtn').href = '/products';
-                        document.getElementById('mainActionBtn').textContent = 'Mulai Kelola Bahan';
-                        
-                        // Update quick access buttons
-                        document.querySelectorAll('.quick-btn').forEach(btn => {
-                            btn.onclick = function() {
-                                const page = this.getAttribute('data-page');
-                                redirectToPage(page);
-                            };
-                        });
-                    } else {
-                        // User is not logged in
-                        document.getElementById('authLink').style.display = 'inline-block';
-                        document.getElementById('logoutLink').style.display = 'none';
-                        document.getElementById('welcomeText').style.display = 'none';
-                        document.getElementById('mainActionBtn').href = '/auth';
-                        document.getElementById('mainActionBtn').textContent = 'Masuk untuk Mulai';
-                        
-                        // Reset quick access buttons to require login
-                        document.querySelectorAll('.quick-btn').forEach(btn => {
-                            btn.onclick = function() {
-                                window.location.href = '/auth';
-                            };
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                // Default to showing login button if there's an error
-                document.getElementById('authLink').style.display = 'inline-block';
-                document.getElementById('logoutLink').style.display = 'none';
-                document.getElementById('welcomeText').style.display = 'none';
-            }
+        function enableDarkMode() {
+            body.classList.add('dark-mode-active');
+            localStorage.setItem('theme', 'dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+            themeIcon.style.color = "#F1C40F"; // Warna kuning untuk icon matahari di dark mode
         }
 
-        // Function to redirect to pages based on auth status
-        function redirectToPage(page) {
-            // Check if user is authenticated first
-            fetch('/auth/status')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.authenticated) {
-                        window.location.href = `/${page}`;
-                    } else {
-                        window.location.href = '/auth';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking auth status:', error);
-                    window.location.href = '/auth';
-                });
+        function disableDarkMode() {
+            body.classList.remove('dark-mode-active');
+            localStorage.setItem('theme', 'light');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+            themeIcon.style.color = ""; // Reset warna
         }
 
-        // Add event listeners to quick access buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check auth status when page loads
-            checkAuthStatus();
+        // --- LOGIC 3: AUTH SIMULATION (Tetap Dipertahankan) ---
+        const authLink = document.getElementById('authLink');
+        const logoutLink = document.getElementById('logoutLink');
+        const welcomeText = document.getElementById('welcomeText');
+        const mainActionBtn = document.getElementById('mainActionBtn');
+
+        function checkAuth() {
+            // Simulasi sederhana menggunakan localStorage
+            const user = localStorage.getItem('kapanbeli_user');
             
-            // Add click event to quick access buttons
-            document.querySelectorAll('.quick-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    redirectToPage(page);
-                });
-            });
+            if (user) {
+                // State: Login
+                authLink.style.display = 'none';
+                logoutLink.style.display = 'inline-block';
+                welcomeText.style.display = 'inline-block';
+                welcomeText.textContent = `Halo, ${user}!`;
+                mainActionBtn.innerHTML = 'Buka Catatan <i class="fas fa-book"></i>';
+                mainActionBtn.href = '/products';
+            } else {
+                // State: Belum Login
+                authLink.style.display = 'inline-block';
+                logoutLink.style.display = 'none';
+                welcomeText.style.display = 'none';
+                mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
+                mainActionBtn.href = '/auth';
+            }
+        }
+
+        // Event Listener untuk Demo Login (Hapus ini jika pakai backend asli)
+        authLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const name = prompt("Masukkan nama Anda (Simulasi):", "Budi");
+            if(name) {
+                localStorage.setItem('kapanbeli_user', name);
+                checkAuth();
+            }
         });
+
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('kapanbeli_user');
+            checkAuth();
+            alert("Anda berhasil keluar.");
+        });
+
+        // --- INISIALISASI ---
+        // Jalankan saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            updateGreeting();
+            checkAuth();
+        });
+
+        // Update setiap menit
+        setInterval(updateGreeting, 60000);
     </script>
 </body>
 </html>

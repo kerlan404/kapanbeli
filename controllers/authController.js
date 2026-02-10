@@ -234,8 +234,16 @@ const authController = {
             // Konfirmasi akun pengguna
             await User.confirmUser(token);
 
-            // Redirect ke halaman login dengan pesan sukses
-            res.redirect(`/auth?confirmed=true`);
+            // Inisialisasi session pengguna (login otomatis setelah konfirmasi)
+            req.session.userId = user.id;
+            req.session.user = {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            };
+
+            // Redirect ke halaman beranda setelah konfirmasi dan login otomatis
+            res.redirect('/');
 
         } catch (error) {
             console.error('Account confirmation error:', error);
