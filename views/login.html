@@ -253,7 +253,7 @@
                     <label>Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock icon-left"></i>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <input type="password" id="loginPassword" placeholder="Masukkan password Anda" required>
                         <i class="fas fa-eye icon-eye" onclick="togglePassword('loginPassword', this)"></i>
                     </div>
                 </div>
@@ -365,12 +365,12 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert(data.message, 'success');
-                    
+                    showAlert(`${data.message} Selamat datang, ${data.user?.name || 'Pengguna'}!`, 'success');
+
                     // Redirect ke halaman tujuan setelah delay
                     setTimeout(() => {
                         window.location.href = data.redirect || '/';
-                    }, 1000);
+                    }, 2000);
                 } else {
                     showAlert(data.message, 'error');
                 }

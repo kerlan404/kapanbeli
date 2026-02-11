@@ -260,7 +260,7 @@
                     <label>Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock icon-left"></i>
-                        <input type="password" id="regPassword" placeholder="Minimal 6 karakter, termasuk huruf besar, kecil, dan angka" required minlength="6">
+                        <input type="password" id="regPassword" placeholder="Masukkan password Anda" required>
                         <i class="fas fa-eye icon-eye" onclick="togglePassword('regPassword', this)"></i>
                     </div>
                 </div>
@@ -358,15 +358,8 @@
                 return;
             }
 
-            if (password.length < 6) {
-                showAlert('Password minimal harus 6 karakter.', 'error');
-                return;
-            }
-
-            // Validasi kompleksitas password
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
-            if (!passwordRegex.test(password)) {
-                showAlert('Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka.', 'error');
+            if (password.length < 1) {
+                showAlert('Password harus diisi.', 'error');
                 return;
             }
 
@@ -399,12 +392,12 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert(data.message, 'success');
+                    showAlert(`${data.message} Selamat datang, ${data.user?.name || 'Pengguna'}!`, 'success');
 
                     // Redirect ke beranda setelah delay
                     setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1500);
+                        window.location.href = data.redirect || '/';
+                    }, 2000);
                 } else {
                     showAlert(data.message, 'error');
                 }

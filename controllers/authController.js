@@ -102,7 +102,15 @@ const authController = {
             };
 
             // Redirect ke halaman utama setelah login berhasil
-            res.json({ success: true, message: 'Login berhasil', redirect: '/' });
+            res.json({ 
+                success: true, 
+                message: 'Login berhasil! Selamat datang kembali.', 
+                redirect: '/',
+                user: {
+                    name: user.name,
+                    email: user.email
+                }
+            });
 
         } catch (error) {
             console.error('Login error:', error);
@@ -139,6 +147,15 @@ const authController = {
                 return res.status(400).json({
                     success: false,
                     message: 'Password dan konfirmasi password tidak cocok'
+                });
+            }
+
+            // Validasi panjang password minimum (opsional, bisa disesuaikan)
+            if (password.length < 1) {
+                console.log('Validation failed: Password too short for email:', email);
+                return res.status(400).json({
+                    success: false,
+                    message: 'Password harus diisi'
                 });
             }
 
@@ -220,8 +237,12 @@ const authController = {
 
             res.json({
                 success: true,
-                message: 'Registrasi berhasil! Selamat datang di Kapan Beli.',
-                redirect: '/' // Langsung arahkan ke beranda setelah registrasi
+                message: 'Registrasi berhasil! Akun Anda telah dibuat. Selamat datang di Kapan Beli.',
+                redirect: '/', // Langsung arahkan ke beranda setelah registrasi
+                user: {
+                    name: newUser.name,
+                    email: newUser.email
+                }
             });
 
         } catch (error) {
@@ -319,7 +340,11 @@ const authController = {
                 res.clearCookie('connect.sid'); // Nama cookie default untuk express-session
 
                 // Redirect ke halaman login setelah logout berhasil
-                res.json({ success: true, message: 'Logout berhasil', redirect: '/auth' });
+                res.json({ 
+                    success: true, 
+                    message: 'Logout berhasil! Sampai jumpa kembali.', 
+                    redirect: '/auth' 
+                });
             });
         } catch (error) {
             console.error('Logout error:', error);
