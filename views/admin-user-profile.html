@@ -564,7 +564,8 @@
                     document.getElementById('userFullName').textContent = `Profil: ${user.name}`;
                     document.getElementById('userNameField').textContent = user.name;
                     document.getElementById('userEmail').textContent = user.email;
-                    document.getElementById('userJoinDate').textContent = new Date(user.created_at).toLocaleDateString('id-ID');
+                    const joinDate = new Date(user.created_at);
+                    document.getElementById('userJoinDate').textContent = `${joinDate.getDate().toString().padStart(2, '0')}/${(joinDate.getMonth() + 1).toString().padStart(2, '0')}/${joinDate.getFullYear()}`;
                     document.getElementById('userStatus').className = `status-badge ${user.is_active ? 'status-active' : 'status-inactive'}`;
                     document.getElementById('userStatus').textContent = user.is_active ? 'Aktif' : 'Non-Aktif';
                     
@@ -607,9 +608,9 @@
                         row.innerHTML = `
                             <td>${product.name}</td>
                             <td>${product.category_id || 'Umum'}</td>
-                            <td>${product.stock_quantity} ${product.unit || ''}</td>
-                            <td>${product.min_stock_level} ${product.unit || ''}</td>
-                            <td class="${expiryStatus.class}">${product.expiry_date ? new Date(product.expiry_date).toLocaleDateString('id-ID') : '-'}</td>
+                            <td>${parseFloat(product.stock_quantity).toString()} ${product.unit || ''}</td>
+                            <td>${parseFloat(product.min_stock_level).toString()} ${product.unit || ''}</td>
+                            <td class="${expiryStatus.class}">${product.expiry_date ? (() => { const d = new Date(product.expiry_date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })() : '-'}</td>
                             <td><span class="stock-status ${status.class}">${status.text}</span></td>
                         `;
                         tbody.appendChild(row);

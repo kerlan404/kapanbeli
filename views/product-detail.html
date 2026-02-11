@@ -135,16 +135,17 @@
                     const p = data.product;
                     document.getElementById('prodName').innerText = p.name;
                     document.getElementById('prodPrice').innerText = `Rp ${parseInt(p.price).toLocaleString('id-ID')}`;
-                    document.getElementById('prodStock').innerText = `${p.stock_quantity} ${p.unit||''}`;
+                    document.getElementById('prodStock').innerText = `${parseFloat(p.stock_quantity).toString()} ${p.unit||''}`;
                     document.getElementById('prodUnit').innerText = p.unit || '-';
-                    document.getElementById('prodMin').innerText = p.min_stock_level;
+                    document.getElementById('prodMin').innerText = parseFloat(p.min_stock_level).toString();
                     document.getElementById('prodCat').innerText = p.category_id || '-';
                     document.getElementById('prodDesc').innerText = p.description || p.notes || 'Tidak ada catatan.';
                     
                     // Expiry Formatting
                     if(p.expiry_date) {
-                        const d = new Date(p.expiry_date).toLocaleDateString('id-ID');
-                        document.getElementById('prodExp').innerText = d;
+                        const d = new Date(p.expiry_date);
+                        const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                        document.getElementById('prodExp').innerText = formattedDate;
                     }
 
                     // Image

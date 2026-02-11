@@ -36,14 +36,13 @@ const productsController = {
         try {
             const userId = req.session.user?.id;
             // Handle both JSON and FormData requests
-            let { name, description, category_id, price, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
-            
+            let { name, description, category_id, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+
             // Convert string values to appropriate types if they come from FormData
-            price = typeof price === 'string' ? parseFloat(price) : price;
-            stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) : stock_quantity;
-            min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) : min_stock_level;
-            quantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
-            
+            stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) || 0 : (stock_quantity || 0);
+            min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) || 5 : (min_stock_level || 5);
+            quantity = typeof quantity === 'string' ? parseFloat(quantity) || 1 : (quantity || 1);
+
             // If file is uploaded, get the image URL from the file
             let imageUrl = image_url || null;
             if (req.file) {
@@ -57,11 +56,25 @@ const productsController = {
                 });
             }
 
-            if (!name || !price) { // Validasi wajib minimal nama dan harga
+            if (!name) { // Validasi wajib minimal nama
                 return res.status(400).json({
                     success: false,
-                    message: 'Nama dan harga produk harus diisi.'
+                    message: 'Nama produk harus diisi.'
                 });
+            }
+
+            // Validasi category_id, jika disediakan harus valid
+            let categoryIdToUse = null;
+            if (category_id) {
+                // Cek apakah category_id valid
+                const CategoryModel = require('../models/Category');
+                const categoryExists = await CategoryModel.getById(category_id);
+                if (categoryExists) {
+                    categoryIdToUse = category_id;
+                } else {
+                    // Jika kategori tidak ditemukan, gunakan null
+                    categoryIdToUse = null;
+                }
             }
 
             // Panggil fungsi dari model untuk membuat produk baru
@@ -69,8 +82,7 @@ const productsController = {
                 user_id: userId,
                 name,
                 description: description || null,
-                category_id: category_id || null,
-                price,
+                category_id: categoryIdToUse,
                 stock_quantity: stock_quantity || 0,
                 min_stock_level: min_stock_level || 5, // Default
                 image_url: imageUrl,
@@ -144,13 +156,12 @@ const productsController = {
             const userId = req.session.user?.id;
             const productId = req.params.id;
             // Handle both JSON and FormData requests
-            let { name, description, category_id, price, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+            let { name, description, category_id, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
 
             // Convert string values to appropriate types if they come from FormData
-            price = typeof price === 'string' ? parseFloat(price) : price;
-            stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) : stock_quantity;
-            min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) : min_stock_level;
-            quantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
+            stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) || 0 : (stock_quantity || 0);
+            min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) || 5 : (min_stock_level || 5);
+            quantity = typeof quantity === 'string' ? parseFloat(quantity) || 1 : (quantity || 1);
 
             if (!userId) {
                 return res.status(401).json({
@@ -166,10 +177,10 @@ const productsController = {
                 });
             }
 
-            if (!name || !price) {
+            if (!name) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Nama dan harga produk harus diisi.'
+                    message: 'Nama produk harus diisi.'
                 });
             }
 
@@ -182,6 +193,25 @@ const productsController = {
                 });
             }
 
+            // Validasi category_id, jika disediakan harus valid
+            let categoryIdToUpdate = existingProduct.category_id; // Gunakan kategori lama sebagai default
+            if (category_id !== undefined) { // Jika category_id disediakan (termasuk null)
+                if (category_id) {
+                    // Cek apakah category_id valid
+                    const CategoryModel = require('../models/Category');
+                    const categoryExists = await CategoryModel.getById(category_id);
+                    if (categoryExists) {
+                        categoryIdToUpdate = category_id;
+                    } else {
+                        // Jika kategori tidak ditemukan, gunakan null
+                        categoryIdToUpdate = null;
+                    }
+                } else {
+                    // Jika category_id adalah null atau "" (falsy), gunakan null
+                    categoryIdToUpdate = null;
+                }
+            }
+
             // If file is uploaded, get the image URL from the file
             let imageUrl = image_url || existingProduct.image_url;
             if (req.file) {
@@ -191,8 +221,7 @@ const productsController = {
             const updatedProduct = await ProductModel.update(productId, userId, {
                 name,
                 description: description || existingProduct.description,
-                category_id: category_id || existingProduct.category_id,
-                price,
+                category_id: categoryIdToUpdate,
                 stock_quantity: stock_quantity !== undefined ? stock_quantity : existingProduct.stock_quantity,
                 min_stock_level: min_stock_level !== undefined ? min_stock_level : existingProduct.min_stock_level,
                 image_url: imageUrl,

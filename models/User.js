@@ -241,6 +241,64 @@ const User = {
             console.error('Error getting active users:', error);
             throw error;
         }
+    },
+
+    // Fungsi untuk mendapatkan pengguna berdasarkan email (alias untuk findByEmail)
+    getByEmail: async (email) => {
+        return await User.findByEmail(email);
+    },
+
+    // Fungsi untuk mendapatkan pengguna berdasarkan ID (alias untuk findById)
+    getById: async (id) => {
+        return await User.findById(id);
+    },
+
+    // Fungsi untuk memperbarui token reset password
+    updatePasswordResetToken: async (userId, token) => {
+        try {
+            // Cek apakah kolom password_reset_token ada di tabel
+            const checkColumnQuery = `
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'users' 
+                AND COLUMN_NAME = 'password_reset_token'
+            `;
+            const [columns] = await db.execute(checkColumnQuery);
+
+            if (columns.length === 0) {
+                // Jika kolom tidak ada, tambahkan kolom tersebut
+                const addColumnQuery = `
+                    ALTER TABLE users 
+                    ADD COLUMN password_reset_token VARCHAR(255) NULL,
+                    ADD COLUMN password_reset_expires DATETIME NULL
+                `;
+                await db.execute(addColumnQuery);
+            }
+
+            // Update token reset password
+            const updateQuery = `
+                UPDATE users 
+                SET password_reset_token = ?, 
+                    password_reset_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR)
+                WHERE id = ?
+            `;
+            await db.execute(updateQuery, [token, userId]);
+        } catch (error) {
+            console.error('Error updating password reset token:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk memperbarui password pengguna
+    updatePassword: async (userId, newPasswordHash) => {
+        try {
+            const query = 'UPDATE users SET password = ? WHERE id = ?';
+            await db.execute(query, [newPasswordHash, userId]);
+        } catch (error) {
+            console.error('Error updating password:', error);
+            throw error;
+        }
     }
 };
 

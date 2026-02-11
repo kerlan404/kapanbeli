@@ -388,9 +388,143 @@
             width: 60px;
             height: 4px;
             background: var(--primary-orange);
-            margin: 10px auto 0;
-            border-radius: 2px;
         }
+
+        .view-all-link {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .view-all-link:hover {
+            color: var(--primary-orange);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-top {
+            height: 140px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        body.dark-mode-active .card-top {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            color: var(--primary-orange);
+            z-index: 2;
+        }
+
+        .category-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 3;
+        }
+
+        .card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prod-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .prod-name:hover {
+            color: var(--primary-orange);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-expired {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+        }
+
+        .badge-warning {
+            background: rgba(254, 202, 87, 0.2);
+            color: #d35400;
+        }
+
+        .badge-safe {
+            background: rgba(29, 209, 161, 0.15);
+            color: var(--accent-green);
+        }
+
 
         /* --- STATS --- */
         .stats-grid {
@@ -672,6 +806,22 @@
         </div>
     </section>
 
+    <!-- PRODUCTS SECTION -->
+    <section class="section" id="productsSection" style="display: none;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 class="section-title">Bahan Saya Terbaru</h2>
+                <a href="/products" class="view-all-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="products-grid" id="recentProductsGrid">
+                <!-- Products will be loaded dynamically -->
+                <div class="loading-placeholder">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat bahan...
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ACTIVITY LIST -->
     <section class="section">
         <div class="container">
@@ -878,6 +1028,96 @@
                     }
                 }
 
+                // Load recent products
+                const productsSection = document.getElementById('productsSection');
+                const recentProductsGrid = document.getElementById('recentProductsGrid');
+                
+                if (productsSection && recentProductsGrid) {
+                    try {
+                        const recentProductsResponse = await fetch('/api/products', {
+                            method: 'GET',
+                            credentials: 'same-origin'
+                        });
+
+                        if (recentProductsResponse.ok) {
+                            const productsData = await recentProductsResponse.json();
+                            if (productsData.success && productsData.products) {
+                                // Show the products section
+                                productsSection.style.display = 'block';
+                                
+                                // Take only the 6 most recent products
+                                const recentProducts = productsData.products.slice(0, 6);
+                                
+                                if (recentProducts.length > 0) {
+                                    recentProductsGrid.innerHTML = ''; // Clear loading placeholder
+                                    
+                                    recentProducts.forEach(product => {
+                                        const productCard = document.createElement('div');
+                                        productCard.className = 'product-card';
+                                        
+                                        // Determine icon based on product name
+                                        const icon = product.name.toLowerCase().includes('ayam') ? 'fa-drumstick-bite' :
+                                                     product.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' :
+                                                     product.name.toLowerCase().includes('telur') ? 'fa-egg' :
+                                                     product.name.toLowerCase().includes('bawang') ? 'fa-seedling' :
+                                                     product.name.toLowerCase().includes('tomat') ? 'fa-apple-alt' :
+                                                     'fa-box-open';
+
+                                        // Determine expiry status
+                                        const expiryStatus = getExpiryStatus(product.expiry_date);
+                                        const isLow = parseFloat(product.stock_quantity) <= parseFloat(product.min_stock_level);
+                                        
+                                        productCard.innerHTML = `
+                                            <div class="card-top">
+                                                ${product.image_url ? `<img src="${product.image_url}" class="card-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute;">` : `<i class="fas ${icon} card-icon"></i>`}
+                                                <span class="category-tag">${product.category_id || 'Umum'}</span>
+                                            </div>
+                                            <div class="card-body">
+                                                <h3 class="prod-name" onclick="window.location='/products/detail/${product.id}'">${product.name}</h3>
+                                                
+                                                <div class="info-row">
+                                                    <span class="label"><i class="fas fa-boxes"></i> Stok</span>
+                                                    <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'inherit'}">
+                                                        ${parseFloat(product.stock_quantity).toString()} ${product.unit || ''}
+                                                    </span>
+                                                </div>
+                                                <div class="info-row" style="border:none;">
+                                                    <span class="label"><i class="fas fa-calendar"></i> Kedaluwarsa</span>
+                                                    <span class="badge ${expiryStatus.class}">${expiryStatus.text}</span>
+                                                </div>
+                                            </div>
+                                        `;
+                                        
+                                        recentProductsGrid.appendChild(productCard);
+                                    });
+                                } else {
+                                    // Show message if no products
+                                    recentProductsGrid.innerHTML = `
+                                        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                                            <i class="fas fa-clipboard-list" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;"></i>
+                                            <h3>Belum ada bahan</h3>
+                                            <p style="margin-top: 10px;">Mulai tambahkan stok dapur Anda sekarang.</p>
+                                            <a href="/products/add" class="cta-button" style="display: inline-block; margin-top: 15px; padding: 12px 24px; text-decoration: none; color: white; background: var(--primary-orange); border-radius: 50px;">Tambah Bahan</a>
+                                        </div>
+                                    `;
+                                }
+                            } else {
+                                // Hide the products section if no data
+                                productsSection.style.display = 'none';
+                            }
+                        } else {
+                            // Hide the products section if request fails
+                            productsSection.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Error loading recent products:', error);
+                        // Hide the products section if there's an error
+                        if (productsSection) {
+                            productsSection.style.display = 'none';
+                        }
+                    }
+                }
+
                 // Load recent activities
                 const activitiesResponse = await fetch('/api/notes/recent', {
                     method: 'GET',
@@ -952,6 +1192,17 @@
             if (diffMins < 60) return `${diffMins} menit yang lalu`;
             if (diffHours < 24) return `${diffHours} jam yang lalu`;
             return `${diffDays} hari yang lalu`;
+        }
+
+        // Helper function to get expiry status
+        function getExpiryStatus(date) {
+            if(!date) return { text: '-', class: 'badge-safe' };
+            const now = new Date();
+            const exp = new Date(date);
+            const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+            if(diff < 0) return { text: 'Kadaluarsa', class: 'badge-expired' };
+            if(diff <= 7) return { text: `${diff} Hari Lagi`, class: 'badge-warning' };
+            return { text: exp.toLocaleDateString('id-ID'), class: 'badge-safe' };
         }
 
         // --- INITIALIZATION ---

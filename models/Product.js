@@ -6,7 +6,7 @@ const Product = {
     getAllByUserId: async (userId) => {
         try {
             const query = `
-                SELECT id, name, description, category_id, price, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
+                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
                 FROM products
                 WHERE user_id = ?
                 ORDER BY created_at DESC
@@ -18,7 +18,7 @@ const Product = {
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, querying with available fields');
                 const query = `
-                    SELECT id, name, category_id, price, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
+                    SELECT id, name, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
                     FROM products
                     WHERE user_id = ?
                     ORDER BY created_at DESC
@@ -42,7 +42,7 @@ const Product = {
     getByIdAndUserId: async (productId, userId) => {
         try {
             const query = `
-                SELECT id, name, description, category_id, price, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
+                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
                 FROM products
                 WHERE id = ? AND user_id = ?
             `;
@@ -58,7 +58,7 @@ const Product = {
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, querying with available fields');
                 const query = `
-                    SELECT id, name, category_id, price, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
+                    SELECT id, name, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
                     FROM products
                     WHERE id = ? AND user_id = ?
                 `;
@@ -84,19 +84,19 @@ const Product = {
 
     // Fungsi untuk membuat produk baru
     create: async ({
-        user_id, name, description, category_id, price, stock_quantity,
+        user_id, name, description, category_id, stock_quantity,
         min_stock_level, image_url, unit, quantity, expiry_date, notes
     }) => {
         try {
             // Try to insert with all columns first
             const query = `
                 INSERT INTO products (
-                    user_id, name, description, category_id, price, stock_quantity,
+                    user_id, name, description, category_id, stock_quantity,
                     min_stock_level, image_url, unit, quantity, expiry_date, notes
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
             const [result] = await db.execute(query, [
-                user_id, name, description, category_id, price, stock_quantity,
+                user_id, name, description, category_id, stock_quantity,
                 min_stock_level, image_url, unit, quantity, expiry_date, notes
             ]);
 
@@ -107,7 +107,6 @@ const Product = {
                 name,
                 description,
                 category_id,
-                price,
                 stock_quantity,
                 min_stock_level,
                 image_url,
@@ -121,16 +120,15 @@ const Product = {
             // Handle missing columns gracefully
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, inserting with available fields');
-                // Insert with only the basic columns that are known to exist
-                const query = `
+                // Try to determine which columns exist by catching the error and building query dynamically
+                // For now, use the most basic insert with only required fields
+                const basicQuery = `
                     INSERT INTO products (
-                        user_id, name, description, category_id, price, stock_quantity,
-                        min_stock_level, image_url
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        user_id, name, stock_quantity, min_stock_level, image_url
+                    ) VALUES (?, ?, ?, ?, ?)
                 `;
-                const [result] = await db.execute(query, [
-                    user_id, name, description, category_id, price, stock_quantity,
-                    min_stock_level, image_url
+                const [result] = await db.execute(basicQuery, [
+                    user_id, name, stock_quantity, min_stock_level, image_url
                 ]);
 
                 // Kembalikan data produk yang baru dibuat
@@ -138,9 +136,8 @@ const Product = {
                     id: result.insertId,
                     user_id,
                     name,
-                    description,
-                    category_id,
-                    price,
+                    description: description || null,
+                    category_id: category_id || null,
                     stock_quantity,
                     min_stock_level,
                     image_url,
@@ -151,24 +148,56 @@ const Product = {
                     created_at: new Date()
                 };
             }
+            // Handle foreign key constraint error
+            else if (error.code === 'ER_NO_REFERENCED_ROW_2' || error.errno === 1452) {
+                console.warn('Foreign key constraint failed, trying to insert without category_id');
+                // Retry insertion without category_id
+                const queryWithoutCategory = `
+                    INSERT INTO products (
+                        user_id, name, description, stock_quantity,
+                        min_stock_level, image_url, unit, quantity, expiry_date, notes
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `;
+                const [result] = await db.execute(queryWithoutCategory, [
+                    user_id, name, description, stock_quantity,
+                    min_stock_level, image_url, unit, quantity, expiry_date, notes
+                ]);
+
+                // Kembalikan data produk yang baru dibuat
+                return {
+                    id: result.insertId,
+                    user_id,
+                    name,
+                    description,
+                    category_id: null, // Set to null due to FK constraint
+                    stock_quantity,
+                    min_stock_level,
+                    image_url,
+                    unit,
+                    quantity,
+                    expiry_date,
+                    notes,
+                    created_at: new Date()
+                };
+            }
             throw error;
         }
     },
 
     // Fungsi untuk memperbarui produk
     update: async (productId, userId, {
-        name, description, category_id, price, stock_quantity,
+        name, description, category_id, stock_quantity,
         min_stock_level, image_url, unit, quantity, expiry_date, notes
     }) => {
         try {
             const query = `
                 UPDATE products
-                SET name = ?, description = ?, category_id = ?, price = ?, stock_quantity = ?,
+                SET name = ?, description = ?, category_id = ?, stock_quantity = ?,
                     min_stock_level = ?, image_url = ?, unit = ?, quantity = ?, expiry_date = ?, notes = ?, updated_at = NOW()
                 WHERE id = ? AND user_id = ?
             `;
             const [result] = await db.execute(query, [
-                name, description, category_id, price, stock_quantity,
+                name, description, category_id, stock_quantity,
                 min_stock_level, image_url, unit, quantity, expiry_date, notes,
                 productId, userId
             ]);
@@ -184,7 +213,6 @@ const Product = {
                 name,
                 description,
                 category_id,
-                price,
                 stock_quantity,
                 min_stock_level,
                 image_url,
@@ -198,15 +226,51 @@ const Product = {
             // Handle missing columns gracefully
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, updating with available fields');
-                const query = `
+                // Try with basic fields only
+                const basicQuery = `
                     UPDATE products
-                    SET name = ?, description = ?, category_id = ?, price = ?, stock_quantity = ?,
-                        min_stock_level = ?, image_url = ?, updated_at = NOW()
+                    SET name = ?, stock_quantity = ?, min_stock_level = ?, updated_at = NOW()
                     WHERE id = ? AND user_id = ?
                 `;
-                const [result] = await db.execute(query, [
-                    name, description, category_id, price, stock_quantity,
-                    min_stock_level, image_url,
+                const [result] = await db.execute(basicQuery, [
+                    name, stock_quantity, min_stock_level,
+                    productId, userId
+                ]);
+
+                if (result.affectedRows === 0) {
+                    throw new Error('Product tidak ditemukan atau tidak memiliki izin untuk mengedit');
+                }
+
+                // Kembalikan data produk yang diperbarui
+                return {
+                    id: productId,
+                    user_id: userId,
+                    name,
+                    description: description || null,
+                    category_id: category_id || null,
+                    stock_quantity,
+                    min_stock_level,
+                    image_url: image_url || null,
+                    unit: unit || null,
+                    quantity: quantity || 1,
+                    expiry_date: expiry_date || null,
+                    notes: notes || '',
+                    updated_at: new Date()
+                };
+            }
+            // Handle foreign key constraint error
+            else if (error.code === 'ER_NO_REFERENCED_ROW_2' || error.errno === 1452) {
+                console.warn('Foreign key constraint failed, trying to update without category_id');
+                // Retry update without category_id
+                const queryWithoutCategory = `
+                    UPDATE products
+                    SET name = ?, description = ?, stock_quantity = ?,
+                        min_stock_level = ?, image_url = ?, unit = ?, quantity = ?, expiry_date = ?, notes = ?, updated_at = NOW()
+                    WHERE id = ? AND user_id = ?
+                `;
+                const [result] = await db.execute(queryWithoutCategory, [
+                    name, description, stock_quantity,
+                    min_stock_level, image_url, unit, quantity, expiry_date, notes,
                     productId, userId
                 ]);
 
@@ -220,15 +284,14 @@ const Product = {
                     user_id: userId,
                     name,
                     description,
-                    category_id,
-                    price,
+                    category_id: null, // Set to null due to FK constraint
                     stock_quantity,
                     min_stock_level,
                     image_url,
-                    unit: unit || null,
-                    quantity: quantity || 1,
-                    expiry_date: expiry_date || null,
-                    notes: notes || '',
+                    unit,
+                    quantity,
+                    expiry_date,
+                    notes,
                     updated_at: new Date()
                 };
             }
@@ -252,7 +315,7 @@ const Product = {
     getAllProductsFromAllUsers: async () => {
         try {
             const query = `
-                SELECT id, user_id, name, description, category_id, price, stock_quantity,
+                SELECT id, user_id, name, description, category_id, stock_quantity,
                        min_stock_level, image_url, unit, quantity, expiry_date, notes, created_at, updated_at
                 FROM products
                 ORDER BY created_at DESC
@@ -264,7 +327,7 @@ const Product = {
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, querying with available fields');
                 const query = `
-                    SELECT id, user_id, name, category_id, price, stock_quantity,
+                    SELECT id, user_id, name, category_id, stock_quantity,
                            min_stock_level, image_url, created_at, updated_at
                     FROM products
                     ORDER BY created_at DESC

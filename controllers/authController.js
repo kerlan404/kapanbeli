@@ -1,3 +1,4 @@
+const path = require('path');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -483,6 +484,170 @@ const authController = {
                 message: 'Terjadi kesalahan saat memperbarui profil'
             });
         }
+    }
+};
+
+// Fungsi untuk menampilkan halaman lupa password
+authController.showForgotPassword = async (req, res) => {
+    try {
+        res.sendFile(path.join(__dirname, '../views/forgot-password.html'));
+    } catch (error) {
+        console.error('Show forgot password page error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan saat menampilkan halaman'
+        });
+    }
+};
+
+// Fungsi untuk mengirim permintaan reset password
+authController.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Validasi email
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email harus diisi'
+            });
+        }
+
+        // Cari pengguna berdasarkan email
+        const user = await User.getByEmail(email);
+        if (!user) {
+            // Untuk alasan keamanan, kita tetap mengembalikan pesan sukses meskipun email tidak ditemukan
+            return res.status(200).json({
+                success: true,
+                message: 'Jika email terdaftar, tautan reset password telah dikirim ke email Anda'
+            });
+        }
+
+        // Generate token untuk reset password
+        const resetToken = jwt.sign(
+            { userId: user.id, email: user.email },
+            process.env.JWT_SECRET || 'fallback_secret_key',
+            { expiresIn: '1h' } // Token berlaku 1 jam
+        );
+
+        // Simpan token ke database (opsional, tergantung implementasi)
+        await User.updatePasswordResetToken(user.id, resetToken);
+
+        // Kirim email dengan tautan reset password
+        const transporter = createTransporter();
+        if (transporter) {
+            const resetUrl = `${req.protocol}://${req.get('host')}/auth/reset-password/${resetToken}`;
+            
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Reset Password - Kapan Beli',
+                html: `
+                    <h2>Permintaan Reset Password</h2>
+                    <p>Anda menerima email ini karena ada permintaan reset password untuk akun Anda.</p>
+                    <p>Klik tautan di bawah ini untuk mereset password Anda:</p>
+                    <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #FF9F43; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0;">Reset Password</a>
+                    <p>Tautan ini akan kedaluwarsa dalam 1 jam.</p>
+                    <p>Jika Anda tidak meminta reset password, abaikan email ini.</p>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Tautan reset password telah dikirim ke email Anda'
+        });
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan saat mengirim permintaan reset password'
+        });
+    }
+};
+
+// Fungsi untuk menampilkan halaman reset password
+authController.showResetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        // Verifikasi token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: 'Token tidak valid atau telah kedaluwarsa'
+            });
+        }
+
+        // Cek apakah token valid di database (opsional, tergantung implementasi)
+        const user = await User.getById(decoded.userId);
+        if (!user || user.password_reset_token !== token) {
+            return res.status(400).json({
+                success: false,
+                message: 'Token tidak valid atau telah digunakan'
+            });
+        }
+
+        // Kirim halaman reset password
+        res.sendFile(path.join(__dirname, '../views/reset-password.html'));
+    } catch (error) {
+        console.error('Show reset password page error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan saat menampilkan halaman'
+        });
+    }
+};
+
+// Fungsi untuk mengatur password baru
+authController.resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        // Validasi password baru
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password baru harus memiliki setidaknya 6 karakter'
+            });
+        }
+
+        // Verifikasi token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: 'Token tidak valid atau telah kedaluwarsa'
+            });
+        }
+
+        // Hash password baru
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password pengguna
+        await User.updatePassword(decoded.userId, hashedPassword);
+        
+        // Hapus token reset password
+        await User.updatePasswordResetToken(decoded.userId, null);
+
+        res.status(200).json({
+            success: true,
+            message: 'Password berhasil direset. Silakan login dengan password baru Anda.'
+        });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan saat mereset password'
+        });
     }
 };
 

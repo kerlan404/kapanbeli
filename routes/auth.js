@@ -34,4 +34,16 @@ router.get('/status', (req, res) => {
     }
 });
 
+// Route untuk halaman lupa password
+router.get('/forgot-password', authController.showForgotPassword);
+
+// Route untuk mengirim permintaan reset password
+router.post('/forgot-password', authController.forgotPassword);
+
+// Route untuk halaman reset password
+router.get('/reset-password/:token', authController.showResetPassword);
+
+// Route untuk mengatur password baru
+router.post('/reset-password/:token', authController.resetPassword);
+
 module.exports = router;

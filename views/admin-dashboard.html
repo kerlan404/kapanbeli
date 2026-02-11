@@ -755,7 +755,7 @@
                             <td>${user.id}</td>
                             <td>${user.name}</td>
                             <td>${user.email}</td>
-                            <td>${new Date(user.created_at).toLocaleDateString('id-ID')}</td>
+                            <td>${(() => { const d = new Date(user.created_at); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })()}</td>
                             <td><span class="status-${user.is_active ? 'active' : 'inactive'}">${user.is_active ? 'Aktif' : 'Non-Aktif'}</span></td>
                             <td class="user-actions">
                                 <button class="btn btn-profile" onclick="viewUserProfile(${user.id})">
@@ -818,9 +818,9 @@
                         row.innerHTML = `
                             <td>${product.user_name}</td>
                             <td>${product.name}</td>
-                            <td>${product.stock_quantity} ${product.unit || ''}</td>
-                            <td>${product.min_stock_level} ${product.unit || ''}</td>
-                            <td>${product.expiry_date ? new Date(product.expiry_date).toLocaleDateString('id-ID') : '-'}</td>
+                            <td>${parseFloat(product.stock_quantity).toString()} ${product.unit || ''}</td>
+                            <td>${parseFloat(product.min_stock_level).toString()} ${product.unit || ''}</td>
+                            <td>${product.expiry_date ? (() => { const d = new Date(product.expiry_date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })() : '-'}</td>
                             <td><span class="stock-status ${status.class}">${status.text}</span></td>
                             <td class="user-actions">
                                 <button class="btn btn-view" onclick="viewUserProfile(${product.user_id})">

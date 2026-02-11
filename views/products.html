@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥕</text></svg>" type="image/x-icon">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* --- CSS VARIABLES & RESET --- */
@@ -259,19 +262,10 @@
                 renderProducts(data.success ? data.products : []);
             } catch (err) {
                 console.error(err);
-                showNotification('Gagal memuat data', 'error');
+                // Tidak menampilkan notifikasi error untuk loadProducts karena bisa mengganggu pengalaman pengguna
             }
         }
 
-        function getExpiryStatus(date) {
-            if(!date) return { text: '-', class: 'badge-safe' };
-            const now = new Date();
-            const exp = new Date(date);
-            const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
-            if(diff < 0) return { text: 'Kadaluarsa', class: 'badge-expired' };
-            if(diff <= 7) return { text: `${diff} Hari Lagi`, class: 'badge-warning' };
-            return { text: exp.toLocaleDateString('id-ID'), class: 'badge-safe' };
-        }
 
         function renderProducts(items) {
             const grid = document.getElementById('productsGrid');
@@ -288,9 +282,8 @@
             }
 
             items.forEach(item => {
-                const expiry = getExpiryStatus(item.expiry_date);
                 const isLow = parseFloat(item.stock_quantity) <= parseFloat(item.min_stock_level);
-                const icon = item.name.toLowerCase().includes('ayam') ? 'fa-drumstick-bite' : 
+                const icon = item.name.toLowerCase().includes('ayam') ? 'fa-drumstick-bite' :
                              item.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' : 'fa-box-open';
 
                 const card = document.createElement('div');
@@ -302,16 +295,16 @@
                     </div>
                     <div class="card-body">
                         <h3 class="prod-name" onclick="window.location='/products/detail/${item.id}'">${item.name}</h3>
-                        
+
                         <div class="info-row">
                             <span class="label"><i class="fas fa-boxes"></i> Stok</span>
                             <span class="value" style="color: ${isLow ? 'var(--danger)' : 'inherit'}">
-                                ${item.stock_quantity} ${item.unit || ''} ${isLow ? '<i class="fas fa-exclamation-circle"></i>' : ''}
+                                ${parseFloat(item.stock_quantity).toString()} ${item.unit || ''} ${isLow ? '<i class="fas fa-exclamation-circle"></i>' : ''}
                             </span>
                         </div>
                         <div class="info-row" style="border:none;">
                             <span class="label"><i class="fas fa-calendar"></i> Kedaluwarsa</span>
-                            <span class="badge ${expiry.class}">${expiry.text}</span>
+                            <span class="value">${item.expiry_date ? (() => { const d = new Date(item.expiry_date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })() : '-'}</span>
                         </div>
 
                         <div class="card-actions">
@@ -332,18 +325,45 @@
         function handleEdit(id) { window.location.href = `/products/edit/${id}`; }
 
         async function handleDelete(id, name) {
-            if(!confirm(`Hapus "${name}"?`)) return;
-            try {
-                const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
-                const data = await res.json();
-                if(data.success) {
-                    showNotification('Produk dihapus', 'success');
-                    loadProducts();
-                } else {
-                    showNotification(data.message, 'error');
+            const result = await Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: `Anda yakin ingin menghapus "${name}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if(data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Produk Berhasil Dihapus!',
+                            text: `"${name}" telah dihapus dari daftar Anda.`,
+                            confirmButtonText: 'OK'
+                        });
+                        loadProducts();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Menghapus Produk',
+                            text: data.message || 'Terjadi kesalahan saat menghapus produk',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } catch(e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Menghapus Produk',
+                        text: 'Terjadi kesalahan saat menghubungi server',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            } catch(e) {
-                showNotification('Gagal menghapus', 'error');
             }
         }
 
