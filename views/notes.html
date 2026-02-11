@@ -339,54 +339,13 @@
             </button>
         </div>
 
+        <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px;"></div>
+
         <div class="notes-grid" id="notesGrid">
             <!-- Notes will be populated here dynamically -->
-            <div class="note-card">
-                <div class="note-header">
-                    <h3 class="note-title">Belanja Mingguan</h3>
-                    <div class="note-date">10 Feb 2026, 14:30</div>
-                </div>
-                <div class="note-body">
-                    <div class="note-content">
-                        Daftar belanja minggu ini: bawang merah, cabai rawit, garam, kunyit bubuk, jahe.
-                    </div>
-                    <div class="note-actions">
-                        <button class="btn btn-edit">Edit</button>
-                        <button class="btn btn-delete">Hapus</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="note-card">
-                <div class="note-header">
-                    <h3 class="note-title">Resep Favorit</h3>
-                    <div class="note-date">09 Feb 2026, 10:15</div>
-                </div>
-                <div class="note-body">
-                    <div class="note-content">
-                        Opor ayam lebaran: ayam kampung, santan kental, bawang merah, bawang putih, kunyit, jahe, serai, daun salam.
-                    </div>
-                    <div class="note-actions">
-                        <button class="btn btn-edit">Edit</button>
-                        <button class="btn btn-delete">Hapus</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="note-card">
-                <div class="note-header">
-                    <h3 class="note-title">Catatan Penting</h3>
-                    <div class="note-date">08 Feb 2026, 16:45</div>
-                </div>
-                <div class="note-body">
-                    <div class="note-content">
-                        Jangan lupa beli susu untuk sarapan. Cek tanggal kadaluarsa sebelum membeli.
-                    </div>
-                    <div class="note-actions">
-                        <button class="btn btn-edit">Edit</button>
-                        <button class="btn btn-delete">Hapus</button>
-                    </div>
-                </div>
+            <div id="loadingSpinner" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
+                <p style="color: var(--text-muted);">Memuat catatan...</p>
             </div>
         </div>
     </div>
@@ -436,45 +395,461 @@
             }
         }
 
-        // Load user info when page loads
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
-
-        // --- 3. NOTES FUNCTIONALITY ---
-        document.getElementById('addNoteBtn').addEventListener('click', () => {
-            alert('Fungsi tambah catatan akan diimplementasikan');
-        });
-
-        // Add event listeners to edit and delete buttons
-        document.querySelectorAll('.btn-edit').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const card = e.target.closest('.note-card');
-                const title = card.querySelector('.note-title').textContent;
-                alert(`Edit catatan: ${title}`);
-            });
-        });
-
-        document.querySelectorAll('.btn-delete').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const card = e.target.closest('.note-card');
-                const title = card.querySelector('.note-title').textContent;
-                if(confirm(`Hapus catatan "${title}"?`)) {
-                    card.remove();
+        // --- 3. NOTIFICATION SYSTEM ---
+        function showNotification(message, type = 'info') {
+            // Create notification container if it doesn't exist
+            let container = document.getElementById('notificationContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notificationContainer';
+                container.style.cssText = `
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    z-index: 10000; 
+                    width: 350px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                min-height: 50px;
+            `;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' : 
+                type === 'error' ? 'fa-exclamation-circle' : 
+                'fa-info-circle'
+            }`;
+            icon.style.cssText = 'font-size: 1.2em;';
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.textContent = message;
+            messageSpan.style.flex = '1';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                notification.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            };
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            notification.appendChild(icon);
+            notification.appendChild(messageSpan);
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
                 }
+            }, 5000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- 4. NOTES FUNCTIONALITY ---
+        async function loadNotes() {
+            try {
+                const response = await fetch('/api/notes');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayNotes(data.notes);
+                } else {
+                    showNotification('Gagal memuat catatan: ' + data.message, 'error');
+                    document.getElementById('notesGrid').innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                            <h3>Gagal Memuat Data</h3>
+                            <p>${data.message || 'Terjadi kesalahan saat memuat data'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                showNotification('Terjadi kesalahan saat memuat catatan.', 'error');
+                document.getElementById('notesGrid').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>Terjadi Kesalahan</h3>
+                        <p>Terjadi kesalahan saat memuat data. Silakan coba lagi.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayNotes(notes) {
+            const grid = document.getElementById('notesGrid');
+            
+            if (notes.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-sticky-note"></i>
+                        <h3>Belum Ada Catatan</h3>
+                        <p>Anda belum memiliki catatan apapun. Buat catatan pertama Anda sekarang!</p>
+                        <button class="add-note-btn" style="margin-top: 20px; display: inline-block; width: auto;" onclick="openAddNoteModal()">
+                            <i class="fas fa-plus"></i>
+                            Buat Catatan
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let notesHTML = '';
+            notes.forEach(note => {
+                const date = new Date(note.created_at);
+                const formattedDate = date.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                notesHTML += `
+                <div class="note-card" data-id="${note.id}">
+                    <div class="note-header">
+                        <h3 class="note-title">${note.title}</h3>
+                        <div class="note-date">${formattedDate}</div>
+                    </div>
+                    <div class="note-body">
+                        <div class="note-content">
+                            ${note.content || 'Tidak ada konten'}
+                        </div>
+                        <div class="note-actions">
+                            <button class="btn btn-edit" onclick="editNote(${note.id}, '${note.title.replace(/'/g, "\\'")}', '${note.content ? note.content.replace(/'/g, "\\'") : ''}')">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteNote(${note.id}, '${note.title.replace(/'/g, "\\'")}')">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+                `;
             });
+
+            grid.innerHTML = notesHTML;
+        }
+
+        document.getElementById('addNoteBtn').addEventListener('click', () => {
+            openAddNoteModal();
         });
 
-        // --- 4. LOGOUT FUNCTIONALITY ---
+        function openAddNoteModal() {
+            // Create a simple modal for adding notes
+            const modal = document.createElement('div');
+            modal.id = 'noteModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: var(--bg-card);
+                    padding: 30px;
+                    border-radius: var(--border-radius);
+                    width: 90%;
+                    max-width: 500px;
+                    box-shadow: var(--shadow-card);
+                    position: relative;
+                ">
+                    <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--text-main);">Tambah Catatan Baru</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-main);">Judul</label>
+                        <input type="text" id="noteTitle" placeholder="Masukkan judul catatan..." style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid rgba(0,0,0,0.1);
+                            border-radius: 8px;
+                            font-family: 'Poppins', sans-serif;
+                        ">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-main);">Isi Catatan</label>
+                        <textarea id="noteContent" placeholder="Tulis catatan Anda di sini..." rows="4" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid rgba(0,0,0,0.1);
+                            border-radius: 8px;
+                            font-family: 'Poppins', sans-serif;
+                        "></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-outline" onclick="closeModal()" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-main);">Batal</button>
+                        <button class="btn btn-primary" onclick="saveNote()">Simpan</button>
+                    </div>
+                    
+                    <button onclick="closeModal()" style="
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        background: none;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        color: var(--text-muted);
+                    ">&times;</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('noteModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function saveNote() {
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+
+            if (!title.trim()) {
+                showNotification('Judul catatan harus diisi.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Catatan berhasil ditambahkan!', 'success');
+                    closeModal();
+                    loadNotes(); // Refresh the notes list
+                } else {
+                    showNotification('Gagal menambahkan catatan: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving note:', error);
+                showNotification('Terjadi kesalahan saat menyimpan catatan.', 'error');
+            }
+        }
+
+        async function editNote(id, title, content) {
+            // Create a modal for editing notes
+            const modal = document.createElement('div');
+            modal.id = 'noteModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: var(--bg-card);
+                    padding: 30px;
+                    border-radius: var(--border-radius);
+                    width: 90%;
+                    max-width: 500px;
+                    box-shadow: var(--shadow-card);
+                    position: relative;
+                ">
+                    <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--text-main);">Edit Catatan</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-main);">Judul</label>
+                        <input type="text" id="editNoteTitle" value="${title}" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid rgba(0,0,0,0.1);
+                            border-radius: 8px;
+                            font-family: 'Poppins', sans-serif;
+                        ">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-main);">Isi Catatan</label>
+                        <textarea id="editNoteContent" rows="4" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid rgba(0,0,0,0.1);
+                            border-radius: 8px;
+                            font-family: 'Poppins', sans-serif;
+                        ">${content}</textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-outline" onclick="closeModal()" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-main);">Batal</button>
+                        <button class="btn btn-primary" onclick="updateNote(${id})">Perbarui</button>
+                    </div>
+                    
+                    <button onclick="closeModal()" style="
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        background: none;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        color: var(--text-muted);
+                    ">&times;</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        async function updateNote(id) {
+            const title = document.getElementById('editNoteTitle').value;
+            const content = document.getElementById('editNoteContent').value;
+
+            if (!title.trim()) {
+                showNotification('Judul catatan harus diisi.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/notes/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Catatan berhasil diperbarui!', 'success');
+                    closeModal();
+                    loadNotes(); // Refresh the notes list
+                } else {
+                    showNotification('Gagal memperbarui catatan: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating note:', error);
+                showNotification('Terjadi kesalahan saat memperbarui catatan.', 'error');
+            }
+        }
+
+        async function deleteNote(id, title) {
+            if (!confirm(`Hapus catatan "${title}"? Tindakan ini tidak dapat dibatalkan.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/notes/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Catatan berhasil dihapus!', 'success');
+                    loadNotes(); // Refresh the notes list
+                } else {
+                    showNotification('Gagal menghapus catatan: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting note:', error);
+                showNotification('Terjadi kesalahan saat menghapus catatan.', 'error');
+            }
+        }
+
+        // --- 5. INITIALIZE PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadNotes();
+        });
+
+        // --- 6. LOGOUT FUNCTIONALITY ---
         document.getElementById('logoutLink').addEventListener('click', async (e) => {
             e.preventDefault();
-            
+
             try {
                 const response = await fetch('/auth/logout', {
                     method: 'GET',
                     credentials: 'same-origin'
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     window.location.href = data.redirect || '/auth';
                 }

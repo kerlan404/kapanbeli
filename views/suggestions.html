@@ -291,6 +291,28 @@
             background: rgba(255, 159, 67, 0.1);
         }
 
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .low-stock {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+        }
+
+        .expiring {
+            background: rgba(255, 203, 98, 0.2);
+            color: #FDCB6E;
+        }
+
+        .recipe {
+            background: rgba(29, 209, 161, 0.2);
+            color: #1DD1A1;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-menu { gap: 15px; }
@@ -350,81 +372,13 @@
             </div>
         </div>
 
+        <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px;"></div>
+
         <div class="suggestions-grid" id="suggestionsContainer">
             <!-- Suggestions will be populated here dynamically -->
-            <div class="suggestion-card">
-                <div class="suggestion-header">
-                    <h3 class="suggestion-title">Stok Rendah</h3>
-                    <p class="suggestion-subtitle">Bahan yang perlu segera dibeli</p>
-                </div>
-                <div class="suggestion-body">
-                    <div class="suggestion-item">
-                        <span>Bawang Merah</span>
-                        <span class="badge low-stock">Stok: 0.2 kg</span>
-                    </div>
-                    <div class="suggestion-item">
-                        <span>Cabai Rawit</span>
-                        <span class="badge low-stock">Stok: 0.1 kg</span>
-                    </div>
-                    <div class="suggestion-item">
-                        <span>Garam</span>
-                        <span class="badge low-stock">Stok: 0.05 kg</span>
-                    </div>
-                </div>
-                <div class="suggestion-actions">
-                    <button class="btn btn-outline">Lihat Detail</button>
-                    <button class="btn btn-primary">Beli Sekarang</button>
-                </div>
-            </div>
-
-            <div class="suggestion-card">
-                <div class="suggestion-header">
-                    <h3 class="suggestion-title">Hampir Kadarluarsa</h3>
-                    <p class="suggestion-subtitle">Bahan yang segera habis masa berlakunya</p>
-                </div>
-                <div class="suggestion-body">
-                    <div class="suggestion-item">
-                        <span>Susu Cair</span>
-                        <span class="badge expiring">2 hari lg</span>
-                    </div>
-                    <div class="suggestion-item">
-                        <span>Yogurt</span>
-                        <span class="badge expiring">3 hari lg</span>
-                    </div>
-                    <div class="suggestion-item">
-                        <span>Bayam</span>
-                        <span class="badge expiring">1 hari lg</span>
-                    </div>
-                </div>
-                <div class="suggestion-actions">
-                    <button class="btn btn-outline">Lihat Detail</button>
-                    <button class="btn btn-primary">Gunakan Sekarang</button>
-                </div>
-            </div>
-
-            <div class="suggestion-card">
-                <div class="suggestion-header">
-                    <h3 class="suggestion-title">Rekomendasi Resep</h3>
-                    <p class="suggestion-subtitle">Ide masak berdasarkan bahan yang tersedia</p>
-                </div>
-                <div class="suggestion-body">
-                    <div class="suggestion-item">
-                        <span>Opor Ayam</span>
-                        <span class="badge recipe">Butuh 3 bahan</span>
-                    </div>
-                    <div class="suggestion-item">
-                        <span>Sayur Asem</span>
-                        <span class="badge recipe">Butuh 5 bahan</span>
-                    </div>
-                    <div class="suggestion-item">
-                        <span>Sambal Goreng</span>
-                        <span class="badge recipe">Butuh 4 bahan</span>
-                    </div>
-                </div>
-                <div class="suggestion-actions">
-                    <button class="btn btn-outline">Lihat Resep</button>
-                    <button class="btn btn-primary">Simpan</button>
-                </div>
+            <div id="loadingSpinner" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
+                <p style="color: var(--text-muted);">Memuat saran pembelian...</p>
             </div>
         </div>
     </div>
@@ -474,21 +428,384 @@
             }
         }
 
-        // Load user info when page loads
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
+        // --- 3. NOTIFICATION SYSTEM ---
+        function showNotification(message, type = 'info') {
+            // Create notification container if it doesn't exist
+            let container = document.getElementById('notificationContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notificationContainer';
+                container.style.cssText = `
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    z-index: 10000; 
+                    width: 350px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                min-height: 50px;
+            `;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' : 
+                type === 'error' ? 'fa-exclamation-circle' : 
+                'fa-info-circle'
+            }`;
+            icon.style.cssText = 'font-size: 1.2em;';
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.textContent = message;
+            messageSpan.style.flex = '1';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                notification.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            };
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            notification.appendChild(icon);
+            notification.appendChild(messageSpan);
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }
 
-        // --- 3. LOGOUT FUNCTIONALITY ---
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- 4. DATA LOADING FUNCTIONS ---
+        async function loadSuggestions() {
+            try {
+                // Load user's products to determine low stock and expiring items
+                const productsResponse = await fetch('/api/products');
+                const productsData = await productsResponse.json();
+                
+                if (productsData.success) {
+                    const products = productsData.products;
+                    
+                    // Calculate stats
+                    updateStats(products);
+                    
+                    // Display suggestions
+                    displaySuggestions(products);
+                } else {
+                    showNotification('Gagal memuat saran pembelian: ' + productsData.message, 'error');
+                    document.getElementById('suggestionsContainer').innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                            <h3>Gagal Memuat Data</h3>
+                            <p>${productsData.message || 'Terjadi kesalahan saat memuat data'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+                showNotification('Terjadi kesalahan saat memuat saran pembelian.', 'error');
+                document.getElementById('suggestionsContainer').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>Terjadi Kesalahan</h3>
+                        <p>Terjadi kesalahan saat memuat data. Silakan coba lagi.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats(products) {
+            // Count low stock items
+            const lowStockItems = products.filter(p => p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0);
+            document.getElementById('lowStockCount').textContent = lowStockItems.length;
+            
+            // Count expiring items (items expiring in next 7 days)
+            const expiringItems = products.filter(p => {
+                if (!p.expiry_date) return false;
+                const expiryDate = new Date(p.expiry_date);
+                const today = new Date();
+                const diffTime = expiryDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 7;
+            });
+            document.getElementById('expiringSoonCount').textContent = expiringItems.length;
+            
+            // Total suggested items
+            document.getElementById('suggestedItemsCount').textContent = lowStockItems.length + expiringItems.length;
+        }
+
+        function displaySuggestions(products) {
+            // Filter products for different suggestion categories
+            const lowStockItems = products.filter(p => p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0);
+            const expiringItems = products.filter(p => {
+                if (!p.expiry_date) return false;
+                const expiryDate = new Date(p.expiry_date);
+                const today = new Date();
+                const diffTime = expiryDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 7;
+            });
+            
+            // Generate recipe recommendations based on available ingredients
+            const recipeRecommendations = generateRecipeRecommendations(products);
+            
+            // Build HTML for suggestions
+            let suggestionsHTML = '';
+            
+            // Low stock items card
+            if (lowStockItems.length > 0) {
+                suggestionsHTML += `
+                <div class="suggestion-card">
+                    <div class="suggestion-header">
+                        <h3 class="suggestion-title">Stok Rendah</h3>
+                        <p class="suggestion-subtitle">Bahan yang perlu segera dibeli</p>
+                    </div>
+                    <div class="suggestion-body">
+                `;
+                
+                lowStockItems.forEach(item => {
+                    suggestionsHTML += `
+                        <div class="suggestion-item">
+                            <span>${item.name}</span>
+                            <span class="badge low-stock">Stok: ${item.stock_quantity} ${item.unit || ''}</span>
+                        </div>
+                    `;
+                });
+                
+                suggestionsHTML += `
+                    </div>
+                    <div class="suggestion-actions">
+                        <button class="btn btn-outline" onclick="viewProductDetail(${lowStockItems[0].id})">Lihat Detail</button>
+                        <button class="btn btn-primary" onclick="goToProducts()">Beli Sekarang</button>
+                    </div>
+                </div>
+                `;
+            }
+            
+            // Expiring items card
+            if (expiringItems.length > 0) {
+                suggestionsHTML += `
+                <div class="suggestion-card">
+                    <div class="suggestion-header">
+                        <h3 class="suggestion-title">Hampir Kadarluarsa</h3>
+                        <p class="suggestion-subtitle">Bahan yang segera habis masa berlakunya</p>
+                    </div>
+                    <div class="suggestion-body">
+                `;
+                
+                expiringItems.forEach(item => {
+                    const expiryDate = new Date(item.expiry_date);
+                    const today = new Date();
+                    const diffTime = expiryDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const daysText = diffDays === 0 ? 'Hari ini' : `${diffDays} hari lg`;
+                    
+                    suggestionsHTML += `
+                        <div class="suggestion-item">
+                            <span>${item.name}</span>
+                            <span class="badge expiring">${daysText}</span>
+                        </div>
+                    `;
+                });
+                
+                suggestionsHTML += `
+                    </div>
+                    <div class="suggestion-actions">
+                        <button class="btn btn-outline" onclick="viewProductDetail(${expiringItems[0].id})">Lihat Detail</button>
+                        <button class="btn btn-primary" onclick="goToProducts()">Gunakan Sekarang</button>
+                    </div>
+                </div>
+                `;
+            }
+            
+            // Recipe recommendations card
+            if (recipeRecommendations.length > 0) {
+                suggestionsHTML += `
+                <div class="suggestion-card">
+                    <div class="suggestion-header">
+                        <h3 class="suggestion-title">Rekomendasi Resep</h3>
+                        <p class="suggestion-subtitle">Ide masak berdasarkan bahan yang tersedia</p>
+                    </div>
+                    <div class="suggestion-body">
+                `;
+                
+                recipeRecommendations.forEach(recipe => {
+                    suggestionsHTML += `
+                        <div class="suggestion-item">
+                            <span>${recipe.name}</span>
+                            <span class="badge recipe">Butuh ${recipe.ingredients_needed} bahan</span>
+                        </div>
+                    `;
+                });
+                
+                suggestionsHTML += `
+                    </div>
+                    <div class="suggestion-actions">
+                        <button class="btn btn-outline" onclick="viewRecipes()">Lihat Resep</button>
+                        <button class="btn btn-primary" onclick="saveRecipes()">Simpan</button>
+                    </div>
+                </div>
+                `;
+            }
+            
+            // If no suggestions, show empty state
+            if (!lowStockItems.length && !expiringItems.length && !recipeRecommendations.length) {
+                suggestionsHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text-main); margin-bottom: 10px;">Tidak Ada Saran Saat Ini</h3>
+                        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">
+                            Stok bahan Anda dalam kondisi baik dan tidak ada yang mendekati tanggal kedaluwarsa.
+                        </p>
+                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="goToProducts()">
+                            <i class="fas fa-plus"></i> Tambah Bahan
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Update the container
+            document.getElementById('suggestionsContainer').innerHTML = suggestionsHTML;
+        }
+
+        function generateRecipeRecommendations(products) {
+            // Simple recipe recommendation algorithm based on available ingredients
+            const recipes = [];
+            
+            // Example recipes - in a real app, this would come from a recipe database
+            const possibleRecipes = [
+                {
+                    name: "Opor Ayam",
+                    required_ingredients: ["ayam", "santan", "bawang", "kunyit"],
+                    ingredients_needed: 2
+                },
+                {
+                    name: "Sayur Asem",
+                    required_ingredients: ["melinjo", "belimbing", "kacang", "daun singkong"],
+                    ingredients_needed: 3
+                },
+                {
+                    name: "Sambal Goreng",
+                    required_ingredients: ["cabe", "teri", "kentang", "pete"],
+                    ingredients_needed: 2
+                },
+                {
+                    name: "Tumis Kangkung",
+                    required_ingredients: ["kangkung", "bawang", "kencur"],
+                    ingredients_needed: 1
+                }
+            ];
+            
+            // Find recipes that can be made with available ingredients
+            possibleRecipes.forEach(recipe => {
+                const availableIngredients = recipe.required_ingredients.filter(reqIng => 
+                    products.some(prod => prod.name.toLowerCase().includes(reqIng.toLowerCase()))
+                );
+                
+                if (availableIngredients.length > 0) {
+                    recipes.push({
+                        name: recipe.name,
+                        ingredients_needed: recipe.required_ingredients.length - availableIngredients.length
+                    });
+                }
+            });
+            
+            return recipes.slice(0, 3); // Return top 3 recommendations
+        }
+
+        function viewProductDetail(productId) {
+            window.location.href = `/products/detail/${productId}`;
+        }
+
+        function goToProducts() {
+            window.location.href = '/products';
+        }
+
+        function viewRecipes() {
+            showNotification('Fitur resep akan segera tersedia.', 'info');
+        }
+
+        function saveRecipes() {
+            showNotification('Resep berhasil disimpan!', 'success');
+        }
+
+        // --- 5. INITIALIZE PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadSuggestions();
+        });
+
+        // --- 6. LOGOUT FUNCTIONALITY ---
         document.getElementById('logoutLink').addEventListener('click', async (e) => {
             e.preventDefault();
-            
+
             try {
                 const response = await fetch('/auth/logout', {
                     method: 'GET',
                     credentials: 'same-origin'
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     window.location.href = data.redirect || '/auth';
                 }

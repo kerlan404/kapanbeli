@@ -59,13 +59,25 @@ const isAuthenticated = (req, res, next) => {
     }
 };
 
+// Authentication guard middleware - redirects authenticated users away from auth pages
+const isNotAuthenticated = (req, res, next) => {
+    if (!req.session.user) {
+        next();
+    } else {
+        // If user is already authenticated, redirect to appropriate page
+        const userRole = req.session.user.role;
+        const redirectUrl = userRole === 'admin' ? '/admin' : '/';
+        res.redirect(redirectUrl);
+    }
+};
+
 // Public routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // Serve login/register page
-app.get('/auth', (req, res) => {
+app.get('/auth', isNotAuthenticated, (req, res) => {
     // Check for confirmation query parameter
     const confirmed = req.query.confirmed === 'true';
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
@@ -74,7 +86,7 @@ app.get('/auth', (req, res) => {
 });
 
 // Serve register page
-app.get('/register', (req, res) => {
+app.get('/register', isNotAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
@@ -102,6 +114,33 @@ app.get('/notes', isAuthenticated, (req, res) => {
 
 // Admin routes
 app.get('/admin', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/users', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/analytics', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/settings', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
         res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));

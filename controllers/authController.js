@@ -30,16 +30,27 @@ const authenticateToken = (req, res, next) => {
 
 // Fungsi untuk membuat transporter email (gunakan konfigurasi SMTP Anda)
 const createTransporter = () => {
+    // Check if nodemailer is properly loaded
+    if (!nodemailer || typeof nodemailer.createTransporter !== 'function') {
+        console.error('Nodemailer is not properly loaded');
+        return null;
+    }
+    
     // Contoh konfigurasi untuk Gmail
     // Pastikan untuk mengaktifkan "Less Secure App Access" atau "App Passwords" di akun Gmail Anda
     // Atau gunakan layanan email lain seperti SendGrid, Mailgun, dll.
-    return nodemailer.createTransporter({
-        service: 'gmail', // Gunakan layanan email Anda
-        auth: {
-            user: process.env.EMAIL_USER, // Alamat email pengirim
-            pass: process.env.EMAIL_PASS  // Password atau App Password
-        }
-    });
+    try {
+        return nodemailer.createTransporter({
+            service: 'gmail', // Gunakan layanan email Anda
+            auth: {
+                user: process.env.EMAIL_USER, // Alamat email pengirim
+                pass: process.env.EMAIL_PASS  // Password atau App Password
+            }
+        });
+    } catch (error) {
+        console.error('Error creating transporter:', error);
+        return null;
+    }
 
     // Contoh alternatif untuk SMTP server kustom:
     /*
@@ -106,6 +117,9 @@ const authController = {
                     message: 'Email atau password salah'
                 });
             }
+            
+            // Debug: Log user role
+            console.log('User role retrieved:', user.role, 'for email:', email);
 
             // Tidak perlu memeriksa konfirmasi email karena semua akun langsung dikonfirmasi saat registrasi
 
@@ -127,12 +141,17 @@ const authController = {
                 email: user.email,
                 role: user.role || 'user'
             };
+            
+            // Debug: Log session role
+            console.log('Session role set to:', user.role || 'user');
 
-            // Redirect ke halaman utama setelah login berhasil
+            // Redirect ke halaman yang sesuai berdasarkan role
+            const redirectUrl = user.role === 'admin' ? '/admin' : '/';
+            
             res.json({
                 success: true,
                 message: 'Login berhasil! Selamat datang kembali.',
-                redirect: '/',
+                redirect: redirectUrl,
                 user: {
                     name: user.name,
                     email: user.email,
@@ -219,30 +238,36 @@ const authController = {
             
             console.log('User created successfully in database:', newUser.email);
 
-            // Kirim email konfirmasi
+            // Kirim email konfirmasi (optional - don't break registration if email fails)
             try {
                 const transporter = createTransporter();
-                const confirmationUrl = `${req.protocol}://${req.get('host')}/auth/confirm/${newUser.confirmation_token}`;
+                
+                // Only try to send email if transporter is available
+                if (transporter) {
+                    const confirmationUrl = `${req.protocol}://${req.get('host')}/auth/confirm/${newUser.confirmation_token}`;
 
-                const mailOptions = {
-                    from: process.env.EMAIL_USER || 'noreply@kapanbeli.com',
-                    to: newUser.email,
-                    subject: 'Konfirmasi Akun KapanBeli',
-                    html: `
-                        <h2>Selamat Datang di KapanBeli, ${newUser.name}!</h2>
-                        <p>Terima kasih telah mendaftar. Untuk mengaktifkan akun Anda, silakan klik tombol di bawah ini:</p>
-                        <a href="${confirmationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #ffb347; color: black; text-decoration: none; border-radius: 5px;">Konfirmasi Akun</a>
-                        <p>Atau salin dan tempel tautan berikut ke browser Anda:</p>
-                        <p>${confirmationUrl}</p>
-                        <p>Tautan ini akan kadaluarsa setelah 24 jam.</p>
-                        <br>
-                        <p>Hormat kami,</p>
-                        <p>Tim KapanBeli</p>
-                    `
-                };
+                    const mailOptions = {
+                        from: process.env.EMAIL_USER || 'noreply@kapanbeli.com',
+                        to: newUser.email,
+                        subject: 'Konfirmasi Akun KapanBeli',
+                        html: `
+                            <h2>Selamat Datang di KapanBeli, ${newUser.name}!</h2>
+                            <p>Terima kasih telah mendaftar. Untuk mengaktifkan akun Anda, silakan klik tombol di bawah ini:</p>
+                            <a href="${confirmationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #ffb347; color: black; text-decoration: none; border-radius: 5px;">Konfirmasi Akun</a>
+                            <p>Atau salin dan tempel tautan berikut ke browser Anda:</p>
+                            <p>${confirmationUrl}</p>
+                            <p>Tautan ini akan kadaluarsa setelah 24 jam.</p>
+                            <br>
+                            <p>Hormat kami,</p>
+                            <p>Tim KapanBeli</p>
+                        `
+                    };
 
-                await transporter.sendMail(mailOptions);
-                console.log(`Confirmation email sent to ${newUser.email}`);
+                    await transporter.sendMail(mailOptions);
+                    console.log(`Confirmation email sent to ${newUser.email}`);
+                } else {
+                    console.warn('Email transporter not available, skipping confirmation email');
+                }
             } catch (emailError) {
                 console.error('Failed to send confirmation email:', emailError);
                 // Jika gagal kirim email, tetap lanjutkan karena user sudah dibuat

@@ -753,6 +753,7 @@
 
         // --- 7. ACTION HANDLERS ---
         function handleEdit(id, name) {
+            showNotification(`Membuka edit untuk produk: ${name}`, 'info');
             window.location.href = `/products/edit/${id}`;
         }
 
@@ -783,6 +784,13 @@
                 showNotification('Gagal menghapus produk. Silakan coba lagi.', 'error');
             }
         }
+
+        // --- 8. FIX EMPTY INGREDIENTS ISSUE ---
+        // Ensure products are loaded when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadProducts(); // Load real products instead of mock data
+        });
     </script>
 </body>
 </html>

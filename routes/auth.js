@@ -25,7 +25,8 @@ router.get('/status', (req, res) => {
             user: {
                 id: req.session.user.id,
                 name: req.session.user.name,
-                email: req.session.user.email
+                email: req.session.user.email,
+                role: req.session.user.role || 'user'
             }
         });
     } else {
