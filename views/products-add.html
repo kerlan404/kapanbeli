@@ -3,754 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Produk - KapanBeli</title>
+    <title>Kelola Produk - Kapan Beli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>➕</text></svg>" type="image/x-icon">
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* Custom Navbar Styles (copied from index.html) */
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
+        :root {
+            --primary-blue: #2E86DE; --primary-orange: #FF9F43; --bg-body: #F0F4F8; --bg-card: #FFFFFF;
+            --text-main: #2C3E50; --text-muted: #636E72; --radius: 12px; --shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
-
-        .nav-title h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: white; /* Ensure title is visible on navbar background */
+        body.dark-mode-active {
+            --bg-body: #1E272E; --bg-card: #2C3E50; --text-main: #DFE6E9; --text-muted: #B2BEC3;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; transition: background 0.3s; }
+        body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
-        .nav-menu {
-            display: flex;
-            gap: 1.5rem;
-            margin: 0 2rem;
+        /* Navbar */
+        .navbar { background: var(--bg-card); padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-weight: 700; font-size: 1.2rem; color: var(--primary-orange); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+        .nav-link { text-decoration: none; color: var(--text-muted); margin-left: 20px; font-size: 0.9rem; }
+        .nav-link:hover { color: var(--primary-blue); }
+
+        /* Container */
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; flex: 1; width: 100%; }
+        
+        .form-card {
+            background: var(--bg-card); border-radius: var(--radius); padding: 40px;
+            box-shadow: var(--shadow);
         }
+        .form-header { text-align: center; margin-bottom: 30px; }
+        .form-header h2 { font-size: 1.8rem; color: var(--primary-blue); }
+        .form-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
 
-        .nav-link {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); }
+        
+        .form-control {
+            width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;
+            background: var(--bg-body); color: var(--text-main); font-size: 1rem;
         }
+        .form-control:focus { outline: none; border-color: var(--primary-orange); background: var(--bg-card); }
 
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        .btn-submit {
+            width: 100%; padding: 15px; background: var(--primary-orange); color: white; border: none;
+            border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 10px;
         }
+        .btn-submit:hover { filter: brightness(1.1); }
 
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .image-preview {
+            width: 100%; height: 200px; border: 2px dashed #ccc; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; margin-top: 10px;
+            overflow: hidden; background: var(--bg-body);
         }
+        .image-preview img { width: 100%; height: 100%; object-fit: contain; }
 
-        .nav-auth-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .welcome-text {
-            font-size: 0.9rem;
-            color: white;
-        }
-
-        .dark-mode-toggle {
-            background: rgba(255, 255, 255, 0.1); /* Subtle background */
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-        }
-
-        .dark-mode-toggle:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-color: white;
-        }
-
-        /* Tambahkan kelas untuk mode gelap */
-        .dark-mode-active .nav-title h1,
-        .dark-mode-active .nav-link,
-        .dark-mode-active .welcome-text,
-        .dark-mode-active .dark-mode-toggle {
-            color: white;
-        }
-
-        /* Tambahkan kelas untuk mode terang */
-        .nav-title h1,
-        .nav-link,
-        .welcome-text,
-        .dark-mode-toggle {
-            color: #333; /* Warna teks default untuk mode terang */
-        }
-
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 10px;
-                padding: 10px;
-            }
-
-            .nav-menu {
-                margin: 0;
-                justify-content: center;
-                flex-wrap: wrap; /* Allow wrapping on small screens */
-            }
-
-            .nav-buttons {
-                order: -1; /* Move auth section to top on mobile */
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Main Content Styles */
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 20px;
-        }
-
-        .form-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .form-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .form-header h2 {
-            font-size: 1.8rem;
-            color: #333;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #ffb347;
-            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
-        }
-
-        .input-with-icon {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: white;
-            cursor: pointer;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: #ffb347;
-            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-
-        .form-col {
-            flex: 1;
-        }
-
-        .form-button {
-            width: 100%;
-            padding: 14px;
-            background-color: #ffb347;
-            color: #222;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .form-button:hover {
-            background-color: #ffa200;
-        }
-
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #ffb347;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
+        @media(max-width: 768px) { .form-row { grid-template-columns: 1fr; } .navbar { flex-direction: column; gap: 10px; } .nav-link { margin: 0 10px; } }
     </style>
 </head>
 <body>
+
     <nav class="navbar">
-        <div class="container nav-container">
-            <div class="nav-title">
-                <h1>Kapan Beli</h1>
-            </div>
-            <div class="nav-menu">
-                <a href="/" class="nav-link">Beranda</a>
-                <a href="/notes" class="nav-link">Catatan Saya</a>
-                <a href="/products" class="nav-link active">Bahan Saya</a>
-                <a href="/suggestions" class="nav-link">Saran Pembelian</a>
-            </div>
-            <div class="nav-buttons">
-                <div class="nav-auth-section">
-                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
-                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
-                </div>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-            </div>
+        <a href="/products" class="nav-brand"><i class="fas fa-arrow-left"></i> Kembali</a>
+        <div>
+            <a href="/products" class="nav-link">Bahan Saya</a>
+            <span style="color:var(--text-muted)">/</span>
+            <span id="navActionText" class="nav-link" style="color:var(--primary-blue)">Tambah</span>
         </div>
     </nav>
 
     <div class="container">
-        <div class="form-container">
+        <div class="form-card">
             <div class="form-header">
-                <h2 id="formTitle"><i class="fas fa-plus-circle"></i> <span id="formTitleText">Tambah Produk Baru</span></h2>
-                <p id="formSubtitle">Isi data produk yang ingin Anda tambahkan atau perbarui</p>
+                <h2 id="pageTitle">Tambah Produk</h2>
+                <p>Lengkapi data bahan makanan di bawah ini</p>
             </div>
 
             <form id="productForm">
                 <div class="form-group">
-                    <label class="form-label" for="productName">Nama Produk *</label>
-                    <div class="input-with-icon">
-                        <input type="text" id="productName" class="form-input" placeholder="Contoh: Bawang Merah" required>
-                        <i class="fas fa-tag input-icon"></i>
+                    <label class="form-label">Nama Produk</label>
+                    <input type="text" id="productName" class="form-control" placeholder="Contoh: Bawang Merah" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Kategori</label>
+                        <select id="productCategory" class="form-control">
+                            <option value="bumbu">Bumbu Dapur</option>
+                            <option value="sayur">Sayuran</option>
+                            <option value="buah">Buah-buahan</option>
+                            <option value="protein">Protein</option>
+                            <option value="bahan_kering">Bahan Kering</option>
+                            <option value="lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Satuan</label>
+                        <select id="productUnit" class="form-control">
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="gram">Gram (gr)</option>
+                            <option value="pcs">Buah/Pcs</option>
+                            <option value="liter">Liter</option>
+                            <option value="bungkus">Bungkus</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label" for="productCategory">Kategori</label>
-                            <select id="productCategory" class="form-select">
-                                <option value="">Pilih Kategori</option>
-                                <option value="bumbu">Bumbu Dapur</option>
-                                <option value="sayur">Sayuran</option>
-                                <option value="buah">Buah-buahan</option>
-                                <option value="rempah">Rempah-rempah</option>
-                                <option value="protein">Protein Hewani</option>
-                                <option value="lainnya">Lainnya</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Jumlah Stok</label>
+                        <input type="number" id="productQuantity" class="form-control" placeholder="0" min="0" required>
                     </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label" for="productUnit">Satuan</label>
-                            <select id="productUnit" class="form-select">
-                                <option value="">Pilih Satuan</option>
-                                <option value="bh">Buah</option>
-                                <option value="kg">Kilogram</option>
-                                <option value="gr">Gram</option>
-                                <option value="ons">Ons</option>
-                                <option value="ltr">Liter</option>
-                                <option value="ml">Mililiter</option>
-                                <option value="pc">Pack</option>
-                                <option value="bungkus">Bungkus</option>
-                                <option value="kaleng">Kaleng</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label" for="productQuantity">Jumlah *</label>
-                            <div class="input-with-icon">
-                                <input type="number" id="productQuantity" class="form-input" placeholder="Contoh: 5" min="0" required>
-                                <i class="fas fa-calculator input-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label" for="productPrice">Harga (Rp) *</label>
-                            <div class="input-with-icon">
-                                <input type="number" id="productPrice" class="form-input" placeholder="Contoh: 15000" min="0" required>
-                                <i class="fas fa-money-bill-wave input-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label" for="productMinStock">Stok Minimal</label>
-                            <div class="input-with-icon">
-                                <input type="number" id="productMinStock" class="form-input" placeholder="Contoh: 1" min="0" value="1">
-                                <i class="fas fa-exclamation-triangle input-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label" for="productExpiry">Tanggal Kadaluarsa (Opsional)</label>
-                            <div class="input-with-icon">
-                                <input type="date" id="productExpiry" class="form-input">
-                                <i class="fas fa-calendar input-icon"></i>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Stok Minimal (Alert)</label>
+                        <input type="number" id="productMinStock" class="form-control" placeholder="1" min="0" value="1">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="productImage">Gambar Produk (Opsional)</label>
-                    <div class="input-with-icon">
-                        <input type="file" id="productImage" class="form-input" accept="image/*">
-                        <i class="fas fa-image input-icon"></i>
-                    </div>
-                    <div id="imagePreview" style="margin-top: 10px; display: none;">
-                        <img id="previewImg" src="" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                    <label class="form-label">Tanggal Kadaluarsa</label>
+                    <input type="date" id="productExpiry" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Gambar Produk</label>
+                    <input type="file" id="productImage" class="form-control" accept="image/*">
+                    <div class="image-preview" id="previewBox">
+                        <span style="color:var(--text-muted)">Preview Gambar</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="productNotes">Catatan Tambahan (Opsional)</label>
-                    <textarea id="productNotes" class="form-input" rows="3" placeholder="Catatan tentang produk ini..."></textarea>
+                    <label class="form-label">Catatan / Deskripsi</label>
+                    <textarea id="productNotes" class="form-control" rows="3"></textarea>
                 </div>
 
-                <button type="submit" class="form-button">
-                    <i class="fas fa-save"></i> <span id="submitButtonText">Simpan Produk</span>
-                </button>
+                <button type="submit" class="btn-submit" id="submitBtn">Simpan Produk</button>
             </form>
-
-            <a href="/products" class="back-link">
-                <i class="fas fa-arrow-left"></i> Kembali ke Daftar Produk
-            </a>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Kapan Beli - Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
-    </footer>
-
     <script>
-        // Check authentication status on page load
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
+        // --- LOGIC (Server & File Upload Preserved) ---
+        const urlId = window.location.pathname.split('/').pop();
+        let isEdit = !isNaN(urlId);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.authenticated) {
-                        document.getElementById('userName').textContent = data.user.name;
-                    } else {
-                        window.location.href = '/auth';
-                    }
-                } else {
-                    window.location.href = '/auth';
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                window.location.href = '/auth';
-            }
+        // Setup UI
+        if(isEdit) {
+            document.getElementById('pageTitle').innerText = 'Edit Produk';
+            document.getElementById('navActionText').innerText = 'Edit';
+            document.getElementById('submitBtn').innerText = 'Perbarui Produk';
+            loadEditData(urlId);
         }
 
-        // Dark mode toggle functionality (copied from index.html)
-        const darkModeToggle = document.querySelector('.dark-mode-toggle');
-        const darkModeIcon = darkModeToggle.querySelector('i'); // Select the icon inside the button
-        const body = document.body;
-
-        // Check for saved theme preference or respect OS setting
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            body.classList.add('dark-mode-active');
-            // Set icon to sun if dark mode is active initially
-            darkModeIcon.classList.remove('fa-moon');
-            darkModeIcon.classList.add('fa-sun');
-        } else {
-            body.classList.remove('dark-mode-active');
-             // Set icon to moon if light mode is active initially
-             darkModeIcon.classList.remove('fa-sun');
-             darkModeIcon.classList.add('fa-moon');
-        }
-
-        darkModeToggle?.addEventListener('click', function() {
-            body.classList.toggle('dark-mode-active');
-
-            // Toggle the icon based on the new state after the class is toggled
-            if (body.classList.contains('dark-mode-active')) {
-                localStorage.setItem('theme', 'dark');
-                darkModeIcon.classList.remove('fa-moon');
-                darkModeIcon.classList.add('fa-sun');
-            } else {
-                localStorage.setItem('theme', 'light');
-                darkModeIcon.classList.remove('fa-sun');
-                darkModeIcon.classList.add('fa-moon');
-            }
-        });
-
-        // Notification function
-        function showNotification(message, type = 'info') {
-            // Create notification container if it doesn't exist
-            let container = document.getElementById('notificationContainer');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'notificationContainer';
-                container.style.cssText = `
-                    position: fixed; 
-                    top: 20px; 
-                    right: 20px; 
-                    z-index: 10000; 
-                    width: 350px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                `;
-                document.body.appendChild(container);
-            }
-            
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.style.cssText = `
-                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
-                color: white;
-                padding: 15px 20px;
-                margin-bottom: 10px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideInRight 0.3s ease;
-                position: relative;
-                overflow: hidden;
-                min-height: 50px;
-            `;
-            
-            const icon = document.createElement('i');
-            icon.className = `fas ${
-                type === 'success' ? 'fa-check-circle' : 
-                type === 'error' ? 'fa-exclamation-circle' : 
-                'fa-info-circle'
-            }`;
-            icon.style.cssText = 'font-size: 1.2em;';
-            
-            const messageSpan = document.createElement('span');
-            messageSpan.textContent = message;
-            messageSpan.style.flex = '1';
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.innerHTML = '&times;';
-            closeBtn.onclick = () => {
-                notification.style.animation = 'fadeOut 0.5s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 500);
-            };
-            closeBtn.style.cssText = `
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5em;
-                cursor: pointer;
-                padding: 0;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            notification.appendChild(icon);
-            notification.appendChild(messageSpan);
-            notification.appendChild(closeBtn);
-            
-            container.appendChild(notification);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'fadeOut 0.5s ease';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 500);
-                }
-            }, 5000);
-        }
-
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Image preview functionality
+        // Image Preview
         document.getElementById('productImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if (file) {
+            if(file) {
                 const reader = new FileReader();
-                
-                reader.onload = function(event) {
-                    const preview = document.getElementById('previewImg');
-                    preview.src = event.target.result;
-                    document.getElementById('imagePreview').style.display = 'block';
-                }
-                
+                reader.onload = function(evt) {
+                    document.getElementById('previewBox').innerHTML = `<img src="${evt.target.result}">`;
+                };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Check if we're editing a product by looking at the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const editProductId = window.location.pathname.split('/').pop();
-        let isEditing = false;
-
-        // Function to load product data for editing
-        async function loadProductForEdit(productId) {
+        // Load Data for Edit
+        async function loadEditData(id) {
             try {
-                const response = await fetch(`/api/products/${productId}`);
-                const result = await response.json();
-
-                if (result.success) {
-                    const product = result.product;
-                    
-                    // Populate form fields with product data
-                    document.getElementById('productName').value = product.name;
-                    document.getElementById('productCategory').value = product.category_id || '';
-                    document.getElementById('productUnit').value = product.unit || '';
-                    document.getElementById('productQuantity').value = product.stock_quantity || 0;
-                    document.getElementById('productPrice').value = product.price || 0;
-                    document.getElementById('productMinStock').value = product.min_stock_level || 1;
-                    document.getElementById('productExpiry').value = product.expiry_date || '';
-                    document.getElementById('productNotes').value = product.notes || '';
-                    
-                    // Update form title and button text
-                    document.getElementById('formTitleText').textContent = 'Edit Produk';
-                    document.getElementById('formSubtitle').textContent = 'Ubah data produk yang ingin Anda perbarui';
-                    document.getElementById('submitButtonText').textContent = 'Perbarui Produk';
-                    document.querySelector('#productForm .form-button i').className = 'fas fa-sync-alt';
-                    
-                    isEditing = true;
-                } else {
-                    showNotification(result.message || 'Gagal memuat data produk.', 'error');
-                    window.location.href = '/products';
+                const res = await fetch(`/api/products/${id}`);
+                const data = await res.json();
+                if(data.success) {
+                    const p = data.product;
+                    document.getElementById('productName').value = p.name;
+                    document.getElementById('productCategory').value = p.category_id || 'lainnya';
+                    document.getElementById('productUnit').value = p.unit || 'pcs';
+                    document.getElementById('productQuantity').value = p.stock_quantity;
+                    document.getElementById('productMinStock').value = p.min_stock_level;
+                    document.getElementById('productExpiry').value = p.expiry_date ? p.expiry_date.split('T')[0] : '';
+                    document.getElementById('productNotes').value = p.description || p.notes || '';
+                    if(p.image_url) {
+                        document.getElementById('previewBox').innerHTML = `<img src="${p.image_url}">`;
+                    }
                 }
-            } catch (error) {
-                console.error('Error loading product for edit:', error);
-                showNotification('Gagal memuat data produk.', 'error');
-                window.location.href = '/products';
-            }
+            } catch(e) { console.error(e); }
         }
 
-        // Form submission handler
+        // Submit Handler
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Menyimpan...';
+            btn.disabled = true;
 
-            // Get form values
-            const productName = document.getElementById('productName').value;
-            const productCategory = document.getElementById('productCategory').value;
-            const productUnit = document.getElementById('productUnit').value;
-            const productQuantity = document.getElementById('productQuantity').value;
-            const productPrice = document.getElementById('productPrice').value;
-            const productMinStock = document.getElementById('productMinStock').value;
-            const productExpiry = document.getElementById('productExpiry').value;
-            const productNotes = document.getElementById('productNotes').value;
-            const productImage = document.getElementById('productImage').files[0];
-
-            // Prepare product data
-            const productData = {
-                name: productName,
-                category_id: productCategory,
-                unit: productUnit,
-                stock_quantity: parseFloat(productQuantity),
-                price: parseInt(productPrice),
-                min_stock_level: parseInt(productMinStock),
-                expiry_date: productExpiry || null,
-                notes: productNotes || '',
-                description: productNotes || '' // Also use notes as description
-            };
+            const formData = new FormData();
+            formData.append('name', document.getElementById('productName').value);
+            formData.append('category_id', document.getElementById('productCategory').value);
+            formData.append('unit', document.getElementById('productUnit').value);
+            formData.append('stock_quantity', document.getElementById('productQuantity').value);
+            formData.append('min_stock_level', document.getElementById('productMinStock').value);
+            formData.append('expiry_date', document.getElementById('productExpiry').value);
+            formData.append('notes', document.getElementById('productNotes').value);
+            formData.append('description', document.getElementById('productNotes').value);
+            
+            const fileInput = document.getElementById('productImage');
+            if(fileInput.files[0]) formData.append('image', fileInput.files[0]);
 
             try {
-                let response;
-                let result;
+                const method = isEdit ? 'PUT' : 'POST';
+                const url = isEdit ? `/api/products/${urlId}` : '/api/products';
                 
-                if (isEditing) {
-                    // Update existing product
-                    if (productImage) {
-                        // If image is selected, we need to send as FormData to handle file upload
-                        const formData = new FormData();
-                        formData.append('name', productName);
-                        formData.append('category_id', productCategory);
-                        formData.append('unit', productUnit);
-                        formData.append('stock_quantity', parseFloat(productQuantity));
-                        formData.append('price', parseInt(productPrice));
-                        formData.append('min_stock_level', parseInt(productMinStock));
-                        formData.append('expiry_date', productExpiry || '');
-                        formData.append('notes', productNotes || '');
-                        formData.append('description', productNotes || '');
-                        formData.append('image', productImage);
+                const res = await fetch(url, { method: method, body: formData });
+                const data = await res.json();
 
-                        response = await fetch(`/api/products/${editProductId}`, {
-                            method: 'PUT',
-                            body: formData,
-                            credentials: 'same-origin'
-                        });
-                    } else {
-                        // No image selected, send as JSON
-                        response = await fetch(`/api/products/${editProductId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(productData),
-                            credentials: 'same-origin'
-                        });
-                    }
-                    
-                    result = await response.json();
-                    
-                    if (response.ok) {
-                        showNotification('Produk berhasil diperbarui!', 'success');
-                        window.location.href = `/products/detail/${editProductId}`;
-                    } else {
-                        showNotification(result.message || 'Gagal memperbarui produk. Silakan coba lagi.', 'error');
-                    }
+                if(res.ok) {
+                    alert(isEdit ? 'Produk diperbarui!' : 'Produk ditambahkan!');
+                    window.location.href = '/products';
                 } else {
-                    // Create new product
-                    if (productImage) {
-                        // If image is selected, we need to send as FormData to handle file upload
-                        const formData = new FormData();
-                        formData.append('name', productName);
-                        formData.append('category_id', productCategory);
-                        formData.append('unit', productUnit);
-                        formData.append('stock_quantity', parseFloat(productQuantity));
-                        formData.append('price', parseInt(productPrice));
-                        formData.append('min_stock_level', parseInt(productMinStock));
-                        formData.append('expiry_date', productExpiry || '');
-                        formData.append('notes', productNotes || '');
-                        formData.append('description', productNotes || '');
-                        formData.append('image', productImage);
-
-                        response = await fetch('/api/products', {
-                            method: 'POST',
-                            body: formData,
-                            credentials: 'same-origin'
-                        });
-                    } else {
-                        // No image selected, send as JSON
-                        response = await fetch('/api/products', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(productData),
-                            credentials: 'same-origin'
-                        });
-                    }
-                    
-                    result = await response.json();
-                    
-                    if (response.ok) {
-                        showNotification('Produk berhasil ditambahkan!', 'success');
-                        document.getElementById('productForm').reset();
-                        document.getElementById('imagePreview').style.display = 'none';
-                        window.location.href = '/products';
-                    } else {
-                        showNotification(result.message || 'Gagal menambahkan produk. Silakan coba lagi.', 'error');
-                    }
+                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+                    btn.innerText = originalText;
+                    btn.disabled = false;
                 }
-            } catch (error) {
-                console.error('Error processing product:', error);
-                showNotification('Terjadi kesalahan saat memproses produk. Silakan coba lagi.', 'error');
+            } catch(err) {
+                console.error(err);
+                alert('Gagal terhubung ke server');
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
-        });
-
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthStatus();
-            
-            // Check if we're in edit mode by looking at the URL
-            if (editProductId && !isNaN(editProductId) && window.location.pathname.includes('/products/edit/')) {
-                loadProductForEdit(editProductId);
-            }
-        });
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthStatus();
         });
     </script>
 </body>

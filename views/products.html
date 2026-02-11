@@ -4,72 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bahan Saya - Kapan Beli</title>
-
-    <!-- Google Fonts: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥕</text></svg>" type="image/x-icon">
 
     <style>
-        /* --- CSS VARIABLES --- */
+        /* --- CSS VARIABLES & RESET --- */
         :root {
-            --primary-orange: #FF9F43;
             --primary-blue: #2E86DE;
-            --bg-body: #F7F9FC;
+            --primary-orange: #FF9F43;
+            --bg-body: #F0F4F8;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
-            --text-muted: #8395A7;
-            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
-            --border-radius: 20px;
-            --dot-color: #E1E8ED;
-            --status-red: #e74c3c;
-            --status-yellow: #f39c12;
-            --status-green: #2ecc71;
+            --text-muted: #636E72;
+            --border-radius: 16px;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px rgba(46, 134, 222, 0.15);
+            --danger: #FF6B6B;
+            --success: #1DD1A1;
+            --warning: #FECA57;
         }
 
         body.dark-mode-active {
             --bg-body: #1E272E;
             --bg-card: #2C3E50;
             --text-main: #DFE6E9;
-            --text-muted: #808E9B;
-            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --dot-color: #34495E;
+            --text-muted: #B2BEC3;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-md: 0 10px 25px rgba(0,0,0,0.4);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
+        
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
-            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
-        /* --- NAVIGATION BAR --- */
+        /* --- NAVBAR --- */
         nav {
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+            padding: 15px 5%;
             position: sticky;
             top: 0;
-            background: var(--bg-card);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             z-index: 100;
-            padding: 15px 5%;
         }
-
         .nav-container {
             display: flex;
             justify-content: space-between;
@@ -77,313 +62,111 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-orange);
-            text-decoration: none;
+            font-weight: 700; font-size: 1.5rem; color: var(--primary-orange); text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
-
-        .logo i { font-size: 1.8rem; }
-
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 12px;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255, 159, 67, 0.1);
-            color: var(--primary-orange);
-        }
-
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .nav-auth-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .welcome-text {
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-
+        .nav-menu { display: flex; gap: 30px; }
+        .nav-link { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
         .dark-mode-toggle {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .dark-mode-toggle:hover {
-            border-color: var(--primary-orange);
-            color: var(--primary-orange);
-            background: rgba(255, 159, 67, 0.1);
+            background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer;
         }
 
         /* --- MAIN CONTENT --- */
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            flex: 1;
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; width: 100%; flex: 1; }
+        
+        .header-section {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
         }
-
-        .products-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+        .page-title { font-size: 1.8rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        
+        .add-btn {
+            background: var(--primary-orange); color: white; border: none; padding: 12px 24px; border-radius: 50px;
+            font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;
+            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.4);
         }
+        .add-btn:hover { transform: translateY(-2px); }
 
-        .section-title {
-            font-size: 2rem;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-title i {
-            color: var(--primary-orange);
-        }
-
-        .add-product-btn {
-            background: var(--primary-orange);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-
-        .add-product-btn:hover {
-            background: #e68a34;
-            transform: translateY(-2px);
-        }
-
-        .search-bar {
-            display: flex;
-            margin-bottom: 30px;
-        }
-
+        /* Search Bar */
+        .search-wrapper { position: relative; margin-bottom: 40px; }
         .search-input {
-            flex: 1;
-            padding: 12px 20px;
-            border: 2px solid rgba(0,0,0,0.05);
-            border-radius: 12px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-body);
-            color: var(--text-main);
+            width: 100%; padding: 16px 20px 16px 50px; border-radius: 50px; border: 2px solid transparent;
+            background: var(--bg-card); font-family: inherit; font-size: 1rem; color: var(--text-main);
+            box-shadow: var(--shadow-sm);
         }
+        .search-input:focus { outline: none; border-color: var(--primary-blue); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            background: var(--bg-card);
-        }
-
+        /* Grid & Cards */
         .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;
         }
 
         .product-card {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-card);
-            transition: transform 0.3s;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            background: var(--bg-card); border-radius: var(--border-radius); overflow: hidden;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.03); transition: transform 0.3s;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+
+        .card-top {
+            height: 140px; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); 
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        body.dark-mode-active .card-top { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+        
+        .card-img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+        .card-icon { font-size: 4rem; color: var(--primary-orange); z-index: 2; }
+        .category-tag {
+            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9);
+            padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            color: var(--primary-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 3;
         }
 
-        .product-card:hover {
-            transform: translateY(-5px);
+        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        .prod-name { font-size: 1.2rem; font-weight: 600; margin: 0; cursor: pointer; }
+        .prod-name:hover { color: var(--primary-orange); }
+
+        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; padding-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); }
+        .info-row:last-child { border-bottom: none; }
+        .label { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .value { font-weight: 600; color: var(--text-main); }
+
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; }
+        .badge-expired { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
+        .badge-warning { background: rgba(254, 202, 87, 0.2); color: #d35400; }
+        .badge-safe { background: rgba(29, 209, 161, 0.15); color: var(--success); }
+
+        .card-actions {
+            margin-top: auto; display: flex; gap: 10px; padding-top: 15px;
         }
-
-        .card-header {
-            padding: 20px;
-            text-align: center;
-            position: relative;
+        .action-btn {
+            flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer;
+            font-weight: 600; font-family: inherit; display: flex; justify-content: center; align-items: center; gap: 6px;
         }
+        .btn-edit { background: transparent; border: 1px solid var(--primary-blue); color: var(--primary-blue); }
+        .btn-edit:hover { background: var(--primary-blue); color: white; }
+        .btn-delete { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+        .btn-delete:hover { background: var(--danger); color: white; }
 
-        .category-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--primary-orange);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .card-icon {
-            font-size: 4rem;
-            color: var(--primary-orange);
-            margin: 10px 0;
-        }
-
-        .card-body {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-main);
-            cursor: pointer;
-        }
-
-        .product-name:hover {
-            text-decoration: underline;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            align-items: center;
-        }
-
-        .info-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .info-value {
-            font-weight: 500;
-            color: var(--text-main);
-        }
-
-        .expiry-badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-safe { background: var(--status-green); color: white; }
-        .status-warning { background: var(--status-yellow); color: white; }
-        .status-expired { background: var(--status-red); color: white; }
-
-        .card-footer {
-            padding: 15px 20px;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .btn-edit {
-            background: transparent;
-            border: 1px solid var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        .btn-edit:hover {
-            background: rgba(46, 134, 222, 0.1);
-        }
-
-        .btn-delete {
-            background: transparent;
-            border: 1px solid var(--status-red);
-            color: var(--status-red);
-        }
-
-        .btn-delete:hover {
-            background: rgba(231, 76, 60, 0.1);
-        }
-
+        /* Empty State */
         .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            grid-column: 1 / -1;
+            grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);
+            background: var(--bg-card); border-radius: var(--border-radius); border: 2px dashed rgba(0,0,0,0.05);
         }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
 
-        .empty-state i {
-            font-size: 4rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
+        /* Notification */
+        #notificationContainer { position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px; }
+        .notification { padding: 15px; border-radius: 8px; color: white; margin-bottom: 10px; animation: slideIn 0.3s; display: flex; align-items: center; gap: 10px; }
+        .notif-success { background: var(--success); }
+        .notif-error { background: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        .empty-state h3 {
-            font-size: 1.5rem;
-            color: var(--text-main);
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: var(--text-muted);
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .nav-menu { gap: 15px; }
-            .products-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .nav-buttons { width: 100%; justify-content: space-between; }
-            .card-footer { flex-direction: column; }
+            .nav-menu { display: none; } .header-section { flex-direction: column; align-items: flex-start; }
+            .add-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -391,405 +174,194 @@
 
     <nav>
         <div class="nav-container">
-            <a href="/" class="logo">
-                <i class="fas fa-carrot"></i>
-                <span>Kapan Beli</span>
-            </a>
+            <a href="/" class="logo"><i class="fas fa-carrot"></i> Kapan Beli</a>
             <div class="nav-menu">
                 <a href="/" class="nav-link">Beranda</a>
                 <a href="/notes" class="nav-link">Catatan Saya</a>
                 <a href="/products" class="nav-link active">Bahan Saya</a>
                 <a href="/suggestions" class="nav-link">Saran Pembelian</a>
             </div>
-            <div class="nav-buttons">
-                <div class="nav-auth-section">
-                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
-                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
-                </div>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span id="userName" style="font-size: 0.9rem; font-weight: 500; display: none;">User</span>
+                <a href="/auth/logout" class="nav-link" style="font-size: 0.9rem;">Keluar</a>
+                <button class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
             </div>
         </div>
     </nav>
 
     <div class="container">
-        <div class="products-header">
-            <h2 class="section-title">
-                <i class="fas fa-carrot"></i>
-                Bahan Saya
-            </h2>
-            <a href="/products/add" class="add-product-btn">
-                <i class="fas fa-plus"></i>
-                Tambah Bahan
-            </a>
+        <div class="header-section">
+            <div class="page-title"><i class="fas fa-box-open" style="color: var(--primary-blue);"></i> Bahan Saya</div>
+            <a href="/products/add" class="add-btn"><i class="fas fa-plus"></i> Tambah Bahan</a>
         </div>
 
-        <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari bahan masak...">
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari bahan (cth: Bawang, Susu)...">
         </div>
-
-        <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px;"></div>
 
         <div class="products-grid" id="productsGrid">
-            <!-- Products will be populated here dynamically -->
+            <!-- Data rendered via JS -->
         </div>
     </div>
 
+    <div id="notificationContainer"></div>
+
     <script>
-        // --- 1. NOTIFICATION SYSTEM ---
-        function showNotification(message, type = 'info') {
-            // Create notification container if it doesn't exist
-            let container = document.getElementById('notificationContainer');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'notificationContainer';
-                container.style.cssText = `
-                    position: fixed; 
-                    top: 20px; 
-                    right: 20px; 
-                    z-index: 10000; 
-                    width: 350px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                `;
-                document.body.appendChild(container);
-            }
-            
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.style.cssText = `
-                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
-                color: white;
-                padding: 15px 20px;
-                margin-bottom: 10px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideInRight 0.3s ease;
-                position: relative;
-                overflow: hidden;
-                min-height: 50px;
-            `;
-            
-            const icon = document.createElement('i');
-            icon.className = `fas ${
-                type === 'success' ? 'fa-check-circle' : 
-                type === 'error' ? 'fa-exclamation-circle' : 
-                'fa-info-circle'
-            }`;
-            icon.style.cssText = 'font-size: 1.2em;';
-            
-            const messageSpan = document.createElement('span');
-            messageSpan.textContent = message;
-            messageSpan.style.flex = '1';
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.innerHTML = '&times;';
-            closeBtn.onclick = () => {
-                notification.style.animation = 'fadeOut 0.5s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 500);
-            };
-            closeBtn.style.cssText = `
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5em;
-                cursor: pointer;
-                padding: 0;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            notification.appendChild(icon);
-            notification.appendChild(messageSpan);
-            notification.appendChild(closeBtn);
-            
-            container.appendChild(notification);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'fadeOut 0.5s ease';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 500);
-                }
-            }, 5000);
-        }
-
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // --- 2. PRODUCT FUNCTIONALITY ---
-        async function loadProducts() {
-            try {
-                const response = await fetch('/api/products');
-                const data = await response.json();
-
-                if (data.success) {
-                    renderProducts(data.products);
-                } else {
-                    console.error('Error loading products:', data.message);
-                    showNotification('Gagal memuat produk: ' + data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Error loading products:', error);
-                showNotification('Terjadi kesalahan saat memuat produk.', 'error');
-            }
-        }
-
-        // --- 3. DARK MODE LOGIC ---
-        const toggleBtn = document.querySelector('.dark-mode-toggle');
-        const body = document.body;
-
-        if (localStorage.getItem('theme') === 'dark' ||
-           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            enableDarkMode();
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode-active')) {
-                disableDarkMode();
-            } else {
-                enableDarkMode();
-            }
-        });
-
-        function enableDarkMode() {
-            body.classList.add('dark-mode-active');
-            localStorage.setItem('theme', 'dark');
-        }
-
-        function disableDarkMode() {
-            body.classList.remove('dark-mode-active');
-            localStorage.setItem('theme', 'light');
-        }
-
-        // --- 4. SERVER AUTH LOGIC ---
+        // --- LOGIC SERVER UTAMA (TIDAK DIUBAH) ---
+        
+        // 1. Auth & Dark Mode
         async function loadUserInfo() {
             try {
-                const response = await fetch('/auth/status');
-                const data = await response.json();
-
+                const res = await fetch('/auth/status');
+                const data = await res.json();
                 if (data.authenticated) {
-                    document.getElementById('userName').textContent = data.user.name;
-                } else {
-                    window.location.href = '/auth';
-                }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                window.location.href = '/auth';
-            }
+                    const userEl = document.getElementById('userName');
+                    userEl.textContent = data.user.name;
+                    userEl.style.display = 'block';
+                } else window.location.href = '/auth';
+            } catch(e) { window.location.href = '/auth'; }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadUserInfo();
-            loadProducts(); // Load real products instead of mock data
+        const toggleBtn = document.querySelector('.dark-mode-toggle');
+        const body = document.body;
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode-active');
+            toggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        toggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode-active');
+            const isDark = body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            toggleBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         });
 
-        document.getElementById('logoutLink').addEventListener('click', async (e) => {
+        document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
             e.preventDefault();
-            try {
-                const response = await fetch('/auth/logout', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-                const data = await response.json();
-                if (data.success) {
-                    window.location.href = data.redirect || '/auth';
-                }
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = '/auth';
-            }
+            await fetch('/auth/logout', { method: 'GET' });
+            window.location.href = '/auth';
         });
 
-        // --- 5. SEARCH FUNCTIONALITY ---
-        const searchInput = document.getElementById('searchInput');
-        
-        searchInput.addEventListener('input', async (e) => {
-            const keyword = e.target.value.toLowerCase();
+        // 2. Notification System
+        function showNotification(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `notification notif-${type}`;
+            div.innerHTML = `<i class="fas ${type==='success'?'fa-check':'fa-times'}"></i> <span>${msg}</span>`;
+            document.getElementById('notificationContainer').appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // 3. Product Logic (Fetch, Render, Delete)
+        async function loadProducts() {
             try {
-                const response = await fetch(`/api/products`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    const filtered = data.products.filter(item => 
-                        item.name.toLowerCase().includes(keyword) || 
-                        (item.category_id && item.category_id.toLowerCase().includes(keyword))
-                    );
-                    renderProducts(filtered);
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-            }
-        });
-
-        // --- 6. RENDER PRODUCTS WITH REAL DATA ---
-        const productsGrid = document.getElementById('productsGrid');
-
-        function getExpiryStatus(dateString) {
-            if (!dateString) return { text: 'N/A', class: 'status-safe' };
-
-            const today = new Date();
-            const expiry = new Date(dateString);
-            const diffTime = expiry - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            // Format Date Indonesia
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            const dateStr = expiry.toLocaleDateString('id-ID', options);
-
-            if (diffDays < 0) {
-                return { text: `Kadaluarsa (${dateStr})`, class: 'status-expired' };
-            } else if (diffDays <= 7) {
-                return { text: `${diffDays} Hari Lagi (${dateStr})`, class: 'status-warning' };
-            } else {
-                return { text: dateStr, class: 'status-safe' };
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                renderProducts(data.success ? data.products : []);
+            } catch (err) {
+                console.error(err);
+                showNotification('Gagal memuat data', 'error');
             }
         }
 
-        function renderProducts(data) {
-            productsGrid.innerHTML = '';
+        function getExpiryStatus(date) {
+            if(!date) return { text: '-', class: 'badge-safe' };
+            const now = new Date();
+            const exp = new Date(date);
+            const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+            if(diff < 0) return { text: 'Kadaluarsa', class: 'badge-expired' };
+            if(diff <= 7) return { text: `${diff} Hari Lagi`, class: 'badge-warning' };
+            return { text: exp.toLocaleDateString('id-ID'), class: 'badge-safe' };
+        }
 
-            if(data.length === 0) {
-                productsGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-muted);">Tidak ada bahan ditemukan.</div>`;
+        function renderProducts(items) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Belum ada bahan</h3>
+                        <p>Mulai tambahkan stok dapur Anda sekarang.</p>
+                    </div>`;
                 return;
             }
 
-            data.forEach(item => {
-                const isLowStock = parseFloat(item.stock_quantity) <= parseFloat(item.min_stock_level);
-                const expiryInfo = getExpiryStatus(item.expiry_date);
-
-                // Determine icon based on product name
-                const icon = getProductIcon(item.name);
-                const iconHtml = `<i class="fas ${icon} card-icon"></i>`;
+            items.forEach(item => {
+                const expiry = getExpiryStatus(item.expiry_date);
+                const isLow = parseFloat(item.stock_quantity) <= parseFloat(item.min_stock_level);
+                const icon = item.name.toLowerCase().includes('ayam') ? 'fa-drumstick-bite' : 
+                             item.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' : 'fa-box-open';
 
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
-                    <div class="card-header">
-                        <div class="category-badge">${item.category_id || 'Umum'}</div>
-                        ${item.image_url ? 
-                          `<img src="${item.image_url}" alt="${item.name}" style="width:100%; height:150px; object-fit:cover; border-radius:10px 10px 0 0;">` : 
-                          iconHtml
-                        }
+                    <div class="card-top">
+                        ${item.image_url ? `<img src="${item.image_url}" class="card-img">` : `<i class="fas ${icon} card-icon"></i>`}
+                        <span class="category-tag">${item.category_id || 'Umum'}</span>
                     </div>
                     <div class="card-body">
-                        <h3 class="product-name" onclick="window.location='/products/detail/${item.id}'" style="cursor: pointer;">${item.name}</h3>
-
+                        <h3 class="prod-name" onclick="window.location='/products/detail/${item.id}'">${item.name}</h3>
+                        
                         <div class="info-row">
-                            <span class="info-label"><i class="fas fa-boxes-stacked"></i> Stok</span>
-                            <span class="info-value">${item.stock_quantity} ${item.unit || ''}</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label"><i class="fas fa-indian-rupee-sign"></i> Harga</span>
-                            <span class="info-value">Rp ${parseInt(item.price).toLocaleString('id-ID')}</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label"><i class="fas fa-ruler-vertical"></i> Stok Min</span>
-                            <span class="info-value">${item.min_stock_level} ${item.unit || ''}</span>
-                        </div>
-
-                        <div class="info-row" style="border-bottom: none;">
-                            <span class="info-label"><i class="fas fa-calendar-days"></i> Kadaluarsa</span>
-                            <span class="expiry-badge ${expiryInfo.class}">
-                                ${expiryInfo.text}
+                            <span class="label"><i class="fas fa-boxes"></i> Stok</span>
+                            <span class="value" style="color: ${isLow ? 'var(--danger)' : 'inherit'}">
+                                ${item.stock_quantity} ${item.unit || ''} ${isLow ? '<i class="fas fa-exclamation-circle"></i>' : ''}
                             </span>
                         </div>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-edit" onclick="handleEdit(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-pen"></i> Edit
-                        </button>
-                        <button class="btn btn-delete" onclick="handleDelete(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-trash"></i> Hapus
-                        </button>
+                        <div class="info-row" style="border:none;">
+                            <span class="label"><i class="fas fa-calendar"></i> Kedaluwarsa</span>
+                            <span class="badge ${expiry.class}">${expiry.text}</span>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="action-btn btn-edit" onclick="handleEdit(${item.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn btn-delete" onclick="handleDelete(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
                     </div>
                 `;
-                productsGrid.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        function getProductIcon(productName) {
-            const name = productName.toLowerCase();
-            if (name.includes('cabai') || name.includes('chili') || name.includes('pepper')) return 'fa-pepper-hot';
-            if (name.includes('bawang') || name.includes('onion')) return 'fa-onion';
-            if (name.includes('jeruk') || name.includes('lemon') || name.includes('lime')) return 'fa-lemon';
-            if (name.includes('ayam') || name.includes('chicken')) return 'fa-drumstick-bite';
-            if (name.includes('ikan') || name.includes('fish')) return 'fa-fish';
-            if (name.includes('telur') || name.includes('egg')) return 'fa-egg';
-            if (name.includes('susu') || name.includes('milk')) return 'fa-glass-whiskey';
-            if (name.includes('gula')) return 'fa-candy-cane';
-            if (name.includes('garam')) return 'fa-pepper-hot'; // Using pepper icon for salt
-            if (name.includes('beras') || name.includes('rice')) return 'fa-wheat-alt';
-            if (name.includes('tepung')) return 'fa-apple-alt';
-            return 'fa-box-open';
-        }
-
-        // --- 7. ACTION HANDLERS ---
-        function handleEdit(id, name) {
-            showNotification(`Membuka edit untuk produk: ${name}`, 'info');
-            window.location.href = `/products/edit/${id}`;
-        }
+        // 4. Actions
+        function handleEdit(id) { window.location.href = `/products/edit/${id}`; }
 
         async function handleDelete(id, name) {
-            if(!confirm(`Yakin ingin menghapus "${name}" dari daftar? Tindakan ini tidak dapat dibatalkan.`)) {
-                return;
-            }
-
+            if(!confirm(`Hapus "${name}"?`)) return;
             try {
-                const response = await fetch(`/api/products/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showNotification(`Produk "${name}" berhasil dihapus.`, 'success');
-                    // Reload the products list
+                const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.success) {
+                    showNotification('Produk dihapus', 'success');
                     loadProducts();
                 } else {
-                    showNotification(data.message || 'Gagal menghapus produk.', 'error');
+                    showNotification(data.message, 'error');
                 }
-            } catch (error) {
-                console.error('Error deleting product:', error);
-                showNotification('Gagal menghapus produk. Silakan coba lagi.', 'error');
+            } catch(e) {
+                showNotification('Gagal menghapus', 'error');
             }
         }
 
-        // --- 8. FIX EMPTY INGREDIENTS ISSUE ---
-        // Ensure products are loaded when page loads
+        // 5. Search
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const q = e.target.value.toLowerCase();
+            const res = await fetch('/api/products');
+            const data = await res.json();
+            if(data.success) {
+                const filtered = data.products.filter(p => p.name.toLowerCase().includes(q) || (p.category_id && p.category_id.toLowerCase().includes(q)));
+                renderProducts(filtered);
+            }
+        });
+
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadUserInfo();
-            loadProducts(); // Load real products instead of mock data
+            loadProducts();
         });
     </script>
 </body>
