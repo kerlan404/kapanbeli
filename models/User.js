@@ -17,6 +17,11 @@ const User = {
                 user.is_confirmed = true; // Asumsikan user dikonfirmasi jika kolom tidak ada
             }
             
+            // Jika kolom role tidak ada, tambahkan nilai default
+            if (typeof user.role === 'undefined') {
+                user.role = 'user'; // Asumsikan user biasa jika kolom tidak ada
+            }
+
             return user;
         } catch (error) {
             // Jika ada error karena kolom tidak ditemukan, coba query tanpa kolom tersebut
@@ -32,7 +37,8 @@ const User = {
                 // Tambahkan nilai default untuk kolom yang mungkin tidak ada
                 const user = rows[0];
                 user.is_confirmed = true; // Asumsikan user dikonfirmasi
-                
+                user.role = 'user'; // Asumsikan user biasa
+
                 return user;
             }
             throw error;
@@ -55,6 +61,11 @@ const User = {
                 user.is_confirmed = true; // Asumsikan user dikonfirmasi jika kolom tidak ada
             }
             
+            // Jika kolom role tidak ada, tambahkan nilai default
+            if (typeof user.role === 'undefined') {
+                user.role = 'user'; // Asumsikan user biasa jika kolom tidak ada
+            }
+
             return user;
         } catch (error) {
             // Jika ada error karena kolom tidak ditemukan, coba query tanpa kolom tersebut
@@ -70,7 +81,8 @@ const User = {
                 // Tambahkan nilai default untuk kolom yang mungkin tidak ada
                 const user = rows[0];
                 user.is_confirmed = true; // Asumsikan user dikonfirmasi
-                
+                user.role = 'user'; // Asumsikan user biasa
+
                 return user;
             }
             throw error;
@@ -102,15 +114,16 @@ const User = {
     },
 
     // Fungsi untuk membuat pengguna baru
-    create: async ({ name, email, password }) => {
-        const query = 'INSERT INTO users (name, email, password, is_confirmed, created_at) VALUES (?, ?, ?, TRUE, NOW())';
-        const [result] = await db.execute(query, [name, email, password]);
+    create: async ({ name, email, password, role = 'user' }) => {
+        const query = 'INSERT INTO users (name, email, password, role, is_confirmed, created_at) VALUES (?, ?, ?, ?, TRUE, NOW())';
+        const [result] = await db.execute(query, [name, email, password, role]);
 
         // Kembalikan data pengguna yang baru dibuat
         return {
             id: result.insertId,
             name,
             email,
+            role,
             is_confirmed: true, // Langsung dikonfirmasi
             created_at: new Date()
         };
@@ -180,6 +193,52 @@ const User = {
                 console.warn('Column is_confirmed does not exist in users table, assuming user is confirmed');
                 return true;
             }
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan semua pengguna
+    getAllUsers: async () => {
+        try {
+            const query = 'SELECT id, name, email, created_at, is_confirmed FROM users ORDER BY created_at DESC';
+            const [rows] = await db.execute(query);
+            return rows;
+        } catch (error) {
+            // Jika kolom is_confirmed tidak ada, coba query tanpa kolom tersebut
+            if (error.code === 'ER_BAD_FIELD_ERROR') {
+                console.warn('Column is_confirmed does not exist in users table, querying without it');
+                const query = 'SELECT id, name, email, created_at FROM users ORDER BY created_at DESC';
+                const [rows] = await db.execute(query);
+                // Tambahkan nilai default untuk is_confirmed
+                return rows.map(user => ({ ...user, is_confirmed: true }));
+            }
+            console.error('Error getting all users:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan total jumlah pengguna
+    getTotalUsers: async () => {
+        try {
+            const query = 'SELECT COUNT(*) as count FROM users';
+            const [rows] = await db.execute(query);
+            return rows[0].count;
+        } catch (error) {
+            console.error('Error getting total users:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan jumlah pengguna aktif
+    getActiveUsers: async () => {
+        try {
+            // Dalam implementasi nyata, ini akan memeriksa pengguna yang login dalam periode tertentu
+            // Untuk saat ini, kita asumsikan semua pengguna sebagai aktif
+            const query = 'SELECT COUNT(*) as count FROM users';
+            const [rows] = await db.execute(query);
+            return rows[0].count;
+        } catch (error) {
+            console.error('Error getting active users:', error);
             throw error;
         }
     }

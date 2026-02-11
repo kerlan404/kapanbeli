@@ -98,7 +98,8 @@ const authController = {
             req.session.user = {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                role: user.role || 'user'
             };
 
             // Redirect ke halaman utama setelah login berhasil
@@ -176,12 +177,17 @@ const authController = {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+            // Check if this is the first user, if so, make them an admin
+            const totalUsers = await User.getTotalUsers();
+            const isAdmin = totalUsers === 0; // First user becomes admin
+            
             // Simpan pengguna baru
             console.log('Creating new user in database:', email);
             const newUser = await User.create({
                 name,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                role: isAdmin ? 'admin' : 'user'
             });
             
             console.log('User created successfully in database:', newUser.email);
@@ -221,7 +227,8 @@ const authController = {
             req.session.user = {
                 id: newUser.id,
                 name: newUser.name,
-                email: newUser.email
+                email: newUser.email,
+                role: newUser.role || 'user'
             };
 
             // Verifikasi bahwa session telah diset

@@ -118,6 +118,47 @@ const Product = {
         }
 
         return { id: productId };
+    },
+
+    // Fungsi untuk mendapatkan semua produk dari semua pengguna
+    getAllProductsFromAllUsers: async () => {
+        try {
+            const query = `
+                SELECT id, user_id, name, description, category_id, price, stock_quantity, 
+                       min_stock_level, image_url, unit, quantity, expiry_date, notes, created_at, updated_at
+                FROM products
+                ORDER BY created_at DESC
+            `;
+            const [rows] = await db.execute(query);
+            return rows;
+        } catch (error) {
+            console.error('Error getting all products from all users:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan total jumlah produk
+    getTotalProducts: async () => {
+        try {
+            const query = 'SELECT COUNT(*) as count FROM products';
+            const [rows] = await db.execute(query);
+            return rows[0].count;
+        } catch (error) {
+            console.error('Error getting total products:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan jumlah produk dengan stok rendah
+    getLowStockItems: async () => {
+        try {
+            const query = 'SELECT COUNT(*) as count FROM products WHERE stock_quantity <= min_stock_level';
+            const [rows] = await db.execute(query);
+            return rows[0].count;
+        } catch (error) {
+            console.error('Error getting low stock items:', error);
+            throw error;
+        }
     }
 };
 

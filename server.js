@@ -45,6 +45,7 @@ app.use(session({
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
 const productRoutes = require('./routes/products');
+const adminRoutes = require('./routes/admin');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
@@ -91,9 +92,40 @@ app.put('/api/products/:id', upload.single('image'), isAuthenticated, productsCo
 // Use the regular routes for other operations
 app.use('/api/products', productRoutes);
 
+// Use admin routes (protected)
+app.use('/api/admin', adminRoutes);
+
 // Protected routes
 app.get('/notes', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'notes.html'));
+});
+
+// Admin routes
+app.get('/admin', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/user/:id', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.sendFile(path.join(__dirname, 'views', 'admin-user-profile.html'));
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/user/:id/products', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.sendFile(path.join(__dirname, 'views', 'admin-user-profile.html'));
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
 });
 
 app.get('/products', isAuthenticated, (req, res) => {
