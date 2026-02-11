@@ -71,6 +71,32 @@ const authController = {
                 });
             }
 
+            // Cek apakah ini login admin default
+            const defaultAdminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@kapanbeli.com';
+            const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
+            
+            if (email === defaultAdminEmail && password === defaultAdminPassword) {
+                // Login sebagai admin default
+                req.session.userId = 'default_admin';
+                req.session.user = {
+                    id: 'default_admin',
+                    name: 'Administrator',
+                    email: defaultAdminEmail,
+                    role: 'admin'
+                };
+
+                return res.json({ 
+                    success: true, 
+                    message: 'Login admin berhasil! Selamat datang kembali.', 
+                    redirect: '/admin',
+                    user: {
+                        name: 'Administrator',
+                        email: defaultAdminEmail,
+                        role: 'admin'
+                    }
+                });
+            }
+
             // Cari pengguna berdasarkan email
             const user = await User.findByEmail(email);
 
@@ -103,13 +129,14 @@ const authController = {
             };
 
             // Redirect ke halaman utama setelah login berhasil
-            res.json({ 
-                success: true, 
-                message: 'Login berhasil! Selamat datang kembali.', 
+            res.json({
+                success: true,
+                message: 'Login berhasil! Selamat datang kembali.',
                 redirect: '/',
                 user: {
                     name: user.name,
-                    email: user.email
+                    email: user.email,
+                    role: user.role
                 }
             });
 
