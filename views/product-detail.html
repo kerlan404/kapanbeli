@@ -249,6 +249,8 @@
 
         <div id="authAlert" class="alert-box"></div>
 
+        <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px;"></div>
+
         <div class="product-card">
             <div class="product-header">
                 <h1 id="productName" class="product-title">Memuat...</h1>
@@ -304,11 +306,118 @@
     </div>
 
     <script>
-        // --- 1. GET PRODUCT ID FROM URL ---
+        // --- 1. NOTIFICATION SYSTEM ---
+        function showNotification(message, type = 'info') {
+            // Create notification container if it doesn't exist
+            let container = document.getElementById('notificationContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notificationContainer';
+                container.style.cssText = `
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    z-index: 10000; 
+                    width: 350px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                min-height: 50px;
+            `;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' : 
+                type === 'error' ? 'fa-exclamation-circle' : 
+                'fa-info-circle'
+            }`;
+            icon.style.cssText = 'font-size: 1.2em;';
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.textContent = message;
+            messageSpan.style.flex = '1';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                notification.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            };
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            notification.appendChild(icon);
+            notification.appendChild(messageSpan);
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- 2. GET PRODUCT ID FROM URL ---
         const urlParams = new URLSearchParams(window.location.search);
         const productId = window.location.pathname.split('/').pop();
 
-        // --- 2. ALERT LOGIC ---
+        // --- 3. ALERT LOGIC ---
         function showAlert(message, type = 'error') {
             const alertBox = document.getElementById('authAlert');
             alertBox.className = `alert-box show ${type === 'error' ? 'alert-error' : 'alert-success'}`;
@@ -324,7 +433,7 @@
             document.getElementById('authAlert').classList.remove('show');
         }
 
-        // --- 3. LOAD PRODUCT DATA ---
+        // --- 4. LOAD PRODUCT DATA ---
         async function loadProduct() {
             try {
                 const response = await fetch(`/api/products/${productId}`, {
@@ -364,11 +473,11 @@
                         document.getElementById('productImage').innerHTML = `<img src="${product.image_url}" alt="${product.name}" style="width:100%; height:100%; border-radius:15px; object-fit:cover;">`;
                     }
                 } else {
-                    showAlert(data.message, 'error');
+                    showNotification(data.message, 'error');
                 }
             } catch (error) {
                 console.error('Error loading product:', error);
-                showAlert('Gagal memuat detail produk. Silakan coba lagi.', 'error');
+                showNotification('Gagal memuat detail produk. Silakan coba lagi.', 'error');
             }
         }
 
@@ -409,17 +518,17 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert(data.message, 'success');
+                    showNotification(data.message, 'success');
                     // Redirect to products page after delay
                     setTimeout(() => {
                         window.location.href = '/products';
                     }, 1500);
                 } else {
-                    showAlert(data.message, 'error');
+                    showNotification(data.message, 'error');
                 }
             } catch (error) {
                 console.error('Error deleting product:', error);
-                showAlert('Gagal menghapus produk. Silakan coba lagi.', 'error');
+                showNotification('Gagal menghapus produk. Silakan coba lagi.', 'error');
             }
         }
 

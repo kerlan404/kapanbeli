@@ -35,7 +35,20 @@ const productsController = {
     async create(req, res) {
         try {
             const userId = req.session.user?.id;
-            const { name, description, category_id, price, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+            // Handle both JSON and FormData requests
+            let { name, description, category_id, price, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+            
+            // Convert string values to appropriate types if they come from FormData
+            price = typeof price === 'string' ? parseFloat(price) : price;
+            stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) : stock_quantity;
+            min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) : min_stock_level;
+            quantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
+            
+            // If file is uploaded, get the image URL from the file
+            let imageUrl = image_url || null;
+            if (req.file) {
+                imageUrl = `/uploads/${req.file.filename}`;
+            }
 
             if (!userId) {
                 return res.status(401).json({
@@ -60,7 +73,7 @@ const productsController = {
                 price,
                 stock_quantity: stock_quantity || 0,
                 min_stock_level: min_stock_level || 5, // Default
-                image_url: image_url || null,
+                image_url: imageUrl,
                 unit: unit || null, // Misalnya 'kg', 'pcs', dll
                 quantity: quantity || 1, // Jumlah satuan
                 expiry_date: expiry_date || null,
@@ -130,7 +143,14 @@ const productsController = {
         try {
             const userId = req.session.user?.id;
             const productId = req.params.id;
-            const { name, description, category_id, price, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+            // Handle both JSON and FormData requests
+            let { name, description, category_id, price, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+
+            // Convert string values to appropriate types if they come from FormData
+            price = typeof price === 'string' ? parseFloat(price) : price;
+            stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) : stock_quantity;
+            min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) : min_stock_level;
+            quantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
 
             if (!userId) {
                 return res.status(401).json({
@@ -162,6 +182,12 @@ const productsController = {
                 });
             }
 
+            // If file is uploaded, get the image URL from the file
+            let imageUrl = image_url || existingProduct.image_url;
+            if (req.file) {
+                imageUrl = `/uploads/${req.file.filename}`;
+            }
+
             const updatedProduct = await ProductModel.update(productId, userId, {
                 name,
                 description: description || existingProduct.description,
@@ -169,7 +195,7 @@ const productsController = {
                 price,
                 stock_quantity: stock_quantity !== undefined ? stock_quantity : existingProduct.stock_quantity,
                 min_stock_level: min_stock_level !== undefined ? min_stock_level : existingProduct.min_stock_level,
-                image_url: image_url || existingProduct.image_url,
+                image_url: imageUrl,
                 unit: unit || existingProduct.unit,
                 quantity: quantity !== undefined ? quantity : existingProduct.quantity,
                 expiry_date: expiry_date || existingProduct.expiry_date,

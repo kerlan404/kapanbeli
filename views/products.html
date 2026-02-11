@@ -16,57 +16,48 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥕</text></svg>" type="image/x-icon">
 
     <style>
-        /* --- CSS VARIABLES (Tema Biru & Oranye) --- */
+        /* --- CSS VARIABLES --- */
         :root {
-            /* Palette Warna Utama */
             --primary-orange: #FF9F43;
-            --primary-orange-hover: #f39c12;
             --primary-blue: #2E86DE;
-            --primary-blue-hover: #3498db;
-            
-            /* Warna Status */
-            --status-red: #FF6B6B;
-            --status-green: #1DD1A1;
-            --status-yellow: #FECA57;
-
-            /* Background & Text */
-            --bg-body: #F0F4F8; /* Abu-abu kebiruan yang lembut */
+            --bg-body: #F7F9FC;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
-            --text-muted: #636E72;
-            --border-color: #DFE6E9;
-            
-            /* Efek */
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
-            --shadow-md: 0 10px 20px rgba(46, 134, 222, 0.1);
-            --radius: 16px;
+            --text-muted: #8395A7;
+            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
+            --border-radius: 20px;
+            --dot-color: #E1E8ED;
+            --status-red: #e74c3c;
+            --status-yellow: #f39c12;
+            --status-green: #2ecc71;
         }
 
-        /* Dark Mode Override */
         body.dark-mode-active {
             --bg-body: #1E272E;
             --bg-card: #2C3E50;
             --text-main: #DFE6E9;
-            --text-muted: #B2BEC3;
-            --border-color: #34495E;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.3);
-            --shadow-md: 0 10px 20px rgba(0,0,0,0.4);
+            --text-muted: #808E9B;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --dot-color: #34495E;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         /* --- NAVIGATION BAR --- */
@@ -74,10 +65,9 @@
             position: sticky;
             top: 0;
             background: var(--bg-card);
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             z-index: 100;
             padding: 15px 5%;
-            border-bottom: 1px solid var(--border-color);
         }
 
         .nav-container {
@@ -98,6 +88,8 @@
             text-decoration: none;
         }
 
+        .logo i { font-size: 1.8rem; }
+
         .nav-menu {
             display: flex;
             gap: 30px;
@@ -106,16 +98,17 @@
 
         .nav-link {
             text-decoration: none;
-            color: var(--text-muted);
+            color: var(--text-main);
             font-weight: 500;
             padding: 8px 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             transition: all 0.3s;
+            position: relative;
         }
 
         .nav-link:hover, .nav-link.active {
-            color: var(--primary-orange);
             background: rgba(255, 159, 67, 0.1);
+            color: var(--primary-orange);
         }
 
         .nav-buttons {
@@ -124,236 +117,206 @@
             gap: 20px;
         }
 
+        .nav-auth-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .welcome-text {
             font-size: 0.9rem;
             color: var(--text-main);
-            display: none; /* Hidden on mobile */
         }
-        @media(min-width: 768px) { .welcome-text { display: block; } }
 
         .dark-mode-toggle {
             background: transparent;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--text-muted);
             color: var(--text-main);
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: all 0.3s;
         }
-        .dark-mode-toggle:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
+
+        .dark-mode-toggle:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background: rgba(255, 159, 67, 0.1);
+        }
 
         /* --- MAIN CONTENT --- */
         .container {
             max-width: 1400px;
-            margin: 40px auto;
+            margin: 30px auto;
             padding: 0 20px;
             flex: 1;
-            width: 100%;
         }
 
-        /* Header Section */
-        .page-header {
+        .products-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
-        .header-title h2 {
-            font-size: 1.8rem;
-            color: var(--primary-blue);
+        .section-title {
+            font-size: 2rem;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
-        
-        .header-title p {
-            color: var(--text-muted);
-            margin-top: 5px;
-            font-size: 0.95rem;
+
+        .section-title i {
+            color: var(--primary-orange);
         }
 
         .add-product-btn {
-            background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-hover));
+            background: var(--primary-orange);
             color: white;
             border: none;
-            padding: 12px 28px;
-            border-radius: 50px; /* Pill shape */
+            padding: 12px 25px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.4);
-        }
-        .add-product-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 159, 67, 0.5);
+            transition: all 0.3s;
         }
 
-        /* Search Bar */
-        .search-container {
-            position: relative;
-            margin-bottom: 40px;
+        .add-product-btn:hover {
+            background: #e68a34;
+            transform: translateY(-2px);
         }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
         .search-input {
-            width: 100%;
-            padding: 18px 25px 18px 55px;
-            border: 2px solid transparent;
-            border-radius: 50px;
-            background: var(--bg-card);
-            color: var(--text-main);
-            font-family: 'Poppins', sans-serif;
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
             font-size: 1rem;
-            box-shadow: var(--shadow-sm);
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
         }
+
         .search-input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            background: #fff;
-        }
-        .search-icon {
-            position: absolute;
-            left: 22px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.2rem;
+            background: var(--bg-card);
         }
 
-        /* Products Grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            padding-bottom: 40px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
         }
 
-        /* Product Card Redesign */
         .product-card {
             background: var(--bg-card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--border-radius);
             overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s;
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color);
-            position: relative;
-            transition: all 0.3s ease;
+            height: 100%;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
-            border-color: rgba(46, 134, 222, 0.3);
         }
 
-        /* Card Header (Icon + Badge) */
         .card-header {
+            padding: 20px;
+            text-align: center;
             position: relative;
-            height: 140px;
-            background: linear-gradient(135deg, #e0f7fa 0%, #fff 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        body.dark-mode-active .card-header {
-            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
         }
 
         .category-badge {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 5px 12px;
+            top: 10px;
+            left: 10px;
+            background: var(--primary-orange);
+            color: white;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--primary-blue);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .card-icon {
             font-size: 4rem;
             color: var(--primary-orange);
-            filter: drop-shadow(0 5px 10px rgba(255, 159, 67, 0.3));
+            margin: 10px 0;
         }
 
-        /* Card Body */
         .card-body {
             padding: 20px;
-            flex: 1;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 12px;
         }
 
         .product-name {
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
             color: var(--text-main);
+            cursor: pointer;
         }
 
-        /* Info Rows (Stock & Expired) */
+        .product-name:hover {
+            text-decoration: underline;
+        }
+
         .info-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
             padding: 8px 0;
-            border-bottom: 1px dashed var(--border-color);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            align-items: center;
         }
 
         .info-label {
-            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
-        .stock-value {
-            font-weight: 700;
-            color: var(--primary-blue);
-            font-size: 1rem;
+        .info-value {
+            font-weight: 500;
+            color: var(--text-main);
         }
 
         .expiry-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
             font-size: 0.8rem;
-            padding: 4px 10px;
-            border-radius: 6px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
-        /* Warna Badge Expired */
-        .status-expired {
-            background-color: rgba(255, 107, 107, 0.15);
-            color: var(--status-red);
-        }
-        .status-warning {
-            background-color: rgba(254, 202, 87, 0.2);
-            color: #d35400;
-        }
-        .status-safe {
-            background-color: rgba(29, 209, 161, 0.15);
-            color: var(--status-green);
-        }
+        .status-safe { background: var(--status-green); color: white; }
+        .status-warning { background: var(--status-yellow); color: white; }
+        .status-expired { background: var(--status-red); color: white; }
 
-        /* Card Footer (Actions) */
         .card-footer {
             padding: 15px 20px;
-            background: rgba(0,0,0,0.02);
+            border-top: 1px solid rgba(0,0,0,0.05);
             display: flex;
             gap: 10px;
-            border-top: 1px solid var(--border-color);
         }
 
         .btn {
@@ -363,40 +326,69 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            gap: 5px;
         }
 
         .btn-edit {
-            background: white;
+            background: transparent;
             border: 1px solid var(--primary-blue);
             color: var(--primary-blue);
         }
-        .btn-edit:hover { background: var(--primary-blue); color: white; }
+
+        .btn-edit:hover {
+            background: rgba(46, 134, 222, 0.1);
+        }
 
         .btn-delete {
-            background: white;
+            background: transparent;
             border: 1px solid var(--status-red);
             color: var(--status-red);
         }
-        .btn-delete:hover { background: var(--status-red); color: white; }
 
-        /* Responsive Adjustments */
+        .btn-delete:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .nav-menu { display: none; } /* Hide menu links on mobile for cleaner look */
-            .products-grid { grid-template-columns: 1fr; }
-            .page-header { flex-direction: column; align-items: flex-start; }
-            .add-product-btn { width: 100%; justify-content: center; }
+            .nav-menu { gap: 15px; }
+            .products-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .nav-buttons { width: 100%; justify-content: space-between; }
+            .card-footer { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR (Tetap Sama) -->
     <nav>
         <div class="nav-container">
             <a href="/" class="logo">
@@ -412,7 +404,7 @@
             <div class="nav-buttons">
                 <div class="nav-auth-section">
                     <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
-                    <a href="/auth/logout" class="nav-link" id="logoutLink" style="font-size:0.9rem; padding: 5px 10px;">Keluar</a>
+                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
                 </div>
                 <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
             </div>
@@ -420,110 +412,155 @@
     </nav>
 
     <div class="container">
-        <!-- HEADER SECTION -->
-        <div class="page-header">
-            <div class="header-title">
-                <h2><i class="fas fa-box-open" style="color: var(--primary-orange);"></i> Bahan Saya</h2>
-                <p>Kelola stok bahan makanan dan pantau kedaluwarsa.</p>
-            </div>
+        <div class="products-header">
+            <h2 class="section-title">
+                <i class="fas fa-carrot"></i>
+                Bahan Saya
+            </h2>
             <a href="/products/add" class="add-product-btn">
                 <i class="fas fa-plus"></i>
                 Tambah Bahan
             </a>
         </div>
 
-        <!-- SEARCH BAR -->
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" id="searchInput" placeholder="Cari bahan (cth: Susu, Roti, Bawang)...">
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari bahan masak...">
         </div>
 
-        <!-- PRODUCT GRID (Konten Dinamis) -->
+        <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px;"></div>
+
         <div class="products-grid" id="productsGrid">
-            <!-- Cards akan di-render oleh JavaScript di bawah -->
+            <!-- Products will be populated here dynamically -->
         </div>
     </div>
 
     <script>
-        // --- 1. DATA SIMULASI (Contoh Data yang Ingin Ditampilkan) ---
-        // Catatan: Dalam aplikasi nyata, data ini biasanya diambil dari server via fetch('/api/products')
-        // Saya buatkan mock data ini agar desainnya terlihat sesuai permintaan (Roti, Susu, dll).
-        
-        const mockProducts = [
-            {
-                id: 1,
-                name: "Susu UHT Full Cream",
-                category: "Minuman",
-                stock: 12,
-                unit: "karton",
-                expiryDate: "2024-12-30", // Format YYYY-MM-DD
-                icon: "fa-glass-water",
-                minStock: 5
-            },
-            {
-                id: 2,
-                name: "Roti Tawar Gandum",
-                category: "Karbohidrat",
-                stock: 1,
-                unit: "bungkus",
-                expiryDate: "2023-10-25", // Expired (Contoh lama)
-                icon: "fa-bread-slice",
-                minStock: 2
-            },
-            {
-                id: 3,
-                name: "Indomie Goreng",
-                category: "Bahan Kering",
-                stock: 45,
-                unit: "pcs",
-                expiryDate: "2025-06-15",
-                icon: "fa-bowl-food",
-                minStock: 10
-            },
-            {
-                id: 4,
-                name: "Cabai Rawit Merah",
-                category: "Sayur & Bumbu",
-                stock: 0.2,
-                unit: "kg",
-                expiryDate: "2023-11-05",
-                icon: "fa-pepper-hot",
-                minStock: 0.5
-            },
-            {
-                id: 5,
-                name: "Bawang Putih",
-                category: "Sayur & Bumbu",
-                stock: 0.8,
-                unit: "kg",
-                expiryDate: "2023-12-01",
-                icon: "fa-seedling",
-                minStock: 0.3
-            },
-            {
-                id: 6,
-                name: "Jahe Segar",
-                category: "Rempah",
-                stock: 150,
-                unit: "gram",
-                expiryDate: "2024-01-20",
-                icon: "fa-root-vegetable", // Alternatif icon jika ada
-                customIcon: "🫚", // Menggunakan emoji jika icon fa tidak ada
-                minStock: 100
-            },
-            {
-                id: 7,
-                name: "Telur Ayam",
-                category: "Protein",
-                stock: 20,
-                unit: "butir",
-                expiryDate: "2023-11-10", // Mendekati expired
-                icon: "fa-egg",
-                minStock: 10
+        // --- 1. NOTIFICATION SYSTEM ---
+        function showNotification(message, type = 'info') {
+            // Create notification container if it doesn't exist
+            let container = document.getElementById('notificationContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notificationContainer';
+                container.style.cssText = `
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    z-index: 10000; 
+                    width: 350px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                `;
+                document.body.appendChild(container);
             }
-        ];
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                min-height: 50px;
+            `;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' : 
+                type === 'error' ? 'fa-exclamation-circle' : 
+                'fa-info-circle'
+            }`;
+            icon.style.cssText = 'font-size: 1.2em;';
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.textContent = message;
+            messageSpan.style.flex = '1';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                notification.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            };
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            notification.appendChild(icon);
+            notification.appendChild(messageSpan);
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }
 
-        // --- 2. DARK MODE LOGIC (Tetap Sama) ---
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- 2. PRODUCT FUNCTIONALITY ---
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderProducts(data.products);
+                } else {
+                    console.error('Error loading products:', data.message);
+                    showNotification('Gagal memuat produk: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showNotification('Terjadi kesalahan saat memuat produk.', 'error');
+            }
+        }
+
+        // --- 3. DARK MODE LOGIC ---
         const toggleBtn = document.querySelector('.dark-mode-toggle');
         const body = document.body;
 
@@ -550,7 +587,7 @@
             localStorage.setItem('theme', 'light');
         }
 
-        // --- 3. SERVER AUTH LOGIC (Jangan Diubah - Permintaan User) ---
+        // --- 4. SERVER AUTH LOGIC ---
         async function loadUserInfo() {
             try {
                 const response = await fetch('/auth/status');
@@ -563,14 +600,13 @@
                 }
             } catch (error) {
                 console.error('Error loading user info:', error);
-                // Jangan redirect otomatis di mode development/testing agar user bisa lihat desain
-                // window.location.href = '/auth'; 
+                window.location.href = '/auth';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadUserInfo();
-            renderProducts(mockProducts); // Render data mock saat load
+            loadProducts(); // Load real products instead of mock data
         });
 
         document.getElementById('logoutLink').addEventListener('click', async (e) => {
@@ -590,14 +626,33 @@
             }
         });
 
-        // --- 4. LOGIKA RENDER PRODUK BARU (Desain & Logika Stock/Expired) ---
-        
-        const productsGrid = document.getElementById('productsGrid');
+        // --- 5. SEARCH FUNCTIONALITY ---
         const searchInput = document.getElementById('searchInput');
+        
+        searchInput.addEventListener('input', async (e) => {
+            const keyword = e.target.value.toLowerCase();
+            try {
+                const response = await fetch(`/api/products`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const filtered = data.products.filter(item => 
+                        item.name.toLowerCase().includes(keyword) || 
+                        (item.category_id && item.category_id.toLowerCase().includes(keyword))
+                    );
+                    renderProducts(filtered);
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        });
+
+        // --- 6. RENDER PRODUCTS WITH REAL DATA ---
+        const productsGrid = document.getElementById('productsGrid');
 
         function getExpiryStatus(dateString) {
             if (!dateString) return { text: 'N/A', class: 'status-safe' };
-            
+
             const today = new Date();
             const expiry = new Date(dateString);
             const diffTime = expiry - today;
@@ -608,7 +663,7 @@
             const dateStr = expiry.toLocaleDateString('id-ID', options);
 
             if (diffDays < 0) {
-                return { text: `Expired (${dateStr})`, class: 'status-expired' };
+                return { text: `Kadaluarsa (${dateStr})`, class: 'status-expired' };
             } else if (diffDays <= 7) {
                 return { text: `${diffDays} Hari Lagi (${dateStr})`, class: 'status-warning' };
             } else {
@@ -625,43 +680,53 @@
             }
 
             data.forEach(item => {
-                const isLowStock = parseFloat(item.stock) <= parseFloat(item.minStock);
-                const expiryInfo = getExpiryStatus(item.expiryDate);
-                
-                // Tentukan Icon
-                const iconHtml = item.customIcon 
-                    ? `<span style="font-size: 4rem;">${item.customIcon}</span>`
-                    : `<i class="fas ${item.icon} card-icon"></i>`;
+                const isLowStock = parseFloat(item.stock_quantity) <= parseFloat(item.min_stock_level);
+                const expiryInfo = getExpiryStatus(item.expiry_date);
+
+                // Determine icon based on product name
+                const icon = getProductIcon(item.name);
+                const iconHtml = `<i class="fas ${icon} card-icon"></i>`;
 
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
                     <div class="card-header">
-                        <div class="category-badge">${item.category}</div>
-                        ${iconHtml}
+                        <div class="category-badge">${item.category_id || 'Umum'}</div>
+                        ${item.image_url ? 
+                          `<img src="${item.image_url}" alt="${item.name}" style="width:100%; height:150px; object-fit:cover; border-radius:10px 10px 0 0;">` : 
+                          iconHtml
+                        }
                     </div>
                     <div class="card-body">
-                        <h3 class="product-name">${item.name}</h3>
-                        
+                        <h3 class="product-name" onclick="window.location='/products/detail/${item.id}'" style="cursor: pointer;">${item.name}</h3>
+
                         <div class="info-row">
                             <span class="info-label"><i class="fas fa-boxes-stacked"></i> Stok</span>
-                            <span class="stock-value" style="color: ${isLowStock ? 'var(--status-red)' : 'var(--primary-blue)'}">
-                                ${item.stock} ${item.unit} ${isLowStock ? '<i class="fas fa-exclamation-triangle" style="font-size:0.8rem; margin-left:5px;"></i>' : ''}
-                            </span>
+                            <span class="info-value">${item.stock_quantity} ${item.unit || ''}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-indian-rupee-sign"></i> Harga</span>
+                            <span class="info-value">Rp ${parseInt(item.price).toLocaleString('id-ID')}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-ruler-vertical"></i> Stok Min</span>
+                            <span class="info-value">${item.min_stock_level} ${item.unit || ''}</span>
                         </div>
 
                         <div class="info-row" style="border-bottom: none;">
-                            <span class="info-label"><i class="fas fa-calendar-days"></i> Kedaluwarsa</span>
+                            <span class="info-label"><i class="fas fa-calendar-days"></i> Kadaluarsa</span>
                             <span class="expiry-badge ${expiryInfo.class}">
                                 ${expiryInfo.text}
                             </span>
                         </div>
                     </div>
                     <div class="card-footer">
-                        <button class="btn btn-edit" onclick="handleEdit(${item.id}, '${item.name}')">
+                        <button class="btn btn-edit" onclick="handleEdit(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
                             <i class="fas fa-pen"></i> Edit
                         </button>
-                        <button class="btn btn-delete" onclick="handleDelete(${item.id}, '${item.name}')">
+                        <button class="btn btn-delete" onclick="handleDelete(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
                             <i class="fas fa-trash"></i> Hapus
                         </button>
                     </div>
@@ -670,35 +735,54 @@
             });
         }
 
-        // --- 5. SEARCH FILTER ---
-        searchInput.addEventListener('input', (e) => {
-            const keyword = e.target.value.toLowerCase();
-            const filtered = mockProducts.filter(item => 
-                item.name.toLowerCase().includes(keyword) || 
-                item.category.toLowerCase().includes(keyword)
-            );
-            renderProducts(filtered);
-        });
-
-        // --- 6. ACTION HANDLERS (Placeholder untuk fungsi backend nanti) ---
-        function handleEdit(id, name) {
-            // Di sini nanti bisa dipanggil fungsi ke server atau buka modal
-            console.log(`Edit ID: ${id}`);
-            alert(`Membuka edit untuk: ${name}`);
+        function getProductIcon(productName) {
+            const name = productName.toLowerCase();
+            if (name.includes('cabai') || name.includes('chili') || name.includes('pepper')) return 'fa-pepper-hot';
+            if (name.includes('bawang') || name.includes('onion')) return 'fa-onion';
+            if (name.includes('jeruk') || name.includes('lemon') || name.includes('lime')) return 'fa-lemon';
+            if (name.includes('ayam') || name.includes('chicken')) return 'fa-drumstick-bite';
+            if (name.includes('ikan') || name.includes('fish')) return 'fa-fish';
+            if (name.includes('telur') || name.includes('egg')) return 'fa-egg';
+            if (name.includes('susu') || name.includes('milk')) return 'fa-glass-whiskey';
+            if (name.includes('gula')) return 'fa-candy-cane';
+            if (name.includes('garam')) return 'fa-pepper-hot'; // Using pepper icon for salt
+            if (name.includes('beras') || name.includes('rice')) return 'fa-wheat-alt';
+            if (name.includes('tepung')) return 'fa-apple-alt';
+            return 'fa-box-open';
         }
 
-        function handleDelete(id, name) {
-            if(confirm(`Yakin ingin menghapus "${name}" dari daftar?`)) {
-                // Hapus dari array mock untuk demo
-                const index = mockProducts.findIndex(p => p.id === id);
-                if (index > -1) {
-                    mockProducts.splice(index, 1);
-                    renderProducts(mockProducts);
+        // --- 7. ACTION HANDLERS ---
+        function handleEdit(id, name) {
+            window.location.href = `/products/edit/${id}`;
+        }
+
+        async function handleDelete(id, name) {
+            if(!confirm(`Yakin ingin menghapus "${name}" dari daftar? Tindakan ini tidak dapat dibatalkan.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`Produk "${name}" berhasil dihapus.`, 'success');
+                    // Reload the products list
+                    loadProducts();
+                } else {
+                    showNotification(data.message || 'Gagal menghapus produk.', 'error');
                 }
-                // Di sini nanti panggil: fetch(`/products/${id}`, { method: 'DELETE' })
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                showNotification('Gagal menghapus produk. Silakan coba lagi.', 'error');
             }
         }
-
     </script>
 </body>
 </html>

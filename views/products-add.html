@@ -361,6 +361,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label" for="productImage">Gambar Produk (Opsional)</label>
+                    <div class="input-with-icon">
+                        <input type="file" id="productImage" class="form-input" accept="image/*">
+                        <i class="fas fa-image input-icon"></i>
+                    </div>
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <img id="previewImg" src="" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label" for="productNotes">Catatan Tambahan (Opsional)</label>
                     <textarea id="productNotes" class="form-input" rows="3" placeholder="Catatan tentang produk ini..."></textarea>
                 </div>
@@ -439,6 +450,129 @@
             }
         });
 
+        // Notification function
+        function showNotification(message, type = 'info') {
+            // Create notification container if it doesn't exist
+            let container = document.getElementById('notificationContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notificationContainer';
+                container.style.cssText = `
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    z-index: 10000; 
+                    width: 350px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                min-height: 50px;
+            `;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' : 
+                type === 'error' ? 'fa-exclamation-circle' : 
+                'fa-info-circle'
+            }`;
+            icon.style.cssText = 'font-size: 1.2em;';
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.textContent = message;
+            messageSpan.style.flex = '1';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                notification.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            };
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            notification.appendChild(icon);
+            notification.appendChild(messageSpan);
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Image preview functionality
+        document.getElementById('productImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const preview = document.getElementById('previewImg');
+                    preview.src = event.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
         // Check if we're editing a product by looking at the URL
         const urlParams = new URLSearchParams(window.location.search);
         const editProductId = window.location.pathname.split('/').pop();
@@ -471,12 +605,12 @@
                     
                     isEditing = true;
                 } else {
-                    alert(result.message || 'Gagal memuat data produk.');
+                    showNotification(result.message || 'Gagal memuat data produk.', 'error');
                     window.location.href = '/products';
                 }
             } catch (error) {
                 console.error('Error loading product for edit:', error);
-                alert('Gagal memuat data produk.');
+                showNotification('Gagal memuat data produk.', 'error');
                 window.location.href = '/products';
             }
         }
@@ -494,6 +628,7 @@
             const productMinStock = document.getElementById('productMinStock').value;
             const productExpiry = document.getElementById('productExpiry').value;
             const productNotes = document.getElementById('productNotes').value;
+            const productImage = document.getElementById('productImage').files[0];
 
             // Prepare product data
             const productData = {
@@ -514,45 +649,92 @@
                 
                 if (isEditing) {
                     // Update existing product
-                    response = await fetch(`/api/products/${editProductId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(productData),
-                        credentials: 'same-origin'
-                    });
+                    if (productImage) {
+                        // If image is selected, we need to send as FormData to handle file upload
+                        const formData = new FormData();
+                        formData.append('name', productName);
+                        formData.append('category_id', productCategory);
+                        formData.append('unit', productUnit);
+                        formData.append('stock_quantity', parseFloat(productQuantity));
+                        formData.append('price', parseInt(productPrice));
+                        formData.append('min_stock_level', parseInt(productMinStock));
+                        formData.append('expiry_date', productExpiry || '');
+                        formData.append('notes', productNotes || '');
+                        formData.append('description', productNotes || '');
+                        formData.append('image', productImage);
+
+                        response = await fetch(`/api/products/${editProductId}`, {
+                            method: 'PUT',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                    } else {
+                        // No image selected, send as JSON
+                        response = await fetch(`/api/products/${editProductId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(productData),
+                            credentials: 'same-origin'
+                        });
+                    }
+                    
                     result = await response.json();
                     
                     if (response.ok) {
-                        alert('Produk berhasil diperbarui!');
+                        showNotification('Produk berhasil diperbarui!', 'success');
                         window.location.href = `/products/detail/${editProductId}`;
                     } else {
-                        alert(result.message || 'Gagal memperbarui produk. Silakan coba lagi.');
+                        showNotification(result.message || 'Gagal memperbarui produk. Silakan coba lagi.', 'error');
                     }
                 } else {
                     // Create new product
-                    response = await fetch('/api/products', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(productData),
-                        credentials: 'same-origin'
-                    });
+                    if (productImage) {
+                        // If image is selected, we need to send as FormData to handle file upload
+                        const formData = new FormData();
+                        formData.append('name', productName);
+                        formData.append('category_id', productCategory);
+                        formData.append('unit', productUnit);
+                        formData.append('stock_quantity', parseFloat(productQuantity));
+                        formData.append('price', parseInt(productPrice));
+                        formData.append('min_stock_level', parseInt(productMinStock));
+                        formData.append('expiry_date', productExpiry || '');
+                        formData.append('notes', productNotes || '');
+                        formData.append('description', productNotes || '');
+                        formData.append('image', productImage);
+
+                        response = await fetch('/api/products', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                    } else {
+                        // No image selected, send as JSON
+                        response = await fetch('/api/products', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(productData),
+                            credentials: 'same-origin'
+                        });
+                    }
+                    
                     result = await response.json();
                     
                     if (response.ok) {
-                        alert('Produk berhasil ditambahkan!');
+                        showNotification('Produk berhasil ditambahkan!', 'success');
                         document.getElementById('productForm').reset();
+                        document.getElementById('imagePreview').style.display = 'none';
                         window.location.href = '/products';
                     } else {
-                        alert(result.message || 'Gagal menambahkan produk. Silakan coba lagi.');
+                        showNotification(result.message || 'Gagal menambahkan produk. Silakan coba lagi.', 'error');
                     }
                 }
             } catch (error) {
                 console.error('Error processing product:', error);
-                alert('Terjadi kesalahan saat memproses produk. Silakan coba lagi.');
+                showNotification('Terjadi kesalahan saat memproses produk. Silakan coba lagi.', 'error');
             }
         });
 

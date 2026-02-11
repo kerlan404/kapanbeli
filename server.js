@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const multer = require('multer');
 const dotenv = require('dotenv');
 
 // Load environment variables
@@ -8,6 +9,19 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/uploads/'); // Make sure this directory exists
+    },
+    filename: (req, file, cb) => {
+        // Generate unique filename
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
 
 // Middleware
 app.use(express.json());
@@ -31,6 +45,9 @@ app.use(session({
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
 const productRoutes = require('./routes/products');
+
+// Import controllers for upload routes
+const productsController = require('./controllers/productsController');
 
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
@@ -66,7 +83,12 @@ app.use('/auth', authRoutes);
 // Use notes routes (protected)
 app.use('/api/notes', notesRoutes);
 
-// Use product routes (protected)
+// Use product routes (protected) - Need to handle upload separately
+// Import product routes that require upload functionality
+app.post('/api/products', upload.single('image'), isAuthenticated, productsController.create);
+app.put('/api/products/:id', upload.single('image'), isAuthenticated, productsController.update);
+
+// Use the regular routes for other operations
 app.use('/api/products', productRoutes);
 
 // Protected routes
