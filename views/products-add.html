@@ -271,8 +271,8 @@
     <div class="container">
         <div class="form-container">
             <div class="form-header">
-                <h2><i class="fas fa-plus-circle"></i> Tambah Produk Baru</h2>
-                <p>Isi data produk yang ingin Anda tambahkan</p>
+                <h2 id="formTitle"><i class="fas fa-plus-circle"></i> <span id="formTitleText">Tambah Produk Baru</span></h2>
+                <p id="formSubtitle">Isi data produk yang ingin Anda tambahkan atau perbarui</p>
             </div>
 
             <form id="productForm">
@@ -294,6 +294,7 @@
                                 <option value="sayur">Sayuran</option>
                                 <option value="buah">Buah-buahan</option>
                                 <option value="rempah">Rempah-rempah</option>
+                                <option value="protein">Protein Hewani</option>
                                 <option value="lainnya">Lainnya</option>
                             </select>
                         </div>
@@ -309,6 +310,9 @@
                                 <option value="ons">Ons</option>
                                 <option value="ltr">Liter</option>
                                 <option value="ml">Mililiter</option>
+                                <option value="pc">Pack</option>
+                                <option value="bungkus">Bungkus</option>
+                                <option value="kaleng">Kaleng</option>
                             </select>
                         </div>
                     </div>
@@ -319,7 +323,7 @@
                         <div class="form-group">
                             <label class="form-label" for="productQuantity">Jumlah *</label>
                             <div class="input-with-icon">
-                                <input type="number" id="productQuantity" class="form-input" placeholder="Contoh: 5" min="1" required>
+                                <input type="number" id="productQuantity" class="form-input" placeholder="Contoh: 5" min="0" required>
                                 <i class="fas fa-calculator input-icon"></i>
                             </div>
                         </div>
@@ -335,11 +339,24 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="productExpiry">Tanggal Kadaluarsa (Opsional)</label>
-                    <div class="input-with-icon">
-                        <input type="date" id="productExpiry" class="form-input">
-                        <i class="fas fa-calendar input-icon"></i>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label" for="productMinStock">Stok Minimal</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="productMinStock" class="form-input" placeholder="Contoh: 1" min="0" value="1">
+                                <i class="fas fa-exclamation-triangle input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label" for="productExpiry">Tanggal Kadaluarsa (Opsional)</label>
+                            <div class="input-with-icon">
+                                <input type="date" id="productExpiry" class="form-input">
+                                <i class="fas fa-calendar input-icon"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -349,7 +366,7 @@
                 </div>
 
                 <button type="submit" class="form-button">
-                    <i class="fas fa-save"></i> Simpan Produk
+                    <i class="fas fa-save"></i> <span id="submitButtonText">Simpan Produk</span>
                 </button>
             </form>
 
@@ -422,6 +439,48 @@
             }
         });
 
+        // Check if we're editing a product by looking at the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const editProductId = window.location.pathname.split('/').pop();
+        let isEditing = false;
+
+        // Function to load product data for editing
+        async function loadProductForEdit(productId) {
+            try {
+                const response = await fetch(`/api/products/${productId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const product = result.product;
+                    
+                    // Populate form fields with product data
+                    document.getElementById('productName').value = product.name;
+                    document.getElementById('productCategory').value = product.category_id || '';
+                    document.getElementById('productUnit').value = product.unit || '';
+                    document.getElementById('productQuantity').value = product.stock_quantity || 0;
+                    document.getElementById('productPrice').value = product.price || 0;
+                    document.getElementById('productMinStock').value = product.min_stock_level || 1;
+                    document.getElementById('productExpiry').value = product.expiry_date || '';
+                    document.getElementById('productNotes').value = product.notes || '';
+                    
+                    // Update form title and button text
+                    document.getElementById('formTitleText').textContent = 'Edit Produk';
+                    document.getElementById('formSubtitle').textContent = 'Ubah data produk yang ingin Anda perbarui';
+                    document.getElementById('submitButtonText').textContent = 'Perbarui Produk';
+                    document.querySelector('#productForm .form-button i').className = 'fas fa-sync-alt';
+                    
+                    isEditing = true;
+                } else {
+                    alert(result.message || 'Gagal memuat data produk.');
+                    window.location.href = '/products';
+                }
+            } catch (error) {
+                console.error('Error loading product for edit:', error);
+                alert('Gagal memuat data produk.');
+                window.location.href = '/products';
+            }
+        }
+
         // Form submission handler
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -432,45 +491,78 @@
             const productUnit = document.getElementById('productUnit').value;
             const productQuantity = document.getElementById('productQuantity').value;
             const productPrice = document.getElementById('productPrice').value;
+            const productMinStock = document.getElementById('productMinStock').value;
             const productExpiry = document.getElementById('productExpiry').value;
             const productNotes = document.getElementById('productNotes').value;
 
             // Prepare product data
             const productData = {
                 name: productName,
-                category: productCategory,
+                category_id: productCategory,
                 unit: productUnit,
-                quantity: parseInt(productQuantity),
+                stock_quantity: parseFloat(productQuantity),
                 price: parseInt(productPrice),
-                expiryDate: productExpiry || null,
-                notes: productNotes || ''
+                min_stock_level: parseInt(productMinStock),
+                expiry_date: productExpiry || null,
+                notes: productNotes || '',
+                description: productNotes || '' // Also use notes as description
             };
 
             try {
-                // Send product data to server API
-                const response = await fetch('/api/products', { // Ganti ke endpoint API produk
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(productData),
-                    credentials: 'same-origin' // Important for session
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert('Produk berhasil ditambahkan!');
-                    // Reset form
-                    document.getElementById('productForm').reset();
-                    // Optionally redirect to products page
-                    window.location.href = '/products';
+                let response;
+                let result;
+                
+                if (isEditing) {
+                    // Update existing product
+                    response = await fetch(`/api/products/${editProductId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(productData),
+                        credentials: 'same-origin'
+                    });
+                    result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('Produk berhasil diperbarui!');
+                        window.location.href = `/products/detail/${editProductId}`;
+                    } else {
+                        alert(result.message || 'Gagal memperbarui produk. Silakan coba lagi.');
+                    }
                 } else {
-                    alert(result.message || 'Gagal menambahkan produk. Silakan coba lagi.');
+                    // Create new product
+                    response = await fetch('/api/products', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(productData),
+                        credentials: 'same-origin'
+                    });
+                    result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('Produk berhasil ditambahkan!');
+                        document.getElementById('productForm').reset();
+                        window.location.href = '/products';
+                    } else {
+                        alert(result.message || 'Gagal menambahkan produk. Silakan coba lagi.');
+                    }
                 }
             } catch (error) {
-                console.error('Error adding product:', error);
-                alert('Terjadi kesalahan saat menambahkan produk. Silakan coba lagi.');
+                console.error('Error processing product:', error);
+                alert('Terjadi kesalahan saat memproses produk. Silakan coba lagi.');
+            }
+        });
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            
+            // Check if we're in edit mode by looking at the URL
+            if (editProductId && !isNaN(editProductId) && window.location.pathname.includes('/products/edit/')) {
+                loadProductForEdit(editProductId);
             }
         });
 

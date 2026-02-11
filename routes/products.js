@@ -33,4 +33,7 @@ router.delete('/:id', productsController.delete);
 // Endpoint untuk mendapatkan statistik produk
 router.get('/stats', productsController.getStats);
 
+// Endpoint untuk mendapatkan detail produk
+router.get('/:id', productsController.getDetail);
+
 module.exports = router;

@@ -82,6 +82,14 @@ app.get('/products/add', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'products-add.html'));
 });
 
+app.get('/products/detail/:id', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'product-detail.html'));
+});
+
+app.get('/products/edit/:id', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'products-add.html')); // Reuse the add page for editing
+});
+
 // Legacy route for adding products (can be removed later if using API route exclusively)
 // This route is now handled by the API route /api/products POST
 // app.post('/products/add', isAuthenticated, (req, res) => {

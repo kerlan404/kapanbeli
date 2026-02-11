@@ -282,6 +282,49 @@ const productsController = {
                 message: 'Terjadi kesalahan saat mengambil statistik produk.'
             });
         }
+    },
+
+    // Fungsi untuk mendapatkan detail produk (untuk API)
+    async getDetail(req, res) {
+        try {
+            const userId = req.session.user?.id;
+            const productId = req.params.id;
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Akses ditolak. Silakan login terlebih dahulu.'
+                });
+            }
+
+            if (!productId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'ID produk tidak valid.'
+                });
+            }
+
+            const product = await ProductModel.getByIdAndUserId(productId, userId);
+
+            if (!product) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Produk tidak ditemukan.'
+                });
+            }
+
+            res.status(200).json({
+                success: true,
+                product: product
+            });
+
+        } catch (error) {
+            console.error('Get product detail error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat mengambil detail produk.'
+            });
+        }
     }
 };
 

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Produk - Kapan Beli</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>" type="image/x-icon">
+
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --primary-orange: #FF9F43;
+            --primary-blue: #2E86DE;
+            --bg-body: #F7F9FC;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
+            --border-radius: 20px;
+            --dot-color: #E1E8ED;
+        }
+
+        body.dark-mode-active {
+            --bg-body: #1E272E;
+            --bg-card: #2C3E50;
+            --text-main: #DFE6E9;
+            --text-muted: #808E9B;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --dot-color: #34495E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+        }
+
+        .logo i { font-size: 1.8rem; }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: var(--primary-orange); color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary-orange); color: var(--primary-orange); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .product-title {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-body);
+            color: var(--text-main);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover { background: var(--primary-orange); color: white; }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            background: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 3rem;
+        }
+
+        .product-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .stock-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-normal { background: rgba(29, 209, 161, 0.2); color: #1DD1A1; }
+        .status-low { background: rgba(255, 203, 98, 0.2); color: #FDCB6E; }
+        .status-out { background: rgba(255, 107, 107, 0.2); color: #FF6B6B; }
+
+        .product-description {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--bg-body);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .description-text {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.95rem;
+            display: none; align-items: center; gap: 10px;
+        }
+        .alert-box.show { display: flex; animation: fadeIn 0.3s; }
+        .alert-error { background: rgba(255, 107, 107, 0.1); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.2); }
+        .alert-success { background: rgba(29, 209, 161, 0.1); color: #1DD1A1; border: 1px solid rgba(29, 209, 161, 0.2); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-info-grid { grid-template-columns: 1fr; }
+            .product-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .product-actions { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shopping-basket"></i>
+                <span>Kapan Beli</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="/products" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Kembali</a>
+            </div>
+        </header>
+
+        <div id="authAlert" class="alert-box"></div>
+
+        <div class="product-card">
+            <div class="product-header">
+                <h1 id="productName" class="product-title">Memuat...</h1>
+                <div class="product-actions">
+                    <button class="action-btn" onclick="editProduct()" title="Edit Produk">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn" onclick="deleteProduct()" title="Hapus Produk">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="productImage" class="product-image">
+                <i class="fas fa-box-open"></i>
+            </div>
+
+            <div class="product-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Harga</span>
+                    <span id="productPrice" class="info-value">Rp 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Stok Saat Ini</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span id="productStock" class="info-value">0</span>
+                        <span id="stockStatus" class="stock-status status-normal">Normal</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Satuan</span>
+                    <span id="productUnit" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Stok Minimal</span>
+                    <span id="productMinStock" class="info-value">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tanggal Kadaluarsa</span>
+                    <span id="productExpiry" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Kategori</span>
+                    <span id="productCategory" class="info-value">-</span>
+                </div>
+            </div>
+
+            <div class="product-description">
+                <h3 class="section-title">Deskripsi Produk</h3>
+                <p id="productDescription" class="description-text">-</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. GET PRODUCT ID FROM URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = window.location.pathname.split('/').pop();
+
+        // --- 2. ALERT LOGIC ---
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('authAlert');
+            alertBox.className = `alert-box show ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+            alertBox.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> <span>${message}</span>`;
+            
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        function hideAlert() {
+            document.getElementById('authAlert').classList.remove('show');
+        }
+
+        // --- 3. LOAD PRODUCT DATA ---
+        async function loadProduct() {
+            try {
+                const response = await fetch(`/api/products/${productId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const product = data.product;
+                    
+                    // Fill in product details
+                    document.getElementById('productName').textContent = product.name;
+                    document.getElementById('productPrice').textContent = `Rp ${parseInt(product.price).toLocaleString('id-ID')}`;
+                    document.getElementById('productStock').textContent = `${product.stock_quantity} ${product.unit || ''}`;
+                    document.getElementById('productUnit').textContent = product.unit || '-';
+                    document.getElementById('productMinStock').textContent = product.min_stock_level;
+                    document.getElementById('productDescription').textContent = product.description || '-';
+                    document.getElementById('productCategory').textContent = product.category_id || '-';
+                    
+                    // Format expiry date
+                    if (product.expiry_date) {
+                        const date = new Date(product.expiry_date);
+                        document.getElementById('productExpiry').textContent = date.toLocaleDateString('id-ID');
+                    } else {
+                        document.getElementById('productExpiry').textContent = '-';
+                    }
+                    
+                    // Set stock status
+                    updateStockStatus(product.stock_quantity, product.min_stock_level);
+                    
+                    // Set image if available
+                    if (product.image_url) {
+                        document.getElementById('productImage').innerHTML = `<img src="${product.image_url}" alt="${product.name}" style="width:100%; height:100%; border-radius:15px; object-fit:cover;">`;
+                    }
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showAlert('Gagal memuat detail produk. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // --- 4. UPDATE STOCK STATUS ---
+        function updateStockStatus(stock, minLevel) {
+            const statusEl = document.getElementById('stockStatus');
+            if (stock <= 0) {
+                statusEl.textContent = 'Stok Habis';
+                statusEl.className = 'stock-status status-out';
+            } else if (stock <= minLevel) {
+                statusEl.textContent = 'Stok Rendah';
+                statusEl.className = 'stock-status status-low';
+            } else {
+                statusEl.textContent = 'Stok Aman';
+                statusEl.className = 'stock-status status-normal';
+            }
+        }
+
+        // --- 5. EDIT PRODUCT ---
+        function editProduct() {
+            window.location.href = `/products/edit/${productId}`;
+        }
+
+        // --- 6. DELETE PRODUCT ---
+        async function deleteProduct() {
+            if (!confirm('Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    // Redirect to products page after delay
+                    setTimeout(() => {
+                        window.location.href = '/products';
+                    }, 1500);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                showAlert('Gagal menghapus produk. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // --- 7. INITIALIZE PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (productId && productId !== 'detail') {
+                loadProduct();
+            } else {
+                showAlert('ID produk tidak valid.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
