@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang Kami - Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
+
+    <style>
+        /* --- VARIABEL & TEMA --- */
+        :root {
+            /* Warna: Oranye Segar & Biru Profesional */
+            --primary-orange: #FF9F43;
+            --primary-blue: #2E86DE;
+            --accent-green: #1DD1A1;
+            --accent-red: #FF6B6B;
+
+            /* Light Mode (Notebook Paper) */
+            --bg-body: #F7F9FC;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --shadow-card: 0 8px 24px rgba(149, 157, 165, 0.08);
+            --shadow-hover: 0 12px 32px rgba(149, 157, 165, 0.15);
+            --border-radius: 24px;
+
+            /* Pattern Dot Grid */
+            --dot-color: #E1E8ED;
+        }
+
+        /* Dark Mode */
+        body.dark-mode-active {
+            --bg-body: #1E272E;
+            --bg-card: #2C3E50;
+            --text-main: #DFE6E9;
+            --text-muted: #808E9B;
+            --nav-bg: rgba(30, 39, 46, 0.9);
+            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.4);
+            --dot-color: #34495E;
+        }
+
+        /* --- RESET & GLOBAL --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: var(--primary-orange); color: white; }
+        a { text-decoration: none; color: inherit; cursor: pointer; }
+        ul { list-style: none; }
+
+        /* --- ANIMASI --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* GIF Wrapper Hover Effects */
+        .gif-wrapper:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255, 159, 67, 0.3);
+        }
+
+        .gif-wrapper:hover img {
+            filter: brightness(1.1);
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+        .delay-6 { transition-delay: 0.6s; }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .nav-brand i { color: var(--primary-orange); font-size: 1.6rem; }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-link {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
+
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0;
+            background-color: var(--primary-orange); transition: width 0.3s ease; border-radius: 2px;
+        }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        .nav-actions { display: flex; align-items: center; gap: 1.2rem; }
+
+        .btn-text { font-weight: 600; color: var(--primary-blue); font-size: 0.9rem; }
+        .btn-text:hover { color: var(--primary-orange); }
+
+        .dark-mode-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-main); width: 38px; height: 38px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.9rem; opacity: 0.8;
+        }
+        .dark-mode-toggle:hover {
+            opacity: 1; background-color: rgba(255, 159, 67, 0.1); color: var(--primary-orange); transform: rotate(15deg);
+        }
+
+        /* --- HERO SECTION --- */
+        .about-hero {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .about-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(46, 134, 222, 0.1); color: var(--primary-blue);
+            padding: 8px 20px; border-radius: 100px; font-size: 0.9rem; font-weight: 600;
+            margin-bottom: 1.5rem; border: 1px solid rgba(46, 134, 222, 0.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .about-hero h1 {
+            font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;
+            color: var(--text-main); letter-spacing: -1.5px; font-weight: 800;
+        }
+
+        .about-hero h1 span {
+            color: var(--primary-orange);
+            position: relative;
+            display: inline-block;
+        }
+
+        .about-hero h1 span::after {
+            content: ''; position: absolute; left: 0; bottom: 8px; width: 100%; height: 14px;
+            background-color: rgba(255, 159, 67, 0.2); z-index: -1; border-radius: 4px;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem; color: var(--text-muted); max-width: 700px;
+            margin: 0 auto 2rem; line-height: 1.8;
+        }
+
+        /* --- NOTEBOOK CARD SECTION --- */
+        .notebook-section {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 24px;
+        }
+
+        .notebook-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid var(--primary-orange);
+        }
+
+        .notebook-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 31px,
+                rgba(46, 134, 222, 0.03) 31px,
+                rgba(46, 134, 222, 0.03) 32px
+            );
+            pointer-events: none;
+        }
+
+        .notebook-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .notebook-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notebook-title i {
+            color: var(--primary-orange);
+        }
+
+        .notebook-text {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 2;
+            margin-bottom: 1.5rem;
+        }
+
+        .notebook-highlight {
+            background: linear-gradient(135deg, rgba(255, 159, 67, 0.15), rgba(46, 134, 222, 0.1));
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border-left: 3px solid var(--primary-orange);
+        }
+
+        .notebook-highlight p {
+            margin: 0;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        /* --- TEAM SECTION --- */
+        .team-section {
+            max-width: 1200px;
+            margin: 5rem auto;
+            padding: 0 24px;
+        }
+
+        .team-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+
+        .team-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 159, 67, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .team-card:hover::before {
+            opacity: 1;
+        }
+
+        .team-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 159, 67, 0.3);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(255, 159, 67, 0.3);
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s ease;
+        }
+
+        .team-card:hover .team-avatar {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .team-avatar.manager {
+            background: linear-gradient(135deg, #FF6B6B, #FF9F43);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .team-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-role {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-role.manager {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 159, 67, 0.2));
+            color: var(--accent-red);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .team-role.member {
+            background: rgba(46, 134, 222, 0.1);
+            color: var(--primary-blue);
+            border: 2px solid rgba(46, 134, 222, 0.2);
+        }
+
+        /* --- GIF SECTION --- */
+        .gif-section {
+            max-width: 1200px;
+            margin: 5rem auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .gif-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .gif-wrapper {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: all 0.4s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .gif-wrapper:nth-child(2) {
+            animation-delay: 1.5s;
+        }
+
+        .gif-wrapper:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .gif-wrapper img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            background: var(--bg-card);
+        }
+
+        .gif-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            text-align: center; padding: 4rem 0; margin-top: 4rem; color: var(--text-muted);
+            border-top: 1px solid rgba(0,0,0,0.05); background-color: var(--bg-card);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .about-hero h1 { font-size: 2.5rem; }
+            .notebook-card { padding: 2rem 1.5rem; }
+            .team-grid { grid-template-columns: 1fr; }
+            .gif-container { gap: 1.5rem; }
+            .gif-wrapper img { width: 150px; height: 150px; }
+            
+            .gif-wrapper {
+                animation: none !important;
+            }
+        }
+
+        /* Mobile Extra Small */
+        @media (max-width: 576px) {
+            .about-hero h1 { font-size: 2rem; }
+            .about-hero p { font-size: 1rem; }
+            
+            .gif-wrapper img { 
+                width: 180px !important; 
+                height: 180px !important; 
+            }
+            
+            .team-title { font-size: 1.8rem; }
+            .notebook-title { font-size: 1.4rem; }
+            
+            .gif-container {
+                gap: 1rem !important;
+            }
+        }
+
+        /* Tablet */
+        @media (min-width: 577px) and (max-width: 768px) {
+            .gif-wrapper img { 
+                width: 220px !important; 
+                height: 220px !important; 
+            }
+            
+            .team-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+            }
+            
+            .gif-container {
+                gap: 1.5rem !important;
+            }
+        }
+
+        /* Desktop */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .gif-wrapper img { 
+                width: 250px !important; 
+                height: 250px !important; 
+            }
+            
+            .gif-container {
+                gap: 2rem !important;
+            }
+        }
+
+        /* Large Desktop */
+        @media (min-width: 1025px) {
+            .gif-wrapper img { 
+                width: 280px !important; 
+                height: 280px !important; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('./partials/navbar') %>
+
+    <!-- HERO SECTION -->
+    <section class="about-hero">
+        <span class="about-badge animate-on-scroll">
+            <i class="fas fa-users"></i> <span>Tim Pengembang</span>
+        </span>
+        <h1 class="animate-on-scroll delay-1">
+            Tentang <span>Kapan Beli</span>
+        </h1>
+        <p class="animate-on-scroll delay-2">
+            Sebuah platform cerdas untuk mengelola stok bahan masakan dapur Anda. 
+            Dicatat dengan rapi, dikelola dengan mudah, dan dimasak tanpa ribet.
+        </p>
+    </section>
+
+    <!-- NOTEBOOK CARD - DESCRIPTION -->
+    <section class="notebook-section">
+        <div class="notebook-card animate-on-scroll delay-3">
+            <div class="notebook-content">
+                <h2 class="notebook-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Apa itu Kapan Beli?
+                </h2>
+                <p class="notebook-text">
+                    <strong>Kapan Beli</strong> adalah sebuah aplikasi web yang dirancang untuk membantu Anda 
+                    mencatat dan mengelola stok <strong>bahan</strong>, <strong>bumbu</strong>, dan 
+                    <strong>bahan masakan</strong> lainnya di dapur Anda.
+                </p>
+                <p class="notebook-text">
+                    Dengan Kapan Beli, Anda dapat dengan mudah melacak stok bahan yang ada, 
+                    mendapatkan notifikasi ketika stok menipis, mencatat tanggal kedaluwarsa, 
+                    dan membuat daftar belanja secara otomatis.
+                </p>
+                <div class="notebook-highlight">
+                    <p>
+                        <i class="fas fa-quote-left" style="color: var(--primary-orange); margin-right: 10px;"></i>
+                        "Catat Stok, Matang Tanpa Ribet" - itulah moto kami dalam membantu Anda 
+                        mengelola dapur dengan lebih efisien dan praktis.
+                        <i class="fas fa-quote-right" style="color: var(--primary-orange); margin-left: 10px;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEAM SECTION -->
+    <section class="team-section">
+        <h2 class="team-title animate-on-scroll">
+            <i class="fas fa-users" style="color: var(--primary-orange);"></i>
+            Tim Kami
+        </h2>
+        <p class="team-subtitle animate-on-scroll delay-1">
+            6 Orang yang bekerja keras mewujudkan Kapan Beli
+        </p>
+
+        <div class="team-grid">
+            <!-- Manager - Bintang -->
+            <div class="team-card animate-on-scroll delay-2">
+                <div class="team-avatar manager">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h3 class="team-name">Bintang</h3>
+                <span class="team-role manager">Manager</span>
+            </div>
+
+            <!-- Member 1 - Rezy -->
+            <div class="team-card animate-on-scroll delay-3">
+                <div class="team-avatar">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="team-name">Rezy</h3>
+                <span class="team-role member">Member</span>
+            </div>
+
+            <!-- Member 2 - Nayo -->
+            <div class="team-card animate-on-scroll delay-4">
+                <div class="team-avatar">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+                <h3 class="team-name">Nayo</h3>
+                <span class="team-role member">Member</span>
+            </div>
+
+            <!-- Member 3 - Emir -->
+            <div class="team-card animate-on-scroll delay-5">
+                <div class="team-avatar">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="team-name">Emir</h3>
+                <span class="team-role member">Member</span>
+            </div>
+
+            <!-- Member 4 - Ar Raafi -->
+            <div class="team-card animate-on-scroll delay-6">
+                <div class="team-avatar">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="team-name">Ar Raafi</h3>
+                <span class="team-role member">Member</span>
+            </div>
+
+            <!-- Member 5 - Zhiran -->
+            <div class="team-card animate-on-scroll delay-6">
+                <div class="team-avatar">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="team-name">Zhiran</h3>
+                <span class="team-role member">Member</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- GIF SECTION -->
+    <section class="gif-section">
+        <h2 class="team-title animate-on-scroll">
+            <i class="fas fa-images" style="color: var(--primary-orange);"></i>
+            Galeri Tim
+        </h2>
+        <p class="team-subtitle animate-on-scroll delay-1">
+            Momen seru dari tim pengembang
+        </p>
+
+        <div class="gif-container">
+            <div class="gif-wrapper animate-on-scroll delay-2">
+                <img src="/images/blehhhhhh.gif" alt="Blehhhhhh">
+                <span class="gif-label">Blehhhhhh</span>
+            </div>
+            <div class="gif-wrapper animate-on-scroll delay-3">
+                <img src="/images/くるくるヘルタ.gif" alt="Herta GIF">
+                <span class="gif-label">Herta Spin</span>
+            </div>
+            <div class="gif-wrapper animate-on-scroll delay-4">
+                <img src="/images/uma-musume-meep.gif" alt="Uma Musume Meep">
+                <span class="gif-label">Low Cortisol</span>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer') %>
+
+    <script>
+        // --- DARK MODE ---
+        const toggleBtn = document.querySelector('.dark-mode-toggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            enableDarkMode();
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
+        });
+
+        function enableDarkMode() {
+            body.classList.add('dark-mode-active');
+            localStorage.setItem('theme', 'dark');
+            themeIcon.className = "fas fa-sun";
+            themeIcon.style.color = "#F1C40F";
+        }
+
+        function disableDarkMode() {
+            body.classList.remove('dark-mode-active');
+            localStorage.setItem('theme', 'light');
+            themeIcon.className = "fas fa-moon";
+            themeIcon.style.color = "";
+        }
+
+        // --- SCROLL ANIMATION ---
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // --- AUTH CHECK ---
+        const authLink = document.getElementById('authLink');
+        const logoutLink = document.getElementById('logoutLink');
+        const welcomeText = document.getElementById('welcomeText');
+
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status', { method: 'GET', credentials: 'same-origin' });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        authLink.style.display = 'none';
+                        logoutLink.style.display = 'inline-block';
+                        welcomeText.style.display = 'inline-block';
+                        welcomeText.textContent = `Halo, ${data.user.name}!`;
+                        return true;
+                    }
+                }
+                authLink.style.display = 'inline-block';
+                logoutLink.style.display = 'none';
+                welcomeText.style.display = 'none';
+                return false;
+            } catch (error) {
+                console.error('Auth check failed', error);
+                return false;
+            }
+        }
+
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = data.redirect || '/';
+                }
+            } catch (error) { console.error('Logout error', error); }
+        });
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuthStatus();
+        });
+    </script>
+</body>
+</html>

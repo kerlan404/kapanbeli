@@ -10,6 +10,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Set EJS as view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -73,7 +77,12 @@ const isNotAuthenticated = (req, res, next) => {
 
 // Public routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+    res.render('index', { currentPage: 'home', footerText: 'Semua hak dilindungi.' });
+});
+
+// Serve about page
+app.get('/about', (req, res) => {
+    res.render('about', { currentPage: 'about', footerText: 'Dibuat dengan ❤️ oleh tim kami.' });
 });
 
 // Serve login/register page
@@ -87,7 +96,7 @@ app.get('/auth', isNotAuthenticated, (req, res) => {
 
 // Serve register page
 app.get('/register', isNotAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'register.html'));
+    res.render('register');
 });
 
 // Use auth routes
@@ -109,14 +118,14 @@ app.use('/api/admin', adminRoutes);
 
 // Protected routes
 app.get('/notes', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'notes.html'));
+    res.render('notes', { currentPage: 'notes' });
 });
 
 // Admin routes
 app.get('/admin', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+        res.render('admin-dashboard', { currentPage: 'admin' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -125,7 +134,7 @@ app.get('/admin', isAuthenticated, (req, res) => {
 app.get('/admin/users', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+        res.render('admin-dashboard', { currentPage: 'admin' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -134,7 +143,7 @@ app.get('/admin/users', isAuthenticated, (req, res) => {
 app.get('/admin/analytics', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+        res.render('admin-dashboard', { currentPage: 'admin' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -143,7 +152,7 @@ app.get('/admin/analytics', isAuthenticated, (req, res) => {
 app.get('/admin/settings', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+        res.render('admin-dashboard', { currentPage: 'admin' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -152,7 +161,7 @@ app.get('/admin/settings', isAuthenticated, (req, res) => {
 app.get('/admin/user/:id', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.sendFile(path.join(__dirname, 'views', 'admin-user-profile.html'));
+        res.render('admin-user-profile', { currentPage: 'admin' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -161,26 +170,26 @@ app.get('/admin/user/:id', isAuthenticated, (req, res) => {
 app.get('/admin/user/:id/products', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.sendFile(path.join(__dirname, 'views', 'admin-user-profile.html'));
+        res.render('admin-user-profile', { currentPage: 'admin' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
 });
 
 app.get('/products', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'products.html'));
+    res.render('products', { currentPage: 'products' });
 });
 
 app.get('/products/add', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'products-add.html'));
+    res.render('products-add', { currentPage: 'products' });
 });
 
 app.get('/products/detail/:id', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'product-detail.html'));
+    res.render('product-detail', { currentPage: 'products' });
 });
 
 app.get('/products/edit/:id', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'products-add.html')); // Reuse the add page for editing
+    res.render('products-add', { currentPage: 'products' }); // Reuse the add page for editing
 });
 
 // Legacy route for adding products (can be removed later if using API route exclusively)
@@ -201,11 +210,11 @@ app.get('/products/edit/:id', isAuthenticated, (req, res) => {
 // });
 
 app.get('/suggestions', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'suggestions.html'));
+    res.render('suggestions', { currentPage: 'suggestions' });
 });
 
 app.get('/stores', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'stores.html'));
+    res.render('stores', { currentPage: 'stores' });
 });
 
 // Error handling

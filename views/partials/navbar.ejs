@@ -1,0 +1,29 @@
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <i class="fas fa-book-open"></i>
+            <span>Kapan Beli</span>
+        </div>
+
+        <div class="nav-menu">
+            <a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">Beranda</a>
+            <a href="/notes" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">Catatan</a>
+            <a href="/products" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>">Bahan Saya</a>
+            <a href="/suggestions" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'suggestions' ? 'active' : '' %>">Saran Belanja</a>
+            <a href="/about" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'about' ? 'active' : '' %>">Tentang Kami</a>
+        </div>
+
+        <div class="nav-actions">
+            <div id="authContainer">
+                <a href="/auth" class="btn-text" id="authLink">Masuk</a>
+                <span id="welcomeText" style="display:none; font-weight: 600; margin-right: 10px; color: var(--text-main);"></span>
+                <a href="/auth/logout" class="btn-text" id="logoutLink" style="display:none; color: var(--accent-red);">Keluar</a>
+            </div>
+
+            <button class="dark-mode-toggle" title="Ganti Mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+        </div>
+    </div>
+</nav>
