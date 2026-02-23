@@ -4,16 +4,19 @@ const db = require('../config/database');
 const Product = {
     // Fungsi untuk mendapatkan semua produk milik pengguna tertentu
     getAllByUserId: async (userId) => {
+        console.log('Getting products for user ID:', userId); // Debug log
         try {
             const query = `
-                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
+                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at, unit, quantity, expiry_date, notes
                 FROM products
                 WHERE user_id = ?
                 ORDER BY created_at DESC
             `;
             const [rows] = await db.execute(query, [userId]);
+            console.log('Retrieved products count:', rows.length); // Debug log
             return rows;
         } catch (error) {
+            console.error('Database error in getAllByUserId:', error); // Debug log
             // Handle missing columns gracefully
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, querying with available fields');
@@ -24,6 +27,7 @@ const Product = {
                     ORDER BY created_at DESC
                 `;
                 const [rows] = await db.execute(query, [userId]);
+                console.log('Retrieved products count (fallback):', rows.length); // Debug log
                 // Add default values for missing columns
                 return rows.map(row => ({
                     ...row,
@@ -42,7 +46,7 @@ const Product = {
     getByIdAndUserId: async (productId, userId) => {
         try {
             const query = `
-                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
+                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at, unit, quantity, expiry_date, notes
                 FROM products
                 WHERE id = ? AND user_id = ?
             `;

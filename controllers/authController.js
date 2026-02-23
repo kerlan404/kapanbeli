@@ -134,6 +134,14 @@ const authController = {
                 });
             }
 
+            // Cek apakah user di-ban
+            if (user.is_banned || user.status === 'banned') {
+                return res.status(403).json({
+                    success: false,
+                    message: `Akun Anda telah di-ban. Alasan: ${user.ban_reason || 'Tidak ada alasan yang diberikan'}`
+                });
+            }
+
             // Simpan token ke session (jika menggunakan session)
             req.session.userId = user.id;
             req.session.user = {
@@ -142,13 +150,26 @@ const authController = {
                 email: user.email,
                 role: user.role || 'user'
             };
-            
+
             // Debug: Log session role
             console.log('Session role set to:', user.role || 'user');
 
+            // Track login
+            const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+            const userAgent = req.get('user-agent') || 'unknown';
+            const sessionId = req.sessionID;
+            
+            try {
+                await User.trackLogin(user.id, clientIp, sessionId, userAgent);
+                console.log('Login tracked for user:', user.email);
+            } catch (trackError) {
+                console.error('Failed to track login:', trackError);
+                // Continue with login even if tracking fails
+            }
+
             // Redirect ke halaman yang sesuai berdasarkan role
             const redirectUrl = user.role === 'admin' ? '/admin' : '/';
-            
+
             res.json({
                 success: true,
                 message: 'Login berhasil! Selamat datang kembali.',
@@ -156,7 +177,8 @@ const authController = {
                 user: {
                     name: user.name,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
+                    lastLogin: user.last_login
                 }
             });
 
@@ -386,6 +408,19 @@ const authController = {
     // Fungsi untuk logout
     async logout(req, res) {
         try {
+            const userId = req.session.userId;
+            const sessionId = req.sessionID;
+
+            // Track logout before destroying session
+            if (userId && userId !== 'default_admin') {
+                try {
+                    await User.trackLogout(userId, sessionId);
+                    console.log('Logout tracked for user ID:', userId);
+                } catch (trackError) {
+                    console.error('Failed to track logout:', trackError);
+                }
+            }
+
             // Hapus session
             req.session.destroy((err) => {
                 if (err) {
@@ -399,11 +434,11 @@ const authController = {
                 // Hapus cookie jika ada
                 res.clearCookie('connect.sid'); // Nama cookie default untuk express-session
 
-                // Redirect ke halaman login setelah logout berhasil
-                res.json({ 
-                    success: true, 
-                    message: 'Logout berhasil! Sampai jumpa kembali.', 
-                    redirect: '/auth' 
+                // Redirect ke halaman utama setelah logout berhasil
+                res.json({
+                    success: true,
+                    message: 'Logout berhasil! Sampai jumpa kembali.',
+                    redirect: '/'
                 });
             });
         } catch (error) {

@@ -11,8 +11,9 @@ router.post('/login', authController.login);
 // Route untuk register
 router.post('/signup', authController.register);
 
-// Route untuk logout
+// Route untuk logout (support both GET and POST)
 router.get('/logout', authController.logout);
+router.post('/logout', authController.logout);
 
 // Route untuk konfirmasi akun
 router.get('/confirm/:token', authController.confirmAccount);

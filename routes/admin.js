@@ -8,9 +8,9 @@ const isAdmin = (req, res, next) => {
     if (req.session.user && req.session.user.role === 'admin') {
         next();
     } else {
-        res.status(403).json({ 
-            success: false, 
-            message: 'Akses ditolak. Hanya admin yang dapat mengakses fitur ini.' 
+        res.status(403).json({
+            success: false,
+            message: 'Akses ditolak. Hanya admin yang dapat mengakses fitur ini.'
         });
     }
 };
@@ -35,5 +35,20 @@ router.get('/user/:id', adminController.getUserById);
 
 // Endpoint untuk mendapatkan produk dari pengguna tertentu
 router.get('/user/:id/products', adminController.getUserProducts);
+
+// Endpoint untuk BAN user
+router.post('/user/:userId/ban', adminController.banUser);
+
+// Endpoint untuk UNBAN user
+router.post('/user/:userId/unban', adminController.unbanUser);
+
+// Endpoint untuk mendapatkan user yang di-ban
+router.get('/users/banned', adminController.getBannedUsers);
+
+// Endpoint untuk mendapatkan statistik produk per user
+router.get('/stats/products-by-user', adminController.getProductStatsByUser);
+
+// Endpoint untuk mendapatkan aktivitas login
+router.get('/stats/login-activity', adminController.getLoginActivity);
 
 module.exports = router;

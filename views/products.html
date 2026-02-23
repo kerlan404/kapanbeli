@@ -51,7 +51,9 @@
 
         /* --- NAVBAR --- */
         nav {
-            background: var(--bg-card);
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             box-shadow: var(--shadow-sm);
             padding: 15px 5%;
             position: sticky;
@@ -66,11 +68,25 @@
             margin: 0 auto;
         }
         .logo {
-            font-weight: 700; font-size: 1.5rem; color: var(--primary-orange); text-decoration: none; display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 1.5rem; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
         .nav-menu { display: flex; gap: 30px; }
-        .nav-link { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
+        .nav-link { 
+            text-decoration: none; 
+            color: var(--text-muted); 
+            font-weight: 500; 
+            transition: 0.3s; 
+            position: relative;
+            padding: 5px 0;
+        }
+        .nav-link:hover, .nav-link.active { 
+            color: var(--primary-blue); 
+        }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0;
+            background-color: var(--primary-orange); transition: width 0.3s ease; border-radius: 2px;
+        }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
         .dark-mode-toggle {
             background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer;
         }
@@ -241,8 +257,11 @@
 
         document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
             e.preventDefault();
-            await fetch('/auth/logout', { method: 'GET' });
-            window.location.href = '/auth';
+            const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+            const data = await response.json();
+            if (response.ok) {
+                window.location.href = data.redirect || '/';
+            }
         });
 
         // 2. Notification System
@@ -347,6 +366,8 @@
                             text: `"${name}" telah dihapus dari daftar Anda.`,
                             confirmButtonText: 'OK'
                         });
+                        // Dispatch custom event to notify other pages
+                        window.dispatchEvent(new CustomEvent('productAdded'));
                         loadProducts();
                     } else {
                         Swal.fire({

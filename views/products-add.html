@@ -230,6 +230,8 @@
                         text: isEdit ? 'Perubahan pada produk telah disimpan.' : 'Produk baru telah ditambahkan ke daftar Anda.',
                         confirmButtonText: 'OK'
                     }).then(() => {
+                        // Dispatch custom event to notify other pages
+                        window.dispatchEvent(new CustomEvent('productAdded'));
                         window.location.href = '/products';
                     });
                 } else {

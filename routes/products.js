@@ -33,4 +33,7 @@ router.delete('/:id', productsController.delete);
 // Endpoint untuk mendapatkan statistik produk
 router.get('/stats', productsController.getStats);
 
+// Endpoint untuk mendapatkan aktivitas terbaru
+router.get('/recent-activities', productsController.getRecentActivities);
+
 module.exports = router;

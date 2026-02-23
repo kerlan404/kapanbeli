@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,10 +30,11 @@
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
             --text-muted: #8395A7;
-            --nav-bg: rgba(255, 255, 255, 0.75);
-            --shadow-card: 0 8px 24px rgba(149, 157, 165, 0.1);
-            --shadow-hover: 0 12px 32px rgba(149, 157, 165, 0.2);
-            --border-radius: 20px;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --shadow-card: 0 8px 24px rgba(149, 157, 165, 0.08);
+            --shadow-hover: 0 12px 32px rgba(149, 157, 165, 0.15);
+            --shadow-search: 0 15px 35px rgba(0,0,0,0.1);
+            --border-radius: 24px;
             
             /* Pattern Dot Grid */
             --dot-color: #E1E8ED;
@@ -45,9 +46,10 @@
             --bg-card: #2C3E50;
             --text-main: #DFE6E9;
             --text-muted: #808E9B;
-            --nav-bg: rgba(30, 39, 46, 0.85);
-            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
-            --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(30, 39, 46, 0.9);
+            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.4);
+            --shadow-search: 0 15px 35px rgba(0,0,0,0.5);
             --dot-color: #34495E;
         }
 
@@ -56,7 +58,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
         }
 
         body {
@@ -69,13 +71,30 @@
             overflow-x: hidden;
         }
 
-        ::selection {
-            background: var(--primary-orange);
-            color: white;
-        }
-
+        ::selection { background: var(--primary-orange); color: white; }
         a { text-decoration: none; color: inherit; cursor: pointer; }
         ul { list-style: none; }
+
+        /* --- ANIMASI --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-entry {
+            opacity: 0; /* Mulai tersembunyi */
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
 
         /* --- NAVBAR --- */
         .navbar {
@@ -83,8 +102,8 @@
             top: 0;
             z-index: 1000;
             background-color: var(--nav-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 4px 20px rgba(0,0,0,0.02);
             padding: 1rem 0;
         }
@@ -102,13 +121,13 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.4rem;
             letter-spacing: -0.5px;
+            color: var(--text-main);
         }
 
         .nav-brand i { color: var(--primary-orange); font-size: 1.6rem; }
-        .nav-brand span { color: var(--text-main); }
 
         .nav-menu {
             display: flex;
@@ -123,63 +142,31 @@
             padding: 5px 0;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--primary-blue);
-        }
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
 
         .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--primary-orange);
-            transition: width 0.3s ease;
-            border-radius: 2px;
+            content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0;
+            background-color: var(--primary-orange); transition: width 0.3s ease; border-radius: 2px;
         }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
 
-        .nav-link:hover::after, .nav-link.active::after {
-            width: 100%;
-        }
+        .nav-actions { display: flex; align-items: center; gap: 1.2rem; }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
-
-        .btn-text {
-            font-weight: 600;
-            color: var(--primary-blue);
-            font-size: 0.9rem;
-        }
+        .btn-text { font-weight: 600; color: var(--primary-blue); font-size: 0.9rem; }
         .btn-text:hover { color: var(--primary-orange); }
 
         .dark-mode-toggle {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-main);
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: transparent; 
+            border: none;
+            color: var(--text-main); width: 38px; height: 38px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.9rem; opacity: 0.8;
         }
-
         .dark-mode-toggle:hover {
-            opacity: 1;
-            border-color: var(--primary-orange);
-            color: var(--primary-orange);
-            transform: rotate(90deg);
+            opacity: 1; background-color: rgba(255, 159, 67, 0.1); color: var(--primary-orange); transform: rotate(15deg);
         }
 
-        /* --- HERO SECTION (GABUNGAN GAMBAR & TEKS) --- */
+        /* --- HERO SECTION --- */
         .hero {
             max-width: 1200px;
             margin: 4rem auto;
@@ -187,109 +174,24 @@
             display: flex;
             align-items: center;
             min-height: 75vh;
-            position: relative; /* Penting untuk positioning gambar background */
-            overflow: hidden; /* Supaya gambar background tidak keluar container */
-            border-radius: var(--border-radius); /* Sudut membulat untuk kesan kotak catatan */
-        }
-
-        /* Elemen Gambar Background yang Menyatu */
-        .hero-bg-image {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 65%; /* Gambar mengambil 65% bagian kanan */
-            height: 100%;
-            background-image: url('https://z-cdn-media.chatglm.cn/files/3aaa6c94-c363-47e0-886e-817084f4b407.jpeg?auth_key=1870694353-37fd08f5dca94279b617d21318047ad0-0-84c2bb20f2aedb79ed770e63f95cd4fe');
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
-            
-            /* Masking: Gambar terlihat jelas di kanan, memudar (fade) ke arah kiri */
-            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-            mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-            
-            /* Sedikit rotasi halus agar natural */
-            transform: rotate(-1deg);
-            border-radius: 30px 0 0 30px;
-        }
-
-        .hero-text {
-            flex: 1;
-            z-index: 2; /* Teks harus di atas gambar background */
             position: relative;
-            max-width: 550px; /* Batasi lebar teks agar rapi */
+            overflow: hidden;
+            border-radius: var(--border-radius);
         }
 
-        .greeting-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(46, 134, 222, 0.1);
-            color: var(--primary-blue);
-            padding: 8px 20px;
-            border-radius: 100px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(46, 134, 222, 0.1);
-            /* Tambahkan background solid sedikit agar teks terbaca jika di atas gambar (responsif) */
-            backdrop-filter: blur(4px);
-            background-color: rgba(255, 255, 255, 0.8);
-        }
-        
-        body.dark-mode-active .greeting-badge {
-            background-color: rgba(30, 39, 46, 0.8);
-            color: var(--primary-blue);
-        }
-
-        .hero h1 {
-            font-size: 3.8rem;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            color: var(--text-main);
-            letter-spacing: -1.5px;
-            font-weight: 800;
-            /* Shadow tipis agar teks terbaca jelas jika bertemu gambar */
-            text-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .hero h1 span { 
-            color: var(--primary-orange);
-            display: inline-block;
-            position: relative;
-        }
-        
-        .hero h1 span::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 5px;
-            width: 100%;
-            height: 12px;
-            background-color: rgba(255, 159, 67, 0.2);
-            z-index: -1;
-            border-radius: 4px;
-        }
-
-        .hero p {
-            font-size: 1.15rem;
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            max-width: 480px;
-            line-height: 1.8;
-        }
-
-        /* --- SEARCH BAR STYLE --- */
+        /* --- SEARCH BAR STYLE (REVAMPED) --- */
         .search-container {
             position: relative;
-            max-width: 480px;
+            max-width: 550px; /* Sedikit lebih lebar */
             margin-bottom: 2.5rem;
+            width: 100%;
+            z-index: 200; /* Di atas konten lain */
         }
 
         .search-container input {
             width: 100%;
             padding: 18px 25px 18px 55px;
-            border: none;
+            border: 2px solid transparent;
             border-radius: 50px;
             background: var(--bg-card);
             box-shadow: var(--shadow-card);
@@ -300,399 +202,303 @@
             transition: all 0.3s ease;
         }
 
-        .search-container input:focus {
-            box-shadow: 0 0 0 4px rgba(255, 159, 67, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .search-container input::placeholder {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .search-container i {
-            position: absolute;
-            left: 22px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary-orange);
-            font-size: 1.1rem;
-        }
-
-        /* --- BUTTONS --- */
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .cta-button {
-            background-color: var(--primary-orange);
-            color: white;
-            padding: 16px 36px;
-            border-radius: 100px;
-            font-weight: 600;
-            font-size: 1rem;
-            box-shadow: 0 10px 25px rgba(255, 159, 67, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            border: none;
-            cursor: pointer;
-            z-index: 2;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px rgba(255, 159, 67, 0.5);
-            background-color: #f08c38;
-        }
-
-        .secondary-button {
-            background-color: var(--bg-card);
-            border: 2px solid rgba(0,0,0,0.05);
-            color: var(--text-main);
-            padding: 14px 32px;
-            border-radius: 100px;
-            font-weight: 600;
-            font-size: 1rem;
-            box-shadow: var(--shadow-card);
-            z-index: 2;
-        }
-        
-        .secondary-button:hover {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        /* --- SECTIONS UMUM --- */
-        .section { padding: 5rem 24px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 3.5rem;
-            font-size: 2.2rem;
-            color: var(--text-main);
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background: var(--primary-orange);
-        }
-
-        .view-all-link {
-            text-decoration: none;
-            color: var(--primary-blue);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
-        }
-
-        .view-all-link:hover {
-            color: var(--primary-orange);
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
-        }
-
-        .product-card {
+        .search-container input:focus { 
+            box-shadow: 0 0 0 4px rgba(255, 159, 67, 0.2), var(--shadow-card); 
+            transform: translateY(-2px); 
+            border-color: var(--primary-orange);
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-card);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: transform 0.3s;
         }
 
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
+        .search-container i { 
+            position: absolute; 
+            left: 22px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: var(--primary-orange); 
+            font-size: 1.2rem; 
+            pointer-events: none; /* Agar klik ikon fokus ke input */
         }
 
-        .card-top {
-            height: 140px;
-            background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        body.dark-mode-active .card-top {
-            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-        }
-
-        .card-icon {
-            font-size: 4rem;
-            color: var(--primary-orange);
-            z-index: 2;
-        }
-
-        .category-tag {
+        /* Search Results Dropdown */
+        .search-results {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255,255,255,0.9);
-            padding: 5px 12px;
+            top: calc(100% + 12px); /* Jarak 12px dari input */
+            left: 0;
+            width: 100%;
+            background: var(--bg-card);
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 3;
+            box-shadow: var(--shadow-search);
+            z-index: 1000;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
-        .card-body {
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .search-results.active {
+            max-height: 450px; /* Tinggi maksimal saat terbuka */
+            opacity: 1;
+            overflow-y: auto; /* Scroll jika panjang */
+            transform: translateY(0);
         }
 
-        .prod-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
+        .search-result-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
             cursor: pointer;
-        }
-
-        .prod-name:hover {
-            color: var(--primary-orange);
-        }
-
-        .info-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            gap: 15px;
+            transition: all 0.2s ease;
         }
 
-        .info-row:last-child {
+        .search-result-item:last-child {
             border-bottom: none;
         }
 
-        .label {
-            color: var(--text-muted);
+        .search-result-item:hover {
+            background-color: rgba(255, 159, 67, 0.05);
+            padding-left: 25px; /* Efek geser sedikit */
+        }
+
+        /* Search Item Content */
+        .search-result-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(46, 134, 222, 0.1);
+            color: var(--primary-blue);
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: background 0.2s, color 0.2s;
         }
 
-        .value {
+        .search-result-item:hover .search-result-icon {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .search-result-content {
+            flex: 1;
+            min-width: 0; /* Mencegah teks overflow */
+        }
+
+        .search-result-title {
             font-weight: 600;
             color: var(--text-main);
+            font-size: 1rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .badge {
-            padding: 4px 10px;
-            border-radius: 8px;
+        .search-result-type {
             font-size: 0.75rem;
-            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
-        .badge-expired {
-            background: rgba(255, 107, 107, 0.15);
-            color: var(--accent-red);
-        }
-
-        .badge-warning {
-            background: rgba(254, 202, 87, 0.2);
-            color: #d35400;
-        }
-
-        .badge-safe {
-            background: rgba(29, 209, 161, 0.15);
-            color: var(--accent-green);
-        }
-
-
-        /* --- STATS --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            padding: 2.5rem 2rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-card);
+        /* Empty State for Search */
+        .search-no-results {
+            padding: 30px 20px;
             text-align: center;
-            border: 1px solid rgba(0,0,0,0.02);
-            transition: all 0.3s ease;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(255, 159, 67, 0.3);
+        .hero-bg-image {
+            position: absolute; top: 0; right: 0; width: 65%; height: 100%;
+            background-image: url('https://z-cdn-media.chatglm.cn/files/3aaa6c94-c363-47e0-886e-817084f4b407.jpeg?auth_key=1870694353-37fd08f5dca94279b617d21318047ad0-0-84c2bb20f2aedb79ed770e63f95cd4fe');
+            background-size: cover; background-position: center; z-index: 0;
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+            transform: rotate(-1deg); border-radius: 30px 0 0 30px;
+        }
+
+        .hero-text { flex: 1; z-index: 2; position: relative; max-width: 550px; }
+
+        .greeting-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(46, 134, 222, 0.1); color: var(--primary-blue);
+            padding: 8px 20px; border-radius: 100px; font-size: 0.9rem; font-weight: 600;
+            margin-bottom: 1.5rem; border: 1px solid rgba(46, 134, 222, 0.1);
+            backdrop-filter: blur(4px); background-color: rgba(255, 255, 255, 0.85);
+        }
+        body.dark-mode-active .greeting-badge { background-color: rgba(30, 39, 46, 0.85); }
+
+        .hero h1 {
+            font-size: 3.8rem; line-height: 1.1; margin-bottom: 1.5rem;
+            color: var(--text-main); letter-spacing: -1.5px; font-weight: 800;
+        }
+
+        .hero h1 span { color: var(--primary-orange); position: relative; display: inline-block; }
+        
+        .hero h1 span::after {
+            content: ''; position: absolute; left: 0; bottom: 8px; width: 100%; height: 14px;
+            background-color: rgba(255, 159, 67, 0.2); z-index: -1; border-radius: 4px;
+        }
+
+        .hero p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 480px; line-height: 1.8; }
+
+        .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .cta-button {
+            background-color: var(--primary-orange); color: white; padding: 16px 36px;
+            border-radius: 100px; font-weight: 600; font-size: 1rem;
+            box-shadow: 0 10px 25px rgba(255, 159, 67, 0.4); transition: all 0.3s;
+            display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer;
+        }
+        .cta-button:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(255, 159, 67, 0.5); background-color: #f08c38; }
+
+        .secondary-button {
+            background-color: var(--bg-card); border: 2px solid rgba(0,0,0,0.05);
+            color: var(--text-main); padding: 14px 32px; border-radius: 100px; font-weight: 600;
+            box-shadow: var(--shadow-card);
+        }
+        .secondary-button:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+
+        /* --- SECTIONS UMUM --- */
+        .section { padding: 5rem 24px; position: relative; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        
+        .section-title {
+            font-size: 2.2rem; color: var(--text-main); font-weight: 700;
+            position: relative; display: inline-block;
+        }
+        .section-title::after { content: ''; display: block; width: 60px; height: 4px; background: var(--primary-orange); margin-top: 8px; border-radius: 2px; }
+
+        .view-all-link { font-weight: 600; color: var(--primary-blue); display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .view-all-link:hover { color: var(--primary-orange); gap: 12px; }
+
+        /* --- STATS SECTION (RINGKASAN DAPUR) --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        
+        .stat-card {
+            background: var(--bg-card); padding: 2.5rem 2rem; border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card); text-align: center; border: 1px solid rgba(0,0,0,0.02);
+            transition: all 0.4s ease; position: relative; overflow: hidden;
+        }
+
+        .stat-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: rgba(255, 159, 67, 0.3); }
+
+        /* Hiasan background halus pada kartu stat */
+        .stat-card::before {
+            content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
         .stat-icon {
-            font-size: 2.2rem;
-            margin-bottom: 1.2rem;
-            color: var(--primary-blue);
-            background: rgba(46, 134, 222, 0.1);
-            width: 70px;
-            height: 70px;
-            line-height: 70px;
-            border-radius: 50%;
-            margin-left: auto;
-            margin-right: auto;
+            font-size: 2.2rem; margin-bottom: 1.2rem; color: var(--primary-blue);
+            background: rgba(46, 134, 222, 0.1); width: 75px; height: 75px; line-height: 75px;
+            border-radius: 50%; margin-left: auto; margin-right: auto; transition: 0.3s;
         }
 
-        .stat-value { font-size: 2.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem; }
-        .stat-label { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card:hover .stat-icon { transform: scale(1.1) rotate(5deg); background: var(--primary-blue); color: white; }
 
-        /* --- QUICK ACCESS --- */
-        .quick-access-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
+        /* Variasi Warna Stat */
+        .stat-card.danger .stat-icon { color: var(--accent-red); background: rgba(255, 107, 107, 0.1); }
+        .stat-card.danger:hover .stat-icon { background: var(--accent-red); }
+        
+        .stat-card.warning .stat-icon { color: var(--primary-orange); background: rgba(255, 159, 67, 0.1); }
+        .stat-card.warning:hover .stat-icon { background: var(--primary-orange); }
+
+        .stat-value { font-size: 3rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem; line-height: 1; }
+        .stat-label { color: var(--text-muted); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        /* --- PRODUCTS GRID (BAHAN SAYA) --- */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+
+        .product-card {
+            background: var(--bg-card); border-radius: var(--border-radius); overflow: hidden;
+            box-shadow: var(--shadow-card); display: flex; flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.03); transition: all 0.3s ease; position: relative;
         }
 
-        .quick-btn {
-            background: var(--bg-card);
-            padding: 2.5rem 1.5rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-card);
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.2rem;
-            transition: all 0.3s ease;
+        .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); }
+
+        .card-top {
+            height: 150px; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+            display: flex; align-items: center; justify-content: center; position: relative;
+            overflow: hidden;
         }
 
-        .quick-btn:hover {
-            border-color: var(--primary-orange);
-            background-color: var(--bg-body);
-            transform: translateY(-5px);
+        body.dark-mode-active .card-top { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+
+        .card-icon { font-size: 4.5rem; color: var(--primary-orange); z-index: 2; transition: 0.3s; }
+        .product-card:hover .card-icon { transform: scale(1.1) rotate(-5deg); }
+
+        .category-tag {
+            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9);
+            padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            color: var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 3; backdrop-filter: blur(4px);
         }
 
-        .quick-icon {
-            width: 65px;
-            height: 65px;
-            background-color: rgba(46, 134, 222, 0.08);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            color: var(--primary-blue);
-            transition: all 0.3s ease;
+        .card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+        
+        .prod-name { font-size: 1.25rem; font-weight: 700; margin: 0; cursor: pointer; transition: color 0.2s; }
+        .prod-name:hover { color: var(--primary-orange); }
+
+        .info-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.9rem; padding-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.08);
         }
+        .info-row:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .quick-btn:hover .quick-icon {
-            background-color: var(--primary-orange);
-            color: white;
-            border-radius: 50%;
-        }
+        .label { color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .value { font-weight: 700; color: var(--text-main); font-size: 1rem; }
 
-        .quick-label { font-weight: 600; color: var(--text-main); font-size: 1.05rem; }
-
-        /* --- ACTIVITY LIST --- */
+        /* --- ACTIVITY LIST (AKTIVITAS TERKINI) --- */
         .activity-container {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 2.5rem;
-            box-shadow: var(--shadow-card);
+            background: var(--bg-card); border-radius: var(--border-radius);
+            padding: 2.5rem; box-shadow: var(--shadow-card);
         }
 
         .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 1.2rem 0;
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            display: flex; align-items: center; padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.2s;
         }
-
         .activity-item:last-child { border-bottom: none; }
+        .activity-item:hover { background-color: rgba(0,0,0,0.02); padding-left: 10px; padding-right: 10px; border-radius: 12px; }
 
         .activity-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1.5rem;
-            font-size: 1.2rem;
+            width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            margin-right: 1.5rem; font-size: 1.3rem; flex-shrink: 0;
         }
 
-        .activity-item:nth-child(1) .activity-icon { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
-        .activity-item:nth-child(2) .activity-icon { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
-        .activity-item:nth-child(3) .activity-icon { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
-        .activity-item:nth-child(4) .activity-icon { background: rgba(253, 203, 110, 0.2); color: #f39c12; }
+        /* Warna icon berdasarkan tipe */
+        .act-add { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
+        .act-warning { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+        .act-note { background: rgba(253, 203, 110, 0.2); color: #f39c12; }
+        .act-cart { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
 
         .activity-content { flex: 1; }
-        .activity-content > div:first-child { font-weight: 600; font-size: 1rem; color: var(--text-main); }
-        .activity-time { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+        .activity-title { font-weight: 600; font-size: 1rem; color: var(--text-main); display: block; margin-bottom: 4px; }
+        .activity-desc { font-size: 0.85rem; color: var(--text-muted); display: block; }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-weight: 500; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px;}
 
         /* --- FOOTER --- */
         .footer {
-            text-align: center;
-            padding: 4rem 0;
-            margin-top: 4rem;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(0,0,0,0.05);
-            background-color: var(--bg-card);
+            text-align: center; padding: 4rem 0; margin-top: 4rem; color: var(--text-muted);
+            border-top: 1px solid rgba(0,0,0,0.05); background-color: var(--bg-card);
         }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 968px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                gap: 2rem;
-                margin-top: 2rem;
-                padding-bottom: 2rem; /* Tambah padding bawah */
-            }
-            
-            /* Adjust Background Image for Mobile */
+            .hero { flex-direction: column; text-align: center; gap: 2rem; margin-top: 2rem; padding-bottom: 2rem; }
             .hero-bg-image {
-                position: relative;
-                width: 100%;
-                height: 300px; /* Tinggi gambar di mobile */
-                top: 0;
-                right: 0;
-                border-radius: 0 0 30px 30px; /* Lengkungan di bawah */
+                position: relative; width: 100%; height: 300px; top: 0; right: 0;
+                border-radius: 0 0 30px 30px; mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
                 -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
-                mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
-                margin-bottom: 2rem;
-                order: -1; /* Gambar di atas teks */
+                order: -1; margin-bottom: 2rem;
             }
-
-            .hero-text {
-                padding: 0 10px;
-            }
-
-            .hero p { margin: 0 auto 2rem; }
-            .hero-buttons { justify-content: center; }
-            .search-container { margin: 0 auto 2.5rem; }
-            
             .nav-menu { display: none; }
             .section-title { font-size: 1.8rem; }
         }
@@ -729,12 +535,10 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION: Gambar disatukan dengan teks -->
+    <!-- HERO SECTION -->
     <section class="hero">
-        <!-- Elemen Background Gambar (Dipisah dari flow dokumen utama) -->
         <div class="hero-bg-image"></div>
-
-        <div class="hero-text">
+        <div class="hero-text animate-entry delay-1">
             <span class="greeting-badge" id="greetingBadge">
                 <i class="fas fa-sun"></i> <span id="greetingText">Selamat Pagi</span>
             </span>
@@ -744,89 +548,92 @@
                 Dapatkan notifikasi bahan habis, rekap belanja otomatis, dan temukan resep dengan mudah.
             </p>
             
-            <!-- SEARCH BAR -->
-            <div class="search-container">
+            <div class="search-container animate-entry delay-2">
                 <i class="fas fa-search"></i>
-                <input type="text" id="heroSearch" placeholder="Cari bahan, resep, atau catatan...">
+                <input type="text" id="heroSearch" placeholder="Cari bahan, resep, atau catatan..." autocomplete="off">
+                <div class="search-results" id="searchResults">
+                    <!-- Results will be injected here -->
+                </div>
             </div>
 
-            <div class="hero-buttons">
+            <div class="hero-buttons animate-entry delay-3">
                 <a href="/auth" class="cta-button" id="mainActionBtn">
                     Mulai Catat <i class="fas fa-arrow-right"></i>
                 </a>
                 <a href="#features" class="secondary-button">Pelajari</a>
             </div>
         </div>
-        
-        <!-- Gambar IMG tag dihapus karena sudah di-handle oleh CSS Background -->
     </section>
 
     <!-- STATS SECTION -->
     <section class="section" id="features">
         <div class="container">
-            <h2 class="section-title">Ringkasan Dapur</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
+            <h2 class="section-title animate-entry delay-1" style="display:block; text-align:center;">Ringkasan Dapur</h2>
+            <div class="stats-grid" id="statsGrid">
+                <!-- Statistik akan dimuat via JS -->
+                <div class="stat-card animate-entry delay-1">
                     <div class="stat-icon"><i class="fas fa-box-open"></i></div>
-                    <div class="stat-value" id="totalProducts">0</div>
+                    <div class="stat-value">0</div>
                     <div class="stat-label">Total Bahan</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--accent-red); background: rgba(255, 107, 107, 0.1);"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stat-value" style="color: var(--accent-red);" id="lowStockCount">0</div>
+                <div class="stat-card danger animate-entry delay-2">
+                    <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-value">0</div>
                     <div class="stat-label">Stok Menipis</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--primary-orange); background: rgba(255, 159, 67, 0.1);"><i class="fas fa-clipboard-list"></i></div>
-                    <div class="stat-value" style="color: var(--primary-orange);" id="shoppingListCount">0</div>
+                <div class="stat-card warning animate-entry delay-3">
+                    <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="stat-value">0</div>
                     <div class="stat-label">Daftar Belanja</div>
+                </div>
+                <div class="stat-card expired animate-entry delay-4">
+                    <div class="stat-icon"><i class="fas fa-skull-crossbones"></i></div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Kadaluarsa</div>
+                </div>
+                <div class="stat-card expiring animate-entry delay-4">
+                    <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Hampir Kadaluarsa</div>
+                </div>
+                <div class="stat-card notes animate-entry delay-4">
+                    <div class="stat-icon"><i class="fas fa-sticky-note"></i></div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Catatan</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- QUICK ACCESS -->
-    <section class="section" style="background-color: rgba(0,0,0,0.02);">
+    <!-- EMPTY STOCK WARNING SECTION (Conditional) -->
+    <section class="section" id="emptyStockSection" style="display: none; background-color: rgba(255, 107, 107, 0.05);">
         <div class="container">
-            <h2 class="section-title">Akses Cepat</h2>
-            <div class="quick-access-container">
-                <div class="quick-btn" onclick="window.location.href='/products'">
-                    <div class="quick-icon"><i class="fas fa-plus-circle"></i></div>
-                    <div class="quick-label">Tambah Stok</div>
-                </div>
-                <div class="quick-btn" onclick="window.location.href='/suggestions'">
-                    <div class="quick-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="quick-label">Cek Belanja</div>
-                </div>
-                <div class="quick-btn" onclick="window.location.href='/notes'">
-                    <div class="quick-icon"><i class="fas fa-utensils"></i></div>
-                    <div class="quick-label">Resep Saya</div>
-                </div>
+            <div class="section-header">
+                <h2 class="section-title" style="color: var(--accent-red);"><i class="fas fa-bell"></i> Segera Beli!</h2>
+                <a href="/suggestions" class="view-all-link" style="color: var(--accent-red);">Lihat Daftar Belanja <i class="fas fa-arrow-right"></i></a>
             </div>
+            <div class="products-grid" id="emptyStockGrid"></div>
         </div>
     </section>
 
     <!-- PRODUCTS SECTION -->
     <section class="section" id="productsSection" style="display: none;">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div class="section-header">
                 <h2 class="section-title">Bahan Saya Terbaru</h2>
                 <a href="/products" class="view-all-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
             </div>
             <div class="products-grid" id="recentProductsGrid">
                 <!-- Products will be loaded dynamically -->
-                <div class="loading-placeholder">
-                    <i class="fas fa-spinner fa-spin"></i> Memuat bahan...
-                </div>
             </div>
         </div>
     </section>
 
     <!-- ACTIVITY LIST -->
-    <section class="section">
+    <section class="section" style="background-color: rgba(0,0,0,0.02);">
         <div class="container">
-            <h2 class="section-title">Aktivitas Terkini</h2>
-            <div class="activity-container">
+            <h2 class="section-title" style="display:block; text-align:center; margin-bottom: 3rem;">Aktivitas Terkini</h2>
+            <div class="activity-container animate-entry delay-2" style="max-width: 900px; margin: 0 auto;">
                 <ul class="activity-list" style="padding: 0;" id="activityList">
                     <!-- Activities will be loaded dynamically -->
                 </ul>
@@ -836,13 +643,8 @@
 
     <footer class="footer">
         <div class="container">
-            <p style="font-weight: 500; margin-bottom: 10px;">Kapan Beli</p>
+            <p style="font-weight: 700; font-size: 1.2rem; color: var(--text-main); margin-bottom: 10px;">Kapan Beli</p>
             <p style="font-size: 0.9rem;">&copy; 2026 Catatan Stok Bahan Masak. Semua hak dilindungi.</p>
-            <div style="margin-top: 15px; font-size: 1.2rem; color: var(--primary-blue);">
-                <i class="fab fa-instagram" style="margin: 0 10px; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-orange)'" onmouseout="this.style.color='var(--primary-blue)'"></i>
-                <i class="fab fa-twitter" style="margin: 0 10px; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-orange)'" onmouseout="this.style.color='var(--primary-blue)'"></i>
-                <i class="fab fa-facebook" style="margin: 0 10px; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-orange)'" onmouseout="this.style.color='var(--primary-blue)'"></i>
-            </div>
         </div>
     </footer>
 
@@ -868,7 +670,7 @@
             }
         }
 
-        // --- LOGIC 2: DARK MODE TOGGLE ---
+        // --- LOGIC 2: DARK MODE ---
         const toggleBtn = document.querySelector('.dark-mode-toggle');
         const themeIcon = document.getElementById('themeIcon');
         const body = document.body;
@@ -878,343 +680,795 @@
         }
 
         toggleBtn.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode-active')) {
-                disableDarkMode();
-            } else {
-                enableDarkMode();
-            }
+            body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
         });
 
         function enableDarkMode() {
             body.classList.add('dark-mode-active');
             localStorage.setItem('theme', 'dark');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
+            themeIcon.className = "fas fa-sun";
             themeIcon.style.color = "#F1C40F"; 
         }
 
         function disableDarkMode() {
             body.classList.remove('dark-mode-active');
             localStorage.setItem('theme', 'light');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
+            themeIcon.className = "fas fa-moon";
             themeIcon.style.color = ""; 
         }
 
-        // --- LOGIC 3: SEARCH BAR (New Feature) ---
+        // --- LOGIC 3: SEARCH BAR (IMPROVED UI) ---
         const searchInput = document.getElementById('heroSearch');
-        
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout = null; // Debounce timer
+
+        searchInput.addEventListener('input', function (e) {
+            const query = e.target.value.trim();
+            
+            // Clear previous timeout
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query === '') {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            // Debounce request (tunggu 300ms setelah user berhenti mengetik)
+            searchTimeout = setTimeout(async () => {
+                try {
+                    // Show loading state (optional, bisa ditambahkan spinner)
+                    searchResults.innerHTML = '<div class="search-no-results"><i class="fas fa-spinner fa-spin"></i> Mencari...</div>';
+                    searchResults.classList.add('active');
+
+                    // Search across products, notes
+                    const [productsRes, notesRes] = await Promise.all([
+                        fetch('/api/products', { credentials: 'same-origin' }),
+                        fetch('/api/notes', { credentials: 'same-origin' })
+                    ]);
+
+                    const [productsData, notesData] = await Promise.all([
+                        productsRes.json(),
+                        notesRes.json()
+                    ]);
+
+                    const allResults = [];
+
+                    // Search in products
+                    if (productsData.success && productsData.products) {
+                        productsData.products.forEach(product => {
+                            if (product.name.toLowerCase().includes(query.toLowerCase())) {
+                                allResults.push({
+                                    type: 'product',
+                                    title: product.name,
+                                    description: 'Bahan Dapur',
+                                    id: product.id,
+                                    link: `/products/detail/${product.id}`,
+                                    icon: 'fa-box-open'
+                                });
+                            }
+                        });
+                    }
+
+                    // Search in notes
+                    if (notesData.success && notesData.notes) {
+                        notesData.notes.forEach(note => {
+                            if (note.title.toLowerCase().includes(query.toLowerCase())) {
+                                allResults.push({
+                                    type: 'note',
+                                    title: note.title,
+                                    description: 'Catatan Pribadi',
+                                    id: note.id,
+                                    link: `/notes`,
+                                    icon: 'fa-sticky-note'
+                                });
+                            }
+                        });
+                    }
+
+                    // Display results
+                    if (allResults.length > 0) {
+                        searchResults.innerHTML = allResults.slice(0, 5).map(result => `
+                            <div class="search-result-item" onclick="window.location.href='${result.link}'">
+                                <div class="search-result-icon">
+                                    <i class="fas ${result.icon}"></i>
+                                </div>
+                                <div class="search-result-content">
+                                    <div class="search-result-title">${result.title}</div>
+                                    <div class="search-result-type">${result.description}</div>
+                                </div>
+                                <i class="fas fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                            </div>
+                        `).join('');
+                    } else {
+                        searchResults.innerHTML = `
+                            <div class="search-no-results">
+                                <i class="fas fa-search" style="font-size: 1.5rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                                <div>Tidak ada hasil untuk "${query}"</div>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    searchResults.innerHTML = `
+                        <div class="search-no-results" style="color: var(--accent-red);">
+                            Terjadi kesalahan saat mencari
+                        </div>
+                    `;
+                }
+            }, 300); // 300ms debounce
+        });
+
+        // Handle Enter key (optional: go to full search page or trigger first result)
         searchInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 const query = this.value;
                 if(query.trim() !== "") {
-                    // Simulasi pencarian
-                    alert(`Mencari: "${query}" \n(Ini adalah simulasi fitur pencarian)`);
-                    this.value = ""; // Reset input
+                    // Simulasi navigasi ke halaman pencarian penuh
+                    window.location.href = `/products?search=${encodeURIComponent(query)}`;
                 }
             }
         });
 
-        // --- LOGIC 4: AUTH CHECK (Connected to Database via Server API) ---
+        // Hide search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // --- LOGIC 4: AUTH CHECK ---
         const authLink = document.getElementById('authLink');
         const logoutLink = document.getElementById('logoutLink');
         const welcomeText = document.getElementById('welcomeText');
         const mainActionBtn = document.getElementById('mainActionBtn');
 
-        // Function to check authentication status from the server
         async function checkAuthStatus() {
             try {
-                const response = await fetch('/auth/status', {
-                    method: 'GET',
-                    credentials: 'same-origin' // Important to include session cookies
-                });
-
+                const response = await fetch('/auth/status', { method: 'GET', credentials: 'same-origin' });
                 if (response.ok) {
                     const data = await response.json();
                     if (data.authenticated) {
-                        // User is logged in
                         authLink.style.display = 'none';
                         logoutLink.style.display = 'inline-block';
                         welcomeText.style.display = 'inline-block';
                         welcomeText.textContent = `Halo, ${data.user.name}!`;
                         mainActionBtn.innerHTML = 'Buka Catatan <i class="fas fa-book"></i>';
-                        mainActionBtn.href = '/products'; // Or '/notes' or wherever the main dashboard is
-                    } else {
-                        // User is not logged in
-                        authLink.style.display = 'inline-block';
-                        logoutLink.style.display = 'none';
-                        welcomeText.style.display = 'none';
-                        mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
-                        mainActionBtn.href = '/auth';
+                        mainActionBtn.href = '/products';
+                        return true; // Authenticated
                     }
-                } else {
-                    // Handle unexpected response status
-                    console.error('Error checking auth status:', response.status);
-                    // Default to logged out state on error
-                    authLink.style.display = 'inline-block';
-                    logoutLink.style.display = 'none';
-                    welcomeText.style.display = 'none';
-                    mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
-                    mainActionBtn.href = '/auth';
                 }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                // Default to logged out state on error
+                // Default logged out state
                 authLink.style.display = 'inline-block';
                 logoutLink.style.display = 'none';
                 welcomeText.style.display = 'none';
                 mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
                 mainActionBtn.href = '/auth';
+                return false;
+            } catch (error) {
+                console.error('Auth check failed', error);
+                return false;
             }
         }
 
-        // Add event listener for logout link to call server API
         logoutLink.addEventListener('click', async (e) => {
             e.preventDefault();
-
             try {
-                const response = await fetch('/auth/logout', {
-                    method: 'GET', // Or 'POST' depending on your server setup
-                    credentials: 'same-origin'
-                });
-
+                const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+                const data = await response.json();
                 if (response.ok) {
-                    // Redirect to auth page or reload current page to reflect logged-out state
-                    window.location.href = '/auth';
-                } else {
-                    // Handle error if logout fails
-                    const result = await response.json();
-                    console.error('Logout failed:', result.message);
-                    alert('Gagal logout. Silakan coba lagi.');
+                    window.location.href = data.redirect || '/';
                 }
-            } catch (error) {
-                console.error('Error during logout:', error);
-                alert('Terjadi kesalahan saat logout. Silakan coba lagi.');
-            }
+            } catch (error) { console.error('Logout error', error); }
         });
 
-        // --- LOGIC 5: LOAD DASHBOARD DATA ---
-        async function loadDashboardData() {
-            try {
-                // Check if user is authenticated first
-                const authResponse = await fetch('/auth/status', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-
-                if (!authResponse.ok) {
-                    console.error('User not authenticated, skipping dashboard data load');
-                    return;
-                }
-
-                const authData = await authResponse.json();
-                if (!authData.authenticated) {
-                    console.error('User not authenticated, skipping dashboard data load');
-                    return;
-                }
-
-                // Load product statistics
-                const productsResponse = await fetch('/api/products/stats', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-
-                if (productsResponse.ok) {
-                    const stats = await productsResponse.json();
-                    if (stats.success) {
-                        document.getElementById('totalProducts').textContent = stats.total || 0;
-                        document.getElementById('lowStockCount').textContent = stats.lowStock || 0;
-                        document.getElementById('shoppingListCount').textContent = stats.shoppingList || 0;
-                    }
-                }
-
-                // Load recent products
-                const productsSection = document.getElementById('productsSection');
-                const recentProductsGrid = document.getElementById('recentProductsGrid');
-                
-                if (productsSection && recentProductsGrid) {
-                    try {
-                        const recentProductsResponse = await fetch('/api/products', {
-                            method: 'GET',
-                            credentials: 'same-origin'
-                        });
-
-                        if (recentProductsResponse.ok) {
-                            const productsData = await recentProductsResponse.json();
-                            if (productsData.success && productsData.products) {
-                                // Show the products section
-                                productsSection.style.display = 'block';
-                                
-                                // Take only the 6 most recent products
-                                const recentProducts = productsData.products.slice(0, 6);
-                                
-                                if (recentProducts.length > 0) {
-                                    recentProductsGrid.innerHTML = ''; // Clear loading placeholder
-                                    
-                                    recentProducts.forEach(product => {
-                                        const productCard = document.createElement('div');
-                                        productCard.className = 'product-card';
-                                        
-                                        // Determine icon based on product name
-                                        const icon = product.name.toLowerCase().includes('ayam') ? 'fa-drumstick-bite' :
-                                                     product.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' :
-                                                     product.name.toLowerCase().includes('telur') ? 'fa-egg' :
-                                                     product.name.toLowerCase().includes('bawang') ? 'fa-seedling' :
-                                                     product.name.toLowerCase().includes('tomat') ? 'fa-apple-alt' :
-                                                     'fa-box-open';
-
-                                        // Determine expiry status
-                                        const expiryStatus = getExpiryStatus(product.expiry_date);
-                                        const isLow = parseFloat(product.stock_quantity) <= parseFloat(product.min_stock_level);
-                                        
-                                        productCard.innerHTML = `
-                                            <div class="card-top">
-                                                ${product.image_url ? `<img src="${product.image_url}" class="card-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute;">` : `<i class="fas ${icon} card-icon"></i>`}
-                                                <span class="category-tag">${product.category_id || 'Umum'}</span>
-                                            </div>
-                                            <div class="card-body">
-                                                <h3 class="prod-name" onclick="window.location='/products/detail/${product.id}'">${product.name}</h3>
-                                                
-                                                <div class="info-row">
-                                                    <span class="label"><i class="fas fa-boxes"></i> Stok</span>
-                                                    <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'inherit'}">
-                                                        ${parseFloat(product.stock_quantity).toString()} ${product.unit || ''}
-                                                    </span>
-                                                </div>
-                                                <div class="info-row" style="border:none;">
-                                                    <span class="label"><i class="fas fa-calendar"></i> Kedaluwarsa</span>
-                                                    <span class="badge ${expiryStatus.class}">${expiryStatus.text}</span>
-                                                </div>
-                                            </div>
-                                        `;
-                                        
-                                        recentProductsGrid.appendChild(productCard);
-                                    });
-                                } else {
-                                    // Show message if no products
-                                    recentProductsGrid.innerHTML = `
-                                        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                                            <i class="fas fa-clipboard-list" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;"></i>
-                                            <h3>Belum ada bahan</h3>
-                                            <p style="margin-top: 10px;">Mulai tambahkan stok dapur Anda sekarang.</p>
-                                            <a href="/products/add" class="cta-button" style="display: inline-block; margin-top: 15px; padding: 12px 24px; text-decoration: none; color: white; background: var(--primary-orange); border-radius: 50px;">Tambah Bahan</a>
-                                        </div>
-                                    `;
-                                }
-                            } else {
-                                // Hide the products section if no data
-                                productsSection.style.display = 'none';
-                            }
-                        } else {
-                            // Hide the products section if request fails
-                            productsSection.style.display = 'none';
-                        }
-                    } catch (error) {
-                        console.error('Error loading recent products:', error);
-                        // Hide the products section if there's an error
-                        if (productsSection) {
-                            productsSection.style.display = 'none';
-                        }
-                    }
-                }
-
-                // Load recent activities
-                const activitiesResponse = await fetch('/api/notes/recent', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-
-                if (activitiesResponse.ok) {
-                    const activities = await activitiesResponse.json();
-                    if (activities.success && activities.notes) {
-                        const activityList = document.getElementById('activityList');
-                        activityList.innerHTML = ''; // Clear existing activities
-                        
-                        activities.notes.forEach(activity => {
-                            const activityItem = document.createElement('li');
-                            activityItem.className = 'activity-item';
-                            
-                            // Determine icon and styling based on activity type
-                            let iconClass = 'fa-plus';
-                            let iconColor = 'var(--accent-green)';
-                            let iconBg = 'rgba(29, 209, 161, 0.15)';
-                            
-                            if (activity.title.toLowerCase().includes('peringatan') || activity.title.toLowerCase().includes('habis')) {
-                                iconClass = 'fa-exclamation-triangle';
-                                iconColor = 'var(--accent-red)';
-                                iconBg = 'rgba(255, 107, 107, 0.15)';
-                            } else if (activity.title.toLowerCase().includes('belanja')) {
-                                iconClass = 'fa-shopping-cart';
-                                iconColor = 'var(--primary-orange)';
-                                iconBg = 'rgba(253, 203, 110, 0.2)';
-                            } else if (activity.title.toLowerCase().includes('perbarui') || activity.title.toLowerCase().includes('update')) {
-                                iconClass = 'fa-sync-alt';
-                                iconColor = 'var(--primary-blue)';
-                                iconBg = 'rgba(46, 134, 222, 0.15)';
-                            }
-                            
-                            activityItem.innerHTML = `
-                                <div class="activity-icon" style="background: ${iconBg}; color: ${iconColor};">
-                                    <i class="fas ${iconClass}"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div>${activity.title || 'Aktivitas baru'}</div>
-                                    <div class="activity-time">${formatTimeAgo(activity.created_at)}</div>
-                                </div>
-                            `;
-                            
-                            activityList.appendChild(activityItem);
-                        });
-                        
-                        // If no activities, show a message
-                        if (activities.notes.length === 0) {
-                            activityList.innerHTML = '<li class="activity-item"><div class="activity-content"><div class="activity-time">Tidak ada aktivitas terbaru</div></div></li>';
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
+        // --- LOGIC 5: MAIN DASHBOARD DATA (UPDATED) ---
+        
+        // Helper: Format Tanggal Indonesia
+        function formatDateID(dateString) {
+            if(!dateString) return '-';
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
         }
 
-        // Helper function to format time ago
+        // Helper: Cek Status Kedaluwarsa
+        function getExpiryStatus(dateString) {
+            if(!dateString) return { text: '-', class: '' };
+            const now = new Date();
+            const exp = new Date(dateString);
+            const diffTime = exp - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            if (diffDays < 0) return { text: 'Kadaluarsa', class: 'text-danger', color: 'var(--accent-red)' };
+            if (diffDays <= 7) return { text: `${diffDays} Hari Lagi`, class: 'text-warning', color: '#f39c12' };
+            return { text: formatDateID(dateString), class: 'text-success', color: 'var(--accent-green)' };
+        }
+
+        // Helper: Icon berdasarkan nama bahan
+        function getIconForProduct(name) {
+            const n = name.toLowerCase();
+            if(n.includes('ayam')) return 'fa-drumstick-bite';
+            if(n.includes('susu')) return 'fa-glass-whiskey';
+            if(n.includes('telur')) return 'fa-egg';
+            if(n.includes('bawang')) return 'fa-seedling';
+            if(n.includes('beras') || n.includes('gandum')) return 'fa-wheat';
+            if(n.includes('cabai')) return 'fa-pepper-hot';
+            if(n.includes('minyak')) return 'fa-bottle-droplet';
+            return 'fa-box-open';
+        }
+
+        // Helper: Format "Waktu Lalu"
         function formatTimeAgo(dateString) {
             if (!dateString) return 'Baru saja';
-            
             const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-
-            if (diffMins < 1) return 'Baru saja';
-            if (diffMins < 60) return `${diffMins} menit yang lalu`;
-            if (diffHours < 24) return `${diffHours} jam yang lalu`;
-            return `${diffDays} hari yang lalu`;
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " tahun lalu";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " bulan lalu";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " hari lalu";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " jam lalu";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " menit lalu";
+            return "Baru saja";
         }
 
-        // Helper function to get expiry status
-        function getExpiryStatus(date) {
-            if(!date) return { text: '-', class: 'badge-safe' };
-            const now = new Date();
-            const exp = new Date(date);
-            const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
-            if(diff < 0) return { text: 'Kadaluarsa', class: 'badge-expired' };
-            if(diff <= 7) return { text: `${diff} Hari Lagi`, class: 'badge-warning' };
-            return { text: exp.toLocaleDateString('id-ID'), class: 'badge-safe' };
+        // Fungsi Utama Load Data
+        async function loadDashboardData() {
+            console.log('Loading dashboard data...');
+
+            // 1. Fetch Stats (Ringkasan Dapur)
+            try {
+                const statsRes = await fetch('/api/products/stats', { credentials: 'same-origin' });
+                console.log('Stats API response status:', statsRes.status); // Debug log
+                if(statsRes.ok) {
+                    const stats = await statsRes.json();
+                    console.log('Stats received:', stats); // Debug log
+                    // Update UI Stats dengan animasi angka sederhana
+                    document.querySelector('#statsGrid .stat-card:nth-child(1) .stat-value').textContent = stats.total || 0;
+                    document.querySelector('#statsGrid .stat-card:nth-child(2) .stat-value').textContent = stats.lowStock || 0;
+                    document.querySelector('#statsGrid .stat-card:nth-child(3) .stat-value').textContent = stats.shoppingList || 0;
+                    
+                    // Update additional stats if they exist
+                    if(document.querySelector('.stat-card.expired')) {
+                        document.querySelector('.stat-card.expired .stat-value').textContent = stats.outOfStock || 0;
+                    }
+                } else {
+                    console.error('Stats API returned error:', statsRes.status);
+                    // Set default values if API fails
+                    document.querySelector('#statsGrid .stat-card:nth-child(1) .stat-value').textContent = '0';
+                    document.querySelector('#statsGrid .stat-card:nth-child(2) .stat-value').textContent = '0';
+                    document.querySelector('#statsGrid .stat-card:nth-child(3) .stat-value').textContent = '0';
+                }
+            } catch (e) { 
+                console.error('Stats API error:', e); 
+                // Set default values if API fails
+                document.querySelector('#statsGrid .stat-card:nth-child(1) .stat-value').textContent = '0';
+                document.querySelector('#statsGrid .stat-card:nth-child(2) .stat-value').textContent = '0';
+                document.querySelector('#statsGrid .stat-card:nth-child(3) .stat-value').textContent = '0';
+            }
+
+            // 2. Fetch Products (Bahan Saya & Stok Rendah)
+            try {
+                const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
+                console.log('Products API response status:', prodRes.status); // Debug log
+                if(prodRes.ok) {
+                    const data = await prodRes.json();
+                    console.log('Products received:', data); // Debug log
+                    if(data.success && data.products) {
+                        renderProducts(data.products);
+                        renderLowStockProducts(data.products); // Logic Deteksi Stok Rendah
+                        
+                        // Update kitchen summary with additional data
+                        updateKitchenSummary(data.products);
+                    } else {
+                        console.error('Products API returned error:', data);
+                    }
+                } else {
+                    console.error('Products API returned error:', prodRes.status);
+                }
+            } catch (e) { 
+                console.error('Products API error', e); 
+            }
+
+            // 3. Fetch Notes
+            try {
+                const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
+                console.log('Notes API response status:', notesRes.status); // Debug log
+                if(notesRes.ok) {
+                    const notesData = await notesRes.json();
+                    console.log('Notes received:', notesData); // Debug log
+                    if(notesData.success && notesData.notes) {
+                        // Update kitchen summary with notes count
+                        updateNotesSummary(notesData.notes);
+                    } else {
+                        console.error('Notes API returned error:', notesData);
+                    }
+                } else {
+                    console.error('Notes API returned error:', notesRes.status);
+                }
+            } catch (e) { 
+                console.error('Notes API error', e); 
+            }
+
+            // 4. Fetch & Render Activities
+            await loadActivities();
         }
 
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            updateGreeting();
-            checkAuthStatus(); // Check auth status when page loads
-            
-            // Load dashboard data if user is authenticated
-            setTimeout(loadDashboardData, 1000); // Delay slightly to allow auth check to complete
+        // Function to force refresh dashboard data
+        function refreshDashboardData() {
+            console.log('Refreshing dashboard data...');
+            loadDashboardData();
+        }
+
+        // Listen for events from other pages to refresh data
+        window.addEventListener('productAdded', () => {
+            setTimeout(refreshDashboardData, 1000); // Delay to allow server to process
         });
 
-        setInterval(updateGreeting, 60000);
+        window.addEventListener('productUpdated', () => {
+            setTimeout(refreshDashboardData, 1000);
+        });
+
+        window.addEventListener('productDeleted', () => {
+            setTimeout(refreshDashboardData, 1000);
+        });
+
+        window.addEventListener('noteAdded', () => {
+            setTimeout(refreshDashboardData, 1000);
+        });
+
+        window.addEventListener('noteUpdated', () => {
+            setTimeout(refreshDashboardData, 1000);
+        });
+
+        window.addEventListener('noteDeleted', () => {
+            setTimeout(refreshDashboardData, 1000);
+        });
+
+        // Update kitchen summary with additional data
+        function updateKitchenSummary(products) {
+            // Calculate additional stats for kitchen summary
+            const expiredProducts = products.filter(p => {
+                if (!p.expiry_date) return false;
+                const expiryDate = new Date(p.expiry_date);
+                const today = new Date();
+                return expiryDate < today;
+            });
+            
+            const expiringSoon = products.filter(p => {
+                if (!p.expiry_date) return false;
+                const expiryDate = new Date(p.expiry_date);
+                const today = new Date();
+                const diffTime = expiryDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays > 0 && diffDays <= 7;
+            });
+            
+            const lowStockProducts = products.filter(p => {
+                const stock = parseFloat(p.stock_quantity) || 0;
+                const minLevel = parseFloat(p.min_stock_level) || 5;
+                return stock <= minLevel && stock > 0;
+            });
+            
+            const outOfStockProducts = products.filter(p => {
+                const stock = parseFloat(p.stock_quantity) || 0;
+                return stock <= 0;
+            });
+            
+            // Update existing values (the elements are already in HTML)
+            if(document.querySelector('.stat-card.expired .stat-value')) {
+                document.querySelector('.stat-card.expired .stat-value').textContent = expiredProducts.length;
+            }
+            if(document.querySelector('.stat-card.expiring .stat-value')) {
+                document.querySelector('.stat-card.expiring .stat-value').textContent = expiringSoon.length;
+            }
+            if(document.querySelector('.stat-card.danger .stat-value')) {
+                document.querySelector('.stat-card.danger .stat-value').textContent = lowStockProducts.length;
+            }
+            if(document.querySelector('.stat-card.warning .stat-value')) {
+                document.querySelector('.stat-card.warning .stat-value').textContent = (lowStockProducts.length + outOfStockProducts.length);
+            }
+            if(document.querySelector('.stat-card:nth-child(1) .stat-value')) {
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = products.length;
+            }
+        }
+
+        // Update notes summary
+        function updateNotesSummary(notes) {
+            // Update existing value (the element is already in HTML)
+            if(document.querySelector('.stat-card.notes .stat-value')) {
+                document.querySelector('.stat-card.notes .stat-value').textContent = notes.length;
+            }
+        }
+
+        // RENDER: Bahan Saya Terbaru
+        function renderProducts(products) {
+            const container = document.getElementById('recentProductsGrid');
+            const section = document.getElementById('productsSection');
+            
+            if(products.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            container.innerHTML = '';
+            
+            // Ambil 6 terakhir
+            products.slice(0, 6).forEach((prod, index) => {
+                const expiryInfo = getExpiryStatus(prod.expiry_date);
+                const isLow = parseFloat(prod.stock_quantity) <= parseFloat(prod.min_stock_level || 0);
+                
+                // Animasi delay bertahap
+                const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
+
+                const card = `
+                    <div class="product-card animate-entry ${delayClass}">
+                        <div class="card-top">
+                            <span class="category-tag">${prod.category_id || 'Umum'}</span>
+                            ${prod.image_url 
+                                ? `<img src="${prod.image_url}" style="width:100%; height:100%; object-fit:cover; position:absolute;">` 
+                                : `<i class="fas ${getIconForProduct(prod.name)} card-icon"></i>`
+                            }
+                        </div>
+                        <div class="card-body">
+                            <h3 class="prod-name" onclick="window.location='/products/detail/${prod.id}'">${prod.name}</h3>
+                            
+                            <!-- MENAMPILKAN STOK & EXPIRY SESUAI REQUEST -->
+                            <div class="info-row">
+                                <span class="label"><i class="fas fa-boxes"></i> Stok</span>
+                                <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'var(--text-main)'}">
+                                    ${prod.stock_quantity} ${prod.unit || ''}
+                                    ${isLow ? '<i class="fas fa-exclamation-circle" style="margin-left:5px; font-size:0.8rem;"></i>' : ''}
+                                </span>
+                            </div>
+                            
+                            <div class="info-row" style="border:none;">
+                                <span class="label"><i class="fas fa-calendar-check"></i> Kedaluwarsa</span>
+                                <span class="value" style="color: ${expiryInfo.color}">${expiryInfo.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // RENDER: Stok Menipis (Otomatis muncul jika ada)
+        function renderLowStockProducts(products) {
+            const container = document.getElementById('emptyStockGrid');
+            const section = document.getElementById('emptyStockSection');
+            
+            // Filter stok <= 0 (habis) atau stok <= min_stock (menipis)
+            const lowStock = products.filter(p => parseFloat(p.stock_quantity) <= parseFloat(p.min_stock_level || 0));
+
+            if(lowStock.length > 0) {
+                section.style.display = 'block';
+                container.innerHTML = '';
+                
+                lowStock.forEach((prod, index) => {
+                    const delayClass = index < 3 ? `delay-${index+1}` : 'delay-3';
+                    const card = `
+                        <div class="product-card animate-entry ${delayClass}" style="border: 1px solid rgba(255, 107, 107, 0.3);">
+                            <div class="card-top" style="background: rgba(255, 107, 107, 0.1);">
+                                <span class="category-tag" style="background:var(--accent-red); color:white;">Darurat</span>
+                                <i class="fas ${getIconForProduct(prod.name)} card-icon" style="color: var(--accent-red);"></i>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="prod-name">${prod.name}</h3>
+                                <div class="info-row">
+                                    <span class="label">Sisa Stok</span>
+                                    <span class="value" style="color: var(--accent-red); font-weight:800;">${prod.stock_quantity} ${prod.unit}</span>
+                                </div>
+                                <div class="info-row" style="border:none;">
+                                    <a href="/suggestions" class="cta-button" style="width:100%; justify-content:center; padding:10px; font-size:0.9rem; margin-top:10px;">
+                                        <i class="fas fa-cart-plus"></i> Beli Sekarang
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        // LOGIC BARU: Aktivitas Terkini Cerdas
+        async function loadActivities() {
+            const list = document.getElementById('activityList');
+            list.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat aktivitas...</div>';
+
+            try {
+                // Fetch combined activities from the API endpoint
+                let activities = [];
+                
+                // Try to get activities from the API
+                try {
+                    const res = await fetch('/api/products/recent-activities', { credentials: 'same-origin' });
+                    console.log('Activities API response status:', res.status); // Debug log
+                    if(res.ok) {
+                        const data = await res.json();
+                        console.log('Activities API response data:', data); // Debug log
+                        if(data.success && Array.isArray(data.activities)) {
+                            activities = data.activities;
+                            console.log('Activities loaded from API:', activities.length); // Debug log
+                        } else {
+                            console.error('API returned error or invalid data:', data);
+                        }
+                    } else {
+                        console.error('API returned HTTP error:', res.status);
+                    }
+                } catch(e) {
+                    console.error('Network error fetching activities from API:', e);
+                }
+
+                // If API didn't return activities, get them manually from products and notes
+                if(activities.length === 0) {
+                    console.log('Fetching activities manually...');
+                    
+                    // Fetch products to create activity entries
+                    try {
+                        const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
+                        if(prodRes.ok) {
+                            const prodData = await prodRes.json();
+                            if(prodData.success && Array.isArray(prodData.products)) {
+                                // Add product activities (creation and updates)
+                                prodData.products.forEach(product => {
+                                    // Add creation/update activity
+                                    activities.push({
+                                        id: `prod-${product.id}`,
+                                        type: 'product',
+                                        title: `Menambahkan bahan: ${product.name}`,
+                                        description: `Stok: ${product.stock_quantity} ${product.unit || ''}`,
+                                        timestamp: product.created_at || product.updated_at || new Date().toISOString(),
+                                        icon: 'fa-box-open',
+                                        colorClass: 'act-add'
+                                    });
+                                    
+                                    // Add low stock warning if applicable
+                                    if(parseFloat(product.stock_quantity) <= parseFloat(product.min_stock_level || 0)) {
+                                        activities.push({
+                                            id: `low-stock-${product.id}`,
+                                            type: 'system_warning',
+                                            title: `Peringatan: Stok ${product.name} menipis`,
+                                            description: `Stok: ${product.stock_quantity} ${product.unit || ''}. Segera isi ulang.`,
+                                            timestamp: product.updated_at || product.created_at || new Date().toISOString(),
+                                            icon: 'fa-exclamation-triangle',
+                                            colorClass: 'act-warning'
+                                        });
+                                    }
+                                    
+                                    // Add expiry warning if applicable
+                                    if(product.expiry_date) {
+                                        const expiryDate = new Date(product.expiry_date);
+                                        const today = new Date();
+                                        const diffTime = expiryDate - today;
+                                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                        
+                                        if(diffDays <= 7 && diffDays >= 0) {
+                                            activities.push({
+                                                id: `expiring-${product.id}`,
+                                                type: 'system_warning',
+                                                title: `Peringatan: ${product.name} akan kadaluarsa`,
+                                                description: `Kadaluarsa dalam ${diffDays} hari`,
+                                                timestamp: product.updated_at || product.created_at || new Date().toISOString(),
+                                                icon: 'fa-clock',
+                                                colorClass: 'act-warning'
+                                            });
+                                        } else if(diffDays < 0) {
+                                            activities.push({
+                                                id: `expired-${product.id}`,
+                                                type: 'system_warning',
+                                                title: `Peringatan: ${product.name} telah kadaluarsa`,
+                                                description: `Harus diganti segera`,
+                                                timestamp: product.updated_at || product.created_at || new Date().toISOString(),
+                                                icon: 'fa-skull-crossbones',
+                                                colorClass: 'act-warning'
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    } catch(e) {
+                        console.error('Error fetching products for activities:', e);
+                    }
+
+                    // Fetch notes to create activity entries
+                    try {
+                        const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
+                        if(notesRes.ok) {
+                            const notesData = await notesRes.json();
+                            if(notesData.success && Array.isArray(notesData.notes)) {
+                                // Add note activities
+                                notesData.notes.forEach(note => {
+                                    activities.push({
+                                        id: `note-${note.id}`,
+                                        type: 'note',
+                                        title: `Menambahkan catatan: ${note.title}`,
+                                        description: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
+                                        timestamp: note.created_at || note.updated_at || new Date().toISOString(),
+                                        icon: 'fa-sticky-note',
+                                        colorClass: 'act-note'
+                                    });
+                                });
+                            }
+                        }
+                    } catch(e) {
+                        console.error('Error fetching notes for activities:', e);
+                    }
+                }
+
+                // Sort activities by timestamp (newest first)
+                activities.sort((a, b) => {
+                    const dateA = new Date(a.timestamp);
+                    const dateB = new Date(b.timestamp);
+                    
+                    // Handle invalid dates
+                    if (isNaN(dateA.getTime())) return 1;
+                    if (isNaN(dateB.getTime())) return -1;
+                    
+                    return dateB - dateA; // Descending order (newest first)
+                });
+
+                // Limit to 10 most recent activities
+                activities = activities.slice(0, 10);
+
+                // Render List
+                list.innerHTML = '';
+                if(activities.length === 0) {
+                    list.innerHTML = '<li style="text-align:center; color:var(--text-muted); padding:20px;">Belum ada aktivitas.</li>';
+                    return;
+                }
+
+                activities.forEach((act, index) => {
+                    // Tentukan tipe icon jika belum diset logic sistem
+                    let iconClass = act.icon || 'fa-info-circle';
+                    let colorClass = act.colorClass || 'act-note'; // default
+
+                    // Logika pewarnaan manual jika data dari API tidak lengkap
+                    if(!act.colorClass) {
+                        if(act.title.toLowerCase().includes('tambah') || act.type === 'product') {
+                            iconClass = 'fa-plus-circle'; colorClass = 'act-add';
+                        } else if(act.title.toLowerCase().includes('catatan') || act.type === 'note') {
+                            iconClass = 'fa-sticky-note'; colorClass = 'act-note';
+                        } else if(act.title.toLowerCase().includes('belanja')) {
+                            iconClass = 'fa-shopping-cart'; colorClass = 'act-cart';
+                        } else if(act.title.toLowerCase().includes('peringatan') || act.title.toLowerCase().includes('stok')) {
+                            iconClass = 'fa-exclamation-triangle'; colorClass = 'act-warning';
+                        } else if(act.title.toLowerCase().includes('kadaluarsa')) {
+                            iconClass = 'fa-skull-crossbones'; colorClass = 'act-warning';
+                        } else if(act.title.toLowerCase().includes('hapus')) {
+                            iconClass = 'fa-trash'; colorClass = 'act-warning';
+                        } else if(act.title.toLowerCase().includes('edit') || act.title.toLowerCase().includes('ubah')) {
+                            iconClass = 'fa-edit'; colorClass = 'act-note';
+                        } else if(act.title.toLowerCase().includes('akan')) {
+                            iconClass = 'fa-clock'; colorClass = 'act-warning';
+                        }
+                    }
+
+                    const item = `
+                        <li class="activity-item animate-entry" style="animation-delay: ${index * 0.1}s">
+                            <div class="activity-icon ${colorClass}">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <span class="activity-title">${act.title}</span>
+                                <span class="activity-desc">${act.description || ''}</span>
+                                <span class="activity-time"><i class="far fa-clock"></i> ${formatTimeAgo(act.timestamp)}</span>
+                            </div>
+                        </li>
+                    `;
+                    list.innerHTML += item;
+                });
+
+            } catch (e) {
+                console.error('Error loading activities:', e);
+                list.innerHTML = '<li style="text-align:center; color:var(--accent-red);">Gagal memuat aktivitas.</li>';
+            }
+        }
+
+        // Function to record activities when user performs actions
+        async function recordActivity(type, title, description = '', timestamp = new Date().toISOString()) {
+            // This function would typically send data to the server to store the activity
+            // For now, we'll just trigger a refresh of the activity feed
+            console.log(`Activity recorded: ${type} - ${title}`);
+            
+            // Refresh the activity feed to show the new activity
+            setTimeout(() => {
+                loadActivities();
+            }, 1000); // Delay to allow server to process the action
+        }
+
+        // Listen for custom events from other pages to update activities
+        window.addEventListener('productAdded', (e) => {
+            recordActivity('product', 'Menambahkan bahan baru', e.detail?.name || '');
+        });
+
+        window.addEventListener('productUpdated', (e) => {
+            recordActivity('product', 'Memperbarui bahan', e.detail?.name || '');
+        });
+
+        window.addEventListener('productDeleted', (e) => {
+            recordActivity('product', 'Menghapus bahan', e.detail?.name || '');
+        });
+
+        window.addEventListener('noteAdded', (e) => {
+            recordActivity('note', 'Menambahkan catatan baru', e.detail?.title || '');
+        });
+
+        window.addEventListener('noteUpdated', (e) => {
+            recordActivity('note', 'Memperbarui catatan', e.detail?.title || '');
+        });
+
+        window.addEventListener('noteDeleted', (e) => {
+            recordActivity('note', 'Menghapus catatan', e.detail?.title || '');
+        });
+
+        // Also listen for page loads to ensure activities are updated
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadActivities();
+            }, 2000); // Delay to ensure everything is loaded
+        });
+
+        // Listen for storage events from other tabs/windows
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'activityUpdate') {
+                loadActivities();
+            }
+        });
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateGreeting();
+            const isAuth = await checkAuthStatus();
+
+            if(isAuth) {
+                // Wait a bit to ensure DOM is fully loaded, then load data
+                setTimeout(async () => {
+                    await loadDashboardData();
+                }, 500);
+            } else {
+                // Jika belum login, biarkan nilai tetap 0 seperti yang sudah ditentukan di HTML
+            }
+
+            // Refresh data tiap 30 detik
+            setInterval(() => {
+                if(isAuth) loadDashboardData();
+            }, 30000);
+
+            setInterval(updateGreeting, 60000);
+        });
+
+        // Event Listener untuk refresh saat user tambah bahan (simulasi komunikasi antar halaman jika SPA)
+        window.addEventListener('productAdded', () => {
+            setTimeout(loadDashboardData, 500);
+        });
+        
+        window.addEventListener('productUpdated', () => {
+            setTimeout(loadDashboardData, 500);
+        });
+        
+        window.addEventListener('productDeleted', () => {
+            setTimeout(loadDashboardData, 500);
+        });
+        
+        window.addEventListener('noteAdded', () => {
+            setTimeout(loadDashboardData, 500);
+        });
+        
+        window.addEventListener('noteUpdated', () => {
+            setTimeout(loadDashboardData, 500);
+        });
+        
+        window.addEventListener('noteDeleted', () => {
+            setTimeout(loadDashboardData, 500);
+        });
     </script>
 </body>
 </html>

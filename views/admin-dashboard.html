@@ -3,885 +3,949 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Kapan Beli</title>
+    <title>Admin Panel - Kapan Beli</title>
 
-    <!-- Google Fonts: Poppins -->
+    <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👤</text></svg>" type="image/x-icon">
+    
+    <!-- Chart.js untuk Grafik Data Nyata -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         /* --- CSS VARIABLES --- */
         :root {
-            --primary-orange: #FF9F43;
             --primary-blue: #2E86DE;
-            --bg-body: #F7F9FC;
+            --primary-dark: #205A9E;
+            --primary-orange: #FF9F43;
+            --accent-green: #1DD1A1;
+            --accent-red: #FF6B6B;
+            --bg-sidebar: #1a1d23; /* Dark Sidebar */
+            --bg-body: #F4F6F9;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
             --text-muted: #8395A7;
-            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
-            --border-radius: 20px;
-            --dot-color: #E1E8ED;
+            --text-light: #ecf0f1;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
+            --sidebar-width: 260px;
+            --header-height: 60px;
         }
 
         body.dark-mode-active {
-            --bg-body: #1E272E;
-            --bg-card: #2C3E50;
-            --text-main: #DFE6E9;
-            --text-muted: #808E9B;
-            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --dot-color: #34495E;
+            --bg-body: #121418;
+            --bg-card: #1e2128;
+            --text-main: #ecf0f1;
+            --text-muted: #bdc3c7;
+            --border-color: #2c3e50;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body {
-            font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
-            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
             color: var(--text-main);
+            display: flex;
             min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            color: var(--text-light);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
             display: flex;
             flex-direction: column;
-            position: relative;
+            z-index: 1000;
+            transition: transform 0.3s ease;
         }
 
-        /* --- NAVIGATION BAR --- */
-        nav {
-            position: sticky;
-            top: 0;
-            background: var(--bg-card);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            z-index: 100;
-            padding: 15px 5%;
-        }
-
-        .nav-container {
+        .sidebar-header {
+            height: var(--header-height);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
+            padding: 0 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-orange); }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .menu-label {
+            padding: 0 24px 10px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: rgba(46, 134, 222, 0.1);
+            color: var(--primary-blue);
+            border-left-color: var(--primary-blue);
+        }
+
+        .nav-item i { width: 24px; margin-right: 12px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-mini-profile {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-orange);
-            text-decoration: none;
         }
 
-        .logo i { font-size: 1.8rem; }
-
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 12px;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255, 159, 67, 0.1);
-            color: var(--primary-orange);
-        }
-
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .nav-auth-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .welcome-text {
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-
-        .dark-mode-toggle {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-main);
+        .user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 12px;
+            border-radius: 50%;
+            background: var(--primary-orange);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            font-weight: 700;
+            color: white;
         }
 
-        .dark-mode-toggle:hover {
-            border-color: var(--primary-orange);
-            color: var(--primary-orange);
-            background: rgba(255, 159, 67, 0.1);
-        }
+        .user-info h4 { font-size: 0.9rem; color: white; margin-bottom: 2px; }
+        .user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+        .logout-btn { margin-left: auto; color: rgba(255,255,255,0.5); cursor: pointer; }
+        .logout-btn:hover { color: var(--accent-red); }
 
         /* --- MAIN CONTENT --- */
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
+        .main-content {
+            margin-left: var(--sidebar-width);
             flex: 1;
+            padding: 30px;
+            transition: margin-left 0.3s ease;
         }
 
-        .dashboard-header {
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
         }
 
-        .section-title {
-            font-size: 2rem;
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
             color: var(--text-main);
+        }
+
+        .top-actions { display: flex; gap: 15px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
+        
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .btn-danger { background: rgba(255, 107, 107, 0.1); color: var(--accent-red); }
+        .btn-danger:hover { background: var(--accent-red); color: white; }
 
-        .section-title i {
-            color: var(--primary-orange);
-        }
-
-        /* Stats Cards */
-        .stats-container {
+        /* --- CARDS & STATS --- */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
             margin-bottom: 30px;
         }
 
         .stat-card {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--shadow-card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            text-align: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
         }
+
+        .stat-info h3 { font-size: 2rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .stat-info p { color: var(--text-muted); font-size: 0.9rem; }
 
         .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-users { background: rgba(46, 134, 222, 0.1); color: var(--primary-blue); }
-        .stat-active { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-        .stat-products { background: rgba(241, 196, 15, 0.1); color: #f1c40f; }
-        .stat-orders { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-        }
-
-        .tab {
-            padding: 10px 20px;
+            width: 50px; height: 50px;
             border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
         }
+        .bg-blue-light { background: rgba(46, 134, 222, 0.1); color: var(--primary-blue); }
+        .bg-green-light { background: rgba(29, 209, 161, 0.1); color: var(--accent-green); }
+        .bg-orange-light { background: rgba(255, 159, 67, 0.1); color: var(--primary-orange); }
+        .bg-red-light { background: rgba(255, 107, 107, 0.1); color: var(--accent-red); }
 
-        .tab.active {
-            background: var(--primary-orange);
-            color: white;
+        /* --- CONTENT PANELS --- */
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
         }
+        .content-panel.active { display: block; }
 
-        .tab:not(.active):hover {
-            background: rgba(0,0,0,0.05);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Tables */
-        .table-container {
+        .panel-card {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-card);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 15px 20px;
-            text-align: left;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        th {
-            background: rgba(0,0,0,0.02);
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-view {
-            background: transparent;
-            border: 1px solid var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        .btn-view:hover {
-            background: rgba(46, 134, 222, 0.1);
-        }
-
-        .btn-profile {
-            background: transparent;
-            border: 1px solid var(--primary-orange);
-            color: var(--primary-orange);
-        }
-
-        .btn-profile:hover {
-            background: rgba(255, 159, 67, 0.1);
-        }
-
-        .status-active {
-            background: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-
-        .status-inactive {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-
-        .stock-status {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .status-normal { background: rgba(29, 209, 161, 0.2); color: #1DD1A1; }
-        .status-low { background: rgba(255, 203, 98, 0.2); color: #FDCB6E; }
-        .status-out { background: rgba(255, 107, 107, 0.2); color: #FF6B6B; }
-
-        /* Charts Section */
-        .charts-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
             padding: 25px;
-            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
         }
 
-        .chart-header {
-            margin-bottom: 20px;
-        }
-
-        .chart-title {
-            font-size: 1.2rem;
-            color: var(--text-main);
-            margin-bottom: 5px;
-        }
-
-        .chart-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .chart-placeholder {
-            height: 200px;
-            background: rgba(0,0,0,0.02);
-            border-radius: 10px;
+        .panel-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
+        .panel-title { font-size: 1.25rem; font-weight: 600; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-menu { gap: 15px; }
-            .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .nav-buttons { width: 100%; justify-content: space-between; }
-            .stats-container { grid-template-columns: 1fr; }
-            .charts-container { grid-template-columns: 1fr; }
-            th, td { padding: 10px; font-size: 0.9rem; }
-            .user-actions { flex-direction: column; }
+        /* --- TABLES --- */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid var(--border-color); }
+        td { padding: 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.95rem; }
+        tr:hover td { background-color: rgba(0,0,0,0.01); }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
+        .badge-warning { background: rgba(255, 159, 67, 0.15); color: var(--primary-orange); }
+        .badge-danger { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+
+        /* --- FORMS (SETTINGS) --- */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; background: var(--bg-body); color: var(--text-main);
+            font-size: 0.95rem; outline: none;
+        }
+        .form-control:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1); }
+        
+        /* --- DETAIL VIEW --- */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        .profile-card { text-align: center; }
+        .profile-large-img {
+            width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
+            margin-bottom: 15px; border: 4px solid var(--bg-body); box-shadow: var(--shadow-md);
+        }
+        .data-list { list-style: none; }
+        .data-list li {
+            padding: 10px 0; border-bottom: 1px dashed var(--border-color);
+            display: flex; justify-content: space-between;
+        }
+        .data-list li:last-child { border: none; }
+        .data-label { color: var(--text-muted); }
+        .data-value { font-weight: 600; color: var(--text-main); }
+
+        /* --- RESPONSIVE --- */
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .detail-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <i class="fas fa-carrot"></i>
-                <span>Kapan Beli</span>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i> KB ADMIN
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-label">Utama</div>
+            <a href="#" class="nav-item active" onclick="showPage('dashboard', this)">
+                <i class="fas fa-th-large"></i> Dashboard
             </a>
-            <div class="nav-menu">
-                <a href="/admin" class="nav-link active">Dashboard</a>
-                <a href="/admin/users" class="nav-link">Manajemen Pengguna</a>
-                <a href="/admin/analytics" class="nav-link">Analitik</a>
-                <a href="/admin/settings" class="nav-link">Pengaturan</a>
-            </div>
-            <div class="nav-buttons">
-                <div class="nav-auth-section">
-                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Admin</strong>!</span>
-                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
-                </div>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-            </div>
-        </div>
-    </nav>
+            <a href="#" class="nav-item" onclick="showPage('users', this)">
+                <i class="fas fa-users"></i> Pengguna
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('products', this)">
+                <i class="fas fa-box"></i> Semua Produk
+            </a>
 
-    <div class="container">
-        <div class="dashboard-header">
-            <h2 class="section-title">
-                <i class="fas fa-chart-bar"></i>
-                Admin Dashboard
-            </h2>
+            <div class="menu-label">Sistem</div>
+            <a href="#" class="nav-item" onclick="showPage('settings', this)">
+                <i class="fas fa-cog"></i> Pengaturan
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('activity-log', this)">
+                <i class="fas fa-history"></i> Log Aktivitas
+            </a>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon stat-users">
-                    <i class="fas fa-users"></i>
+        <div class="sidebar-footer">
+            <div class="user-mini-profile">
+                <div class="user-avatar">AD</div>
+                <div class="user-info">
+                    <h4>Super Admin</h4>
+                    <p>admin@kapanbeli.id</p>
                 </div>
-                <div class="stat-number" id="totalUsers">0</div>
-                <div class="stat-label">Total Pengguna</div>
+                <div class="logout-btn" onclick="handleLogout()" title="Keluar">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-active">
-                    <i class="fas fa-user-check"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
                 </div>
-                <div class="stat-number" id="activeUsers">0</div>
-                <div class="stat-label">Pengguna Aktif</div>
+                <h2 class="page-title" id="pageTitle">Dashboard Overview</h2>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-products">
-                    <i class="fas fa-boxes"></i>
-                </div>
-                <div class="stat-number" id="totalProducts">0</div>
-                <div class="stat-label">Total Produk</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-orders">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <div class="stat-number" id="lowStockItems">0</div>
-                <div class="stat-label">Stok Rendah</div>
+            <div class="top-actions">
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <div class="tab active" data-tab="users">Pengguna</div>
-            <div class="tab" data-tab="activity">Aktivitas Login</div>
-            <div class="tab" data-tab="products">Produk Pengguna</div>
-            <div class="tab" data-tab="analytics">Analitik</div>
-        </div>
-
-        <!-- Users Table -->
-        <div class="table-container tab-content active" id="usersTab">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Tanggal Registrasi</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    <!-- Users will be loaded here -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Activity Table -->
-        <div class="table-container tab-content" id="activityTab">
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Login Terakhir</th>
-                        <th>Logout Terakhir</th>
-                        <th>IP Address</th>
-                    </tr>
-                </thead>
-                <tbody id="activityTableBody">
-                    <!-- Activity will be loaded here -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Products Table -->
-        <div class="table-container tab-content" id="productsTab">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Pengguna</th>
-                        <th>Produk</th>
-                        <th>Stok</th>
-                        <th>Stok Minimal</th>
-                        <th>Kadaluarsa</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="productsTableBody">
-                    <!-- Products will be loaded here -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Analytics Section -->
-        <div class="charts-container tab-content" id="analyticsTab">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">Pengguna Baru per Bulan</h3>
-                    <p class="chart-subtitle">Jumlah pendaftaran pengguna baru</p>
+        <!-- 1. DASHBOARD VIEW -->
+        <div id="dashboard-view" class="content-panel active">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-users">0</h3>
+                        <p>Total Pengguna</p>
+                    </div>
+                    <div class="stat-icon bg-blue-light"><i class="fas fa-users"></i></div>
                 </div>
-                <div class="chart-placeholder">
-                    <i class="fas fa-chart-line"></i> Grafik Analitik Pengguna
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-active">0</h3>
+                        <p>Pengguna Aktif</p>
+                    </div>
+                    <div class="stat-icon bg-green-light"><i class="fas fa-user-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-products">0</h3>
+                        <p>Total Produk</p>
+                    </div>
+                    <div class="stat-icon bg-orange-light"><i class="fas fa-boxes"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-issues">0</h3>
+                        <p>Stok Menipis</p>
+                    </div>
+                    <div class="stat-icon bg-red-light"><i class="fas fa-exclamation-triangle"></i></div>
                 </div>
             </div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">Aktivitas Login</h3>
-                    <p class="chart-subtitle">Jumlah login per hari dalam seminggu terakhir</p>
+
+            <!-- Charts Section -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Analitik Pertumbuhan</h3>
+                    <select class="form-control" style="width: auto;">
+                        <option>7 Hari Terakhir</option>
+                        <option>Bulan Ini</option>
+                    </select>
                 </div>
-                <div class="chart-placeholder">
-                    <i class="fas fa-chart-line"></i> Grafik Aktivitas Login
+                <div style="height: 300px; position: relative;">
+                    <canvas id="growthChart"></canvas>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- 2. USERS VIEW -->
+        <div id="users-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Daftar Pengguna</h3>
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Tambah User</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Bergabung</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY LOG SECTION -->
+        <div id="activity-log-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Log Aktivitas Sistem</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <select class="form-control" style="width: auto;" onchange="filterActivities(this.value)">
+                            <option value="all">Semua Aktivitas</option>
+                            <option value="user">Pengguna</option>
+                            <option value="product">Produk</option>
+                            <option value="system">Sistem</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="refreshActivities()">
+                            <i class="fas fa-sync"></i> Muat Ulang
+                        </button>
+                    </div>
+                </div>
+                <div id="activityLogContainer" style="min-height: 400px;">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. USER DETAIL VIEW -->
+        <div id="user-detail-view" class="content-panel">
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="showPage('users')">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                </button>
+            </div>
+
+            <div class="detail-grid">
+                <!-- Profile Card -->
+                <div class="panel-card profile-card">
+                    <img src="https://picsum.photos/seed/admin/200/200" alt="User" class="profile-large-img">
+                    <h3 id="detail-name" style="margin-bottom: 5px;">-</h3>
+                    <p id="detail-email" style="color: var(--text-muted); margin-bottom: 20px;">-</p>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center;">Edit Profil</button>
+                        <button class="btn btn-danger" style="width: 100%; justify-content: center;">Nonaktifkan</button>
+                    </div>
+                </div>
+
+                <!-- Data & Products -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Data & Stok User</h3>
+                        <button class="btn btn-outline" onclick="alert('Data disalin!')"><i class="fas fa-copy"></i> Ekspor Data</button>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: var(--primary-blue);">Informasi Akun</h4>
+                    <ul class="data-list" style="margin-bottom: 30px;">
+                        <li><span class="data-label">ID Pengguna</span> <span class="data-value" id="detail-id">-</span></li>
+                        <li><span class="data-label">Role</span> <span class="data-value">Member</span></li>
+                        <li><span class="data-label">Terakhir Login</span> <span class="data-value" id="detail-last-login">-</span></li>
+                        <li><span class="data-label">Status Akun</span> <span class="badge badge-success">Aktif</span></li>
+                    </ul>
+
+                    <div class="user-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin-bottom: 5px;" id="userProductCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Produk</div>
+                        </div>
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-red); margin-bottom: 5px;" id="userLowStockCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Stok Rendah</div>
+                        </div>
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-green); margin-bottom: 5px;" id="userNotesCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Catatan</div>
+                        </div>
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-orange); margin-bottom: 5px;" id="userSuggestionsCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Saran</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: var(--primary-blue);">Produk Milik User</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Stok</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userProductsTable">
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SETTINGS VIEW -->
+        <div id="settings-view" class="content-panel">
+            <div class="panel-card" style="max-width: 800px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Pengaturan Sistem</h3>
+                </div>
+                <form onsubmit="event.preventDefault(); alert('Pengaturan disimpan!');">
+                    <div class="form-group">
+                        <label class="form-label">Nama Aplikasi</label>
+                        <input type="text" class="form-control" value="Kapan Beli">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Email Support</label>
+                            <input type="email" class="form-control" value="support@kapanbeli.id">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nomor Kontak</label>
+                            <input type="text" class="form-control" value="+62 812 3456 7890">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mode Maintenance</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="maintenanceMode" style="width: 20px; height: 20px;">
+                            <label for="maintenanceMode" style="margin: 0; cursor: pointer;">Aktifkan Mode Maintenance (Situs tidak dapat diakses publik)</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notifikasi Email</label>
+                        <select class="form-control">
+                            <option>Aktif (Stok Rendah & Kadaluarsa)</option>
+                            <option>Hanya Stok Rendah</option>
+                            <option>Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; text-align: right;">
+                        <button type="button" class="btn btn-outline" style="margin-right: 10px;">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Placeholder for Products View -->
+        <div id="products-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Semua Produk di Database</h3>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); padding: 50px;">Menampilkan seluruh produk dari seluruh pengguna...</p>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        // --- 1. NOTIFICATION SYSTEM ---
-        function showNotification(message, type = 'info') {
-            // Create notification container if it doesn't exist
-            let container = document.getElementById('notificationContainer');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'notificationContainer';
-                container.style.cssText = `
-                    position: fixed; 
-                    top: 20px; 
-                    right: 20px; 
-                    z-index: 10000; 
-                    width: 350px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                `;
-                document.body.appendChild(container);
-            }
-            
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.style.cssText = `
-                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
-                color: white;
-                padding: 15px 20px;
-                margin-bottom: 10px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideInRight 0.3s ease;
-                position: relative;
-                overflow: hidden;
-                min-height: 50px;
-            `;
-            
-            const icon = document.createElement('i');
-            icon.className = `fas ${
-                type === 'success' ? 'fa-check-circle' : 
-                type === 'error' ? 'fa-exclamation-circle' : 
-                'fa-info-circle'
-            }`;
-            icon.style.cssText = 'font-size: 1.2em;';
-            
-            const messageSpan = document.createElement('span');
-            messageSpan.textContent = message;
-            messageSpan.style.flex = '1';
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.innerHTML = '&times;';
-            closeBtn.onclick = () => {
-                notification.style.animation = 'fadeOut 0.5s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 500);
-            };
-            closeBtn.style.cssText = `
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5em;
-                cursor: pointer;
-                padding: 0;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            notification.appendChild(icon);
-            notification.appendChild(messageSpan);
-            notification.appendChild(closeBtn);
-            
-            container.appendChild(notification);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'fadeOut 0.5s ease';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 500);
-                }
-            }, 5000);
-        }
+        // --- GLOBAL VARIABLES ---
+        let allActivities = []; // Store all activities for filtering
+        let growthChartInstance = null;
 
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-            .tab-content {
-                display: none;
-            }
-            .tab-content.active {
-                display: block;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // --- 2. TAB FUNCTIONALITY ---
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and content
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                tab.classList.add('active');
-                
-                // Show corresponding content
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(`${tabId}Tab`).classList.add('active');
-            });
-        });
-
-        // --- 3. DARK MODE LOGIC ---
-        const toggleBtn = document.querySelector('.dark-mode-toggle');
-        const body = document.body;
-
-        if (localStorage.getItem('theme') === 'dark' ||
-           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            enableDarkMode();
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode-active')) {
-                disableDarkMode();
-            } else {
-                enableDarkMode();
-            }
-        });
-
-        function enableDarkMode() {
-            body.classList.add('dark-mode-active');
-            localStorage.setItem('theme', 'dark');
-        }
-
-        function disableDarkMode() {
-            body.classList.remove('dark-mode-active');
-            localStorage.setItem('theme', 'light');
-        }
-
-        // --- 4. AUTHENTICATION CHECK ---
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status');
-                const data = await response.json();
-
-                if (data.authenticated) {
-                    document.getElementById('userName').textContent = data.user.name;
-                    // Additional check if user is admin
-                    if (data.user.role !== 'admin') {
-                        window.location.href = '/'; // Redirect non-admins
-                    }
-                } else {
-                    window.location.href = '/auth';
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                window.location.href = '/auth';
-            }
-        }
-
-        // --- 5. DATA LOADING FUNCTIONS ---
-        async function loadDashboardStats() {
-            try {
-                const response = await fetch('/api/admin/stats');
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('totalUsers').textContent = data.stats.totalUsers;
-                    document.getElementById('activeUsers').textContent = data.stats.activeUsers;
-                    document.getElementById('totalProducts').textContent = data.stats.totalProducts;
-                    document.getElementById('lowStockItems').textContent = data.stats.lowStockItems;
-                }
-            } catch (error) {
-                console.error('Error loading dashboard stats:', error);
-                showNotification('Gagal memuat statistik dashboard.', 'error');
-            }
-        }
-
-        async function loadUsers() {
-            try {
-                const response = await fetch('/api/admin/users');
-                const data = await response.json();
-
-                if (data.success) {
-                    const tbody = document.getElementById('usersTableBody');
-                    tbody.innerHTML = '';
-
-                    data.users.forEach(user => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${user.id}</td>
-                            <td>${user.name}</td>
-                            <td>${user.email}</td>
-                            <td>${(() => { const d = new Date(user.created_at); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })()}</td>
-                            <td><span class="status-${user.is_active ? 'active' : 'inactive'}">${user.is_active ? 'Aktif' : 'Non-Aktif'}</span></td>
-                            <td class="user-actions">
-                                <button class="btn btn-profile" onclick="viewUserProfile(${user.id})">
-                                    <i class="fas fa-user"></i> Profil
-                                </button>
-                                <button class="btn btn-view" onclick="viewUserProducts(${user.id})">
-                                    <i class="fas fa-box"></i> Produk
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading users:', error);
-                showNotification('Gagal memuat daftar pengguna.', 'error');
-            }
-        }
-
-        async function loadActivityLogs() {
-            try {
-                const response = await fetch('/api/admin/activity');
-                const data = await response.json();
-
-                if (data.success) {
-                    const tbody = document.getElementById('activityTableBody');
-                    tbody.innerHTML = '';
-
-                    data.activity.forEach(log => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${log.user_name}</td>
-                            <td>${log.user_email}</td>
-                            <td>${log.last_login ? new Date(log.last_login).toLocaleString('id-ID') : '-'}</td>
-                            <td>${log.last_logout ? new Date(log.last_logout).toLocaleString('id-ID') : '-'}</td>
-                            <td>${log.ip_address || '-'}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading activity logs:', error);
-                showNotification('Gagal memuat log aktivitas.', 'error');
-            }
-        }
-
-        async function loadUserProducts() {
-            try {
-                const response = await fetch('/api/admin/products');
-                const data = await response.json();
-
-                if (data.success) {
-                    const tbody = document.getElementById('productsTableBody');
-                    tbody.innerHTML = '';
-
-                    data.products.forEach(product => {
-                        const status = getProductStatus(product.stock_quantity, product.min_stock_level);
-                        
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${product.user_name}</td>
-                            <td>${product.name}</td>
-                            <td>${parseFloat(product.stock_quantity).toString()} ${product.unit || ''}</td>
-                            <td>${parseFloat(product.min_stock_level).toString()} ${product.unit || ''}</td>
-                            <td>${product.expiry_date ? (() => { const d = new Date(product.expiry_date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })() : '-'}</td>
-                            <td><span class="stock-status ${status.class}">${status.text}</span></td>
-                            <td class="user-actions">
-                                <button class="btn btn-view" onclick="viewUserProfile(${product.user_id})">
-                                    <i class="fas fa-user"></i> Profil
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading user products:', error);
-                showNotification('Gagal memuat daftar produk pengguna.', 'error');
-            }
-        }
-
-        function getProductStatus(stock, minLevel) {
-            if (stock <= 0) {
-                return { class: 'status-out', text: 'Stok Habis' };
-            } else if (stock <= minLevel) {
-                return { class: 'status-low', text: 'Stok Rendah' };
-            } else {
-                return { class: 'status-normal', text: 'Cukup' };
-            }
-        }
-
-        // --- 6. ACTION FUNCTIONS ---
-        function viewUserProfile(userId) {
-            window.location.href = `/admin/user/${userId}`;
-        }
-
-        function viewUserProducts(userId) {
-            window.location.href = `/admin/user/${userId}/products`;
-        }
-
-        // --- 7. INITIALIZE DASHBOARD ---
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuthStatus();
-            loadDashboardStats();
-            loadUsers();
-            loadActivityLogs();
-            loadUserProducts();
+            initTheme();
+            loadDashboardData();
         });
 
-        // Logout functionality
-        document.getElementById('logoutLink').addEventListener('click', async (e) => {
-            e.preventDefault();
+        // --- THEME LOGIC ---
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' ||
+               (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode-active');
+                Chart.defaults.color = '#bdc3c7';
+                Chart.defaults.borderColor = '#2c3e50';
+            } else {
+                Chart.defaults.color = '#2C3E50';
+                Chart.defaults.borderColor = '#e9ecef';
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-active');
+            const isDark = document.body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            Chart.defaults.color = isDark ? '#bdc3c7' : '#2C3E50';
+            Chart.defaults.borderColor = isDark ? '#2c3e50' : '#e9ecef';
+            
+            // Update chart colors if chart exists
+            if(growthChartInstance) {
+                growthChartInstance.update();
+            }
+        }
+
+        // --- NAVIGATION ---
+        function showPage(pageId, element) {
+            document.querySelectorAll('.content-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(pageId + '-view').classList.add('active');
+
+            if(element) {
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'users': 'Manajemen Pengguna',
+                'user-detail': 'Detail Pengguna',
+                'settings': 'Pengaturan Sistem',
+                'products': 'Database Produk',
+                'activity-log': 'Log Aktivitas'
+            };
+            document.getElementById('pageTitle').textContent = titles[pageId] || 'Admin';
+
+            if(window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // --- DATA LOADING (NO DUMMY DATA) ---
+        async function loadDashboardData() {
             try {
-                const response = await fetch('/auth/logout', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
+                // 1. Load Stats
+                const statsRes = await fetch('/api/admin/stats', { credentials: 'same-origin' });
+                const statsData = await statsRes.json();
+                
+                if (statsData.success) {
+                    document.getElementById('stat-users').textContent = statsData.stats.totalUsers || 0;
+                    document.getElementById('stat-active').textContent = statsData.stats.activeUsers || 0;
+                    document.getElementById('stat-products').textContent = statsData.stats.totalProducts || 0;
+                    document.getElementById('stat-issues').textContent = statsData.stats.lowStockItems || 0;
+                } else {
+                    console.error('Stats Error:', statsData.message);
+                }
+
+                // 2. Load Users
+                const usersRes = await fetch('/api/admin/users', { credentials: 'same-origin' });
+                const usersData = await usersRes.json();
+                if (usersData.success) {
+                    renderUsersTable(usersData.users);
+                } else {
+                    renderUsersTable([]); // Render empty
+                }
+
+                // 3. Load Activities
+                const actsRes = await fetch('/api/admin/activity', { credentials: 'same-origin' });
+                const actsData = await actsRes.json();
+                if (actsData.success) {
+                    renderActivityLog(actsData.activities);
+                } else {
+                    renderActivityLog([]); // Render empty
+                }
+
+                // 4. Initialize/Update Charts
+                // Note: Real chart history data requires a specific endpoint. 
+                // We init with 0 to respect "no dummy data" rule unless API provides history.
+                initCharts(); 
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                // Handle Error State (No Dummy Data)
+                document.getElementById('stat-users').textContent = 'Err';
+                document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Gagal memuat data</td></tr>';
+                document.getElementById('activityLogContainer').innerHTML = '<div style="text-align:center; color:var(--accent-red);">Gagal memuat data</div>';
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                            <p>Belum ada data pengguna</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>#${user.id}</td>
+                    <td style="font-weight: 600;">${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.created_at ? new Date(user.created_at).toLocaleDateString('id-ID') : 'N/A'}</td>
+                    <td>
+                        <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${user.is_active ? 'Aktif' : 'Non-Aktif'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;" onclick="viewUserDetail(${user.id})">
+                            <i class="fas fa-eye"></i> Detail
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderActivityLog(activities) {
+            allActivities = activities || [];
+            const container = document.getElementById('activityLogContainer');
+            
+            if (!allActivities.length) {
+                container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted);"><p>Belum ada aktivitas</p></div>`;
+                return;
+            }
+
+            container.innerHTML = allActivities.slice(0, 10).map(act => {
+                const timestamp = new Date(act.timestamp).toLocaleString('id-ID');
+                let icon = 'fa-info-circle';
+                let colorClass = 'text-muted'; // Default color logic based on content
+
+                if (act.action && act.action.toLowerCase().includes('login')) icon = 'fa-sign-in-alt';
+                else if (act.action && act.action.toLowerCase().includes('logout')) icon = 'fa-sign-out-alt';
+                else if (act.action && act.action.toLowerCase().includes('create')) icon = 'fa-plus';
+                else if (act.action && act.action.toLowerCase().includes('delete')) icon = 'fa-trash';
+
+                return `
+                    <div class="activity-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <i class="fas ${icon}" style="color: var(--${colorClass}); margin-right: 15px; font-size: 1.2rem; width: 24px; text-align: center;"></i>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: var(--text-main);">${act.action}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">${act.description || ''}</div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">${timestamp}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- FILTER & REFRESH ---
+        function filterActivities(type) {
+            if (type === 'all') {
+                renderActivityLog(allActivities);
+                return;
+            }
+            const filtered = allActivities.filter(a => a.action && a.action.toLowerCase().includes(type));
+            renderActivityLog(filtered);
+        }
+
+        async function refreshActivities() {
+            const container = document.getElementById('activityLogContainer');
+            container.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i></div>';
+
+            try {
+                const res = await fetch('/api/admin/activity', { credentials: 'same-origin' });
+                const data = await res.json();
+                if(data.success) renderActivityLog(data.activities);
+                else container.innerHTML = '<div style="text-align:center; color:var(--accent-red);">Gagal</div>';
+            } catch(e) {
+                container.innerHTML = '<div style="text-align:center; color:var(--accent-red);">Error Koneksi</div>';
+            }
+        }
+
+        // --- USER DETAIL LOGIC ---
+        async function viewUserDetail(userId) {
+            try {
+                // 1. Fetch User Info
+                const userRes = await fetch(`/api/admin/user/${userId}`, { credentials: 'same-origin' });
+                const userData = await userRes.json();
+
+                if (userData.success) {
+                    const u = userData.user;
+                    document.getElementById('detail-name').textContent = u.name;
+                    document.getElementById('detail-email').textContent = u.email;
+                    document.getElementById('detail-id').textContent = `#${u.id}`;
+                    document.getElementById('detail-last-login').textContent = u.last_login ? new Date(u.last_login).toLocaleString('id-ID') : '-';
+
+                    // Update mini stats (Assuming API returns these or we calculate them)
+                    document.getElementById('userProductCount').textContent = u.product_count || 0;
+                    document.getElementById('userLowStockCount').textContent = u.low_stock_count || 0;
+                    document.getElementById('userNotesCount').textContent = u.note_count || 0;
+                    document.getElementById('userSuggestionsCount').textContent = u.suggestion_count || 0;
+                } else {
+                    alert('User tidak ditemukan');
+                    return;
+                }
+
+                // 2. Fetch User Products
+                const prodRes = await fetch(`/api/admin/user/${userId}/products`, { credentials: 'same-origin' });
+                const prodData = await prodRes.json();
+                const prodTable = document.getElementById('userProductsTable');
+
+                if (prodData.success && prodData.products && prodData.products.length > 0) {
+                    prodTable.innerHTML = prodData.products.map(p => {
+                        const stock = parseFloat(p.stock_quantity);
+                        const min = parseFloat(p.min_stock_level || 0);
+                        let badge = 'badge-success';
+                        let status = 'Aman';
+
+                        if (stock <= 0) { badge = 'badge-danger'; status = 'Habis'; }
+                        else if (stock <= min) { badge = 'badge-warning'; status = 'Rendah'; }
+
+                        return `
+                            <tr>
+                                <td><b>${p.name}</b></td>
+                                <td>${stock} ${p.unit || ''}</td>
+                                <td><span class="badge ${badge}">${status}</span></td>
+                                <td><button class="btn btn-outline" style="padding: 4px 8px;"><i class="fas fa-eye"></i></button></td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    prodTable.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada produk</td></tr>`;
+                }
+
+                showPage('user-detail');
+
+            } catch (error) {
+                console.error('Error loading user detail:', error);
+                alert('Gagal memuat data pengguna.');
+            }
+        }
+
+        // --- CHART.JS (No Dummy Data) ---
+        function initCharts() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            // Data diinisialisasi dengan 0 karena tidak ada endpoint history yang disediakan.
+            // Jika ada API endpoint history, panggil API di sini dan masukkan datanya.
+            const labels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+            const dataUsers = [0, 0, 0, 0, 0, 0, 0];
+            const dataLogin = [0, 0, 0, 0, 0, 0, 0];
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(46, 134, 222, 0.5)');
+            gradient.addColorStop(1, 'rgba(46, 134, 222, 0.0)');
+
+            growthChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Pengguna Baru',
+                            data: dataUsers,
+                            borderColor: '#2E86DE',
+                            backgroundColor: gradient,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#2E86DE',
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'Login Harian',
+                            data: dataLogin,
+                            borderColor: '#FF9F43',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Handle logout function
+        async function handleLogout() {
+            try {
+                const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
                 const data = await response.json();
-                if (data.success) {
-                    window.location.href = data.redirect || '/auth';
+                if (response.ok) {
+                    window.location.href = data.redirect || '/';
                 }
             } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = '/auth';
+                console.error('Logout error', error);
             }
-        });
+        }
     </script>
 </body>
 </html>

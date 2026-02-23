@@ -296,6 +296,8 @@ const productsController = {
         try {
             const userId = req.session.user?.id;
 
+            console.log('Get stats for user ID:', userId); // Debug log
+
             if (!userId) {
                 return res.status(401).json({
                     success: false,
@@ -306,21 +308,28 @@ const productsController = {
             // Dapatkan semua produk milik pengguna
             const products = await ProductModel.getAllByUserId(userId);
 
-            // Hitung total produk
-            const total = products.length;
+            console.log('Products retrieved:', products.length); // Debug log
 
-            // Hitung produk dengan stok rendah
-            const lowStock = products.filter(product => 
-                product.stock_quantity <= product.min_stock_level && product.stock_quantity > 0
-            ).length;
+            // Hitung total produk - make sure to handle potential undefined values
+            const total = Array.isArray(products) ? products.length : 0;
 
-            // Hitung produk yang stoknya habis
-            const outOfStock = products.filter(product => 
-                product.stock_quantity <= 0
-            ).length;
+            // Hitung produk dengan stok rendah - ensure numeric comparison
+            const lowStock = Array.isArray(products) ? products.filter(product => {
+                const stock = parseFloat(product.stock_quantity) || 0;
+                const minLevel = parseFloat(product.min_stock_level) || 5;
+                return stock <= minLevel && stock > 0;
+            }).length : 0;
+
+            // Hitung produk yang stoknya habis - ensure numeric comparison
+            const outOfStock = Array.isArray(products) ? products.filter(product => {
+                const stock = parseFloat(product.stock_quantity) || 0;
+                return stock <= 0;
+            }).length : 0;
 
             // Total produk yang perlu dibeli (stok rendah atau habis)
             const shoppingList = lowStock + outOfStock;
+
+            console.log('Stats calculated - Total:', total, 'Low stock:', lowStock, 'Out of stock:', outOfStock); // Debug log
 
             res.status(200).json({
                 success: true,
@@ -378,6 +387,87 @@ const productsController = {
             res.status(500).json({
                 success: false,
                 message: 'Terjadi kesalahan saat mengambil detail produk.'
+            });
+        }
+    },
+
+    // Fungsi untuk mendapatkan aktivitas terbaru milik pengguna
+    async getRecentActivities(req, res) {
+        try {
+            const userId = req.session.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Akses ditolak. Silakan login terlebih dahulu.'
+                });
+            }
+
+            // Dapatkan produk-produk terbaru milik pengguna
+            const products = await ProductModel.getAllByUserId(userId);
+
+            // Dapatkan catatan-catatan terbaru milik pengguna
+            const NotesModel = require('../models/Notes');
+            const notes = await NotesModel.getAllByUserId(userId);
+
+            // Gabungkan dan urutkan berdasarkan tanggal terbaru
+            let allActivities = [];
+
+            // Tambahkan produk ke aktivitas
+            products.forEach(product => {
+                // Konversi timestamp ke objek Date jika bukan null/undefined
+                const timestamp = product.created_at || product.updated_at || new Date();
+                allActivities.push({
+                    type: 'product',
+                    title: `Menambahkan bahan: ${product.name}`,
+                    content: `Stok: ${product.stock_quantity} ${product.unit || ''}`,
+                    timestamp: timestamp,
+                    icon: 'fa-box-open'
+                });
+            });
+
+            // Tambahkan catatan ke aktivitas
+            notes.forEach(note => {
+                // Konversi timestamp ke objek Date jika bukan null/undefined
+                const timestamp = note.created_at || note.updated_at || new Date();
+                allActivities.push({
+                    type: 'note',
+                    title: note.title || 'Catatan Baru',
+                    content: note.content || '',
+                    timestamp: timestamp,
+                    icon: 'fa-sticky-note'
+                });
+            });
+
+            // Urutkan berdasarkan tanggal terbaru (descending)
+            allActivities.sort((a, b) => {
+                const dateA = new Date(a.timestamp);
+                const dateB = new Date(b.timestamp);
+                
+                // Handle invalid dates
+                if (isNaN(dateA.getTime())) {
+                    return 1; // Move invalid dates to end
+                }
+                if (isNaN(dateB.getTime())) {
+                    return -1; // Move invalid dates to end
+                }
+                
+                return dateB - dateA; // Descending order (newest first)
+            });
+
+            // Ambil 5 aktivitas terbaru
+            const recentActivities = allActivities.slice(0, 5);
+
+            res.status(200).json({
+                success: true,
+                activities: recentActivities
+            });
+
+        } catch (error) {
+            console.error('Get recent activities error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat mengambil aktivitas terbaru.'
             });
         }
     }

@@ -3,382 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saran Pembelian - Kapan Beli</title>
+    <title>Catatan Belanja - Kapan Beli</title>
 
-    <!-- Google Fonts: Poppins -->
+    <!-- Google Fonts: Poppins & Handlee (Handwriting) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>" type="image/x-icon">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" type="image/x-icon">
 
     <style>
-        /* --- CSS VARIABLES --- */
+        /* --- CSS VARIABLES (DARI KODE ANDA) --- */
         :root {
-            --primary-orange: #FF9F43;
             --primary-blue: #2E86DE;
-            --bg-body: #F7F9FC;
+            --primary-orange: #FF9F43;
+            --bg-body: #F0F4F8;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
-            --text-muted: #8395A7;
-            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
-            --border-radius: 20px;
-            --dot-color: #E1E8ED;
+            --text-muted: #636E72;
+            --border-radius: 16px;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px rgba(46, 134, 222, 0.15);
+            --danger: #FF6B6B;
+            --success: #1DD1A1;
+            --warning: #FECA57;
+            --border-light: #eee;
         }
 
         body.dark-mode-active {
             --bg-body: #1E272E;
             --bg-card: #2C3E50;
             --text-main: #DFE6E9;
-            --text-muted: #808E9B;
-            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --dot-color: #34495E;
+            --text-muted: #B2BEC3;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-md: 0 10px 25px rgba(0,0,0,0.4);
+            --border-light: #444;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s, box-shadow 0.3s; }
 
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
-            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            /* Pola Dot Grid halus seperti buku tulis */
+            background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
             background-size: 24px 24px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
-        /* --- NAVIGATION BAR --- */
+        /* --- NAVBAR --- */
         nav {
             position: sticky;
             top: 0;
-            background: var(--bg-card);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
             z-index: 100;
-            padding: 15px 5%;
+            padding: 12px 5%;
         }
+        body.dark-mode-active nav { background: rgba(30, 39, 46, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
         }
-
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-orange);
-            text-decoration: none;
-        }
-
-        .logo i { font-size: 1.8rem; }
-
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
             color: var(--text-main);
-            font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 12px;
-            transition: all 0.3s;
+            text-decoration: none;
+            /* Font Tulisan Tangan untuk Logo */
+            font-family: 'Handlee', cursive;
+        }
+        .logo i { color: var(--primary-orange); }
+        .nav-menu { display: flex; gap: 25px; }
+        .nav-link { 
+            text-decoration: none; 
+            color: var(--text-muted); 
+            font-weight: 500; 
+            transition: 0.3s; 
             position: relative;
+            padding: 5px 0;
         }
-
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255, 159, 67, 0.1);
-            color: var(--primary-orange);
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0;
+            background-color: var(--primary-orange); transition: width 0.3s ease; border-radius: 2px;
         }
-
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .nav-auth-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .welcome-text {
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+        .nav-buttons { display: flex; align-items: center; gap: 20px; }
         .dark-mode-toggle {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container { 
+            max-width: 1000px; 
+            margin: 30px auto; 
+            padding: 0 20px; 
+            width: 100%; 
+            flex: 1; 
+        }
+
+        /* Header Section */
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .page-title { 
+            font-size: 2.2rem; 
+            color: var(--text-main); 
+            font-weight: 700; 
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            gap: 12px;
+            /* Font Tulisan Tangan */
+            font-family: 'Handlee', cursive;
         }
 
-        .dark-mode-toggle:hover {
-            border-color: var(--primary-orange);
-            color: var(--primary-orange);
-            background: rgba(255, 159, 67, 0.1);
-        }
-
-        /* --- MAIN CONTENT --- */
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            flex: 1;
-        }
-
-        .page-header {
+        /* Stats Pills (Sticky Notes Style) */
+        .stats-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-size: 2rem;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
             gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
-
-        .page-title i {
-            color: var(--primary-orange);
+        .stat-pill {
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-light);
+            position: relative;
         }
+        /* Efek Selotip (Tape) di pinggir stat */
+        .stat-pill::before {
+            content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 40px; height: 16px; background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(2px);
+        }
+        
+        .stat-pill i { font-size: 1.2rem; }
+        .stat-pill.red { color: var(--danger); border-bottom: 3px solid var(--danger); }
+        .stat-pill.yellow { color: var(--warning); border-bottom: 3px solid var(--warning); }
+        .stat-pill.green { color: var(--success); border-bottom: 3px solid var(--success); }
 
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+        /* --- SEARCH BAR --- */
+        .search-container {
+            position: relative;
             margin-bottom: 30px;
         }
-
-        .stat-card {
+        .search-input {
+            width: 100%;
+            padding: 18px 25px 18px 55px;
+            border-radius: 50px;
+            border: 2px solid transparent;
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--shadow-card);
-            text-align: center;
-            transition: transform 0.3s;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-main);
+            box-shadow: var(--shadow-md);
+            outline: none;
         }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
         }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
+        .search-icon {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--primary-orange);
-            margin: 10px 0;
+            font-size: 1.1rem;
         }
 
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .suggestions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .suggestion-card {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-card);
-            transition: transform 0.3s;
-        }
-
-        .suggestion-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .suggestion-header {
-            background: linear-gradient(135deg, var(--primary-orange), #ffbf69);
-            padding: 20px;
-            color: white;
-        }
-
-        .suggestion-title {
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-        }
-
-        .suggestion-subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .suggestion-body {
-            padding: 20px;
-        }
-
-        .suggestion-item {
+        /* --- LIST CONTAINER (NOTEBOOK CARDS) --- */
+        .list-wrapper {
             display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        .suggestion-actions {
-            padding: 20px;
+        /* List Group Header */
+        .list-group-header {
+            font-family: 'Handlee', cursive;
+            font-size: 1.4rem;
+            color: var(--text-main);
+            margin: 20px 0 10px 0;
             display: flex;
-            justify-content: flex-end;
+            align-items: center;
             gap: 10px;
-            border-top: 1px solid rgba(0,0,0,0.05);
+            opacity: 0.8;
+        }
+        .list-group-header::before {
+            content: ''; display: block; width: 6px; height: 24px; background: var(--primary-blue); border-radius: 3px;
         }
 
-        .btn {
-            padding: 10px 20px;
+        /* Note Card Style */
+        .note-card {
+            background: var(--bg-card);
             border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            padding: 0;
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Garis warna di kiri kartu (Highlighter) */
+        .note-card.type-low { border-left: 6px solid var(--danger); }
+        .note-card.type-exp { border-left: 6px solid var(--warning); }
+
+        .item-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
+            margin: 0 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .item-checkbox:hover { border-color: var(--primary-blue); background: rgba(46, 134, 222, 0.05); }
+
+        .item-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 1.5rem;
+            color: var(--primary-orange);
+            flex-shrink: 0;
+        }
+        
+        .item-details { flex: 1; min-width: 0; padding: 18px 0; }
+        .item-name { 
+            font-weight: 600; 
+            font-size: 1.1rem; 
+            color: var(--text-main); 
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .item-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-low { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
+        .badge-exp { background: rgba(254, 202, 87, 0.15); color: #d35400; }
+
+        .item-action {
+            margin-left: 20px;
+            padding: 0 20px;
+        }
+        .btn-buy {
+            background: var(--primary-blue);
+            color: white;
             border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
         }
-
-        .btn-primary {
-            background: var(--primary-orange);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #e68a34;
+        .btn-buy:hover { 
+            background: #2575c9; 
             transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3);
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary-orange);
-            color: var(--primary-orange);
-        }
-
-        .btn-outline:hover {
-            background: rgba(255, 159, 67, 0.1);
-        }
-
-        .badge {
-            padding: 3px 8px;
+        /* Empty State */
+        .empty-state {
+            text-align: center; 
+            padding: 80px 20px; 
+            color: var(--text-muted);
+            background: var(--bg-card);
             border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            border: 2px dashed var(--border-light);
         }
-
-        .low-stock {
-            background: rgba(255, 107, 107, 0.2);
-            color: #FF6B6B;
-        }
-
-        .expiring {
-            background: rgba(255, 203, 98, 0.2);
-            color: #FDCB6E;
-        }
-
-        .recipe {
-            background: rgba(29, 209, 161, 0.2);
-            color: #1DD1A1;
+        .empty-state i { 
+            font-size: 4rem; 
+            margin-bottom: 20px; 
+            opacity: 0.3; 
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .nav-menu { gap: 15px; }
-            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .nav-buttons { width: 100%; justify-content: space-between; }
-            .stats-container { grid-template-columns: 1fr; }
+        @media (max-width: 600px) {
+            .note-card { flex-direction: column; align-items: flex-start; padding: 15px; }
+            .item-checkbox { display: none; }
+            .item-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-right: 15px; }
+            .item-details { width: 100%; padding: 0 0 15px 0; }
+            .item-action { width: 100%; padding: 0; }
+            .btn-buy { width: 100%; justify-content: center; }
+            .stats-row { flex-direction: column; }
+            .stat-pill { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
+    <!-- NAVBAR -->
     <nav>
         <div class="nav-container">
             <a href="/" class="logo">
-                <i class="fas fa-shopping-cart"></i>
+                <i class="fas fa-shopping-bag"></i>
                 <span>Kapan Beli</span>
             </a>
             <div class="nav-menu">
                 <a href="/" class="nav-link">Beranda</a>
-                <a href="/notes" class="nav-link">Catatan Saya</a>
-                <a href="/products" class="nav-link">Bahan Saya</a>
-                <a href="/suggestions" class="nav-link active">Saran Pembelian</a>
+                <a href="/notes" class="nav-link">Catatan</a>
+                <a href="/products" class="nav-link">Bahan</a>
+                <a href="/suggestions" class="nav-link active">Saran</a>
             </div>
             <div class="nav-buttons">
-                <div class="nav-auth-section">
-                    <span class="welcome-text" id="welcomeText">Halo, <strong id="userName">Pengguna</strong>!</span>
-                    <a href="/auth/logout" class="nav-link" id="logoutLink">Keluar</a>
-                </div>
                 <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
             </div>
         </div>
     </nav>
 
     <div class="container">
+        <!-- Header -->
         <div class="page-header">
-            <h1 class="page-title">
-                <i class="fas fa-lightbulb"></i>
-                Saran Pembelian
-            </h1>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat-card">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #FF9F43;"></i>
-                <div class="stat-number" id="lowStockCount">0</div>
-                <div class="stat-label">Stok Rendah</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-clock" style="font-size: 2rem; color: #4ECDC4;"></i>
-                <div class="stat-number" id="expiringSoonCount">0</div>
-                <div class="stat-label">Hampir Kadarluarsa</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-shopping-cart" style="font-size: 2rem; color: #1DD1A1;"></i>
-                <div class="stat-number" id="suggestedItemsCount">0</div>
-                <div class="stat-label">Item Disarankan</div>
+            <h1 class="page-title"><i class="fas fa-clipboard-list" style="color: var(--primary-blue);"></i> Catatan Belanja</h1>
+            
+            <!-- Stats (Red/Yellow/Green from your code) -->
+            <div class="stats-row">
+                <div class="stat-pill red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><span id="lowStockCount">0</span> Stok Rendah</span>
+                </div>
+                <div class="stat-pill yellow">
+                    <i class="fas fa-clock"></i>
+                    <span><span id="expiringSoonCount">0</span> Kadaluarsa</span>
+                </div>
+                <div class="stat-pill green">
+                    <i class="fas fa-check-circle"></i>
+                    <span><span id="totalSuggestionsCount">0</span> Total Item</span>
+                </div>
             </div>
         </div>
 
-        <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; width: 350px; display: flex; flex-direction: column; gap: 10px;"></div>
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari item belanjaan (contoh: bawang, telur)...">
+        </div>
 
-        <div class="suggestions-grid" id="suggestionsContainer">
-            <!-- Suggestions will be populated here dynamically -->
-            <div id="loadingSpinner" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
-                <p style="color: var(--text-muted);">Memuat saran pembelian...</p>
+        <!-- List Container -->
+        <div id="listContainer" class="list-wrapper">
+            <div id="loadingSpinner" style="text-align: center; padding: 60px;">
+                <i class="fas fa-pen-nib fa-spin" style="font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
+                <p style="color: var(--text-muted);">Menulis catatan...</p>
             </div>
         </div>
     </div>
@@ -394,434 +423,272 @@
         }
 
         toggleBtn.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode-active')) {
-                disableDarkMode();
-            } else {
-                enableDarkMode();
-            }
+            body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
         });
 
         function enableDarkMode() {
             body.classList.add('dark-mode-active');
             localStorage.setItem('theme', 'dark');
         }
-
         function disableDarkMode() {
             body.classList.remove('dark-mode-active');
             localStorage.setItem('theme', 'light');
         }
 
-        // --- 2. USER INFO POPULATION ---
-        async function loadUserInfo() {
-            try {
-                const response = await fetch('/auth/status');
-                const data = await response.json();
+        // --- 2. DATA MANAGEMENT ---
+        let allSuggestions = []; // Store all items globally for filtering
 
-                if (data.authenticated) {
-                    document.getElementById('userName').textContent = data.user.name;
-                } else {
-                    window.location.href = '/auth';
-                }
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                window.location.href = '/auth';
-            }
+        // Helper: Get Icon
+        function getIcon(name) {
+            const n = name.toLowerCase();
+            if(n.includes('ayam')) return 'fa-drumstick-bite';
+            if(n.includes('susu')) return 'fa-glass-whiskey';
+            if(n.includes('telur')) return 'fa-egg';
+            if(n.includes('bawang')) return 'fa-seedling';
+            if(n.includes('beras')) return 'fa-wheat';
+            if(n.includes('cabai')) return 'fa-pepper-hot';
+            if(n.includes('minyak')) return 'fa-bottle-droplet';
+            return 'fa-box-open';
         }
 
-        // --- 3. NOTIFICATION SYSTEM ---
-        function showNotification(message, type = 'info') {
-            // Create notification container if it doesn't exist
-            let container = document.getElementById('notificationContainer');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'notificationContainer';
-                container.style.cssText = `
-                    position: fixed; 
-                    top: 20px; 
-                    right: 20px; 
-                    z-index: 10000; 
-                    width: 350px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                `;
-                document.body.appendChild(container);
-            }
-            
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.style.cssText = `
-                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
-                color: white;
-                padding: 15px 20px;
-                margin-bottom: 10px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideInRight 0.3s ease;
-                position: relative;
-                overflow: hidden;
-                min-height: 50px;
-            `;
-            
-            const icon = document.createElement('i');
-            icon.className = `fas ${
-                type === 'success' ? 'fa-check-circle' : 
-                type === 'error' ? 'fa-exclamation-circle' : 
-                'fa-info-circle'
-            }`;
-            icon.style.cssText = 'font-size: 1.2em;';
-            
-            const messageSpan = document.createElement('span');
-            messageSpan.textContent = message;
-            messageSpan.style.flex = '1';
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.innerHTML = '&times;';
-            closeBtn.onclick = () => {
-                notification.style.animation = 'fadeOut 0.5s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 500);
-            };
-            closeBtn.style.cssText = `
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5em;
-                cursor: pointer;
-                padding: 0;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            notification.appendChild(icon);
-            notification.appendChild(messageSpan);
-            notification.appendChild(closeBtn);
-            
-            container.appendChild(notification);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'fadeOut 0.5s ease';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 500);
-                }
-            }, 5000);
+        // Helper: Format Date
+        function formatDate(dateStr) {
+            if(!dateStr) return '-';
+            const d = new Date(dateStr);
+            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
         }
 
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // --- 4. DATA LOADING FUNCTIONS ---
         async function loadSuggestions() {
             try {
-                // Load user's products to determine low stock and expiring items
-                const productsResponse = await fetch('/api/products');
-                const productsData = await productsResponse.json();
+                const response = await fetch('/api/products');
+                const data = await response.json();
                 
-                if (productsData.success) {
-                    const products = productsData.products;
-                    
-                    // Calculate stats
-                    updateStats(products);
-                    
-                    // Display suggestions
-                    displaySuggestions(products);
+                if (data.success) {
+                    processProducts(data.products);
                 } else {
-                    showNotification('Gagal memuat saran pembelian: ' + productsData.message, 'error');
-                    document.getElementById('suggestionsContainer').innerHTML = `
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
-                            <h3>Gagal Memuat Data</h3>
-                            <p>${productsData.message || 'Terjadi kesalahan saat memuat data'}</p>
-                        </div>
-                    `;
+                    showErrorState();
                 }
             } catch (error) {
-                console.error('Error loading suggestions:', error);
-                showNotification('Terjadi kesalahan saat memuat saran pembelian.', 'error');
-                document.getElementById('suggestionsContainer').innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
-                        <h3>Terjadi Kesalahan</h3>
-                        <p>Terjadi kesalahan saat memuat data. Silakan coba lagi.</p>
-                    </div>
-                `;
+                console.error(error);
+                showErrorState();
             }
         }
 
-        function updateStats(products) {
-            // Count low stock items
-            const lowStockItems = products.filter(p => p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0);
-            document.getElementById('lowStockCount').textContent = lowStockItems.length;
-            
-            // Count expiring items (items expiring in next 7 days)
-            const expiringItems = products.filter(p => {
+        function processProducts(products) {
+            // 1. Categorize
+            const lowStock = products.filter(p => p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0);
+            const expiring = products.filter(p => {
                 if (!p.expiry_date) return false;
-                const expiryDate = new Date(p.expiry_date);
-                const today = new Date();
-                const diffTime = expiryDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = Math.ceil((new Date(p.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
                 return diffDays >= 0 && diffDays <= 7;
             });
-            document.getElementById('expiringSoonCount').textContent = expiringItems.length;
-            
-            // Total suggested items
-            document.getElementById('suggestedItemsCount').textContent = lowStockItems.length + expiringItems.length;
+
+            // 2. Update Stats
+            document.getElementById('lowStockCount').textContent = lowStock.length;
+            document.getElementById('expiringSoonCount').textContent = expiring.length;
+            document.getElementById('totalSuggestionsCount').textContent = lowStock.length + expiring.length;
+
+            // 3. Create Unified List Object
+            allSuggestions = [
+                ...lowStock.map(p => ({ ...p, category: 'Stok Rendah', type: 'low-stock', color: 'red' })),
+                ...expiring.map(p => ({ ...p, category: 'Hampir Kadaluarsa', type: 'expiring', color: 'yellow' }))
+            ];
+
+            // 4. Sort by Category then Name
+            allSuggestions.sort((a, b) => {
+                if (a.type === b.type) return a.name.localeCompare(b.name);
+                return a.type.localeCompare(b.type);
+            });
+
+            renderList(allSuggestions);
         }
 
-        function displaySuggestions(products) {
-            // Filter products for different suggestion categories
-            const lowStockItems = products.filter(p => p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0);
-            const expiringItems = products.filter(p => {
-                if (!p.expiry_date) return false;
-                const expiryDate = new Date(p.expiry_date);
-                const today = new Date();
-                const diffTime = expiryDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays >= 0 && diffDays <= 7;
-            });
-            
-            // Generate recipe recommendations based on available ingredients
-            const recipeRecommendations = generateRecipeRecommendations(products);
-            
-            // Build HTML for suggestions
-            let suggestionsHTML = '';
-            
-            // Low stock items card
-            if (lowStockItems.length > 0) {
-                suggestionsHTML += `
-                <div class="suggestion-card">
-                    <div class="suggestion-header">
-                        <h3 class="suggestion-title">Stok Rendah</h3>
-                        <p class="suggestion-subtitle">Bahan yang perlu segera dibeli</p>
+        // --- 3. RENDER LIST (CATATAN STYLE) ---
+        function renderList(items) {
+            const container = document.getElementById('listContainer');
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle" style="color: var(--success); opacity: 0.2; font-size: 5rem;"></i>
+                        <h3>Catatan Kosong</h3>
+                        <p>Stok dapur Anda aman dan terjaga!</p>
                     </div>
-                    <div class="suggestion-body">
                 `;
-                
-                lowStockItems.forEach(item => {
-                    const expiryDate = new Date(item.expiry_date);
-                    const formattedExpiryDate = item.expiry_date ? `${expiryDate.getDate().toString().padStart(2, '0')}/${(expiryDate.getMonth() + 1).toString().padStart(2, '0')}/${expiryDate.getFullYear()}` : '-';
-                    
-                    suggestionsHTML += `
-                        <div class="suggestion-item">
-                            <span>${item.name}</span>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                                <span class="badge low-stock">Stok: ${parseFloat(item.stock_quantity).toString()} ${item.unit || ''}</span>
-                                <small style="margin-top: 4px; color: var(--text-muted);">Kadaluarsa: ${formattedExpiryDate}</small>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                suggestionsHTML += `
-                    </div>
-                    <div class="suggestion-actions">
-                        <button class="btn btn-outline" onclick="viewProductDetail(${lowStockItems[0].id})">Lihat Detail</button>
-                        <button class="btn btn-primary" onclick="goToProducts()">Beli Sekarang</button>
-                    </div>
-                </div>
-                `;
+                return;
             }
-            
-            // Expiring items card
-            if (expiringItems.length > 0) {
-                suggestionsHTML += `
-                <div class="suggestion-card">
-                    <div class="suggestion-header">
-                        <h3 class="suggestion-title">Hampir Kadarluarsa</h3>
-                        <p class="suggestion-subtitle">Bahan yang segera habis masa berlakunya</p>
-                    </div>
-                    <div class="suggestion-body">
-                `;
+
+            let currentCategory = '';
+
+            items.forEach(item => {
+                // Add Header if category changes
+                if (item.category !== currentCategory) {
+                    const header = document.createElement('div');
+                    header.className = 'list-group-header';
+                    header.innerHTML = `<i class="fas ${item.type === 'low-stock' ? 'fa-exclamation-triangle' : 'fa-clock'}"></i> ${item.category}`;
+                    container.appendChild(header);
+                    currentCategory = item.category;
+                }
+
+                const row = document.createElement('div');
+                // Tambahkan class type-low (Merah) atau type-exp (Kuning) untuk border kiri
+                row.className = `note-card type-${item.type === 'low-stock' ? 'low' : 'exp'}`;
                 
-                expiringItems.forEach(item => {
-                    const expiryDate = new Date(item.expiry_date);
-                    const today = new Date();
-                    const diffTime = expiryDate - today;
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    const daysText = diffDays === 0 ? 'Hari ini' : `${diffDays} hari lg`;
-                    
-                    const formattedExpiryDate = `${expiryDate.getDate().toString().padStart(2, '0')}/${(expiryDate.getMonth() + 1).toString().padStart(2, '0')}/${expiryDate.getFullYear()}`;
-                    
-                    suggestionsHTML += `
-                        <div class="suggestion-item">
-                            <span>${item.name}</span>
-                            <span class="badge expiring">${formattedExpiryDate}</span>
+                // Badge Logic (Menggunakan warna dari prompt: danger/warning)
+                let badgeHTML = '';
+                if(item.type === 'low-stock') {
+                    badgeHTML = `<span class="badge badge-low">Sisa: ${item.stock_quantity} ${item.unit || ''}</span>`;
+                } else {
+                    const diffDays = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    badgeHTML = `<span class="badge badge-exp">Sisa: ${diffDays} hari</span>`;
+                }
+
+                row.innerHTML = `
+                    <div class="item-checkbox" onclick="approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">
+                        <i class="fas fa-check" style="color:var(--primary-blue); font-size:0.8rem; opacity:0;"></i>
+                    </div>
+                    <div class="item-icon">
+                        ${item.image_url 
+                            ? `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">` 
+                            : `<i class="fas ${getIcon(item.name)}"></i>`
+                        }
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name" onclick="viewProductDetail(${item.id})" style="cursor:pointer;">${item.name}</div>
+                        <div class="item-meta">
+                            <span><i class="far fa-calendar"></i> ${formatDate(item.expiry_date)}</span>
+                            ${badgeHTML}
                         </div>
-                    `;
-                });
-                
-                suggestionsHTML += `
                     </div>
-                    <div class="suggestion-actions">
-                        <button class="btn btn-outline" onclick="viewProductDetail(${expiringItems[0].id})">Lihat Detail</button>
-                        <button class="btn btn-primary" onclick="goToProducts()">Gunakan Sekarang</button>
-                    </div>
-                </div>
-                `;
-            }
-            
-            // Recipe recommendations card
-            if (recipeRecommendations.length > 0) {
-                suggestionsHTML += `
-                <div class="suggestion-card">
-                    <div class="suggestion-header">
-                        <h3 class="suggestion-title">Rekomendasi Resep</h3>
-                        <p class="suggestion-subtitle">Ide masak berdasarkan bahan yang tersedia</p>
-                    </div>
-                    <div class="suggestion-body">
-                `;
-                
-                recipeRecommendations.forEach(recipe => {
-                    suggestionsHTML += `
-                        <div class="suggestion-item">
-                            <span>${recipe.name}</span>
-                            <span class="badge recipe">Butuh ${recipe.ingredients_needed} bahan</span>
-                        </div>
-                    `;
-                });
-                
-                suggestionsHTML += `
-                    </div>
-                    <div class="suggestion-actions">
-                        <button class="btn btn-outline" onclick="viewRecipes()">Lihat Resep</button>
-                        <button class="btn btn-primary" onclick="saveRecipes()">Simpan</button>
-                    </div>
-                </div>
-                `;
-            }
-            
-            // If no suggestions, show empty state
-            if (!lowStockItems.length && !expiringItems.length && !recipeRecommendations.length) {
-                suggestionsHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-                        <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--text-main); margin-bottom: 10px;">Tidak Ada Saran Saat Ini</h3>
-                        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">
-                            Stok bahan Anda dalam kondisi baik dan tidak ada yang mendekati tanggal kedaluwarsa.
-                        </p>
-                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="goToProducts()">
-                            <i class="fas fa-plus"></i> Tambah Bahan
+                    <div class="item-action">
+                        <button class="btn-buy" onclick="approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">
+                            <i class="fas fa-shopping-basket"></i> Beli
                         </button>
                     </div>
                 `;
-            }
-            
-            // Update the container
-            document.getElementById('suggestionsContainer').innerHTML = suggestionsHTML;
-        }
-
-        function generateRecipeRecommendations(products) {
-            // Simple recipe recommendation algorithm based on available ingredients
-            const recipes = [];
-            
-            // Example recipes - in a real app, this would come from a recipe database
-            const possibleRecipes = [
-                {
-                    name: "Opor Ayam",
-                    required_ingredients: ["ayam", "santan", "bawang", "kunyit"],
-                    ingredients_needed: 2
-                },
-                {
-                    name: "Sayur Asem",
-                    required_ingredients: ["melinjo", "belimbing", "kacang", "daun singkong"],
-                    ingredients_needed: 3
-                },
-                {
-                    name: "Sambal Goreng",
-                    required_ingredients: ["cabe", "teri", "kentang", "pete"],
-                    ingredients_needed: 2
-                },
-                {
-                    name: "Tumis Kangkung",
-                    required_ingredients: ["kangkung", "bawang", "kencur"],
-                    ingredients_needed: 1
-                }
-            ];
-            
-            // Find recipes that can be made with available ingredients
-            possibleRecipes.forEach(recipe => {
-                const availableIngredients = recipe.required_ingredients.filter(reqIng => 
-                    products.some(prod => prod.name.toLowerCase().includes(reqIng.toLowerCase()))
-                );
-                
-                if (availableIngredients.length > 0) {
-                    recipes.push({
-                        name: recipe.name,
-                        ingredients_needed: recipe.required_ingredients.length - availableIngredients.length
-                    });
-                }
+                container.appendChild(row);
             });
-            
-            return recipes.slice(0, 3); // Return top 3 recommendations
         }
 
-        function viewProductDetail(productId) {
-            window.location.href = `/products/detail/${productId}`;
+        function showErrorState() {
+            document.getElementById('listContainer').innerHTML = `
+                <div class="empty-state" style="border-color: var(--danger);">
+                    <i class="fas fa-exclamation-circle" style="color: var(--danger);"></i>
+                    <h3>Gagal Memuat</h3>
+                    <p>Tidak dapat mengambil data saran pembelian.</p>
+                </div>
+            `;
         }
 
-        function goToProducts() {
-            window.location.href = '/products';
-        }
-
-        function viewRecipes() {
-            showNotification('Fitur resep akan segera tersedia.', 'info');
-        }
-
-        function saveRecipes() {
-            showNotification('Resep berhasil disimpan!', 'success');
-        }
-
-        // --- 5. INITIALIZE PAGE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadUserInfo();
-            loadSuggestions();
+        // --- 4. SEARCH LOGIC ---
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allSuggestions.filter(item => 
+                item.name.toLowerCase().includes(query)
+            );
+            renderList(filtered);
         });
 
-        // --- 6. LOGOUT FUNCTIONALITY ---
-        document.getElementById('logoutLink').addEventListener('click', async (e) => {
-            e.preventDefault();
+        // --- 5. ACTIONS (LOGIC UTAMA) ---
+        function viewProductDetail(id) {
+            window.location.href = `/products/detail/${id}`;
+        }
 
-            try {
-                const response = await fetch('/auth/logout', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
+        async function approveSuggestion(productId, productName, type) {
+            // Gunakan SweetAlert untuk input data pembelian/penggunaan
+            const result = await Swal.fire({
+                title: type === 'low-stock' ? 'Catat Pembelian' : 'Tandai Digunakan',
+                html: `
+                    <div style="text-align:left; margin-bottom:15px; font-family: 'Poppins', sans-serif;">
+                        <p style="font-size:1.2rem; font-weight:600; margin-bottom:5px; color:var(--text-main);">${productName}</p>
+                        <p style="font-size:0.9rem; color:var(--text-muted);">
+                            ${type === 'low-stock' 
+                                ? 'Masukkan jumlah stok baru dan tanggal kadaluarsa.' 
+                                : 'Anda yakin ingin menandai bahan ini sudah digunakan/habis?'}
+                        </p>
+                    </div>
+                    ${type === 'low-stock' ? `
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:0.85rem; margin-bottom:5px; color:var(--text-muted);">Jumlah Stok Baru</label>
+                        <input id="swal-input1" class="swal2-input" placeholder="Contoh: 5" type="number" min="1" style="width:100%;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.85rem; margin-bottom:5px; color:var(--text-muted);">Tanggal Kadaluarsa</label>
+                        <input id="swal-input2" class="swal2-input" type="date" style="width:100%;">
+                    </div>
+                    ` : ''}
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    if (type === 'low-stock') {
+                        const stock = document.getElementById('swal-input1').value;
+                        const date = document.getElementById('swal-input2').value;
+                        if (!stock || parseFloat(stock) <= 0) {
+                            Swal.showValidationMessage('Mohon masukkan jumlah stok yang valid');
+                            return false;
+                        }
+                        return [stock, date];
+                    }
+                    return true;
+                },
+                showCancelButton: true,
+                confirmButtonText: type === 'low-stock' ? 'Simpan Stok' : 'Ya, Habis',
+                confirmButtonColor: type === 'low-stock' ? 'var(--primary-blue)' : 'var(--danger)',
+                cancelButtonText: 'Batal'
+            });
 
-                const data = await response.json();
+            if (result.isConfirmed) {
+                try {
+                    let updatedData = {};
+                    
+                    if (type === 'low-stock') {
+                        const [newStock, newExpiry] = result.value;
+                        updatedData = {
+                            stock_quantity: parseFloat(newStock),
+                            expiry_date: newExpiry || null
+                        };
+                    } else {
+                        // Expiring item marked as used
+                        updatedData = { stock_quantity: 0 };
+                    }
 
-                if (data.success) {
-                    window.location.href = data.redirect || '/auth';
+                    const response = await fetch(`/api/products/${productId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updatedData)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: type === 'low-stock' ? 'Stok Diperbarui!' : 'Bahan Ditandai Habis'
+                        });
+
+                        // Reload data to refresh list
+                        loadSuggestions();
+                    } else {
+                        Swal.fire('Gagal', data.message, 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error', 'Terjadi kesalahan koneksi.', 'error');
                 }
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = '/auth';
             }
-        });
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', loadSuggestions);
     </script>
 </body>
 </html>

@@ -299,6 +299,304 @@ const User = {
             console.error('Error updating password:', error);
             throw error;
         }
+    },
+
+    // Fungsi untuk track login user
+    trackLogin: async (userId, ipAddress, sessionId = null, userAgent = null) => {
+        try {
+            // Update user last login
+            const updateQuery = `
+                UPDATE users 
+                SET last_login = NOW(), 
+                    last_ip = ?, 
+                    login_count = login_count + 1,
+                    status = 'active'
+                WHERE id = ?
+            `;
+            await db.execute(updateQuery, [ipAddress, userId]);
+
+            // Insert login log
+            const logQuery = `
+                INSERT INTO login_logs (user_id, login_time, ip_address, session_id, user_agent, created_at)
+                VALUES (?, NOW(), ?, ?, ?, NOW())
+            `;
+            const [result] = await db.execute(logQuery, [userId, ipAddress, sessionId, userAgent]);
+
+            // Update user stats
+            await User.updateUserStats(userId, { total_logins: 'increment' });
+
+            return { success: true, logId: result.insertId };
+        } catch (error) {
+            console.error('Error tracking login:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk track logout user
+    trackLogout: async (userId, sessionId = null) => {
+        try {
+            // Update user last logout
+            const updateQuery = 'UPDATE users SET last_logout = NOW() WHERE id = ?';
+            await db.execute(updateQuery, [userId]);
+
+            // Update login log with logout time
+            const logQuery = `
+                UPDATE login_logs 
+                SET logout_time = NOW() 
+                WHERE user_id = ? AND session_id = ? AND logout_time IS NULL
+                ORDER BY login_time DESC 
+                LIMIT 1
+            `;
+            await db.execute(logQuery, [userId, sessionId]);
+
+            // Update user stats
+            await User.updateUserStats(userId, { last_activity: new Date() });
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error tracking logout:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk ban user
+    banUser: async (userId, reason, bannedBy) => {
+        try {
+            const query = `
+                UPDATE users 
+                SET is_banned = TRUE, 
+                    ban_reason = ?, 
+                    banned_by = ?, 
+                    banned_at = NOW(),
+                    status = 'banned'
+                WHERE id = ?
+            `;
+            await db.execute(query, [reason, bannedBy, userId]);
+            return { success: true };
+        } catch (error) {
+            console.error('Error banning user:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk unban user
+    unbanUser: async (userId) => {
+        try {
+            const query = `
+                UPDATE users 
+                SET is_banned = FALSE, 
+                    ban_reason = NULL, 
+                    banned_by = NULL, 
+                    banned_at = NULL,
+                    status = 'active'
+                WHERE id = ?
+            `;
+            await db.execute(query, [userId]);
+            return { success: true };
+        } catch (error) {
+            console.error('Error unbanning user:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan semua users dengan info lengkap
+    getAllUsersWithDetails: async () => {
+        try {
+            const query = `
+                SELECT 
+                    u.id, u.name, u.email, u.role, u.is_banned, u.ban_reason, 
+                    u.banned_at, u.last_login, u.last_logout, u.login_count,
+                    u.status, u.created_at,
+                    COALESCE(s.total_products, 0) as total_products,
+                    COALESCE(s.total_notes, 0) as total_notes
+                FROM users u
+                LEFT JOIN user_stats s ON u.id = s.user_id
+                ORDER BY u.created_at DESC
+            `;
+            const [rows] = await db.execute(query);
+            return rows;
+        } catch (error) {
+            console.error('Error getting all users with details:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan user by ID dengan detail lengkap
+    findByIdWithDetails: async (id) => {
+        try {
+            const query = `
+                SELECT 
+                    u.*, 
+                    COALESCE(s.total_products, 0) as total_products,
+                    COALESCE(s.total_notes, 0) as total_notes,
+                    COALESCE(s.total_logins, 0) as total_logins
+                FROM users u
+                LEFT JOIN user_stats s ON u.id = s.user_id
+                WHERE u.id = ?
+            `;
+            const [rows] = await db.execute(query, [id]);
+
+            if (rows.length === 0) {
+                return null;
+            }
+
+            return rows[0];
+        } catch (error) {
+            console.error('Error finding user by ID with details:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan login logs user
+    getLoginLogs: async (userId, limit = 50) => {
+        try {
+            const query = `
+                SELECT * FROM login_logs 
+                WHERE user_id = ? 
+                ORDER BY login_time DESC 
+                LIMIT ?
+            `;
+            const [rows] = await db.execute(query, [userId, limit]);
+            return rows;
+        } catch (error) {
+            console.error('Error getting login logs:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan semua login logs
+    getAllLoginLogs: async (limit = 100) => {
+        try {
+            const query = `
+                SELECT 
+                    ll.*, 
+                    u.name as user_name, 
+                    u.email as user_email
+                FROM login_logs ll
+                LEFT JOIN users u ON ll.user_id = u.id
+                ORDER BY ll.login_time DESC 
+                LIMIT ?
+            `;
+            const [rows] = await db.execute(query, [limit]);
+            return rows;
+        } catch (error) {
+            console.error('Error getting all login logs:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk update user stats
+    updateUserStats: async (userId, stats) => {
+        try {
+            // Check if stats record exists
+            const [existing] = await db.execute('SELECT id FROM user_stats WHERE user_id = ?', [userId]);
+
+            if (existing.length === 0) {
+                // Create new stats record
+                const insertQuery = `
+                    INSERT INTO user_stats (user_id, total_products, total_notes, total_logins, created_at, updated_at)
+                    VALUES (?, 0, 0, 0, NOW(), NOW())
+                `;
+                await db.execute(insertQuery, [userId]);
+            }
+
+            // Build update query dynamically
+            const updates = [];
+            const values = [];
+
+            for (const [key, value] of Object.entries(stats)) {
+                if (value === 'increment') {
+                    updates.push(`${key} = ${key} + 1`);
+                } else {
+                    updates.push(`${key} = ?`);
+                    values.push(value);
+                }
+            }
+
+            if (updates.length > 0) {
+                values.push(userId);
+                const updateQuery = `
+                    UPDATE user_stats 
+                    SET ${updates.join(', ')}, updated_at = NOW()
+                    WHERE user_id = ?
+                `;
+                await db.execute(updateQuery, values);
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating user stats:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk mendapatkan statistik untuk dashboard admin
+    getDashboardStats: async () => {
+        try {
+            const stats = {};
+
+            // Total users
+            const [totalUsersResult] = await db.execute('SELECT COUNT(*) as count FROM users');
+            stats.totalUsers = totalUsersResult[0].count;
+
+            // Active users
+            const [activeUsersResult] = await db.execute("SELECT COUNT(*) as count FROM users WHERE status = 'active'");
+            stats.activeUsers = activeUsersResult[0].count;
+
+            // Banned users
+            const [bannedUsersResult] = await db.execute("SELECT COUNT(*) as count FROM users WHERE status = 'banned'");
+            stats.bannedUsers = bannedUsersResult[0].count;
+
+            // Total products
+            const [totalProductsResult] = await db.execute('SELECT COUNT(*) as count FROM products');
+            stats.totalProducts = totalProductsResult[0].count;
+
+            // Total notes
+            const [totalNotesResult] = await db.execute('SELECT COUNT(*) as count FROM notes');
+            stats.totalNotes = totalNotesResult[0].count;
+
+            // Users online today (logged in today)
+            const [onlineTodayResult] = await db.execute(
+                "SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_time) = CURDATE()"
+            );
+            stats.usersOnlineToday = onlineTodayResult[0].count;
+
+            // Products by category
+            const [productsByCategoryResult] = await db.execute(`
+                SELECT c.name as category, COUNT(p.id) as count
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                GROUP BY c.id, c.name
+                ORDER BY count DESC
+            `);
+            stats.productsByCategory = productsByCategoryResult;
+
+            // Products by user (top 10)
+            const [productsByUserResult] = await db.execute(`
+                SELECT u.name, u.email, COUNT(p.id) as product_count
+                FROM users u
+                LEFT JOIN products p ON u.id = p.user_id
+                GROUP BY u.id, u.name, u.email
+                ORDER BY product_count DESC
+                LIMIT 10
+            `);
+            stats.productsByUser = productsByUserResult;
+
+            // Login activity (last 7 days)
+            const [loginActivityResult] = await db.execute(`
+                SELECT DATE(login_time) as date, COUNT(*) as count
+                FROM login_logs
+                WHERE login_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                GROUP BY DATE(login_time)
+                ORDER BY date ASC
+            `);
+            stats.loginActivity = loginActivityResult;
+
+            return stats;
+        } catch (error) {
+            console.error('Error getting dashboard stats:', error);
+            throw error;
+        }
     }
 };
 
