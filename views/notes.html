@@ -19,33 +19,39 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" type="image/x-icon">
 
     <style>
-        /* --- CSS VARIABLES --- */
+        /* --- CSS VARIABLES (INTAK) --- */
         :root {
             --primary-orange: #FF9F43;
             --primary-blue: #2E86DE;
             --accent-purple: #5f27cd;
-            --bg-body: #F0F4F8;
+            --bg-body: #E6E9ED; /* Sedikit lebih gelap agar kertas putih menonjol */
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
             --text-muted: #636E72;
-            --border-radius: 20px;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.02);
-            --shadow-md: 0 10px 30px rgba(46, 134, 222, 0.1);
-            --shadow-hover: 0 15px 35px rgba(46, 134, 222, 0.2);
+            --border-radius: 2px; /* Sudut kertas biasanya tumpul sedikit */
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 20px rgba(0,0,0,0.1); /* Bayangan kertas */
             --danger: #FF6B6B;
             --success: #1DD1A1;
             --warning: #FECA57;
-            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            
+            /* Variabel Buku Tulis */
+            --line-color: rgba(46, 134, 222, 0.2); /* Garis biru tipis */
+            --margin-color: rgba(255, 107, 107, 0.6); /* Garis margin merah */
+            --line-height: 2rem; /* Tinggi antar garis */
         }
 
         body.dark-mode-active {
-            --bg-body: #1E272E;
-            --bg-card: #2C3E50;
-            --text-main: #DFE6E9;
+            --bg-body: #1a2228;
+            --bg-card: #2d3b45;
+            --text-main: #ECF0F1;
             --text-muted: #B2BEC3;
             --shadow-sm: 0 4px 6px rgba(0,0,0,0.2);
-            --shadow-md: 0 10px 30px rgba(0,0,0,0.3);
+            --shadow-md: 0 10px 20px rgba(0,0,0,0.4);
             --glass-bg: rgba(44, 62, 80, 0.9);
+            --line-color: rgba(255, 255, 255, 0.05);
+            --margin-color: rgba(255, 107, 107, 0.3);
         }
 
         * {
@@ -58,8 +64,9 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
+            /* Pola papan tulis (titik-titik) */
             background-image: radial-gradient(var(--text-muted) 0.5px, transparent 0.5px);
-            background-size: 24px 24px; /* Pola titik halus */
+            background-size: 30px 30px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -71,11 +78,11 @@
             position: sticky;
             top: 0;
             background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
             z-index: 100;
             padding: 15px 5%;
+            box-shadow: var(--shadow-sm);
         }
 
         .nav-container {
@@ -110,24 +117,16 @@
             font-weight: 500;
             padding: 8px 12px;
             border-radius: 12px;
-            transition: all 0.3s;
             position: relative;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--primary-blue);
-        }
-
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
         .nav-link.active::after {
             content: ''; position: absolute; width: 100%; height: 3px; bottom: 0; left: 0;
             background-color: var(--primary-orange); border-radius: 10px 10px 0 0;
         }
 
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        .nav-buttons { display: flex; align-items: center; gap: 20px; }
 
         .dark-mode-toggle {
             background: transparent;
@@ -154,18 +153,23 @@
             margin-bottom: 40px;
             flex-wrap: wrap;
             gap: 20px;
+            background: var(--bg-card);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border-left: 5px solid var(--primary-orange);
         }
 
         .page-title {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: var(--text-main);
-            font-weight: 800;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        /* Search Bar - Glassmorphism Style */
+        /* Search Bar */
         .search-wrapper {
             position: relative;
             margin-bottom: 50px;
@@ -201,132 +205,169 @@
             font-size: 1.1rem;
         }
 
-        /* Add Button - Styling Upgrade */
+        /* Add Button - Styling seperti pena/tinta */
         .add-btn {
-            background: linear-gradient(135deg, var(--primary-orange) 0%, #ff7e5f 100%);
+            background: var(--primary-blue);
             color: white;
             border: none;
-            padding: 14px 32px;
-            border-radius: 50px;
+            padding: 12px 25px;
+            border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
             text-decoration: none;
-            box-shadow: 0 8px 20px rgba(255, 159, 67, 0.4);
+            box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3);
             transition: transform 0.3s, box-shadow 0.3s;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .add-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(255, 159, 67, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 134, 222, 0.4);
+            background: #2373c7;
         }
 
-        /* --- NOTES GRID --- */
+        /* --- NOTES GRID (BUKU TULIS STYLE) --- */
         .notes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 35px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 50px;
             padding-bottom: 80px;
         }
 
         .note-card {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--border-radius); /* Sudut kertas */
+            box-shadow: var(--shadow-md);
             display: flex;
             flex-direction: column;
-            border: 1px solid rgba(0,0,0,0.03);
             position: relative;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            opacity: 0; /* Start hidden for animation */
+            padding-top: 20px; /* Ruang untuk pita */
+            min-height: 250px;
+            /* Pola Garis Buku Tulis */
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+            background-size: 100% var(--line-height);
+            background-position: 0 20px; /* Mulai garis setelah header */
+            overflow: hidden;
         }
 
         .note-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(46, 134, 222, 0.2);
+            transform: translateY(-5px) rotate(1deg); /* Efek miring saat hover */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            z-index: 5;
         }
 
-        /* Card Header with Accent */
-        .card-header-accent {
-            height: 8px;
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+        /* Garis Margin Merah */
+        .note-card::before {
+            content: ''; position: absolute; left: 40px; top: 20px; bottom: 20px; width: 2px;
+            background-color: var(--margin-color);
+            z-index: 1;
+        }
+
+        /* Pita Perekat (Tape) */
+        .tape {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 120px; height: 35px;
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            backdrop-filter: blur(2px);
+            z-index: 10;
+            border-left: 2px dashed rgba(0,0,0,0.05);
+            border-right: 2px dashed rgba(0,0,0,0.05);
+        }
+        body.dark-mode-active .tape { background-color: rgba(0, 0, 0, 0.3); }
+
+        /* Pin Peniti */
+        .push-pin {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 11;
         }
 
         .card-body {
-            padding: 25px;
+            padding: 0 50px 20px 60px; /* Padding kiri lebih lebar karena ada margin */
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            z-index: 2; /* Di atas garis */
         }
 
         .note-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             font-weight: 600;
+            margin-bottom: 5px;
+            border-bottom: 2px solid var(--primary-orange);
+            padding-bottom: 5px;
+            display: inline-block;
+            align-self: flex-start;
         }
 
         .note-title {
             font-size: 1.4rem;
             font-weight: 700;
-            margin: 0;
+            margin: 10px 0;
             color: var(--text-main);
-            line-height: 1.3;
+            line-height: var(--line-height); /* Teks mengikuti garis */
             cursor: pointer;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .note-title:hover { color: var(--primary-orange); }
+        .note-title:hover { color: var(--primary-blue); text-decoration: underline; text-decoration-color: var(--primary-orange); }
 
         .note-content {
-            color: var(--text-muted);
-            line-height: 1.6;
-            font-size: 0.95rem;
+            color: var(--text-main); /* Warna teks utama agar terbaca */
+            line-height: var(--line-height); /* PENTING: Supaya teks nempel di garis */
+            font-size: 1rem;
             flex: 1;
-            /* Truncate text if too long */
+            /* Truncate text */
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 6; /* Tampilkan 6 baris */
             -webkit-box-orient: vertical;
             overflow: hidden;
+            font-weight: 400;
         }
 
         .card-footer {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px dashed rgba(0,0,0,0.08);
+            margin-top: 15px;
+            padding-top: 10px;
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            opacity: 0.6;
+            opacity: 0.7;
             transition: opacity 0.3s;
+            border-top: 1px solid var(--line-color);
         }
 
         .note-card:hover .card-footer { opacity: 1; }
 
         .icon-btn {
-            background: none;
+            background: transparent;
             border: none;
             cursor: pointer;
             font-size: 1.1rem;
             padding: 8px;
-            border-radius: 8px;
+            border-radius: 50%;
             transition: all 0.2s;
             color: var(--text-muted);
         }
 
-        .icon-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-main); }
-        .icon-btn.edit:hover { color: var(--primary-blue); background: rgba(46, 134, 222, 0.1); }
+        .icon-btn:hover { 
+            transform: scale(1.1); 
+            color: var(--primary-blue); 
+            background: rgba(46, 134, 222, 0.1); 
+        }
         .icon-btn.delete:hover { color: var(--danger); background: rgba(255, 107, 107, 0.1); }
 
         /* Empty State */
@@ -336,23 +377,21 @@
             padding: 80px 20px;
             background: var(--bg-card);
             border-radius: var(--border-radius);
-            border: 2px dashed rgba(0,0,0,0.08);
-            animation: fadeIn 0.5s ease;
+            border: 2px dashed var(--primary-blue);
+            box-shadow: var(--shadow-sm);
         }
         .empty-state i {
             font-size: 5rem;
             margin-bottom: 25px;
-            background: -webkit-linear-gradient(var(--primary-orange), var(--primary-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary-orange);
         }
 
-        /* --- CUSTOM MODAL (Perbaikan Tambah Catatan) --- */
+        /* --- MODAL (Writing Pad Style) --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
             z-index: 1000;
             display: flex;
             align-items: center;
@@ -362,113 +401,98 @@
             transition: all 0.3s ease;
         }
 
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
 
         .modal-box {
             background: var(--bg-card);
             width: 90%;
-            max-width: 550px;
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 600px;
+            border-radius: 2px; /* Seperti kertas */
+            padding: 40px 40px 40px 60px; /* Padding kiri lebar untuk margin */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             transform: translateY(20px) scale(0.95);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
+            /* Garis di modal juga */
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+            background-size: 100% 2.5rem;
+            border-left: 4px solid var(--margin-color); /* Margin tebal di modal */
         }
 
-        .modal-overlay.active .modal-box {
-            transform: translateY(0) scale(1);
-        }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
 
-        .modal-header {
-            margin-bottom: 25px;
-        }
+        .modal-header { margin-bottom: 30px; border-bottom: 2px solid var(--primary-orange); padding-bottom: 10px; display: inline-block; width: 100%; }
 
         .modal-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 5px;
+            margin-bottom: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .modal-subtitle {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
+        .modal-subtitle { color: var(--text-muted); font-size: 0.9rem; font-style: italic; }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 25px; position: relative; }
         
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-main);
+            font-size: 0.85rem;
+            color: var(--primary-blue);
+            text-transform: uppercase;
         }
 
         .form-control {
             width: 100%;
-            padding: 14px 18px;
-            border: 2px solid rgba(0,0,0,0.08);
-            border-radius: 12px;
-            background: var(--bg-body);
+            padding: 0;
+            border: none;
+            background: transparent;
             color: var(--text-main);
-            font-family: inherit;
-            font-size: 1rem;
-            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif; /* Atau font tulisan tangan jika ada */
+            font-size: 1.1rem;
+            line-height: 2.5rem; /* Sesuai garis background */
+            resize: none;
             outline: none;
         }
 
-        .form-control:focus {
-            border-color: var(--primary-blue);
-            background: var(--bg-card);
-            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
-        }
+        .form-control::placeholder { color: rgba(0,0,0,0.2); font-style: italic; }
+        body.dark-mode-active .form-control::placeholder { color: rgba(255,255,255,0.2); }
 
-        textarea.form-control { resize: vertical; min-height: 120px; }
+        textarea.form-control { min-height: 150px; }
 
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 15px;
             margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--text-muted);
         }
 
         .btn {
-            padding: 12px 28px;
-            border-radius: 12px;
+            padding: 10px 25px;
+            border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             border: none;
             font-family: inherit;
             transition: transform 0.2s;
         }
+        .btn:active { transform: scale(0.95); }
 
-        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); }
+        .btn-secondary:hover { color: var(--danger); border-color: var(--danger); }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-muted);
-            border: 2px solid transparent;
-        }
-        .btn-secondary:hover { color: var(--danger); background: rgba(255, 107, 107, 0.1); }
-
-        .btn-primary {
-            background: var(--primary-blue);
-            color: white;
-            box-shadow: 0 4px 15px rgba(46, 134, 222, 0.4);
-        }
-        .btn-primary:hover { background: #2575c9; box-shadow: 0 6px 20px rgba(46, 134, 222, 0.5); }
+        .btn-primary { background: var(--primary-blue); color: white; box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3); }
+        .btn-primary:hover { background: #2373c7; transform: translateY(-2px); }
 
         .close-modal-btn {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: none; border: none;
-            font-size: 1.5rem; color: var(--text-muted);
-            cursor: pointer; transition: 0.2s;
+            position: absolute; top: 15px; right: 20px;
+            background: none; border: none; font-size: 1.5rem; color: var(--text-muted);
+            cursor: pointer; transition: 0.2s; z-index: 10;
         }
         .close-modal-btn:hover { color: var(--danger); transform: rotate(90deg); }
 
@@ -477,15 +501,15 @@
             from { transform: translateY(40px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-menu { display: none; } /* Simplified for this demo */
-            .header-section { flex-direction: column; align-items: stretch; }
+            .nav-menu { display: none; }
+            .header-section { flex-direction: column; align-items: stretch; text-align: center; }
             .add-btn { width: 100%; justify-content: center; }
             .notes-grid { grid-template-columns: 1fr; }
-            .modal-box { padding: 25px; width: 95%; }
+            .modal-box { padding: 30px 20px 30px 40px; }
+            .card-body { padding-left: 50px; padding-right: 20px; }
         }
     </style>
 </head>
@@ -495,7 +519,7 @@
     <nav>
         <div class="nav-container">
             <a href="/" class="logo">
-                <i class="fas fa-sticky-note"></i>
+                <i class="fas fa-book-open"></i>
                 <span>Kapan Beli</span>
             </a>
             <div class="nav-menu">
@@ -515,18 +539,18 @@
         <!-- Header -->
         <div class="header-section">
             <div class="page-title">
-                <i class="fas fa-feather-alt" style="color: var(--primary-blue);"></i> 
-                Catatan Saya
+                <i class="fas fa-feather-alt" style="color: var(--primary-orange);"></i> 
+                Buku Catatan Dapur
             </div>
             <button class="add-btn" id="openAddModalBtn">
-                <i class="fas fa-plus"></i> Buat Catatan Baru
+                <i class="fas fa-pen-fancy"></i> Tulis Catatan Baru
             </button>
         </div>
 
         <!-- Search -->
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari catatan resep, ide, atau pengingat...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari di catatan (cth: Resep, Belanja)...">
         </div>
 
         <!-- Grid -->
@@ -534,34 +558,34 @@
             <!-- Notes will be populated here dynamically -->
             <div id="loadingSpinner" style="grid-column: 1 / -1; text-align: center; padding: 60px;">
                 <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary-orange);"></i>
-                <p style="margin-top: 15px; color: var(--text-muted); font-weight: 500;">Memuat catatan Anda...</p>
+                <p style="margin-top: 15px; color: var(--text-muted); font-weight: 500;">Membuka buku catatan...</p>
             </div>
         </div>
     </div>
 
-    <!-- CUSTOM MODAL HTML (Dipindahkan dari JS String agar lebih rapi dan mudah diakses) -->
+    <!-- MODAL HTML -->
     <div class="modal-overlay" id="addNoteModal">
         <div class="modal-box">
             <button class="close-modal-btn" onclick="closeModal()">&times;</button>
             <div class="modal-header">
-                <h3 class="modal-title">Tulis Catatan Baru</h3>
-                <p class="modal-subtitle">Simpan ide brilian, resep, atau daftar belanja.</p>
+                <h3 class="modal-title">Halaman Baru</h3>
+                <p class="modal-subtitle">Tulis apa yang ada di pikiranmu...</p>
             </div>
             
             <div class="form-group">
-                <label class="form-label" for="noteTitle">Judul Catatan</label>
-                <input type="text" id="noteTitle" class="form-control" placeholder="Contoh: Resep Nasi Goreng Spesial">
+                <label class="form-label">Judul</label>
+                <input type="text" id="noteTitle" class="form-control" placeholder="Masukkan judul catatan..." autocomplete="off">
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="noteContent">Isi Catatan</label>
+                <label class="form-label">Isi Catatan</label>
                 <textarea id="noteContent" class="form-control" placeholder="Tulis detail catatan di sini..."></textarea>
             </div>
 
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
                 <button class="btn btn-primary" onclick="saveNote()">
-                    <i class="fas fa-save"></i> Simpan Catatan
+                    <i class="fas fa-save"></i> Simpan
                 </button>
             </div>
         </div>
@@ -573,7 +597,6 @@
         const body = document.body;
         const themeIcon = toggleBtn.querySelector('i');
 
-        // Check local storage or system preference
         if (localStorage.getItem('theme') === 'dark' ||
            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             enableDarkMode();
@@ -603,19 +626,16 @@
             }
         }
 
-        // --- 2. MODAL LOGIC (Refactored for Better UX) ---
+        // --- 2. MODAL LOGIC ---
         const modal = document.getElementById('addNoteModal');
         const openModalBtn = document.getElementById('openAddModalBtn');
         const noteTitleInput = document.getElementById('noteTitle');
         const noteContentInput = document.getElementById('noteContent');
 
         openModalBtn.addEventListener('click', () => {
-            // Clear inputs
             noteTitleInput.value = '';
             noteContentInput.value = '';
-            // Show modal with animation
             modal.classList.add('active');
-            // Focus on title
             setTimeout(() => noteTitleInput.focus(), 100);
         });
 
@@ -623,33 +643,23 @@
             modal.classList.remove('active');
         }
 
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        // Close on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('active')) {
-                closeModal();
-            }
-        });
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('active')) closeModal(); });
 
         // --- 3. NOTES FUNCTIONALITY ---
         async function loadNotes() {
             try {
                 const response = await fetch('/api/notes');
                 const data = await response.json();
-
                 const grid = document.getElementById('notesGrid');
-                grid.innerHTML = ''; // Clear spinner/content
+                grid.innerHTML = ''; 
 
                 if (data.success) {
                     displayNotes(data.notes);
                 } else {
                     grid.innerHTML = `
                         <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle" style="background: none; -webkit-text-fill-color: var(--danger);"></i>
+                            <i class="fas fa-exclamation-triangle"></i>
                             <h3>Gagal Memuat Data</h3>
                             <p>${data.message || 'Silakan cek koneksi internet Anda.'}</p>
                             <button class="btn btn-primary" style="margin-top: 20px;" onclick="loadNotes()">Coba Lagi</button>
@@ -660,7 +670,7 @@
                 console.error('Error loading notes:', error);
                 document.getElementById('notesGrid').innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-wifi" style="background: none; -webkit-text-fill-color: var(--warning);"></i>
+                        <i class="fas fa-wifi"></i>
                         <h3>Koneksi Terputus</h3>
                         <p>Tidak dapat menghubungi server.</p>
                     </div>
@@ -668,6 +678,7 @@
             }
         }
 
+        // MODIFIED: displayNotes agar output HTML sesuai style "Buku Tulis"
         function displayNotes(notes) {
             const grid = document.getElementById('notesGrid');
 
@@ -675,8 +686,8 @@
                 grid.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-book-open"></i>
-                        <h3>Belum Ada Catatan</h3>
-                        <p>Mulai catat ide hebat Anda dengan menekan tombol "Buat Catatan Baru".</p>
+                        <h3>Buku Catatan Kosong</h3>
+                        <p>Mulai tulis ide hebat Anda sekarang.</p>
                     </div>
                 `;
                 return;
@@ -688,24 +699,24 @@
                     day: 'numeric', month: 'short', year: 'numeric', 
                     hour: '2-digit', minute: '2-digit' 
                 });
-
-                // Staggered animation delay based on index
                 const animDelay = index * 0.1; 
 
                 const card = document.createElement('div');
                 card.className = 'note-card';
-                card.style.animationDelay = `${animDelay}s`;
+                card.style.animation = `slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${animDelay}s`;
+                card.style.opacity = '0'; // Start hidden
                 
-                // Escape quotes safely for JS onclick handlers
+                // Escape quotes
                 const safeTitle = note.title.replace(/'/g, "\\'");
                 const safeContent = (note.content || '').replace(/'/g, "\\'");
 
+                // HTML Structure Baru: Menambahkan Tape dan Pin
                 card.innerHTML = `
-                    <div class="card-header-accent"></div>
+                    <div class="tape"></div>
+                    <div class="push-pin"></div>
                     <div class="card-body">
                         <div class="note-meta">
                             <span><i class="far fa-clock"></i> ${formattedDate}</span>
-                            <span>Catatan</span>
                         </div>
                         <h3 class="note-title" onclick="editNote(${note.id}, '${safeTitle}', '${safeContent}')">${note.title}</h3>
                         <p class="note-content">${note.content || 'Tidak ada isi catatan.'}</p>
@@ -724,29 +735,22 @@
             });
         }
 
-        // --- 4. SAVE LOGIC (Modified for new Modal) ---
+        // --- 4. SAVE LOGIC ---
         async function saveNote() {
             const title = noteTitleInput.value.trim();
             const content = noteContentInput.value.trim();
 
             if (!title) {
-                // Shake animation or simple alert
-                noteTitleInput.style.borderColor = 'var(--danger)';
-                noteTitleInput.focus();
+                noteTitleInput.style.borderBottom = "2px solid var(--danger)";
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Judul Kosong',
-                    text: 'Silakan beri judul pada catatan Anda.',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
+                    icon: 'warning', title: 'Judul Kosong', text: 'Silakan beri judul pada catatan.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+                    background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                    color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
                 });
                 return;
             }
-
-            // Reset border
-            noteTitleInput.style.borderColor = 'rgba(0,0,0,0.08)';
+            noteTitleInput.style.borderBottom = "none";
 
             try {
                 const response = await fetch('/api/notes', {
@@ -754,29 +758,24 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title, content })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Catatan Anda telah disimpan.',
-                        timer: 1500,
-                        showConfirmButton: false
+                        icon: 'success', title: 'Berhasil!', text: 'Catatan tersimpan.', timer: 1500, showConfirmButton: false,
+                        background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                        color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
                     });
                     closeModal();
-                    loadNotes(); // Refresh grid
+                    loadNotes();
                 } else {
                     Swal.fire('Gagal', data.message, 'error');
                 }
             } catch (error) {
-                console.error(error);
                 Swal.fire('Error', 'Gagal menyimpan catatan.', 'error');
             }
         }
 
-        // --- 5. EDIT LOGIC (SweetAlert - Kept intact) ---
+        // --- 5. EDIT LOGIC (SweetAlert - Style tetap standar agar fokus pada input) ---
         async function editNote(id, title, content) {
             const { value: formValues } = await Swal.fire({
                 title: 'Edit Catatan',
@@ -785,104 +784,64 @@
                     <textarea id="swal-input2" class="swal2-textarea" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" rows="4" placeholder="Isi Catatan">${content}</textarea>
                 `,
                 focusConfirm: false,
-                preConfirm: () => {
-                    return [
-                        document.getElementById('swal-input1').value,
-                        document.getElementById('swal-input2').value
-                    ];
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Simpan Perubahan',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: 'var(--primary-blue)'
+                preConfirm: () => [ document.getElementById('swal-input1').value, document.getElementById('swal-input2').value ],
+                showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal',
+                confirmButtonColor: 'var(--primary-blue)',
+                background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
             });
 
             if (formValues) {
                 const [newTitle, newContent] = formValues;
-                if (!newTitle.trim()) {
-                    Swal.fire('Error', 'Judul tidak boleh kosong', 'error');
-                    return;
-                }
-
+                if (!newTitle.trim()) { Swal.fire('Error', 'Judul tidak boleh kosong', 'error'); return; }
                 try {
                     const response = await fetch(`/api/notes/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title: newTitle, content: newContent })
                     });
                     const data = await response.json();
                     if (data.success) {
                         Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1500, showConfirmButton: false });
                         loadNotes();
-                    } else {
-                        Swal.fire('Gagal', data.message, 'error');
-                    }
-                } catch (error) {
-                    Swal.fire('Error', 'Gagal mengupdate catatan', 'error');
-                }
+                    } else { Swal.fire('Gagal', data.message, 'error'); }
+                } catch (error) { Swal.fire('Error', 'Gagal mengupdate catatan', 'error'); }
             }
         }
 
-        // --- 6. DELETE LOGIC (SweetAlert - Kept intact) ---
+        // --- 6. DELETE LOGIC ---
         async function deleteNote(id, title) {
             const result = await Swal.fire({
-                title: 'Hapus Catatan?',
-                text: `Anda yakin ingin menghapus "${title}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
+                title: 'Hapus Halaman?', text: `Anda yakin ingin menghapus "${title}"?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal',
+                background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
             });
-
             if (result.isConfirmed) {
                 try {
                     const response = await fetch(`/api/notes/${id}`, { method: 'DELETE' });
                     const data = await response.json();
-                    if (data.success) {
-                        Swal.fire('Terhapus!', 'Catatan Anda telah dihapus.', 'success');
-                        loadNotes();
-                    } else {
-                        Swal.fire('Gagal', data.message, 'error');
-                    }
-                } catch (error) {
-                    Swal.fire('Error', 'Gagal menghapus catatan.', 'error');
-                }
+                    if (data.success) { Swal.fire('Terhapus!', 'Catatan Anda telah dihapus.', 'success'); loadNotes(); } 
+                    else { Swal.fire('Gagal', data.message, 'error'); }
+                } catch (error) { Swal.fire('Error', 'Gagal menghapus catatan.', 'error'); }
             }
         }
 
         // --- 7. SEARCH LOGIC ---
         document.getElementById('searchInput').addEventListener('input', async (e) => {
             const query = e.target.value.toLowerCase();
-            // Optimasi: Jika kosong, load ulang semua, jika ada query, filter di client side atau panggil API
-            // Disini kita filter di client side untuk performa jika datanya tidak terlalu besar
-            // Jika datanya ribuan, sebaiknya panggil API endpoint search.
-            
-            // Untuk demo ini, kita load semua dulu lalu filter (memastikan UI tetap cepat)
-            // Namun karena loadNotes() mengambil dari API, kita harus menunggu response dulu
-            // Cara terbaik: Fetch all notes di memory saat pertama load.
-            
-            // Simpler approach for this context: Fetch again if query exists, 
-            // OR simply hide elements in DOM if already loaded.
-            
-            // Mari kita lakukan cara DOM manipulation untuk UX tercepat
             const cards = document.querySelectorAll('.note-card');
             let hasResult = false;
 
             cards.forEach(card => {
                 const title = card.querySelector('.note-title').textContent.toLowerCase();
                 const content = card.querySelector('.note-content').textContent.toLowerCase();
-                
                 if (title.includes(query) || content.includes(query)) {
                     card.style.display = 'flex';
                     hasResult = true;
-                } else {
-                    card.style.display = 'none';
-                }
+                } else { card.style.display = 'none'; }
             });
 
-            // Handle empty result specifically in grid
             const emptyState = document.querySelector('.empty-state');
             if (!hasResult && query !== '') {
                 if(!emptyState) {
