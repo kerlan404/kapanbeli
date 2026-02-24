@@ -57,6 +57,8 @@ const settingsRoutes = require('./routes/settings');
 const adminAnalyticsRoutes = require('./routes/adminAnalytics');
 const activityLogsRoutes = require('./routes/activityLogs');
 const userRoutes = require('./routes/userRoutes');
+const userProfileRoutes = require('./routes/userProfileRoutes');
+const adminProductRoutes = require('./routes/adminProductRoutes');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
@@ -402,6 +404,13 @@ app.use('/api/activity-logs', activityLogsRoutes);
 // Use user management routes (protected)
 app.use('/api/users', userRoutes);
 
+// Use user profile routes (protected)
+app.use('/admin/user', userProfileRoutes);
+
+// Use admin product routes (protected)
+app.use('/admin/products', adminProductRoutes);
+app.use('/api/admin/products', adminProductRoutes);
+
 // Use suggestions routes (protected)
 app.use('/api/suggestions', suggestionsRoutes);
 
@@ -437,7 +446,7 @@ app.get('/admin', isAuthenticated, (req, res) => {
 app.get('/admin/users', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.render('admin-dashboard', { currentPage: 'admin' });
+        res.render('admin-users', { currentPage: 'users' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -468,6 +477,11 @@ app.get('/admin/user/:id', isAuthenticated, (req, res) => {
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
+});
+
+// Public user profile page
+app.get('/profile/:id', async (req, res) => {
+    res.render('user-profile', { currentPage: 'profile' });
 });
 
 app.get('/admin/user/:id/products', isAuthenticated, (req, res) => {
@@ -518,64 +532,6 @@ app.get('/suggestions', isAuthenticated, (req, res) => {
 
 app.get('/stores', isAuthenticated, (req, res) => {
     res.render('stores', { currentPage: 'stores' });
-});
-
-// Error handling
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
-
-// 404 handler
-app.use((req, res) => {
-    res.status(404).send(`
-        <html>
-        <head>
-            <title>404 - Page Not Found</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    background-color: #f5f5f5;
-                }
-                .container {
-                    text-align: center;
-                    padding: 20px;
-                }
-                h1 {
-                    color: #333;
-                    font-size: 72px;
-                    margin: 0;
-                }
-                h2 {
-                    color: #666;
-                    font-size: 24px;
-                    margin: 10px 0;
-                }
-                a {
-                    color: #007bff;
-                    text-decoration: none;
-                    font-size: 18px;
-                }
-                a:hover {
-                    text-decoration: underline;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>404</h1>
-                <h2>Page Not Found</h2>
-                <p>The page you are looking for does not exist.</p>
-                <a href="/">Go back to home</a>
-            </div>
-        </body>
-        </html>
-    `);
 });
 
 // ============================================

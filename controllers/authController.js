@@ -153,12 +153,14 @@ const authController = {
 
             // Debug: Log session role
             console.log('Session role set to:', user.role || 'user');
+            console.log('Session ID:', req.sessionID);
+            console.log('Session saved:', req.session);
 
             // Track login
             const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
             const userAgent = req.get('user-agent') || 'unknown';
             const sessionId = req.sessionID;
-            
+
             try {
                 await User.trackLogin(user.id, clientIp, sessionId, userAgent);
                 console.log('Login tracked for user:', user.email);
@@ -169,7 +171,7 @@ const authController = {
 
             // Redirect ke halaman yang sesuai berdasarkan role
             let redirectUrl = user.role === 'admin' ? '/admin' : '/';
-            
+
             // Check if there's a returnUrl in session (passed from login page)
             if (req.body.returnUrl && req.body.returnUrl.startsWith('/')) {
                 // Make sure returnUrl is not /auth or /register
@@ -178,16 +180,25 @@ const authController = {
                 }
             }
 
-            res.json({
-                success: true,
-                message: 'Login berhasil! Selamat datang kembali.',
-                redirect: redirectUrl,
-                user: {
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    lastLogin: user.last_login
+            // Save session explicitly before sending response
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Error saving session:', err);
+                } else {
+                    console.log('Session saved successfully');
                 }
+                
+                res.json({
+                    success: true,
+                    message: 'Login berhasil! Selamat datang kembali.',
+                    redirect: redirectUrl,
+                    user: {
+                        name: user.name,
+                        email: user.email,
+                        role: user.role,
+                        lastLogin: user.last_login
+                    }
+                });
             });
 
         } catch (error) {

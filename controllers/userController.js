@@ -262,20 +262,29 @@ const userController = {
     // ============================================
     deleteUser: errorHandler.asyncHandler(async (req, res) => {
         const { id } = req.params;
+        
+        console.log('[userController.deleteUser] Deleting user:', id);
+        console.log('[userController.deleteUser] Session user:', req.session?.user);
 
         // Check if user exists
         const user = await userService.findById(id);
         if (!user) {
+            console.log('[userController.deleteUser] User not found');
             return errorHandler.notFoundError(res, 'User tidak ditemukan');
         }
 
         // Prevent deleting yourself
         if (req.session.user && req.session.user.id == id) {
+            console.log('[userController.deleteUser] Cannot delete self');
             return errorHandler.forbidden(res, 'Tidak dapat menghapus akun sendiri');
         }
 
+        console.log('[userController.deleteUser] Proceeding with soft delete');
+        
         // Soft delete
         const result = await userService.softDelete(id);
+        
+        console.log('[userController.deleteUser] Delete result:', result);
 
         res.json(result);
     }),

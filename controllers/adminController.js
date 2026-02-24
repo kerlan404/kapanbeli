@@ -26,17 +26,26 @@ const adminController = {
     // Fungsi untuk mendapatkan semua pengguna dengan detail lengkap
     async getAllUsers(req, res) {
         try {
-            const users = await User.getAllUsersWithDetails();
+            // Gunakan userService yang baru
+            const userService = require('../services/userService');
+            
+            const { page = 1, limit = 100 } = req.query;
+            const result = await userService.getUsers({ 
+                page: parseInt(page), 
+                limit: parseInt(limit) 
+            });
 
             res.status(200).json({
                 success: true,
-                users: users
+                users: result.data,
+                pagination: result.pagination
             });
         } catch (error) {
             console.error('Error getting all users:', error);
             res.status(500).json({
                 success: false,
-                message: 'Terjadi kesalahan saat mengambil daftar pengguna.'
+                message: 'Terjadi kesalahan saat mengambil daftar pengguna: ' + error.message,
+                users: []
             });
         }
     },

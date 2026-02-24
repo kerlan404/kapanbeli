@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Users</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { background: #2a2a2a; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .test-section h2 { margin-bottom: 15px; color: #2E86DE; }
+        button { background: #2E86DE; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1a73c9; }
+        pre { background: #1a1a1a; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .success { color: #1DD1A1; }
+        .error { color: #FF6B6B; }
+        .loading { color: #FECA57; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test API Users Endpoint</h1>
+        
+        <div class="test-section">
+            <h2>1. GET /api/users</h2>
+            <button onclick="testGetUsers()">Test Get Users</button>
+            <div id="getUsersResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. GET /api/admin/users</h2>
+            <button onclick="testGetAdminUsers()">Test Get Admin Users</button>
+            <div id="getAdminUsersResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. GET /api/users/statistics</h2>
+            <button onclick="testGetStatistics()">Test Get Statistics</button>
+            <div id="getStatisticsResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. GET /api/admin/stats</h2>
+            <button onclick="testGetAdminStats()">Test Get Admin Stats</button>
+            <div id="getAdminStatsResult"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testGetUsers() {
+            const resultDiv = document.getElementById('getUsersResult');
+            resultDiv.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const response = await fetch('/api/users?page=1&limit=10');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="${data.success ? 'success' : 'error'}">
+                        Status: ${response.status} | Success: ${data.success}
+                    </p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testGetAdminUsers() {
+            const resultDiv = document.getElementById('getAdminUsersResult');
+            resultDiv.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const response = await fetch('/api/admin/users');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="${data.success ? 'success' : 'error'}">
+                        Status: ${response.status} | Success: ${data.success}
+                    </p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testGetStatistics() {
+            const resultDiv = document.getElementById('getStatisticsResult');
+            resultDiv.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const response = await fetch('/api/users/statistics');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="${data.success ? 'success' : 'error'}">
+                        Status: ${response.status} | Success: ${data.success}
+                    </p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testGetAdminStats() {
+            const resultDiv = document.getElementById('getAdminStatsResult');
+            resultDiv.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="${data.success ? 'success' : 'error'}">
+                        Status: ${response.status} | Success: ${data.success}
+                    </p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

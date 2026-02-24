@@ -21,8 +21,18 @@ router.use(isAdmin);
 // Endpoint untuk mendapatkan statistik dashboard
 router.get('/stats', adminController.getStats);
 
-// Endpoint untuk mendapatkan semua pengguna
-router.get('/users', adminController.getAllUsers);
+// Endpoint untuk mendapatkan semua pengguna (deprecated - gunakan /api/users)
+router.get('/users', async (req, res) => {
+    try {
+        // Redirect ke endpoint baru atau gunakan userService
+        const userService = require('../services/userService');
+        const result = await userService.getUsers({ page: 1, limit: 100 });
+        res.json({ success: true, users: result.data });
+    } catch (error) {
+        console.error('Error in /api/admin/users:', error);
+        res.status(500).json({ success: false, message: error.message, users: [] });
+    }
+});
 
 // Endpoint untuk mendapatkan log aktivitas
 router.get('/activity', adminController.getActivityLogs);

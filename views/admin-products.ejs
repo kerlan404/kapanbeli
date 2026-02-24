@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Produk - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' }
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .badge { @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1; }
+        .badge-out { @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400; }
+        .badge-low { @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400; }
+        .badge-good { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
+        .badge-active { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
+        .badge-inactive { @apply bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center gap-4">
+                    <a href="/admin" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">
+                        <i class="fas fa-home text-xl"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Database Produk</h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Menampilkan seluruh produk dari seluruh pengguna</p>
+                    </div>
+                </div>
+                <button onclick="toggleTheme()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Statistics -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="statsGrid">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Produk</p><p id="statTotal" class="text-3xl font-bold text-primary-600">0</p></div>
+                    <div class="w-14 h-14 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center"><i class="fas fa-box text-2xl text-primary-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Produk Aktif</p><p id="statActive" class="text-3xl font-bold text-green-600">0</p></div>
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"><i class="fas fa-check-circle text-2xl text-green-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Stok Rendah</p><p id="statLow" class="text-3xl font-bold text-yellow-600">0</p></div>
+                    <div class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center"><i class="fas fa-exclamation-triangle text-2xl text-yellow-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Habis Stok</p><p id="statOut" class="text-3xl font-bold text-red-600">0</p></div>
+                    <div class="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center"><i class="fas fa-times-circle text-2xl text-red-600"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-search text-primary-600 mr-1"></i> Cari</label>
+                    <input type="text" id="searchInput" placeholder="Nama produk, user, atau kategori..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onkeyup="debounceSearch()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-tags text-primary-600 mr-1"></i> Kategori</label>
+                    <select id="categoryFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadProducts()"><option value="">Semua Kategori</option></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-clock text-primary-600 mr-1"></i> Kadaluarsa</label>
+                    <select id="expiryStatusFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadProducts()"><option value="">Semua</option><option value="soon">Segera (30 hari)</option><option value="expired">Sudah Kadaluarsa</option></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-toggle-on text-primary-600 mr-1"></i> Status</label>
+                    <select id="activeFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadProducts()"><option value="">Semua</option><option value="active">Aktif</option><option value="inactive">Non-Aktif</option></select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-boxes text-primary-600 mr-1"></i> Stok</label>
+                    <select id="stockStatusFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadProducts()"><option value="">Semua</option><option value="good">Aman</option><option value="low">Rendah</option><option value="out">Habis</option></select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-sort text-primary-600 mr-1"></i> Urutkan</label>
+                    <select id="sortFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadProducts()"><option value="created_at_DESC">Terbaru</option><option value="created_at_ASC">Terlama</option><option value="name_ASC">Nama A-Z</option><option value="name_DESC">Nama Z-A</option><option value="stock_quantity_DESC">Stok Tertinggi</option><option value="stock_quantity_ASC">Stok Terendah</option><option value="expiry_date_ASC">Kadaluarsa Segera</option></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Daftar Produk</h3>
+                <button onclick="loadProducts()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div id="tableLoading" class="text-center py-12" style="display: none;"><i class="fas fa-circle-notch fa-spin text-4xl text-primary-600 mb-4"></i><p class="text-gray-500 dark:text-gray-400">Memuat data...</p></div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="productsTable">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Produk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Stok</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Kadaluarsa</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="productsTableBody"></tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4" id="paginationContainer" style="display: none;">
+                <div class="text-sm text-gray-600 dark:text-gray-400">Menampilkan <span id="showingFrom" class="font-medium">0</span> - <span id="showingTo" class="font-medium">0</span> dari <span id="totalItems" class="font-medium">0</span> produk</div>
+                <div class="flex gap-2" id="paginationButtons"></div>
+            </div>
+            <div id="emptyState" class="text-center py-12" style="display: none;"><i class="fas fa-box-open text-5xl text-gray-300 mb-4"></i><p class="text-gray-500 dark:text-gray-400">Belum ada produk</p></div>
+        </div>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 rounded-t-xl">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Produk</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="editForm">
+                    <input type="hidden" id="editProductId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nama Produk *</label><input type="text" id="editName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Deskripsi</label><textarea id="editDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label><input type="text" id="editCategory" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Satuan</label><input type="text" id="editUnit" placeholder="kg, liter, pcs" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stok *</label><input type="number" id="editStock" required min="0" step="0.01" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min. Stok *</label><input type="number" id="editMinStock" required min="0" step="0.01" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kadaluarsa</label><input type="date" id="editExpiryDate" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></div>
+                        <div class="md:col-span-2"><label class="flex items-center gap-2"><input type="checkbox" id="editIsActive" class="rounded"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Produk Aktif</span></label></div>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-gray-800 rounded-b-xl">
+                <button onclick="closeEditModal()" class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Batal</button>
+                <button onclick="handleEditSubmit()" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-3xl text-red-600"></i></div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Hapus Produk?</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="flex gap-3 justify-center">
+                    <button onclick="closeDeleteModal()" class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Batal</button>
+                    <button onclick="confirmDelete()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <script>
+        let currentPage = 1, currentLimit = 20, deleteProductId = null, searchTimer = null;
+        document.addEventListener('DOMContentLoaded', () => { loadProducts(); loadStatistics(); });
+
+        // Theme toggle
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
+
+        async function loadStatistics() {
+            try {
+                const res = await fetch('/api/admin/products/statistics', { credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) {
+                    const s = result.data;
+                    document.getElementById('statTotal').textContent = s.total_products || 0;
+                    document.getElementById('statActive').textContent = s.active_products || 0;
+                    document.getElementById('statLow').textContent = s.low_stock || 0;
+                    document.getElementById('statOut').textContent = s.out_of_stock || 0;
+                    const catSelect = document.getElementById('categoryFilter');
+                    if (s.categories?.length > 0) { s.categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; catSelect.appendChild(o); }); }
+                }
+            } catch (e) { console.error('Stats error:', e); }
+        }
+
+        async function loadProducts() {
+            const search = document.getElementById('searchInput').value, category = document.getElementById('categoryFilter').value, stockStatus = document.getElementById('stockStatusFilter').value, expiryStatus = document.getElementById('expiryStatusFilter').value, isActive = document.getElementById('activeFilter').value, sort = document.getElementById('sortFilter').value;
+            const [sortBy, sortOrder] = sort.split('_');
+            const params = new URLSearchParams({ page: currentPage, limit: currentLimit, ...(search && { search }), ...(category && { category }), ...(stockStatus && { stockStatus }), ...(expiryStatus && { expiryStatus }), ...(isActive && { isActive }), sortBy, sortOrder });
+            document.getElementById('tableLoading').style.display = 'block';
+            try {
+                const res = await fetch(`/api/admin/products?${params}`, { credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) { renderProducts(result.data); renderPagination(result.pagination); updatePaginationInfo(result.pagination); }
+                else { showToast('Gagal: ' + result.message, 'error'); }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+            finally { document.getElementById('tableLoading').style.display = 'none'; }
+        }
+
+        function renderProducts(products) {
+            const tbody = document.getElementById('productsTableBody'), empty = document.getElementById('emptyState'), pag = document.getElementById('paginationContainer');
+            if (!products?.length) { tbody.innerHTML = ''; empty.style.display = 'block'; pag.style.display = 'none'; return; }
+            empty.style.display = 'none'; pag.style.display = 'flex';
+            tbody.innerHTML = products.map(p => {
+                const statusClass = p.stock_status === 'out_of_stock' ? 'badge-out' : p.stock_status === 'low_stock' ? 'badge-low' : 'badge-good';
+                const statusText = p.stock_status === 'out_of_stock' ? 'Habis' : p.stock_status === 'low_stock' ? 'Rendah' : 'Aman';
+                const activeBadge = p.is_active ? '<span class="badge badge-active">Aktif</span>' : '<span class="badge badge-inactive">Non-Aktif</span>';
+                const expiry = p.expiry_date ? new Date(p.expiry_date).toLocaleDateString('id-ID') : '-';
+                const created = new Date(p.created_at).toLocaleDateString('id-ID');
+                return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50"><td class="px-6 py-4"><div class="font-medium text-gray-900 dark:text-white">${p.name}</div>${p.description ? `<div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">${p.description}</div>` : ''}</td><td class="px-6 py-4"><div class="text-sm text-gray-900 dark:text-white">${p.user_name}</div><div class="text-xs text-gray-500 dark:text-gray-400">${p.user_email}</div></td><td class="px-6 py-4">${p.category ? `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">${p.category}</span>` : '<span class="text-gray-400">-</span>'}</td><td class="px-6 py-4"><div class="text-sm text-gray-900 dark:text-white">${p.stock_quantity} ${p.unit || ''}</div><div class="text-xs text-gray-500 dark:text-gray-400">Min: ${p.min_stock_level}</div></td><td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${expiry}</td><td class="px-6 py-4"><div class="flex flex-col gap-1">${activeBadge}<span class="${statusClass}">${statusText}</span></div></td><td class="px-6 py-4"><div class="flex gap-2"><button onclick="openEditModal(${p.id})" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fas fa-edit"></i></button><button onclick="toggleProductStatus(${p.id})" class="text-${p.is_active ? 'yellow' : 'green'}-600 hover:text-${p.is_active ? 'yellow' : 'green'}-800" title="${p.is_active ? 'Nonaktifkan' : 'Aktifkan'}"><i class="fas fa-${p.is_active ? 'pause' : 'play'}-circle"></i></button><button onclick="confirmDeleteProduct(${p.id})" class="text-red-600 hover:text-red-800" title="Hapus"><i class="fas fa-trash"></i></button></div></td></tr>`;
+            }).join('');
+        }
+
+        function renderPagination(p) {
+            const { page, totalPages, hasNext, hasPrev } = p;
+            let btns = `<button ${!hasPrev ? 'disabled class="opacity-50 cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded"' : 'class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"'} onclick="goToPage(${page - 1})"><i class="fas fa-chevron-left"></i></button>`;
+            const max = 5, start = Math.max(1, page - 2), end = Math.min(totalPages, start + 4);
+            for (let i = start; i <= end; i++) { btns += `<button ${i === page ? 'class="px-3 py-2 bg-primary-600 text-white border border-primary-600 rounded"' : 'class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"'} onclick="goToPage(${i})">${i}</button>`; }
+            btns += `<button ${!hasNext ? 'disabled class="opacity-50 cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded"' : 'class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"'} onclick="goToPage(${page + 1})"><i class="fas fa-chevron-right"></i></button>`;
+            document.getElementById('paginationButtons').innerHTML = btns;
+        }
+
+        function updatePaginationInfo(p) { const { page, limit, total } = p; document.getElementById('showingFrom').textContent = total > 0 ? (page - 1) * limit + 1 : 0; document.getElementById('showingTo').textContent = Math.min(page * limit, total); document.getElementById('totalItems').textContent = total; }
+        function goToPage(p) { currentPage = p; loadProducts(); }
+        function debounceSearch() { if (searchTimer) clearTimeout(searchTimer); searchTimer = setTimeout(() => { currentPage = 1; loadProducts(); }, 500); }
+
+        async function openEditModal(id) {
+            try {
+                const res = await fetch(`/api/admin/products/${id}`, { credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) {
+                    const p = result.data;
+                    document.getElementById('editProductId').value = p.id;
+                    document.getElementById('editName').value = p.name;
+                    document.getElementById('editDescription').value = p.description || '';
+                    document.getElementById('editCategory').value = p.category || '';
+                    document.getElementById('editUnit').value = p.unit || '';
+                    document.getElementById('editStock').value = p.stock_quantity;
+                    document.getElementById('editMinStock').value = p.min_stock_level;
+                    document.getElementById('editExpiryDate').value = p.expiry_date ? p.expiry_date.split('T')[0] : '';
+                    document.getElementById('editIsActive').checked = p.is_active;
+                    document.getElementById('editModal').classList.remove('hidden');
+                    document.getElementById('editModal').classList.add('flex');
+                } else { showToast('Gagal: ' + result.message, 'error'); }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); document.getElementById('editModal').classList.remove('flex'); }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); document.getElementById('deleteModal').classList.remove('flex'); deleteProductId = null; }
+
+        async function handleEditSubmit() {
+            const id = document.getElementById('editProductId').value, data = { name: document.getElementById('editName').value.trim(), description: document.getElementById('editDescription').value.trim(), category: document.getElementById('editCategory').value.trim(), unit: document.getElementById('editUnit').value.trim(), stock_quantity: parseFloat(document.getElementById('editStock').value), min_stock_level: parseFloat(document.getElementById('editMinStock').value), expiry_date: document.getElementById('editExpiryDate').value || null, is_active: document.getElementById('editIsActive').checked ? 1 : 0 };
+            if (!data.name || data.name.length < 3) { showToast('Nama minimal 3 karakter', 'error'); return; }
+            if (data.stock_quantity < 0 || data.min_stock_level < 0) { showToast('Stok tidak boleh negatif', 'error'); return; }
+            try {
+                const res = await fetch(`/api/admin/products/${id}`, { method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await res.json();
+                if (result.success) { showToast('Produk diupdate', 'success'); closeEditModal(); loadProducts(); loadStatistics(); }
+                else { showToast(result.message, 'error'); }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        function confirmDeleteProduct(id) { deleteProductId = id; document.getElementById('deleteModal').classList.remove('hidden'); document.getElementById('deleteModal').classList.add('flex'); }
+        async function confirmDelete() {
+            if (!deleteProductId) return;
+            try {
+                const res = await fetch(`/api/admin/products/${deleteProductId}`, { method: 'DELETE', credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) { showToast('Produk dihapus', 'success'); closeDeleteModal(); loadProducts(); loadStatistics(); }
+                else { showToast(result.message, 'error'); }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function toggleProductStatus(id) {
+            try {
+                const res = await fetch(`/api/admin/products/${id}/toggle-status`, { method: 'PATCH', credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) { showToast(result.message, 'success'); loadProducts(); }
+                else { showToast(result.message, 'error'); }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toastContainer'), t = document.createElement('div'), bg = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-yellow-500', icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle';
+            t.className = `${bg} text-white px-6 py-3 rounded-lg shadow-lg mb-3 flex items-center gap-3 animate-slide-in`; t.innerHTML = `<i class="fas ${icon}"></i><span>${msg}</span>`; c.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; setTimeout(() => t.remove(), 300); }, 3000);
+        }
+    </script>
+    <style>@keyframes slide-in { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } } .animate-slide-in { animation: slide-in 0.3s ease-out; }</style>
+</body>
+</html>

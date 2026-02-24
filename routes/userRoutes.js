@@ -44,23 +44,40 @@ const upload = multer({
 
 // Middleware untuk memeriksa apakah user terautentikasi
 const isAuthenticated = (req, res, next) => {
+    console.log('[isAuthenticated] Session:', req.session ? 'exists' : 'null');
+    console.log('[isAuthenticated] Session user:', req.session?.user || 'no user');
+    console.log('[isAuthenticated] Session ID:', req.sessionID);
+    
     if (req.session && req.session.user) {
+        console.log('[isAuthenticated] User authenticated:', req.session.user.email, 'Role:', req.session.user.role);
         next();
     } else {
-        return errorHandler.unauthorized(res, 'Authentication required');
+        console.error('[isAuthenticated] Authentication failed - no session or user');
+        return errorHandler.unauthorized(res, 'Authentication required. Please login as admin.');
     }
 };
 
 // Middleware untuk admin only
 const isAdmin = (req, res, next) => {
+    console.log('[isAdmin] Checking admin role. Current role:', req.session?.user?.role);
+    
     if (req.session && req.session.user && req.session.user.role === 'admin') {
+        console.log('[isAdmin] User is admin. Access granted.');
         next();
     } else {
+        console.error('[isAdmin] Access denied. User role:', req.session?.user?.role);
         return errorHandler.forbidden(res, 'Access denied. Admin only.');
     }
 };
 
 // Apply authentication to all routes
+router.use((req, res, next) => {
+    console.log('[userRoutes] Incoming request:', req.method, req.path);
+    console.log('[userRoutes] Session exists:', !!req.session);
+    console.log('[userRoutes] Session user:', req.session?.user);
+    next();
+});
+
 router.use(isAuthenticated);
 router.use(isAdmin);
 

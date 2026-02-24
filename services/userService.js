@@ -80,6 +80,8 @@ const userService = {
                 sortOrder = 'DESC'
             } = options;
 
+            console.log('[userService.getUsers] Options:', options);
+
             const offset = (page - 1) * limit;
             const validSortColumns = ['id', 'name', 'email', 'created_at', 'last_login'];
             const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
@@ -566,6 +568,8 @@ const userService = {
      */
     async hardDelete(userId) {
         try {
+            console.log('[userService.hardDelete] Attempting to delete user:', userId);
+            
             // Check if user exists
             const user = await this.findById(userId);
             if (!user) {
@@ -574,28 +578,32 @@ const userService = {
 
             // Delete profile image if exists
             if (user.profile_image) {
-                const fs = require('fs').promises;
-                const path = require('path');
-                const imagePath = path.join(__dirname, '..', user.profile_image);
-                
                 try {
+                    const fs = require('fs').promises;
+                    const path = require('path');
+                    const imagePath = path.join(__dirname, '..', user.profile_image);
+                    
                     await fs.access(imagePath);
                     await fs.unlink(imagePath);
+                    console.log('[userService.hardDelete] Deleted profile image:', user.profile_image);
                 } catch (err) {
-                    // File doesn't exist, ignore
+                    // File doesn't exist or can't be accessed, ignore
+                    console.log('[userService.hardDelete] Profile image not found or cannot be deleted:', err.message);
                 }
             }
 
             // Delete user (foreign keys will handle related data)
             const query = 'DELETE FROM users WHERE id = ?';
             await db.execute(query, [userId]);
+            
+            console.log('[userService.hardDelete] User deleted successfully:', userId);
 
             return {
                 success: true,
                 message: 'User berhasil dihapus permanen'
             };
         } catch (error) {
-            console.error('Error hard deleting user:', error);
+            console.error('[userService.hardDelete] Error:', error);
             throw error;
         }
     },

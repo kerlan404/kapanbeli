@@ -58,6 +58,27 @@ const activityLogsController = {
                     }
                 });
             } else {
+                // Handle table not exists error
+                if (result.error && (result.error.includes('ER_NO_SUCH_TABLE') || result.error.includes('activity_logs'))) {
+                    console.warn('activity_logs table not found, returning empty data');
+                    return res.json({
+                        success: true,
+                        message: 'Activity logs table not initialized yet',
+                        data: [],
+                        pagination: {
+                            total: 0,
+                            page: pageNum,
+                            limit: limitNum,
+                            totalPages: 0
+                        },
+                        filters: {
+                            range,
+                            search,
+                            activityType
+                        }
+                    });
+                }
+                
                 res.status(500).json({
                     success: false,
                     message: result.error || 'Failed to get activity logs',
@@ -67,6 +88,27 @@ const activityLogsController = {
             }
         } catch (error) {
             console.error('Error in getLogs controller:', error);
+            
+            // Handle table not exists
+            if (error.code === 'ER_NO_SUCH_TABLE' || (error.message && error.message.includes('activity_logs'))) {
+                return res.json({
+                    success: true,
+                    message: 'Activity logs not available yet. Please run migration.',
+                    data: [],
+                    pagination: {
+                        total: 0,
+                        page: 1,
+                        limit: 10,
+                        totalPages: 0
+                    },
+                    filters: {
+                        range: req.query.range || '7days',
+                        search: req.query.search || '',
+                        activityType: req.query.activityType || ''
+                    }
+                });
+            }
+            
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',
