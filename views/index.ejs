@@ -694,7 +694,7 @@
             </div>
 
             <div class="hero-buttons animate-entry delay-3">
-                <a href="/auth" class="cta-button" id="mainActionBtn">
+                <a href="/notes" class="cta-button" id="mainActionBtn">
                     Mulai Catat <i class="fas fa-arrow-right"></i>
                 </a>
                 <a href="#features" class="secondary-button">Pelajari</a>
@@ -753,7 +753,7 @@
         </div>
     </section>
 
-    <!-- PRODUCTS SECTION - UPDATED WITH LARGER IMAGES -->
+    <!-- PRODUCTS SECTION - USER'S PRODUCTS -->
     <section class="section" id="productsSection">
         <div class="container">
             <div class="section-header">
@@ -766,7 +766,7 @@
         </div>
     </section>
 
-    <!-- NOTES SECTION - NEW -->
+    <!-- NOTES SECTION - USER'S NOTES -->
     <section class="section" id="notesSection" style="background-color: rgba(0,0,0,0.02);">
         <div class="container">
             <div class="section-header">
@@ -966,6 +966,7 @@
         const logoutLink = document.getElementById('logoutLink');
         const welcomeText = document.getElementById('welcomeText');
         const mainActionBtn = document.getElementById('mainActionBtn');
+        // Note: These elements may not exist in all pages, so we check for null
 
         async function checkAuthStatus() {
             try {
@@ -973,21 +974,27 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data.authenticated) {
-                        authLink.style.display = 'none';
-                        logoutLink.style.display = 'inline-block';
-                        welcomeText.style.display = 'inline-block';
-                        welcomeText.textContent = `Halo, ${data.user.name}!`;
-                        mainActionBtn.innerHTML = 'Buka Catatan <i class="fas fa-book"></i>';
-                        mainActionBtn.href = '/products';
+                        if(authLink) authLink.style.display = 'none';
+                        if(logoutLink) logoutLink.style.display = 'inline-block';
+                        if(welcomeText) {
+                            welcomeText.style.display = 'inline-block';
+                            welcomeText.textContent = `Halo, ${data.user.name}!`;
+                        }
+                        if(mainActionBtn) {
+                            mainActionBtn.innerHTML = 'Buka Catatan <i class="fas fa-book"></i>';
+                            mainActionBtn.href = '/products';
+                        }
                         return true; // Authenticated
                     }
                 }
                 // Default logged out state
-                authLink.style.display = 'inline-block';
-                logoutLink.style.display = 'none';
-                welcomeText.style.display = 'none';
-                mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
-                mainActionBtn.href = '/auth';
+                if(authLink) authLink.style.display = 'inline-block';
+                if(logoutLink) logoutLink.style.display = 'none';
+                if(welcomeText) welcomeText.style.display = 'none';
+                if(mainActionBtn) {
+                    mainActionBtn.innerHTML = 'Mulai Catat <i class="fas fa-arrow-right"></i>';
+                    mainActionBtn.href = '/auth';
+                }
                 return false;
             } catch (error) {
                 console.error('Auth check failed', error);
@@ -999,15 +1006,16 @@
             e.preventDefault();
             try {
                 const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
-                const data = await response.json();
-                if (response.ok) {
-                    window.location.href = data.redirect || '/';
-                }
-            } catch (error) { console.error('Logout error', error); }
+                // Redirect langsung ke home page setelah logout
+                window.location.href = '/';
+            } catch (error) { 
+                console.error('Logout error', error);
+                window.location.href = '/';
+            }
         });
 
         // --- LOGIC 5: MAIN DASHBOARD DATA (UPDATED) ---
-        
+
         // Helper: Format Tanggal Indonesia
         function formatDateID(dateString) {
             if(!dateString) return '-';
@@ -1021,8 +1029,8 @@
             const now = new Date();
             const exp = new Date(dateString);
             const diffTime = exp - now;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
             if (diffDays < 0) return { text: 'Kadaluarsa', class: 'text-danger', color: 'var(--accent-red)' };
             if (diffDays <= 7) return { text: `${diffDays} Hari Lagi`, class: 'text-warning', color: '#f39c12' };
             return { text: formatDateID(dateString), class: 'text-success', color: 'var(--accent-green)' };
@@ -1057,6 +1065,106 @@
             interval = seconds / 60;
             if (interval > 1) return Math.floor(interval) + " menit lalu";
             return "Baru saja";
+        }
+
+        // RENDER: Bahan Saya - Display user's products (show latest 6)
+        function renderProducts(products) {
+            const container = document.getElementById('recentProductsGrid');
+            const section = document.getElementById('productsSection');
+
+            if(!products || products.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            container.innerHTML = '';
+
+            // Get latest 6 products
+            const recentProducts = products.slice(0, 6);
+
+            recentProducts.forEach((prod, index) => {
+                const expiryInfo = getExpiryStatus(prod.expiry_date);
+                const isLow = parseFloat(prod.stock_quantity) <= parseFloat(prod.min_stock_level || 0);
+
+                const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
+
+                const card = `
+                    <div class="product-card animate-entry ${delayClass}">
+                        <div class="card-top">
+                            <span class="category-tag">${prod.category_name || 'Umum'}</span>
+                            ${prod.image_url
+                                ? `<img src="${prod.image_url}" alt="${prod.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                                : ''
+                            }
+                            <i class="fas ${getIconForProduct(prod.name)} card-icon" style="${prod.image_url ? 'display:none;' : ''}"></i>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="prod-name" onclick="window.location='/products/detail/${prod.id}'">${prod.name}</h3>
+
+                            <div class="info-row">
+                                <span class="label"><i class="fas fa-boxes"></i> Stok</span>
+                                <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'var(--text-main)'}">
+                                    ${prod.stock_quantity} ${prod.unit || ''}
+                                    ${isLow ? '<i class="fas fa-exclamation-circle" style="margin-left:5px; font-size:0.8rem;"></i>' : ''}
+                                </span>
+                            </div>
+
+                            <div class="info-row" style="border:none;">
+                                <span class="label"><i class="fas fa-calendar-check"></i> Kedaluwarsa</span>
+                                <span class="value" style="color: ${expiryInfo.color}">${expiryInfo.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // RENDER: Catatan Saya - Display user's notes (show latest 6)
+        function renderNotes(notes) {
+            const container = document.getElementById('notesGrid');
+            const section = document.getElementById('notesSection');
+
+            if(!notes || notes.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            container.innerHTML = '';
+
+            // Get latest 6 notes
+            const recentNotes = notes.slice(0, 6);
+
+            recentNotes.forEach((note, index) => {
+                const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
+                const date = new Date(note.created_at);
+                const formattedDate = date.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                const card = `
+                    <div class="note-card animate-entry ${delayClass}">
+                        <div class="note-card-header">
+                            <h3 class="note-title" onclick="window.location='/notes'">${note.title}</h3>
+                            <span class="note-date">${formattedDate}</span>
+                        </div>
+                        <div class="note-content">${note.content || 'Tidak ada isi catatan...'}</div>
+                        <div class="note-footer">
+                            <button class="note-btn note-btn-edit" onclick="editNote(${note.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="note-btn note-btn-delete" onclick="deleteNote(${note.id}, '${note.title.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
         }
 
         // Fungsi Utama Load Data - UPDATED TO USE SERVER-SIDE STATS
@@ -1124,7 +1232,8 @@
                         dashboardStats.shoppingList = lowStockProducts.length + outOfStockProducts.length;
                         dashboardStats.expired = expiredProducts.length;
                         dashboardStats.expiring = expiringSoonProducts.length;
-                        
+
+                        // Render products on home page (latest 6)
                         renderProducts(data.products);
                         renderLowStockProducts(data.products);
                         updateKitchenSummary(data.products, dashboardStats);
@@ -1150,8 +1259,8 @@
                     if(notesData.success && Array.isArray(notesData.notes)) {
                         dashboardStats.notes = notesData.notes.length;
                         console.log('✅ Notes count set to:', dashboardStats.notes);
-                        
-                        // RENDER NOTES DI HALAMAN UTAMA
+
+                        // Render notes on home page (latest 6)
                         renderNotes(notesData.notes);
                     } else {
                         console.error('Notes API returned invalid data:', notesData);
@@ -1303,141 +1412,24 @@
         function updateNotesSummary(notes) {
             const notesCount = notes.length;
             console.log('Updating notes count to:', notesCount);
-            
+
             // Update the 6th stat card (Notes) - use multiple selectors for reliability
             const statCards = document.querySelectorAll('#statsGrid .stat-card .stat-value');
             console.log('Found stat cards:', statCards.length);
-            
+
             if (statCards.length >= 6) {
                 statCards[5].textContent = notesCount;
                 console.log('Notes card updated via index 5');
             }
-            
+
             // Also try by class name as backup
             const notesCard = document.querySelector('#statsGrid .stat-card.notes .stat-value');
             if (notesCard) {
                 notesCard.textContent = notesCount;
                 console.log('Notes card updated via class selector');
             }
-            
+
             console.log('Final notes count in DOM:', document.querySelector('#statsGrid .stat-card:nth-child(6) .stat-value')?.textContent);
-        }
-
-        // RENDER: Bahan Saya Terbaru - UPDATED WITH LARGER IMAGES
-        function renderProducts(products) {
-            const container = document.getElementById('recentProductsGrid');
-            const section = document.getElementById('productsSection');
-
-            console.log('=== Rendering Products ===');
-            console.log('Products:', products);
-            console.log('Products length:', products ? products.length : 0);
-
-            if(!products || products.length === 0) {
-                console.log('No products to display');
-                section.style.display = 'none';
-                return;
-            }
-
-            console.log('Displaying products section');
-            section.style.display = 'block';
-            container.innerHTML = '';
-
-            // Ambil 6 terakhir
-            products.slice(0, 6).forEach((prod, index) => {
-                const expiryInfo = getExpiryStatus(prod.expiry_date);
-                const isLow = parseFloat(prod.stock_quantity) <= parseFloat(prod.min_stock_level || 0);
-
-                // Animasi delay bertahap
-                const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
-
-                const card = `
-                    <div class="product-card animate-entry ${delayClass}">
-                        <div class="card-top">
-                            <span class="category-tag">${prod.category_id || 'Umum'}</span>
-                            ${prod.image_url
-                                ? `<img src="${prod.image_url}" alt="${prod.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
-                                : ''
-                            }
-                            <i class="fas ${getIconForProduct(prod.name)} card-icon" style="${prod.image_url ? 'display:none;' : ''}"></i>
-                        </div>
-                        <div class="card-body">
-                            <h3 class="prod-name" onclick="window.location='/products/detail/${prod.id}'">${prod.name}</h3>
-
-                            <div class="info-row">
-                                <span class="label"><i class="fas fa-boxes"></i> Stok</span>
-                                <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'var(--text-main)'}">
-                                    ${prod.stock_quantity} ${prod.unit || ''}
-                                    ${isLow ? '<i class="fas fa-exclamation-circle" style="margin-left:5px; font-size:0.8rem;"></i>' : ''}
-                                </span>
-                            </div>
-
-                            <div class="info-row" style="border:none;">
-                                <span class="label"><i class="fas fa-calendar-check"></i> Kedaluwarsa</span>
-                                <span class="value" style="color: ${expiryInfo.color}">${expiryInfo.text}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
-
-            console.log('Products rendered successfully!');
-        }
-
-        // RENDER: Catatan Saya - NEW FUNCTION
-        function renderNotes(notes) {
-            const container = document.getElementById('notesGrid');
-            const section = document.getElementById('notesSection');
-
-            console.log('=== Rendering Notes ===');
-            console.log('Notes data:', notes);
-            console.log('Notes length:', notes ? notes.length : 0);
-            console.log('Container exists:', !!container);
-            console.log('Section exists:', !!section);
-
-            if(!notes || notes.length === 0) {
-                console.log('No notes to display');
-                section.style.display = 'none';
-                return;
-            }
-
-            console.log('Displaying notes section');
-            section.style.display = 'block';
-            container.innerHTML = '';
-
-            // Ambil 6 catatan terakhir
-            notes.slice(0, 6).forEach((note, index) => {
-                const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
-                const date = new Date(note.created_at);
-                const formattedDate = date.toLocaleDateString('id-ID', { 
-                    day: 'numeric', 
-                    month: 'short', 
-                    year: 'numeric' 
-                });
-
-                console.log('Rendering note:', note.title);
-
-                const card = `
-                    <div class="note-card animate-entry ${delayClass}">
-                        <div class="note-card-header">
-                            <h3 class="note-title" onclick="window.location='/notes'">${note.title}</h3>
-                            <span class="note-date">${formattedDate}</span>
-                        </div>
-                        <div class="note-content">${note.content || 'Tidak ada isi catatan...'}</div>
-                        <div class="note-footer">
-                            <button class="note-btn note-btn-edit" onclick="editNote(${note.id})">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="note-btn note-btn-delete" onclick="deleteNote(${note.id}, '${note.title.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
-
-            console.log('Notes rendered successfully!');
         }
 
         // Edit note function
@@ -1799,13 +1791,10 @@
             const isAuth = await checkAuthStatus();
 
             if(isAuth) {
-                // Wait a bit to ensure DOM is fully loaded, then load data
                 setTimeout(async () => {
                     await loadDashboardData();
-                    await loadNotes(); // Load notes on page init
+                    await loadNotes();
                 }, 500);
-            } else {
-                // Jika belum login, biarkan nilai tetap 0 seperti yang sudah ditentukan di HTML
             }
 
             // Refresh data tiap 30 detik

@@ -68,17 +68,36 @@ const productsController = {
                 });
             }
 
-            // Validasi category_id, jika disediakan harus valid
+            // Validasi category_id - konversi dari nama kategori ke ID
             let categoryIdToUse = null;
             if (category_id) {
-                // Cek apakah category_id valid
+                // Mapping nama kategori ke ID (sesuai database categories)
+                const categoryToId = {
+                    'Bumbu Dapur': 1,
+                    'Sayuran': 2,
+                    'Buah-buahan': 3,
+                    'Protein': 4,
+                    'Bahan Kering': 5,
+                    'Lainnya': 6
+                };
+                
+                // Cek apakah category_id adalah nama kategori
+                let numericCategoryId = category_id;
+                if (typeof category_id === 'string') {
+                    // Jika string, coba convert dari nama ke ID
+                    numericCategoryId = categoryToId[category_id] || category_id;
+                }
+                
+                // Cek apakah category_id valid (numeric ID)
                 const CategoryModel = require('../models/Category');
-                const categoryExists = await CategoryModel.getById(category_id);
+                const categoryExists = await CategoryModel.getById(numericCategoryId);
                 if (categoryExists) {
-                    categoryIdToUse = category_id;
+                    categoryIdToUse = numericCategoryId;
+                    console.log('Category set to ID:', numericCategoryId, 'from:', category_id);
                 } else {
                     // Jika kategori tidak ditemukan, gunakan null
                     categoryIdToUse = null;
+                    console.log('Category not found, setting to null');
                 }
             }
 
@@ -203,22 +222,36 @@ const productsController = {
                 });
             }
 
-            // Validasi category_id, jika disediakan harus valid
+            // Validasi category_id - konversi dari nama kategori ke ID
             let categoryIdToUpdate = existingProduct.category_id; // Gunakan kategori lama sebagai default
-            if (category_id !== undefined) { // Jika category_id disediakan (termasuk null)
-                if (category_id) {
-                    // Cek apakah category_id valid
-                    const CategoryModel = require('../models/Category');
-                    const categoryExists = await CategoryModel.getById(category_id);
-                    if (categoryExists) {
-                        categoryIdToUpdate = category_id;
-                    } else {
-                        // Jika kategori tidak ditemukan, gunakan null
-                        categoryIdToUpdate = null;
-                    }
+            if (category_id !== undefined && category_id !== null) { // Jika category_id disediakan
+                // Mapping nama kategori ke ID (sesuai database categories)
+                const categoryToId = {
+                    'Bumbu Dapur': 1,
+                    'Sayuran': 2,
+                    'Buah-buahan': 3,
+                    'Protein': 4,
+                    'Bahan Kering': 5,
+                    'Lainnya': 6
+                };
+                
+                // Cek apakah category_id adalah nama kategori
+                let numericCategoryId = category_id;
+                if (typeof category_id === 'string') {
+                    // Jika string, coba convert dari nama ke ID
+                    numericCategoryId = categoryToId[category_id] || category_id;
+                }
+                
+                // Cek apakah category_id valid (numeric ID)
+                const CategoryModel = require('../models/Category');
+                const categoryExists = await CategoryModel.getById(numericCategoryId);
+                if (categoryExists) {
+                    categoryIdToUpdate = numericCategoryId;
+                    console.log('Category updated to ID:', numericCategoryId, 'from:', category_id);
                 } else {
-                    // Jika category_id adalah null atau "" (falsy), gunakan null
+                    // Jika kategori tidak ditemukan, gunakan null
                     categoryIdToUpdate = null;
+                    console.log('Category not found, setting to null');
                 }
             }
 

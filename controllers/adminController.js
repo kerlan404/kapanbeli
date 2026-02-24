@@ -41,21 +41,57 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk mendapatkan log aktivitas
+    // Fungsi untuk mendapatkan log aktivitas (untuk backward compatibility)
     async getActivityLogs(req, res) {
         try {
+            // Gunakan activity_logs yang baru
+            const db = require('../config/database');
+            
             const limit = parseInt(req.query.limit) || 100;
-            const logs = await User.getAllLoginLogs(limit);
+            
+            // Query dari activity_logs table
+            const query = `
+                SELECT
+                    al.id,
+                    al.user_id,
+                    al.activity_type as action,
+                    al.description,
+                    al.ip_address,
+                    al.created_at as timestamp,
+                    u.name as user_name,
+                    u.email as user_email
+                FROM activity_logs al
+                LEFT JOIN users u ON al.user_id = u.id
+                ORDER BY al.created_at DESC
+                LIMIT ?
+            `;
+            
+            const [rows] = await db.execute(query, [limit]);
+            
+            // Format agar kompatibel dengan frontend lama
+            const formattedLogs = rows.map(log => ({
+                id: log.id,
+                user_id: log.user_id,
+                user_name: log.user_name,
+                user_email: log.user_email,
+                action: log.action,
+                description: log.description,
+                ip_address: log.ip_address,
+                timestamp: log.timestamp
+            }));
 
             res.status(200).json({
                 success: true,
-                activity: logs
+                activities: formattedLogs
             });
         } catch (error) {
             console.error('Error getting activity logs:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Terjadi kesalahan saat mengambil log aktivitas.'
+            
+            // Return empty array jika tabel activity_logs belum ada
+            res.status(200).json({
+                success: true,
+                activities: [],
+                message: 'Tabel activity_logs belum tersedia'
             });
         }
     },

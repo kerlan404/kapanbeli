@@ -442,12 +442,8 @@ const authController = {
                 // Hapus cookie jika ada
                 res.clearCookie('connect.sid'); // Nama cookie default untuk express-session
 
-                // Redirect ke halaman utama setelah logout berhasil
-                res.json({
-                    success: true,
-                    message: 'Logout berhasil! Sampai jumpa kembali.',
-                    redirect: '/'
-                });
+                // Redirect langsung ke halaman utama setelah logout berhasil
+                res.redirect('/');
             });
         } catch (error) {
             console.error('Logout error:', error);

@@ -130,15 +130,25 @@ const User = {
     },
 
     // Fungsi untuk memperbarui informasi pengguna
-    update: async (id, { name, email }) => {
-        const query = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
-        const [result] = await db.execute(query, [name, email, id]);
+    update: async (id, { name, email, profile_photo }) => {
+        let query;
+        let params;
+        
+        if (profile_photo !== undefined) {
+            query = 'UPDATE users SET name = ?, email = ?, profile_photo = ? WHERE id = ?';
+            params = [name, email, profile_photo, id];
+        } else {
+            query = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
+            params = [name, email, id];
+        }
+        
+        const [result] = await db.execute(query, params);
 
         if (result.affectedRows === 0) {
             throw new Error('User tidak ditemukan');
         }
 
-        return { id, name, email };
+        return { id, name, email, profile_photo: profile_photo || null };
     },
 
     // Fungsi untuk menghapus pengguna
@@ -481,6 +491,30 @@ const User = {
             return rows;
         } catch (error) {
             console.error('Error getting all login logs:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk menghapus produk user
+    deleteUserProducts: async (userId) => {
+        try {
+            const query = 'DELETE FROM products WHERE user_id = ?';
+            await db.execute(query, [userId]);
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting user products:', error);
+            throw error;
+        }
+    },
+
+    // Fungsi untuk menghapus catatan user
+    deleteUserNotes: async (userId) => {
+        try {
+            const query = 'DELETE FROM notes WHERE user_id = ?';
+            await db.execute(query, [userId]);
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting user notes:', error);
             throw error;
         }
     },

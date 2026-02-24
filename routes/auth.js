@@ -19,15 +19,20 @@ router.post('/logout', authController.logout);
 router.get('/confirm/:token', authController.confirmAccount);
 
 // Route untuk memeriksa status otentikasi
-router.get('/status', (req, res) => {
+router.get('/status', async (req, res) => {
     if (req.session.user) {
+        // Get user with profile photo from database
+        const User = require('../models/User');
+        const user = await User.findById(req.session.user.id);
+        
         res.json({
             authenticated: true,
             user: {
-                id: req.session.user.id,
-                name: req.session.user.name,
-                email: req.session.user.email,
-                role: req.session.user.role || 'user'
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                profile_photo: user.profile_photo || null,
+                role: user.role || 'user'
             }
         });
     } else {

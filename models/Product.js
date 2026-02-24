@@ -7,10 +7,26 @@ const Product = {
         console.log('Getting products for user ID:', userId); // Debug log
         try {
             const query = `
-                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at, unit, quantity, expiry_date, notes
-                FROM products
-                WHERE user_id = ?
-                ORDER BY created_at DESC
+                SELECT 
+                    p.id, 
+                    p.name, 
+                    p.description, 
+                    p.category_id, 
+                    c.name as category_name,
+                    p.stock_quantity, 
+                    p.min_stock_level, 
+                    p.image_url, 
+                    p.user_id, 
+                    p.created_at, 
+                    p.updated_at, 
+                    p.unit, 
+                    p.quantity, 
+                    DATE_FORMAT(p.expiry_date, '%Y-%m-%d') as expiry_date,
+                    p.notes
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.user_id = ?
+                ORDER BY p.created_at DESC
             `;
             const [rows] = await db.execute(query, [userId]);
             console.log('Retrieved products count:', rows.length); // Debug log
@@ -35,7 +51,8 @@ const Product = {
                     unit: row.unit || null,
                     quantity: row.quantity || 1,
                     expiry_date: row.expiry_date || null,
-                    notes: row.notes || ''
+                    notes: row.notes || '',
+                    category_name: null
                 }));
             }
             throw error;
@@ -46,7 +63,8 @@ const Product = {
     getByIdAndUserId: async (productId, userId) => {
         try {
             const query = `
-                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at, unit, quantity, expiry_date, notes
+                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at, unit, quantity, 
+                DATE_FORMAT(expiry_date, '%Y-%m-%d') as expiry_date, notes
                 FROM products
                 WHERE id = ? AND user_id = ?
             `;
@@ -92,6 +110,16 @@ const Product = {
         min_stock_level, image_url, unit, quantity, expiry_date, notes
     }) => {
         try {
+            // FIX: Handle expiry_date - pastikan format DATE tanpa waktu
+            let expiryDateValue = expiry_date;
+            if (expiry_date && typeof expiry_date === 'string') {
+                // Jika ada waktu (YYYY-MM-DD HH:MM:SS), ambil tanggal saja
+                if (expiry_date.includes(' ')) {
+                    expiryDateValue = expiry_date.split(' ')[0];
+                }
+                // Jika hanya tanggal (YYYY-MM-DD), gunakan apa adanya
+            }
+            
             // Try to insert with all columns first
             const query = `
                 INSERT INTO products (
@@ -101,7 +129,7 @@ const Product = {
             `;
             const [result] = await db.execute(query, [
                 user_id, name, description, category_id, stock_quantity,
-                min_stock_level, image_url, unit, quantity, expiry_date, notes
+                min_stock_level, image_url, unit, quantity, expiryDateValue, notes
             ]);
 
             // Update user stats after creating product (lazy require to avoid circular dependency)
@@ -206,6 +234,14 @@ const Product = {
         min_stock_level, image_url, unit, quantity, expiry_date, notes
     }) => {
         try {
+            // FIX: Handle expiry_date - pastikan format DATE tanpa waktu
+            let expiryDateValue = expiry_date;
+            if (expiry_date && typeof expiry_date === 'string') {
+                if (expiry_date.includes(' ')) {
+                    expiryDateValue = expiry_date.split(' ')[0];
+                }
+            }
+            
             const query = `
                 UPDATE products
                 SET name = ?, description = ?, category_id = ?, stock_quantity = ?,
@@ -214,7 +250,7 @@ const Product = {
             `;
             const [result] = await db.execute(query, [
                 name, description, category_id, stock_quantity,
-                min_stock_level, image_url, unit, quantity, expiry_date, notes,
+                min_stock_level, image_url, unit, quantity, expiryDateValue, notes,
                 productId, userId
             ]);
 

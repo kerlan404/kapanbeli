@@ -206,6 +206,11 @@
         .alert-error { background: rgba(255, 107, 107, 0.1); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.2); }
         .alert-success { background: rgba(29, 209, 161, 0.1); color: #1DD1A1; border: 1px solid rgba(29, 209, 161, 0.2); }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; max-height: 100vh; }
             .auth-brand-panel { display: none; }
@@ -388,11 +393,13 @@
         }
 
         // Check for confirmation message from server
-        <% if (typeof confirmed !== 'undefined' && confirmed) { %>
+    </script>
+    <% if (typeof confirmed !== 'undefined' && confirmed) { -%>
+    <script>
         window.addEventListener('DOMContentLoaded', function() {
             showAlert('Akun berhasil dikonfirmasi! Silakan login.', 'success');
         });
-        <% } %>
     </script>
+    <% } -%>
 </body>
 </html>

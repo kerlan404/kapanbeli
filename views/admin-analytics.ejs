@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analitik Pertumbuhan - Admin Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #2E86DE;
+            --primary-orange: #FF9F43;
+            --bg-body: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #95A5A6;
+            --success: #1DD1A1;
+            --danger: #FF6B6B;
+            --warning: #FECA57;
+            --info: #54A0FF;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        body.dark-mode-active {
+            --bg-body: #1a2228;
+            --bg-card: #2d3b45;
+            --text-main: #ECF0F1;
+            --text-muted: #B2BEC3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: var(--primary-blue);
+        }
+
+        .filter-select {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 2px solid rgba(0,0,0,0.1);
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary-blue);
+        }
+
+        .stat-card.success::before { background: var(--success); }
+        .stat-card.warning::before { background: var(--primary-orange); }
+        .stat-card.danger::before { background: var(--danger); }
+        .stat-card.info::before { background: var(--info); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue { background: rgba(46, 134, 222, 0.12); color: var(--primary-blue); }
+        .stat-icon.green { background: rgba(29, 209, 161, 0.12); color: var(--success); }
+        .stat-icon.orange { background: rgba(255, 159, 67, 0.12); color: var(--primary-orange); }
+        .stat-icon.red { background: rgba(255, 107, 107, 0.12); color: var(--danger); }
+        .stat-icon.cyan { background: rgba(84, 160, 255, 0.12); color: var(--info); }
+
+        .stat-badge {
+            background: rgba(0,0,0,0.05);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .stat-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .stat-growth {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stat-growth.up { color: var(--success); }
+        .stat-growth.down { color: var(--danger); }
+        .stat-growth.neutral { color: var(--text-muted); }
+
+        .stat-growth-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .stat-growth.up .stat-growth-icon { background: rgba(29, 209, 161, 0.15); }
+        .stat-growth.down .stat-growth-icon { background: rgba(255, 107, 107, 0.15); }
+
+        .stat-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-title i {
+            color: var(--primary-blue);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Combined Chart */
+        .combined-chart-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .loading i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+            color: var(--primary-blue);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .error-state i {
+            font-size: 4rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .error-state h3 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .error-state p {
+            color: var(--text-muted);
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #1a73c9;
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn i {
+            transition: transform 0.5s ease;
+        }
+
+        .refresh-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Timestamp */
+        .last-updated {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 280px;
+            }
+        }
+
+        /* Animation for numbers */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-value {
+            animation: countUp 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Analitik Pertumbuhan
+            </h1>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <select id="rangeFilter" class="filter-select" onchange="loadAnalytics()">
+                    <option value="today">Hari Ini</option>
+                    <option value="7days" selected>7 Hari Terakhir</option>
+                    <option value="month">Bulan Ini</option>
+                </select>
+                <button class="refresh-btn" onclick="loadAnalytics()" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <p>Memuat data analitik...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-state" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Oops! Terjadi Kesalahan</h3>
+            <p id="errorMessage">Gagal memuat data analitik</p>
+        </div>
+
+        <!-- Content -->
+        <div id="analyticsContent" style="display: none;">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <!-- Total Users -->
+                <div class="stat-card info">
+                    <div class="stat-header">
+                        <div class="stat-icon cyan">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span class="stat-badge">Semua Waktu</span>
+                    </div>
+                    <div class="stat-label">Total Pengguna</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-footer">
+                        <div class="stat-growth" id="usersGrowth">
+                            <span class="stat-growth-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </span>
+                            <span>0%</span>
+                        </div>
+                        <span class="stat-subtitle">vs periode sebelumnya</span>
+                    </div>
+                </div>
+
+                <!-- New Users -->
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <div class="stat-icon green">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span class="stat-badge" id="newUsersBadge">Periode Ini</span>
+                    </div>
+                    <div class="stat-label">Pengguna Baru</div>
+                    <div class="stat-value" id="newUsers">0</div>
+                    <div class="stat-footer">
+                        <div class="stat-growth up" id="newUsersGrowth">
+                            <span class="stat-growth-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </span>
+                            <span>0%</span>
+                        </div>
+                        <span class="stat-subtitle">vs periode sebelumnya</span>
+                    </div>
+                </div>
+
+                <!-- Total Logins -->
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <span class="stat-badge" id="loginsBadge">Periode Ini</span>
+                    </div>
+                    <div class="stat-label">Total Login</div>
+                    <div class="stat-value" id="totalLogins">0</div>
+                    <div class="stat-footer">
+                        <div class="stat-growth" id="loginsGrowth">
+                            <span class="stat-growth-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </span>
+                            <span>0%</span>
+                        </div>
+                        <span class="stat-subtitle">vs periode sebelumnya</span>
+                    </div>
+                </div>
+
+                <!-- Daily Active Users -->
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <div class="stat-icon red">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <span class="stat-badge">Unik</span>
+                    </div>
+                    <div class="stat-label">Daily Active Users</div>
+                    <div class="stat-value" id="dau">0</div>
+                    <div class="stat-footer">
+                        <div class="stat-growth neutral">
+                            <span class="stat-growth-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                            <span>User unik yang login</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combined Chart -->
+            <div class="combined-chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-mixed"></i>
+                        Overview Pertumbuhan & Aktivitas
+                    </h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #2E86DE;"></div>
+                            <span>Pengguna Baru</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #1DD1A1;"></div>
+                            <span>Login</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="combinedChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Individual Charts -->
+            <div class="charts-grid">
+                <!-- Users Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-user-plus"></i>
+                            Pertumbuhan Pengguna Baru
+                        </h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Logins Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Aktivitas Login
+                        </h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="loginsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="last-updated">
+                <i class="far fa-clock"></i>
+                Terakhir diperbarui: <span id="lastUpdated">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart instances
+        let combinedChartInstance = null;
+        let usersChartInstance = null;
+        let loginsChartInstance = null;
+
+        // Period labels
+        const periodLabels = {
+            today: 'Hari Ini',
+            '7days': '7 Hari Terakhir',
+            month: 'Bulan Ini'
+        };
+
+        // Load analytics data
+        async function loadAnalytics() {
+            const range = document.getElementById('rangeFilter').value;
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            // Show loading state
+            refreshBtn.classList.add('spinning');
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('analyticsContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/admin/analytics?range=${range}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    updateStatsCards(data.summary, data.period);
+                    updateCharts(data.chart);
+                    updateLastUpdated();
+                    
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('analyticsContent').style.display = 'block';
+                } else {
+                    showError(data.message || 'Gagal memuat data analitik');
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                showError('Gagal memuat data analitik. Pastikan server berjalan dan database terhubung.');
+            } finally {
+                refreshBtn.classList.remove('spinning');
+            }
+        }
+
+        // Update stats cards
+        function updateStatsCards(summary, period) {
+            // Update badge labels
+            document.getElementById('newUsersBadge').textContent = period;
+            document.getElementById('loginsBadge').textContent = period;
+            
+            // Update values with animation
+            animateValue('totalUsers', summary.totalUsers);
+            animateValue('newUsers', summary.newUsers);
+            animateValue('totalLogins', summary.totalLogins);
+            animateValue('dau', summary.dailyActiveUsers);
+
+            // Update growth indicators
+            updateGrowthIndicator('usersGrowth', summary.growth.users.percentage, summary.growth.users.trend);
+            updateGrowthIndicator('newUsersGrowth', summary.growth.users.percentage, summary.growth.users.trend);
+            updateGrowthIndicator('loginsGrowth', summary.growth.logins.percentage, summary.growth.logins.trend);
+        }
+
+        // Animate number values
+        function animateValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            const duration = 500;
+            const start = 0;
+            const end = value;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = Math.floor(start + (end - start) * easeOutQuart);
+                
+                element.textContent = current.toLocaleString('id-ID');
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Update growth indicator
+        function updateGrowthIndicator(elementId, percentage, trend) {
+            const element = document.getElementById(elementId);
+            const icon = element.querySelector('.stat-growth-icon i');
+            const text = element.querySelector('span:last-child');
+
+            // Remove all trend classes
+            element.classList.remove('up', 'down', 'neutral');
+
+            // Set trend
+            if (trend === 'up') {
+                element.classList.add('up');
+                icon.className = 'fas fa-arrow-up';
+            } else if (trend === 'down') {
+                element.classList.add('down');
+                icon.className = 'fas fa-arrow-down';
+            } else {
+                element.classList.add('neutral');
+                icon.className = 'fas fa-minus';
+            }
+
+            // Format percentage
+            const sign = percentage >= 0 ? '+' : '';
+            text.textContent = `${sign}${percentage}%`;
+        }
+
+        // Update charts
+        function updateCharts(chartData) {
+            // Destroy existing charts
+            if (combinedChartInstance) combinedChartInstance.destroy();
+            if (usersChartInstance) usersChartInstance.destroy();
+            if (loginsChartInstance) loginsChartInstance.destroy();
+
+            // Combined Chart (Line + Bar)
+            combinedChartInstance = new Chart(document.getElementById('combinedChart'), {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Pengguna Baru',
+                            data: chartData.users,
+                            borderColor: '#2E86DE',
+                            backgroundColor: 'rgba(46, 134, 222, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#2E86DE',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Login',
+                            data: chartData.logins,
+                            type: 'bar',
+                            backgroundColor: 'rgba(29, 209, 161, 0.8)',
+                            borderColor: '#1DD1A1',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { size: 11 }
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                precision: 0,
+                                font: { size: 11 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Pengguna Baru',
+                                font: { size: 12 }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                precision: 0,
+                                font: { size: 11 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Login',
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Users Chart (Line)
+            usersChartInstance = new Chart(document.getElementById('usersChart'), {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Pengguna Baru',
+                        data: chartData.users,
+                        borderColor: '#2E86DE',
+                        backgroundColor: 'rgba(46, 134, 222, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#2E86DE',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Logins Chart (Bar)
+            loginsChartInstance = new Chart(document.getElementById('loginsChart'), {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Login',
+                        data: chartData.logins,
+                        backgroundColor: 'rgba(29, 209, 161, 0.8)',
+                        borderColor: '#1DD1A1',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('lastUpdated').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadAnalytics);
+    </script>
+</body>
+</html>

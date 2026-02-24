@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Analytics - Kapan Beli</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .filter { padding: 10px 20px; font-size: 16px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .stat-card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-card .growth { font-size: 14px; margin-top: 10px; }
+        .stat-card .growth.up { color: #1DD1A1; }
+        .stat-card .growth.down { color: #FF6B6B; }
+        .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; }
+        .chart-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .chart-card h3 { margin-bottom: 20px; color: #333; }
+        .loading { text-align: center; padding: 60px; color: #666; }
+        .error { background: #ffe6e6; color: #d63031; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .success { background: #e6ffe6; color: #00b894; padding: 10px; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Test Analytics - Kapan Beli</h1>
+        
+        <div style="margin-bottom: 20px;">
+            <select id="rangeFilter" class="filter" onchange="loadAnalytics()">
+                <option value="today">Hari Ini</option>
+                <option value="7days" selected>7 Hari Terakhir</option>
+                <option value="month">Bulan Ini</option>
+            </select>
+            <button onclick="loadAnalytics()" style="padding: 10px 20px; margin-left: 10px; cursor: pointer; border-radius: 8px; border: none; background: #2E86DE; color: white;">Refresh</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="loading" class="loading">Loading...</div>
+        <div id="content" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Pengguna</h3>
+                    <div class="value" id="totalUsers">0</div>
+                    <div class="growth" id="usersGrowth">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pengguna Baru</h3>
+                    <div class="value" id="newUsers">0</div>
+                    <div class="growth" id="newUsersGrowth">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Login</h3>
+                    <div class="value" id="totalLogins">0</div>
+                    <div class="growth" id="loginsGrowth">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Daily Active Users</h3>
+                    <div class="value" id="dau">0</div>
+                    <div class="growth" style="color: #666;">User unik yang login</div>
+                </div>
+            </div>
+            
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3>Pengguna Baru per Periode</h3>
+                    <canvas id="usersChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Login per Periode</h3>
+                    <canvas id="loginsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let usersChart, loginsChart;
+
+        async function loadAnalytics() {
+            const range = document.getElementById('rangeFilter').value;
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('content');
+            const status = document.getElementById('status');
+            
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            status.innerHTML = '';
+            
+            try {
+                const response = await fetch(`/api/analytics/test?range=${range}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.innerHTML = `<div class="success">✅ Data berhasil dimuat! Range: ${data.period}</div>`;
+                    updateStats(data.summary);
+                    updateCharts(data.chart);
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                } else {
+                    status.innerHTML = `<div class="error">❌ Error: ${data.message}</div>`;
+                    loading.style.display = 'none';
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                loading.style.display = 'none';
+            }
+        }
+
+        function updateStats(summary) {
+            document.getElementById('totalUsers').textContent = summary.totalUsers;
+            document.getElementById('newUsers').textContent = summary.newUsers;
+            document.getElementById('totalLogins').textContent = summary.totalLogins;
+            document.getElementById('dau').textContent = summary.dailyActiveUsers;
+            
+            updateGrowth('usersGrowth', summary.growth.users);
+            updateGrowth('newUsersGrowth', summary.growth.users);
+            updateGrowth('loginsGrowth', summary.growth.logins);
+        }
+
+        function updateGrowth(id, data) {
+            const el = document.getElementById(id);
+            const sign = data.percentage >= 0 ? '+' : '';
+            const arrow = data.trend === 'up' ? '↑' : '↓';
+            el.className = `growth ${data.trend}`;
+            el.textContent = `${arrow} ${sign}${data.percentage}% (vs ${data.previous})`;
+        }
+
+        function updateCharts(chartData) {
+            if (usersChart) usersChart.destroy();
+            if (loginsChart) loginsChart.destroy();
+            
+            usersChart = new Chart(document.getElementById('usersChart'), {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Pengguna Baru',
+                        data: chartData.users,
+                        borderColor: '#2E86DE',
+                        backgroundColor: 'rgba(46, 134, 222, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true }
+            });
+            
+            loginsChart = new Chart(document.getElementById('loginsChart'), {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Login',
+                        data: chartData.logins,
+                        backgroundColor: 'rgba(29, 209, 161, 0.8)',
+                        borderColor: '#1DD1A1'
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        window.onload = loadAnalytics;
+    </script>
+</body>
+</html>

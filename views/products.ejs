@@ -113,15 +113,99 @@
         }
         .add-btn:hover { background: #2373c7; transform: translateY(-2px); }
 
-        /* Search Bar */
-        .search-wrapper { position: relative; margin-bottom: 30px; }
-        .search-input {
-            width: 100%; padding: 18px 25px; border-radius: 50px; border: 2px solid transparent;
-            background: var(--bg-card); font-family: inherit; font-size: 1rem; color: var(--text-main);
+        /* Search Bar - IMPROVED UI/UX */
+        .search-wrapper { 
+            position: relative; 
+            margin-bottom: 30px; 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            background: var(--bg-card);
+            padding: 20px 25px;
+            border-radius: 16px;
             box-shadow: var(--shadow-sm);
         }
-        .search-input:focus { outline: none; border-color: var(--primary-orange); }
-        .search-icon { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-input {
+            flex: 1; 
+            min-width: 250px; 
+            padding: 16px 25px; 
+            border-radius: 12px; 
+            border: 2px solid rgba(0,0,0,0.08);
+            background: var(--bg-body); 
+            font-family: inherit; 
+            font-size: 1rem; 
+            color: var(--text-main);
+            transition: all 0.3s;
+        }
+        .search-input:focus { 
+            outline: none; 
+            border-color: var(--primary-blue); 
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+        }
+
+        /* Filter Section */
+        .filter-wrapper {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-label i {
+            color: var(--primary-blue);
+        }
+
+        /* Category Filter - Enhanced */
+        .filter-select {
+            padding: 14px 20px; 
+            border-radius: 12px; 
+            border: 2px solid rgba(0,0,0,0.08);
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer; 
+            outline: none; 
+            transition: all 0.3s;
+            min-width: 180px;
+        }
+        .filter-select:hover {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+        }
+        .filter-select:focus { 
+            border-color: var(--primary-orange); 
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(255, 159, 67, 0.15);
+        }
+        
+        /* Filter Stats Badge */
+        .filter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(46, 134, 222, 0.1);
+            color: var(--primary-blue);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .filter-badge i {
+            font-size: 0.8rem;
+        }
 
         /* Grid & Cards - FIXED SIZE CONSISTENT LAYOUT */
         .products-grid {
@@ -141,7 +225,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(0,0,0,0.05);
-            height: 420px; /* FIXED HEIGHT */
+            height: 450px; /* Normal height - not too big, not too small */
         }
 
         .product-card:hover {
@@ -154,7 +238,7 @@
         .card-header {
             position: relative;
             width: 100%;
-            height: 200px; /* FIXED HEIGHT */
+            height: 200px; /* Normal height for image */
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             overflow: hidden;
             flex-shrink: 0; /* Don't shrink */
@@ -272,6 +356,7 @@
             background: rgba(0,0,0,0.03);
             border-radius: 10px;
             transition: background 0.2s;
+            font-size: 0.9rem;
         }
 
         body.dark-mode-active .info-row {
@@ -408,6 +493,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span id="userName" style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: none;">User</span>
+                <a href="/profile" class="nav-link" style="font-size: 0.85rem;" title="Profil"><i class="fas fa-user-circle"></i></a>
                 <a href="/auth/logout" class="nav-link" style="font-size: 0.85rem;">Keluar</a>
                 <button class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
             </div>
@@ -421,8 +507,26 @@
         </div>
 
         <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari di catatan (cth: Bawang, Susu)...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari bahan (cth: Bawang, Susu)...">
+            
+            <div class="filter-wrapper">
+                <span class="filter-label">
+                    <i class="fas fa-filter"></i> Filter:
+                </span>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">Semua Kategori</option>
+                    <option value="Bumbu Dapur">Bumbu Dapur</option>
+                    <option value="Sayuran">Sayuran</option>
+                    <option value="Buah-buahan">Buah-buahan</option>
+                    <option value="Protein">Protein</option>
+                    <option value="Bahan Kering">Bahan Kering</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </div>
+            
+            <span class="filter-badge" id="filterBadge" style="display: none;">
+                <i class="fas fa-box"></i> <span id="filterCount">0</span> Ditemukan
+            </span>
         </div>
 
         <div class="products-grid" id="productsGrid">
@@ -484,9 +588,15 @@
             try {
                 const res = await fetch('/api/products');
                 const data = await res.json();
-                renderProducts(data.success ? data.products : []);
+                if(data.success) {
+                    allProducts = data.products; // Store for filtering
+                    renderProducts(data.products);
+                } else {
+                    renderProducts([]);
+                }
             } catch (err) {
                 console.error(err);
+                renderProducts([]);
             }
         }
 
@@ -494,6 +604,15 @@
         function renderProducts(items) {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
+
+            // Update filter badge
+            const filterBadge = document.getElementById('filterBadge');
+            const filterCount = document.getElementById('filterCount');
+            
+            if (filterBadge && filterCount) {
+                filterCount.textContent = items.length;
+                filterBadge.style.display = items.length > 0 ? 'inline-flex' : 'none';
+            }
 
             if (items.length === 0) {
                 grid.innerHTML = `
@@ -506,13 +625,20 @@
             }
 
             items.forEach(item => {
-                const isLow = parseFloat(item.stock_quantity) <= parseFloat(item.min_stock_level);
+                // Format stock without .0 for whole numbers
+                const stockNum = parseFloat(item.stock_quantity);
+                const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
+                
+                const minStockNum = parseFloat(item.min_stock_level);
+                const minStockDisplay = Number.isInteger(minStockNum) ? minStockNum.toString() : minStockNum.toFixed(1);
+                
+                const isLow = stockNum <= minStockNum;
                 const isExpired = item.expiry_date && new Date(item.expiry_date) < new Date();
                 const isExpiringSoon = item.expiry_date && (() => {
                     const diffDays = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
                     return diffDays >= 0 && diffDays <= 3;
                 })();
-                
+
                 // Tentukan icon jika tidak ada gambar
                 let iconClass = 'fa-box-open';
                 if (item.name.toLowerCase().includes('ayam')) iconClass = 'fa-drumstick-bite';
@@ -525,24 +651,60 @@
 
                 // Stock indicator class
                 let stockClass = 'normal';
-                if (parseFloat(item.stock_quantity) <= 0) stockClass = 'empty';
+                if (stockNum <= 0) stockClass = 'empty';
                 else if (isLow) stockClass = 'low';
 
-                // Format expiry date
+                // Format expiry date dd/mm/yyyy dengan 2 digit untuk hari dan bulan
                 const expiryDate = item.expiry_date ? (() => {
                     const d = new Date(item.expiry_date);
                     const today = new Date();
                     const diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
-                    
+
                     if (diffDays < 0) return { text: 'Kadaluarsa', class: 'expired' };
                     if (diffDays === 0) return { text: 'Hari ini', class: 'expired' };
                     if (diffDays <= 3) return { text: `${diffDays} hari lagi`, class: 'warning' };
-                    
-                    return { 
-                        text: `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`, 
-                        class: '' 
+
+                    // Format dengan padStart untuk memastikan 2 digit
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0'); // getMonth() mulai dari 0
+                    const year = d.getFullYear();
+
+                    return {
+                        text: `${day}/${month}/${year}`,
+                        class: ''
                     };
                 })() : { text: '-', class: '' };
+
+                // Category name mapping - dari ID kategori ke nama display (fallback)
+                const categoryNames = {
+                    1: 'Bumbu Dapur',
+                    2: 'Sayuran',
+                    3: 'Buah-buahan',
+                    4: 'Protein',
+                    5: 'Bahan Kering',
+                    6: 'Lainnya'
+                };
+                
+                // Dapatkan nama kategori - prioritaskan category_name dari API
+                const categoryId = item.category_id;
+                const categoryNameFromApi = item.category_name;
+                
+                console.log('Product:', item.name, 'Category ID:', categoryId, 'Category Name from API:', categoryNameFromApi);
+                
+                // Gunakan category_name dari API jika ada
+                let categoryName = categoryNameFromApi;
+                
+                // Fallback: jika tidak ada category_name, gunakan mapping dari category_id
+                if (!categoryName && categoryId) {
+                    categoryName = categoryNames[parseInt(categoryId)];
+                }
+                
+                // Default ke 'Lainnya' jika tetap tidak ada
+                if (!categoryName) {
+                    categoryName = 'Lainnya';
+                }
+                
+                console.log('Product:', item.name, 'Final Category Name:', categoryName);
 
                 const card = document.createElement('div');
                 card.className = 'product-card';
@@ -551,8 +713,8 @@
                 card.innerHTML = `
                     <div class="card-header">
                         <div class="stock-indicator ${stockClass}" title="${stockClass === 'empty' ? 'Habis' : stockClass === 'low' ? 'Stok Rendah' : 'Aman'}"></div>
-                        <span class="category-badge">${item.category_id || 'Umum'}</span>
-                        ${item.image_url 
+                        <span class="category-badge">${categoryName}</span>
+                        ${item.image_url
                             ? `<img src="${item.image_url}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">`
                             : ''
                         }
@@ -566,7 +728,7 @@
                             <div class="info-row">
                                 <span class="label"><i class="fas fa-cube"></i> Stok</span>
                                 <span class="value ${isLow ? 'low-stock' : ''}">
-                                    ${parseFloat(item.stock_quantity)} ${item.unit || ''}
+                                    ${stockDisplay} ${item.unit || ''}
                                 </span>
                             </div>
                             <div class="info-row">
@@ -575,6 +737,18 @@
                                     ${expiryDate.text}
                                 </span>
                             </div>
+                            ${isExpiringSoon && !isExpired ? `
+                            <div class="info-row">
+                                <span class="label"><i class="fas fa-exclamation-triangle"></i> Info</span>
+                                <span class="value warning">Hampir Kadaluarsa</span>
+                            </div>
+                            ` : ''}
+                            ${isExpired ? `
+                            <div class="info-row">
+                                <span class="label"><i class="fas fa-times-circle"></i> Info</span>
+                                <span class="value expired">Sudah Kadaluarsa</span>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
 
@@ -642,21 +816,77 @@
             }
         }
 
-        // 5. Search
-        document.getElementById('searchInput').addEventListener('input', async (e) => {
-            const q = e.target.value.toLowerCase();
-            const res = await fetch('/api/products');
-            const data = await res.json();
-            if(data.success) {
-                const filtered = data.products.filter(p => p.name.toLowerCase().includes(q) || (p.category_id && p.category_id.toLowerCase().includes(q)));
-                renderProducts(filtered);
+        // 5. Search & Filter
+        let allProducts = []; // Store all products for filtering
+        
+        // Category ID mapping
+        const categoryToId = {
+            'Bumbu Dapur': 1,
+            'Sayuran': 2,
+            'Buah-buahan': 3,
+            'Protein': 4,
+            'Bahan Kering': 5,
+            'Lainnya': 6
+        };
+
+        // Category filter
+        document.getElementById('categoryFilter').addEventListener('change', async (e) => {
+            const category = e.target.value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (allProducts.length === 0) {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                if(data.success) allProducts = data.products;
             }
+
+            let filtered = allProducts;
+
+            // Filter by category (convert category name to ID)
+            if (category) {
+                const categoryId = categoryToId[category];
+                filtered = filtered.filter(p => p.category_id === categoryId);
+            }
+
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            renderProducts(filtered);
+        });
+        
+        // Search input
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            if (allProducts.length === 0) {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                if(data.success) allProducts = data.products;
+            }
+
+            let filtered = allProducts;
+
+            // Filter by category (convert category name to ID)
+            if (category) {
+                const categoryId = categoryToId[category];
+                filtered = filtered.filter(p => p.category_id === categoryId);
+            }
+
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            renderProducts(filtered);
         });
 
         // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            loadUserInfo();
-            loadProducts();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserInfo();
+            await loadProducts();
         });
     </script>
 </body>

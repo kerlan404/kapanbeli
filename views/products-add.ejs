@@ -15,6 +15,7 @@
         :root {
             --primary-blue: #2E86DE; --primary-orange: #FF9F43; --bg-body: #F0F4F8; --bg-card: #FFFFFF;
             --text-main: #2C3E50; --text-muted: #636E72; --radius: 12px; --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --success: #1DD1A1; --danger: #FF6B6B;
         }
         body.dark-mode-active {
             --bg-body: #1E272E; --bg-card: #2C3E50; --text-main: #DFE6E9; --text-muted: #B2BEC3;
@@ -47,6 +48,33 @@
             background: var(--bg-body); color: var(--text-main); font-size: 1rem;
         }
         .form-control:focus { outline: none; border-color: var(--primary-orange); background: var(--bg-card); }
+
+        /* Date input wrapper */
+        .date-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .date-input-wrapper .form-control {
+            letter-spacing: 0.5px;
+        }
+        .date-input-wrapper .form-control::placeholder {
+            letter-spacing: normal;
+            color: var(--text-muted);
+        }
+        .date-input-wrapper .date-icon {
+            position: absolute;
+            right: 14px;
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+        .form-control.date-invalid {
+            border-color: var(--danger) !important;
+        }
+        .form-control.date-valid {
+            border-color: var(--success) !important;
+        }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
@@ -94,12 +122,12 @@
                     <div class="form-group">
                         <label class="form-label">Kategori</label>
                         <select id="productCategory" class="form-control">
-                            <option value="bumbu">Bumbu Dapur</option>
-                            <option value="sayur">Sayuran</option>
-                            <option value="buah">Buah-buahan</option>
-                            <option value="protein">Protein</option>
-                            <option value="bahan_kering">Bahan Kering</option>
-                            <option value="lainnya">Lainnya</option>
+                            <option value="Bumbu Dapur">Bumbu Dapur</option>
+                            <option value="Sayuran">Sayuran</option>
+                            <option value="Buah-buahan">Buah-buahan</option>
+                            <option value="Protein">Protein</option>
+                            <option value="Bahan Kering">Bahan Kering</option>
+                            <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -133,9 +161,24 @@
                             <i class="fas fa-infinity" style="font-size: 0.9rem;"></i> Tidak memiliki tanggal kadaluarsa
                         </label>
                     </div>
-                    <input type="date" id="productExpiry" class="form-control" style="opacity: 1; transition: opacity 0.3s;">
+                    <!-- 
+                        PERUBAHAN: Menggunakan text input dengan format dd/mm/yyyy
+                        bukan type="date" yang menggunakan format mm/dd/yyyy (browser default)
+                    -->
+                    <div class="date-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="productExpiry" 
+                            class="form-control" 
+                            placeholder="dd/mm/yyyy"
+                            maxlength="10"
+                            autocomplete="off"
+                            style="opacity: 1; transition: opacity 0.3s;"
+                        >
+                        <i class="fas fa-calendar-alt date-icon"></i>
+                    </div>
                     <p id="expiryHelp" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
-                        <i class="fas fa-info-circle"></i> Wajib diisi untuk produk yang memiliki kadaluarsa
+                        <i class="fas fa-info-circle"></i> Format: DD/MM/YYYY — Wajib diisi untuk produk yang memiliki kadaluarsa
                     </p>
                 </div>
 
@@ -158,39 +201,158 @@
     </div>
 
     <script>
-        // --- LOGIC (Server & File Upload Preserved) ---
-        const urlId = window.location.pathname.split('/').pop();
-        let isEdit = !isNaN(urlId);
+        // ─── UTILITY: Date Helpers ───────────────────────────────────────────────
 
-        // Setup UI
-        if(isEdit) {
+        /**
+         * Konversi dari "YYYY-MM-DD" (ISO / dari server) ke "DD/MM/YYYY" (tampilan)
+         * FIX: Menggunakan parsing manual untuk menghindari masalah timezone
+         */
+        function isoToDmy(isoStr) {
+            if (!isoStr) return '';
+
+            // Handle format "YYYY-MM-DD" atau "YYYY-MM-DDT..."
+            const datePart = isoStr.split('T')[0];
+            const parts = datePart.split('-');
+
+            if (parts.length !== 3) return '';
+
+            // Parse sebagai integer untuk memastikan nilai yang benar
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+
+            // Validasi nilai
+            if (isNaN(year) || isNaN(month) || isNaN(day)) return '';
+            if (year < 1900 || year > 2100) return '';
+            if (month < 1 || month > 12) return '';
+            if (day < 1 || day > 31) return '';
+
+            // Format dengan padStart untuk memastikan 2 digit (FIX untuk bulan)
+            const dd = String(day).padStart(2, '0');
+            const mm = String(month).padStart(2, '0'); // Pastikan bulan 2 digit (01, 02, dst)
+            const yyyy = year;
+
+            const result = `${dd}/${mm}/${yyyy}`;
+            console.log('isoToDmy:', isoStr, '->', result);
+            return result;
+        }
+
+        /**
+         * Konversi dari "DD/MM/YYYY" (input user) ke "YYYY-MM-DD" (untuk server)
+         */
+        function dmyToIso(dmyStr) {
+            if (!dmyStr) return '';
+            const parts = dmyStr.split('/');
+            if (parts.length !== 3) return '';
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        /**
+         * Validasi apakah string "DD/MM/YYYY" adalah tanggal valid
+         */
+        function isValidDmy(dmyStr) {
+            if (!dmyStr || dmyStr.length !== 10) return false;
+            const parts = dmyStr.split('/');
+            if (parts.length !== 3) return false;
+            const [dd, mm, yyyy] = parts.map(Number);
+            if (isNaN(dd) || isNaN(mm) || isNaN(yyyy)) return false;
+            if (mm < 1 || mm > 12) return false;
+            if (dd < 1 || dd > 31) return false;
+            if (yyyy < 1900 || yyyy > 2100) return false;
+            const date = new Date(yyyy, mm - 1, dd);
+            return date.getFullYear() === yyyy && date.getMonth() === mm - 1 && date.getDate() === dd;
+        }
+
+        // ─── SETUP ───────────────────────────────────────────────────────────────
+
+        const urlId = window.location.pathname.split('/').pop();
+        let isEdit = !isNaN(urlId) && urlId !== '';
+
+        // Setup UI teks sesuai mode (tambah / edit)
+        if (isEdit) {
             document.getElementById('pageTitle').innerText = 'Edit Produk';
             document.getElementById('navActionText').innerText = 'Edit';
             document.getElementById('submitBtn').innerText = 'Perbarui Produk';
             loadEditData(urlId);
         }
 
-        // Checkbox Logic for No Expiry Date
-        const noExpiryCheckbox = document.getElementById('noExpiryCheckbox');
+        // ─── AUTO FORMAT TANGGAL saat mengetik ──────────────────────────────────
         const productExpiry = document.getElementById('productExpiry');
+
+        productExpiry.addEventListener('input', function (e) {
+            let val = this.value.replace(/\D/g, ''); // hanya angka
+            
+            // Batasi panjang maksimal 8 digit (DDMMYYYY)
+            if (val.length > 8) val = val.substring(0, 8);
+            
+            let formatted = '';
+            
+            // Format hari (2 digit)
+            if (val.length >= 1) {
+                formatted += val.substring(0, Math.min(2, val.length));
+            }
+            // Tambahkan separator dan bulan (2 digit)
+            if (val.length >= 3) {
+                formatted += '/' + val.substring(2, Math.min(4, val.length));
+            }
+            // Tambahkan separator dan tahun (4 digit)
+            if (val.length >= 5) {
+                formatted += '/' + val.substring(4, Math.min(8, val.length));
+            }
+            
+            this.value = formatted;
+            
+            // Auto-add leading zero when user types single digit for day
+            if (val.length === 1 && parseInt(val) > 3) {
+                // Jika user mengetik angka > 3 untuk hari pertama, tambahkan 0 di depan
+                this.value = '0' + val;
+            }
+            
+            // Auto-add leading zero when user types single digit for month
+            if (val.length === 3 && parseInt(val.substring(2, 3)) > 1) {
+                // Jika digit pertama bulan > 1, tambahkan 0 di depan bulan
+                const day = val.substring(0, 2);
+                const month = val.substring(2, 3);
+                const year = val.length > 4 ? val.substring(3, 7) : '';
+                this.value = day + '/0' + month + (year ? '/' + year : '');
+            }
+
+            // Validasi visual
+            if (formatted.length === 10) {
+                if (isValidDmy(formatted)) {
+                    this.classList.remove('date-invalid');
+                    this.classList.add('date-valid');
+                } else {
+                    this.classList.remove('date-valid');
+                    this.classList.add('date-invalid');
+                }
+            } else {
+                this.classList.remove('date-valid', 'date-invalid');
+            }
+        });
+
+        // ─── CHECKBOX: Tidak ada kadaluarsa ──────────────────────────────────────
+        const noExpiryCheckbox = document.getElementById('noExpiryCheckbox');
         const expiryHelp = document.getElementById('expiryHelp');
 
-        noExpiryCheckbox.addEventListener('change', function() {
+        noExpiryCheckbox.addEventListener('change', function () {
             if (this.checked) {
                 productExpiry.disabled = true;
                 productExpiry.value = '';
                 productExpiry.style.opacity = '0.5';
-                productExpiry.removeAttribute('required');
+                productExpiry.classList.remove('date-valid', 'date-invalid');
                 expiryHelp.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Produk tidak memiliki kadaluarsa (garam, gula, madu, dll)';
             } else {
                 productExpiry.disabled = false;
                 productExpiry.style.opacity = '1';
-                productExpiry.setAttribute('required', 'required');
-                expiryHelp.innerHTML = '<i class="fas fa-info-circle"></i> Wajib diisi untuk produk yang memiliki kadaluarsa';
+                expiryHelp.innerHTML = '<i class="fas fa-info-circle"></i> Format: DD/MM/YYYY — Wajib diisi untuk produk yang memiliki kadaluarsa';
             }
         });
 
-        // Initialize checkbox state based on existing value
+        /**
+         * Inisialisasi state checkbox berdasarkan data yang sudah ada.
+         * Dipanggil setelah data produk selesai dimuat saat edit.
+         */
         function initializeCheckboxState() {
             const hasExpiry = productExpiry.value && productExpiry.value.trim() !== '';
             if (!hasExpiry) {
@@ -198,60 +360,136 @@
                 productExpiry.disabled = true;
                 productExpiry.style.opacity = '0.5';
                 expiryHelp.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Produk tidak memiliki kadaluarsa';
+            } else {
+                noExpiryCheckbox.checked = false;
+                productExpiry.disabled = false;
+                productExpiry.style.opacity = '1';
             }
         }
 
-        // Image Preview
-        document.getElementById('productImage').addEventListener('change', function(e) {
+        // ─── IMAGE PREVIEW ───────────────────────────────────────────────────────
+        document.getElementById('productImage').addEventListener('change', function (e) {
             const file = e.target.files[0];
-            if(file) {
+            if (file) {
                 const reader = new FileReader();
-                reader.onload = function(evt) {
+                reader.onload = function (evt) {
                     document.getElementById('previewBox').innerHTML = `<img src="${evt.target.result}">`;
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Load Data for Edit
+        // ─── LOAD DATA UNTUK EDIT ─────────────────────────────────────────────────
         async function loadEditData(id) {
             try {
+                console.log('Loading edit data for ID:', id);
                 const res = await fetch(`/api/products/${id}`);
                 const data = await res.json();
-                if(data.success) {
+                console.log('API Response:', data);
+
+                if (data.success) {
                     const p = data.product;
+                    console.log('Product data:', p);
+
+                    // Nama
                     document.getElementById('productName').value = p.name;
-                    document.getElementById('productCategory').value = p.category_id || 'lainnya';
+
+                    // ✅ FIX KATEGORI: Load kategori yang benar saat edit
+                    const categorySelect = document.getElementById('productCategory');
+                    
+                    // category_id adalah ID integer dari database, kita perlu nama kategorinya
+                    const categoryId = p.category_id;
+                    
+                    console.log('Category ID from DB:', categoryId);
+                    
+                    // Mapping ID kategori ke nama (sesuai dengan database)
+                    const categoryNames = {
+                        1: 'Bumbu Dapur',
+                        2: 'Sayuran',
+                        3: 'Buah-buahan',
+                        4: 'Protein',
+                        5: 'Bahan Kering',
+                        6: 'Lainnya'
+                    };
+                    
+                    // Jika category_id ada di mapping, gunakan nama tersebut
+                    if (categoryId && categoryNames[categoryId]) {
+                        categorySelect.value = categoryNames[categoryId];
+                        console.log('✅ Category set to:', categoryNames[categoryId]);
+                    } else {
+                        // Default ke 'Lainnya' jika tidak ditemukan
+                        categorySelect.value = 'Lainnya';
+                        console.log('⚠️ Category not found, defaulting to Lainnya');
+                    }
+
+                    // Satuan
                     document.getElementById('productUnit').value = p.unit || 'pcs';
-                    document.getElementById('productQuantity').value = p.stock_quantity;
-                    document.getElementById('productMinStock').value = p.min_stock_level;
-                    document.getElementById('productExpiry').value = p.expiry_date ? p.expiry_date.split('T')[0] : '';
+
+                    // Stok
+                    const stockNum = parseFloat(p.stock_quantity);
+                    document.getElementById('productQuantity').value = Number.isInteger(stockNum) ? stockNum : stockNum;
+
+                    const minStockNum = parseFloat(p.min_stock_level);
+                    document.getElementById('productMinStock').value = Number.isInteger(minStockNum) ? minStockNum : minStockNum;
+
+                    // ✅ FIX TANGGAL: konversi dari ISO "YYYY-MM-DD" ke "DD/MM/YYYY"
+                    if (p.expiry_date) {
+                        const convertedDate = isoToDmy(p.expiry_date);
+                        productExpiry.value = convertedDate;
+                        console.log('Expiry date loaded:', p.expiry_date, '->', convertedDate);
+                        // Trigger validasi visual
+                        if (isValidDmy(convertedDate)) {
+                            productExpiry.classList.add('date-valid');
+                        }
+                    } else {
+                        productExpiry.value = '';
+                        console.log('No expiry date');
+                    }
+
+                    // Deskripsi / catatan
                     document.getElementById('productNotes').value = p.description || p.notes || '';
-                    if(p.image_url) {
+
+                    // Gambar
+                    if (p.image_url) {
                         document.getElementById('previewBox').innerHTML = `<img src="${p.image_url}">`;
                     }
-                    // Initialize checkbox state after loading data
+
+                    // Init checkbox setelah data terisi
                     setTimeout(initializeCheckboxState, 100);
                 }
-            } catch(e) { console.error(e); }
+            } catch (e) {
+                console.error('Error loading edit data:', e);
+            }
         }
 
-        // Submit Handler
+        // ─── SUBMIT ───────────────────────────────────────────────────────────────
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Validation for expiry date
             const isNoExpiry = noExpiryCheckbox.checked;
-            const expiryValue = productExpiry.value;
+            const expiryValue = productExpiry.value.trim();
 
-            if (!isNoExpiry && !expiryValue) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Tanggal Kadaluarsa Wajib Diisi',
-                    text: 'Produk ini memiliki tanggal kadaluarsa. Silakan isi tanggal atau centang "Tidak memiliki tanggal kadaluarsa".',
-                    confirmButtonText: 'OK'
-                });
-                return;
+            // Validasi tanggal kadaluarsa
+            if (!isNoExpiry) {
+                if (!expiryValue) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tanggal Kadaluarsa Wajib Diisi',
+                        text: 'Produk ini memiliki tanggal kadaluarsa. Silakan isi tanggal atau centang "Tidak memiliki tanggal kadaluarsa".',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                if (!isValidDmy(expiryValue)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Format Tanggal Tidak Valid',
+                        text: 'Gunakan format DD/MM/YYYY. Contoh: 25/12/2025',
+                        confirmButtonText: 'OK'
+                    });
+                    productExpiry.focus();
+                    return;
+                }
             }
 
             const btn = document.getElementById('submitBtn');
@@ -266,11 +504,15 @@
             formData.append('stock_quantity', document.getElementById('productQuantity').value);
             formData.append('min_stock_level', document.getElementById('productMinStock').value);
 
-            // Handle expiry date - send NULL if no expiry checkbox is checked
+            // Kirim tanggal ke server dalam format YYYY-MM-DD (ISO), atau kosong jika tidak ada
             if (isNoExpiry) {
-                formData.append('expiry_date', ''); // Empty string will be converted to NULL in backend
+                formData.append('expiry_date', ''); // backend konversi ke NULL
             } else {
-                formData.append('expiry_date', expiryValue);
+                // FIX: Pastikan tanggal tidak mengalami timezone shift
+                // User input: 25/02/2025 -> ISO: 2025-02-25
+                const isoDate = dmyToIso(expiryValue);
+                console.log('Sending expiry date:', expiryValue, '->', isoDate);
+                formData.append('expiry_date', isoDate);
             }
 
             const notesValue = document.getElementById('productNotes').value;
@@ -278,7 +520,7 @@
             formData.append('notes', notesValue);
 
             const fileInput = document.getElementById('productImage');
-            if(fileInput.files[0]) formData.append('image', fileInput.files[0]);
+            if (fileInput.files[0]) formData.append('image', fileInput.files[0]);
 
             try {
                 const method = isEdit ? 'PUT' : 'POST';
@@ -287,14 +529,13 @@
                 const res = await fetch(url, { method: method, body: formData });
                 const data = await res.json();
 
-                if(res.ok) {
+                if (res.ok) {
                     Swal.fire({
                         icon: 'success',
                         title: isEdit ? 'Produk Berhasil Diperbarui!' : 'Produk Berhasil Ditambahkan!',
                         text: isEdit ? 'Perubahan pada produk telah disimpan.' : 'Produk baru telah ditambahkan ke daftar Anda.',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        // Dispatch custom event to notify other pages
                         window.dispatchEvent(new CustomEvent('productAdded'));
                         window.location.href = '/products';
                     });
@@ -308,7 +549,7 @@
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
-            } catch(err) {
+            } catch (err) {
                 console.error(err);
                 Swal.fire({
                     icon: 'error',
