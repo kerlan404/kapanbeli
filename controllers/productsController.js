@@ -43,6 +43,11 @@ const productsController = {
             min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) || 5 : (min_stock_level || 5);
             quantity = typeof quantity === 'string' ? parseFloat(quantity) || 1 : (quantity || 1);
 
+            // Handle expiry_date: convert empty string to NULL for products without expiry
+            if (expiry_date === '' || expiry_date === null || expiry_date === undefined) {
+                expiry_date = null;
+            }
+
             // If file is uploaded, get the image URL from the file
             let imageUrl = image_url || null;
             if (req.file) {
@@ -88,7 +93,7 @@ const productsController = {
                 image_url: imageUrl,
                 unit: unit || null, // Misalnya 'kg', 'pcs', dll
                 quantity: quantity || 1, // Jumlah satuan
-                expiry_date: expiry_date || null,
+                expiry_date: expiry_date, // NULL untuk produk tanpa kadaluarsa
                 notes: notes || ''
             });
 
@@ -163,6 +168,11 @@ const productsController = {
             min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) || 5 : (min_stock_level || 5);
             quantity = typeof quantity === 'string' ? parseFloat(quantity) || 1 : (quantity || 1);
 
+            // Handle expiry_date: convert empty string to NULL for products without expiry
+            if (expiry_date === '' || expiry_date === null || expiry_date === undefined) {
+                expiry_date = null;
+            }
+
             if (!userId) {
                 return res.status(401).json({
                     success: false,
@@ -227,7 +237,7 @@ const productsController = {
                 image_url: imageUrl,
                 unit: unit || existingProduct.unit,
                 quantity: quantity !== undefined ? quantity : existingProduct.quantity,
-                expiry_date: expiry_date || existingProduct.expiry_date,
+                expiry_date: expiry_date, // NULL untuk produk tanpa kadaluarsa
                 notes: notes || existingProduct.notes
             });
 

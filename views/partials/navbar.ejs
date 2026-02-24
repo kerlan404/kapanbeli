@@ -8,15 +8,20 @@
 
         <div class="nav-menu">
             <a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">Beranda</a>
-            <a href="/notes" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">Catatan</a>
-            <a href="/products" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>">Bahan Saya</a>
-            <a href="/suggestions" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'suggestions' ? 'active' : '' %>">Saran Belanja</a>
+            <a href="/notes" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>" onclick="checkAuth(event)">Catatan</a>
+            <a href="/products" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>" onclick="checkAuth(event)">Bahan Saya</a>
+            <a href="/suggestions" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'suggestions' ? 'active' : '' %>" onclick="checkAuth(event)">Saran Belanja</a>
             <a href="/about" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'about' ? 'active' : '' %>">Tentang Kami</a>
         </div>
 
         <div class="nav-actions">
             <div id="authContainer">
-                <a href="/auth" class="btn-text" id="authLink">Masuk</a>
+                <!-- Unauthenticated: Show Login & Register buttons -->
+                <div id="unauthButtons" style="display: none;">
+                    <a href="/auth" class="btn-text" style="margin-right: 15px;">Masuk</a>
+                    <a href="/register" class="btn-primary" style="padding: 8px 20px; background: var(--primary-orange); color: white; border-radius: 8px; font-weight: 500;">Daftar</a>
+                </div>
+                <!-- Authenticated: Show Welcome & Logout -->
                 <span id="welcomeText" style="display:none; font-weight: 600; margin-right: 10px; color: var(--text-main);"></span>
                 <a href="/auth/logout" class="btn-text" id="logoutLink" style="display:none; color: var(--accent-red);">Keluar</a>
             </div>
@@ -27,3 +32,56 @@
         </div>
     </div>
 </nav>
+
+<script>
+    // Check authentication status and update navbar
+    async function checkAuthStatus() {
+        try {
+            const response = await fetch('/auth/status');
+            const data = await response.json();
+            
+            const unauthButtons = document.getElementById('unauthButtons');
+            const welcomeText = document.getElementById('welcomeText');
+            const logoutLink = document.getElementById('logoutLink');
+            
+            if (data.authenticated) {
+                // User is logged in
+                unauthButtons.style.display = 'none';
+                welcomeText.style.display = 'inline';
+                welcomeText.textContent = `Hai, ${data.user.name}!`;
+                logoutLink.style.display = 'inline';
+            } else {
+                // User is not logged in
+                unauthButtons.style.display = 'inline-block';
+                welcomeText.style.display = 'none';
+                logoutLink.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Auth check error:', error);
+        }
+    }
+
+    // Check auth when page loads
+    document.addEventListener('DOMContentLoaded', checkAuthStatus);
+
+    // Function to check auth before accessing protected pages
+    function checkAuth(event) {
+        event.preventDefault();
+        const targetUrl = event.currentTarget.href;
+        
+        fetch('/auth/status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    window.location.href = targetUrl;
+                } else {
+                    // Redirect to login with return URL
+                    window.location.href = '/auth?returnUrl=' + encodeURIComponent(targetUrl);
+                }
+            })
+            .catch(error => {
+                console.error('Auth check error:', error);
+                window.location.href = '/auth';
+            });
+    }
+</script>

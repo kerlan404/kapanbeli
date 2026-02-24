@@ -241,6 +241,8 @@
             </div>
             
             <form onsubmit="handleLogin(event)">
+                <input type="hidden" id="returnUrl" value="<%= typeof returnUrl !== 'undefined' ? returnUrl : '/' %>">
+                
                 <div class="input-group">
                     <label>Email</label>
                     <div class="input-wrapper">
@@ -337,6 +339,7 @@
 
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            const returnUrl = document.getElementById('returnUrl').value;
 
             // Validasi
             if (!email || !password) {
@@ -358,7 +361,8 @@
                     },
                     body: JSON.stringify({
                         email: email,
-                        password: password
+                        password: password,
+                        returnUrl: returnUrl
                     })
                 });
 
@@ -382,6 +386,13 @@
                 btn.disabled = false;
             }
         }
+
+        // Check for confirmation message from server
+        <% if (typeof confirmed !== 'undefined' && confirmed) { %>
+        window.addEventListener('DOMContentLoaded', function() {
+            showAlert('Akun berhasil dikonfirmasi! Silakan login.', 'success');
+        });
+        <% } %>
     </script>
 </body>
 </html>

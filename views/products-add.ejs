@@ -127,7 +127,16 @@
 
                 <div class="form-group">
                     <label class="form-label">Tanggal Kadaluarsa</label>
-                    <input type="date" id="productExpiry" class="form-control">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <input type="checkbox" id="noExpiryCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="noExpiryCheckbox" style="cursor: pointer; color: var(--text-muted); font-weight: 500;">
+                            <i class="fas fa-infinity" style="font-size: 0.9rem;"></i> Tidak memiliki tanggal kadaluarsa
+                        </label>
+                    </div>
+                    <input type="date" id="productExpiry" class="form-control" style="opacity: 1; transition: opacity 0.3s;">
+                    <p id="expiryHelp" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> Wajib diisi untuk produk yang memiliki kadaluarsa
+                    </p>
                 </div>
 
                 <div class="form-group">
@@ -161,6 +170,37 @@
             loadEditData(urlId);
         }
 
+        // Checkbox Logic for No Expiry Date
+        const noExpiryCheckbox = document.getElementById('noExpiryCheckbox');
+        const productExpiry = document.getElementById('productExpiry');
+        const expiryHelp = document.getElementById('expiryHelp');
+
+        noExpiryCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                productExpiry.disabled = true;
+                productExpiry.value = '';
+                productExpiry.style.opacity = '0.5';
+                productExpiry.removeAttribute('required');
+                expiryHelp.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Produk tidak memiliki kadaluarsa (garam, gula, madu, dll)';
+            } else {
+                productExpiry.disabled = false;
+                productExpiry.style.opacity = '1';
+                productExpiry.setAttribute('required', 'required');
+                expiryHelp.innerHTML = '<i class="fas fa-info-circle"></i> Wajib diisi untuk produk yang memiliki kadaluarsa';
+            }
+        });
+
+        // Initialize checkbox state based on existing value
+        function initializeCheckboxState() {
+            const hasExpiry = productExpiry.value && productExpiry.value.trim() !== '';
+            if (!hasExpiry) {
+                noExpiryCheckbox.checked = true;
+                productExpiry.disabled = true;
+                productExpiry.style.opacity = '0.5';
+                expiryHelp.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Produk tidak memiliki kadaluarsa';
+            }
+        }
+
         // Image Preview
         document.getElementById('productImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -190,6 +230,8 @@
                     if(p.image_url) {
                         document.getElementById('previewBox').innerHTML = `<img src="${p.image_url}">`;
                     }
+                    // Initialize checkbox state after loading data
+                    setTimeout(initializeCheckboxState, 100);
                 }
             } catch(e) { console.error(e); }
         }
@@ -197,6 +239,21 @@
         // Submit Handler
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Validation for expiry date
+            const isNoExpiry = noExpiryCheckbox.checked;
+            const expiryValue = productExpiry.value;
+
+            if (!isNoExpiry && !expiryValue) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tanggal Kadaluarsa Wajib Diisi',
+                    text: 'Produk ini memiliki tanggal kadaluarsa. Silakan isi tanggal atau centang "Tidak memiliki tanggal kadaluarsa".',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             const originalText = btn.innerText;
             btn.innerText = 'Menyimpan...';
@@ -208,18 +265,25 @@
             formData.append('unit', document.getElementById('productUnit').value);
             formData.append('stock_quantity', document.getElementById('productQuantity').value);
             formData.append('min_stock_level', document.getElementById('productMinStock').value);
-            formData.append('expiry_date', document.getElementById('productExpiry').value);
+
+            // Handle expiry date - send NULL if no expiry checkbox is checked
+            if (isNoExpiry) {
+                formData.append('expiry_date', ''); // Empty string will be converted to NULL in backend
+            } else {
+                formData.append('expiry_date', expiryValue);
+            }
+
             const notesValue = document.getElementById('productNotes').value;
             formData.append('description', notesValue);
             formData.append('notes', notesValue);
-            
+
             const fileInput = document.getElementById('productImage');
             if(fileInput.files[0]) formData.append('image', fileInput.files[0]);
 
             try {
                 const method = isEdit ? 'PUT' : 'POST';
                 const url = isEdit ? `/api/products/${urlId}` : '/api/products';
-                
+
                 const res = await fetch(url, { method: method, body: formData });
                 const data = await res.json();
 
@@ -246,7 +310,12 @@
                 }
             } catch(err) {
                 console.error(err);
-                alert('Gagal terhubung ke server');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Terhubung ke Server',
+                    text: 'Periksa koneksi internet Anda',
+                    confirmButtonText: 'OK'
+                });
                 btn.innerText = originalText;
                 btn.disabled = false;
             }

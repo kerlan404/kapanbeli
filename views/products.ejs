@@ -123,135 +123,254 @@
         .search-input:focus { outline: none; border-color: var(--primary-orange); }
         .search-icon { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        /* Grid & Cards */
+        /* Grid & Cards - FIXED SIZE CONSISTENT LAYOUT */
         .products-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; /* Gap lebih lebar */
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px;
         }
 
-        /* --- DESIGN CATATAN (NOTE STYLE) --- */
+        /* --- FIXED SIZE PRODUCT CARD --- */
         .product-card {
-            background: var(--bg-card); 
-            border-radius: 2px; /* Sudut tumpul sedikit */
-            overflow: visible; /* Supaya pin bisa keluar */
-            display: flex; flex-direction: column;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             position: relative;
-            box-shadow: var(--shadow-md);
-            transition: transform 0.2s, box-shadow 0.2s;
-            /* Pola Garis Kertas */
-            background-image: linear-gradient(var(--paper-line-color) 1px, transparent 1px);
-            background-size: 100% 2rem; /* Tinggi garis */
-            background-position: 0 1rem;
-            padding-top: 20px; /* Ruang untuk pin */
-            min-height: 280px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+            height: 420px; /* FIXED HEIGHT */
         }
 
-        .product-card:hover { 
-            transform: translateY(-5px) rotate(1deg); /* Efek miring sedikit saat hover */
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15); 
-            z-index: 2;
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+            border-color: rgba(46, 134, 222, 0.3);
         }
 
-        /* 1. Pin Peniti (CSS Art) */
-        .push-pin {
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        /* Card Header - FIXED IMAGE CONTAINER */
+        .card-header {
+            position: relative;
+            width: 100%;
+            height: 200px; /* FIXED HEIGHT */
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            overflow: hidden;
+            flex-shrink: 0; /* Don't shrink */
+        }
+
+        body.dark-mode-active .card-header {
+            background: linear-gradient(135deg, #2d3b45 0%, #1a2228 100%);
+        }
+
+        .card-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* CROP to fill - no stretching */
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .card-header img {
+            transform: scale(1.08);
+        }
+
+        .card-header .card-icon {
+            font-size: 4rem;
+            color: var(--primary-orange);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Category Badge */
+        .category-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--primary-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
             z-index: 10;
         }
-        .push-pin::after {
-            content: ''; position: absolute; top: 50%; left: 50%; width: 6px; height: 6px;
-            background: rgba(255,255,255,0.4); border-radius: 50%; transform: translate(-50%, -50%);
-        }
 
-        /* 2. Pita Perekat (Tape) */
-        .tape {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-2deg);
-            width: 100px; height: 30px;
-            background-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            backdrop-filter: blur(2px);
-            z-index: 9;
-            border-left: 2px dashed rgba(0,0,0,0.05);
-            border-right: 2px dashed rgba(0,0,0,0.05);
-        }
-        body.dark-mode-active .tape { background-color: rgba(0, 0, 0, 0.2); }
-
-        /* 3. Konten Kertas */
-        .card-body { padding: 10px 25px 25px 25px; flex: 1; display: flex; flex-direction: column; position: relative; }
-        
-        /* Garis Margin Merah (Seperti Buku Tulis) */
-        .card-body::before {
-            content: ''; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px;
-            background: var(--paper-margin-color);
-        }
-
-        .category-stamp {
-            position: absolute; top: 15px; right: 15px;
-            border: 2px solid var(--primary-blue);
+        body.dark-mode-active .category-badge {
+            background: rgba(44, 62, 80, 0.95);
             color: var(--primary-blue);
-            padding: 2px 8px;
-            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            border-radius: 4px;
-            transform: rotate(3deg); /* Miring seperti cap stempel */
-            background: rgba(255,255,255,0.8);
         }
-        body.dark-mode-active .category-stamp { background: rgba(0,0,0,0.3); border-color: var(--primary-blue); color: var(--primary-blue); }
 
-        .prod-name { 
-            font-size: 1.3rem; font-weight: 700; margin: 0 0 10px 15px; 
-            cursor: pointer; color: var(--text-main);
-            line-height: 2rem; /* Sesuaikan dengan tinggi garis background */
-            font-family: 'Poppins', sans-serif;
-            text-decoration: underline;
-            text-decoration-color: var(--primary-orange);
-            text-decoration-thickness: 2px;
+        /* Stock Status Indicator */
+        .stock-indicator {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.8);
+            z-index: 10;
         }
-        .prod-name:hover { color: var(--primary-orange); text-decoration: none; }
 
-        /* Area Informasi di bawah Nama */
+        body.dark-mode-active .stock-indicator {
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.8);
+        }
+
+        .stock-indicator.normal { background: var(--success); }
+        .stock-indicator.low { background: var(--warning); }
+        .stock-indicator.empty { background: var(--danger); }
+
+        /* Card Body - FLEXIBLE CONTENT */
+        .card-body {
+            padding: 15px 18px;
+            flex: 1; /* Takes remaining space */
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .prod-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Max 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 32px; /* Fixed height for 2 lines */
+        }
+
+        .prod-name:hover {
+            color: var(--primary-orange);
+        }
+
+        /* Info Section - FIXED LAYOUT */
         .info-section {
-            margin-left: 15px;
-            display: flex; flex-direction: column; gap: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
         }
 
         .info-row {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.95rem; padding-bottom: 2px;
-            line-height: 2rem; /* Teks menempel di garis */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 10px;
+            transition: background 0.2s;
         }
-        .label { color: var(--text-muted); font-style: italic; display: flex; align-items: center; gap: 8px; }
-        .value { font-weight: 600; color: var(--text-main); font-family: 'Poppins', sans-serif; }
 
-        /* Gambar terlihat seperti foto yang ditempel */
-        .photo-sticker {
-            width: 90px; height: 90px;
-            background: white; padding: 5px 5px 25px 5px; /* Polaroid bottom padding */
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-            position: absolute; bottom: 20px; right: 20px;
-            transform: rotate(-5deg);
-            z-index: 5;
-            transition: transform 0.3s;
+        body.dark-mode-active .info-row {
+            background: rgba(255,255,255,0.05);
         }
-        .product-card:hover .photo-sticker { transform: rotate(0deg) scale(1.05); }
-        .photo-sticker img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-sticker i { font-size: 2.5rem; color: var(--primary-orange); width: 100%; text-align: center; display: block; margin-top: 10px; }
 
-        .card-actions {
-            margin-top: auto; display: flex; gap: 10px; padding-top: 20px; padding-left: 15px;
+        .info-row:hover {
+            background: rgba(0,0,0,0.06);
+        }
+
+        body.dark-mode-active .info-row:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .label i {
+            font-size: 0.9rem;
+            color: var(--primary-blue);
+        }
+
+        .value {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .value.low-stock {
+            color: var(--danger);
+        }
+
+        .value.expired {
+            color: var(--danger);
+        }
+
+        .value.warning {
+            color: var(--warning);
+        }
+
+        /* Card Footer - FIXED POSITION AT BOTTOM */
+        .card-footer {
+            padding: 15px 18px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0; /* Don't shrink */
+        }
+
+        body.dark-mode-active .card-footer {
+            border-top-color: rgba(255,255,255,0.05);
         }
 
         .action-btn {
-            flex: 1; padding: 8px; border-radius: 20px; border: none; cursor: pointer;
-            font-weight: 600; font-family: inherit; display: flex; justify-content: center; align-items: center; gap: 5px;
-            font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+            padding: 11px 16px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
         }
-        .btn-edit { background: var(--primary-blue); color: white; }
-        .btn-edit:hover { background: #1e6bb8; }
-        
-        .btn-delete { background: var(--danger); color: white; }
-        .btn-delete:hover { background: #d63031; }
+
+        .btn-edit {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1e6bb8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 134, 222, 0.3);
+        }
+
+        .btn-delete {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
 
         /* Empty State */
         .empty-state {
@@ -371,77 +490,101 @@
             }
         }
 
-        // MODIFIED: renderProducts untuk menyesuaikan tampilan "Catatan"
+        // MODIFIED: renderProducts untuk menyesuaikan tampilan MODERN CARD
         function renderProducts(items) {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
-            
+
             if (items.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-file-alt"></i>
-                        <h3>Belum ada catatan</h3>
-                        <p>Catatan stok dapur Anda masih kosong.</p>
+                        <i class="fas fa-box-open"></i>
+                        <h3>Belum ada bahan</h3>
+                        <p>Stok dapur Anda masih kosong.</p>
                     </div>`;
                 return;
             }
 
             items.forEach(item => {
                 const isLow = parseFloat(item.stock_quantity) <= parseFloat(item.min_stock_level);
+                const isExpired = item.expiry_date && new Date(item.expiry_date) < new Date();
+                const isExpiringSoon = item.expiry_date && (() => {
+                    const diffDays = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    return diffDays >= 0 && diffDays <= 3;
+                })();
+                
                 // Tentukan icon jika tidak ada gambar
                 let iconClass = 'fa-box-open';
                 if (item.name.toLowerCase().includes('ayam')) iconClass = 'fa-drumstick-bite';
                 else if (item.name.toLowerCase().includes('susu')) iconClass = 'fa-glass-whiskey';
                 else if (item.name.toLowerCase().includes('telur')) iconClass = 'fa-egg';
                 else if (item.name.toLowerCase().includes('bawang')) iconClass = 'fa-seedling';
+                else if (item.name.toLowerCase().includes('beras')) iconClass = 'fa-wheat';
+                else if (item.name.toLowerCase().includes('cabai')) iconClass = 'fa-pepper-hot';
+                else if (item.name.toLowerCase().includes('minyak')) iconClass = 'fa-bottle-droplet';
 
-                // Warna teks stok
-                const stockColor = isLow ? 'var(--danger)' : 'var(--text-main)';
-                const stockAlert = isLow ? ' (Stok Tipis!)' : '';
+                // Stock indicator class
+                let stockClass = 'normal';
+                if (parseFloat(item.stock_quantity) <= 0) stockClass = 'empty';
+                else if (isLow) stockClass = 'low';
+
+                // Format expiry date
+                const expiryDate = item.expiry_date ? (() => {
+                    const d = new Date(item.expiry_date);
+                    const today = new Date();
+                    const diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) return { text: 'Kadaluarsa', class: 'expired' };
+                    if (diffDays === 0) return { text: 'Hari ini', class: 'expired' };
+                    if (diffDays <= 3) return { text: `${diffDays} hari lagi`, class: 'warning' };
+                    
+                    return { 
+                        text: `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`, 
+                        class: '' 
+                    };
+                })() : { text: '-', class: '' };
 
                 const card = document.createElement('div');
                 card.className = 'product-card';
-                
-                // HTML Structure Baru untuk Style Catatan
+
+                // MODERN CARD Structure
                 card.innerHTML = `
-                    <div class="tape"></div>
-                    <div class="push-pin"></div>
-                    
+                    <div class="card-header">
+                        <div class="stock-indicator ${stockClass}" title="${stockClass === 'empty' ? 'Habis' : stockClass === 'low' ? 'Stok Rendah' : 'Aman'}"></div>
+                        <span class="category-badge">${item.category_id || 'Umum'}</span>
+                        ${item.image_url 
+                            ? `<img src="${item.image_url}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">`
+                            : ''
+                        }
+                        <i class="fas ${iconClass} card-icon" style="${item.image_url ? 'display:none;' : ''}"></i>
+                    </div>
+
                     <div class="card-body">
-                        <span class="category-stamp">${item.category_id || 'Umum'}</span>
-                        
-                        <h3 class="prod-name" onclick="window.location='/products/detail/${item.id}'">${item.name}</h3>
-                        
+                        <h3 class="prod-name" onclick="window.location='/products/detail/${item.id}'" title="${item.name}">${item.name}</h3>
+
                         <div class="info-section">
                             <div class="info-row">
-                                <span class="label"><i class="fas fa-cube"></i> Stok:</span>
-                                <span class="value" style="color: ${stockColor}">
-                                    ${parseFloat(item.stock_quantity)} ${item.unit || ''}${stockAlert}
+                                <span class="label"><i class="fas fa-cube"></i> Stok</span>
+                                <span class="value ${isLow ? 'low-stock' : ''}">
+                                    ${parseFloat(item.stock_quantity)} ${item.unit || ''}
                                 </span>
                             </div>
                             <div class="info-row">
-                                <span class="label"><i class="fas fa-calendar-alt"></i> Exp:</span>
-                                <span class="value">
-                                    ${item.expiry_date ? (() => { 
-                                        const d = new Date(item.expiry_date); 
-                                        return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; 
-                                    })() : '-'}
+                                <span class="label"><i class="fas fa-calendar-alt"></i> Exp</span>
+                                <span class="value ${expiryDate.class}">
+                                    ${expiryDate.text}
                                 </span>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="photo-sticker">
-                            ${item.image_url ? `<img src="${item.image_url}">` : `<i class="fas ${iconClass}"></i>`}
-                        </div>
-
-                        <div class="card-actions">
-                            <button class="action-btn btn-edit" onclick="handleEdit(${item.id})">
-                                <i class="fas fa-pencil-alt"></i> Edit
-                            </button>
-                            <button class="action-btn btn-delete" onclick="handleDelete(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-trash-alt"></i> Hapus
-                            </button>
-                        </div>
+                    <div class="card-footer">
+                        <button class="action-btn btn-edit" onclick="handleEdit(${item.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn btn-delete" onclick="handleDelete(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
                     </div>
                 `;
                 grid.appendChild(card);

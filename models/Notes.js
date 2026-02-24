@@ -25,6 +25,18 @@ const Notes = {
         const query = 'INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)';
         const [result] = await db.execute(query, [userId, title, content]);
 
+        // Update user stats after creating note (lazy require to avoid circular dependency)
+        setImmediate(async () => {
+            try {
+                const User = require('../models/User');
+                await User.updateUserStats(userId, { total_notes: 'increment' }).catch(err => {
+                    console.error('Failed to update user stats after note creation:', err);
+                });
+            } catch (err) {
+                console.error('Error loading User model:', err);
+            }
+        });
+
         // Kembalikan data catatan yang baru dibuat
         return {
             id: result.insertId,
@@ -62,6 +74,18 @@ const Notes = {
         if (result.affectedRows === 0) {
             throw new Error('Note tidak ditemukan atau tidak memiliki izin untuk menghapus');
         }
+
+        // Update user stats after deleting note (lazy require to avoid circular dependency)
+        setImmediate(async () => {
+            try {
+                const User = require('../models/User');
+                await User.updateUserStats(userId, { total_notes: 'decrement' }).catch(err => {
+                    console.error('Failed to update user stats after note deletion:', err);
+                });
+            } catch (err) {
+                console.error('Error loading User model:', err);
+            }
+        });
 
         return { id: noteId };
     },

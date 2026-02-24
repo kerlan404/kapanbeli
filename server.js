@@ -50,6 +50,9 @@ const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
 const productRoutes = require('./routes/products');
 const adminRoutes = require('./routes/admin');
+const suggestionsRoutes = require('./routes/suggestions');
+const dashboardRoutes = require('./routes/dashboard');
+const dashboardSSRRoutes = require('./routes/dashboardSSR');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
@@ -75,12 +78,93 @@ const isNotAuthenticated = (req, res, next) => {
     }
 };
 
-// Public routes
-app.get('/', (req, res) => {
-    res.render('index', { currentPage: 'home', footerText: 'Semua hak dilindungi.' });
+// Public routes (no authentication required)
+app.get('/', async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        
+        // Default stats (untuk user yang belum login)
+        let stats = {
+            totalBahan: 0,
+            stokMenipis: 0,
+            habisStok: 0,
+            kadaluarsa: 0,
+            hampirKadaluarsa: 0,
+            totalCatatan: 0,
+            daftarBelanja: 0
+        };
+        
+        // Jika user sudah login, ambil stats dari database
+        if (userId) {
+            const db = require('./config/database');
+            
+            // Query stats produk dengan CASE statements (1 query efisien)
+            const statsQuery = `
+                SELECT 
+                    COUNT(DISTINCT p.id) as total_bahan,
+                    SUM(CASE WHEN p.stock_quantity > 0 AND p.stock_quantity <= 5 THEN 1 ELSE 0 END) as stok_menipis,
+                    SUM(CASE WHEN p.stock_quantity <= 0 THEN 1 ELSE 0 END) as habis_stok,
+                    SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE() THEN 1 ELSE 0 END) as kadaluarsa,
+                    SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date >= CURDATE() AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 3 DAY) THEN 1 ELSE 0 END) as hampir_kadaluarsa
+                FROM products p
+                WHERE p.user_id = ?
+            `;
+            
+            const [statsResults] = await db.execute(statsQuery, [userId]);
+            const productStats = statsResults[0];
+            
+            // Query untuk catatan
+            const notesQuery = 'SELECT COUNT(*) as total_catatan FROM notes WHERE user_id = ?';
+            const [notesResults] = await db.execute(notesQuery, [userId]);
+            
+            // Query untuk daftar belanja
+            const shoppingQuery = `
+                SELECT COUNT(*) as daftar_belanja
+                FROM products
+                WHERE user_id = ?
+                AND (stock_quantity <= 0 OR stock_quantity <= 5)
+            `;
+            const [shoppingResults] = await db.execute(shoppingQuery, [userId]);
+            
+            // Gabungkan semua stats
+            stats = {
+                totalBahan: parseInt(productStats.total_bahan) || 0,
+                stokMenipis: parseInt(productStats.stok_menipis) || 0,
+                habisStok: parseInt(productStats.habis_stok) || 0,
+                kadaluarsa: parseInt(productStats.kadaluarsa) || 0,
+                hampirKadaluarsa: parseInt(productStats.hampir_kadaluarsa) || 0,
+                totalCatatan: parseInt(notesResults[0].total_catatan) || 0,
+                daftarBelanja: parseInt(shoppingResults[0].daftar_belanja) || 0
+            };
+        }
+        
+        res.render('index', { 
+            currentPage: 'home', 
+            footerText: 'Semua hak dilindungi.',
+            stats: stats,
+            user: req.session.user || null
+        });
+        
+    } catch (error) {
+        console.error('Index route error:', error);
+        // Fallback ke stats 0 jika ada error
+        res.render('index', { 
+            currentPage: 'home', 
+            footerText: 'Semua hak dilindungi.',
+            stats: {
+                totalBahan: 0,
+                stokMenipis: 0,
+                habisStok: 0,
+                kadaluarsa: 0,
+                hampirKadaluarsa: 0,
+                totalCatatan: 0,
+                daftarBelanja: 0
+            }
+        });
+    }
 });
 
-// Serve about page
+// Serve about page (public)
 app.get('/about', (req, res) => {
     res.render('about', { currentPage: 'about', footerText: 'Dibuat dengan ❤️ oleh tim kami.' });
 });
@@ -89,9 +173,8 @@ app.get('/about', (req, res) => {
 app.get('/auth', isNotAuthenticated, (req, res) => {
     // Check for confirmation query parameter
     const confirmed = req.query.confirmed === 'true';
-    res.sendFile(path.join(__dirname, 'views', 'login.html'));
-    // Note: We cannot pass 'confirmed' variable directly here without a view engine like EJS
-    // The client-side JavaScript in login.html will handle displaying the message
+    const returnUrl = req.query.returnUrl || '/';
+    res.render('login', { confirmed: confirmed, returnUrl: returnUrl });
 });
 
 // Serve register page
@@ -115,6 +198,15 @@ app.use('/api/products', productRoutes);
 
 // Use admin routes (protected)
 app.use('/api/admin', adminRoutes);
+
+// Use suggestions routes (protected)
+app.use('/api/suggestions', suggestionsRoutes);
+
+// Use dashboard routes (protected)
+app.use('/api/dashboard', dashboardRoutes);
+
+// Use dashboard SSR routes (page rendering)
+app.use('/dashboard', dashboardSSRRoutes);
 
 // Protected routes
 app.get('/notes', isAuthenticated, (req, res) => {

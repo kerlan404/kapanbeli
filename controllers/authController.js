@@ -168,7 +168,15 @@ const authController = {
             }
 
             // Redirect ke halaman yang sesuai berdasarkan role
-            const redirectUrl = user.role === 'admin' ? '/admin' : '/';
+            let redirectUrl = user.role === 'admin' ? '/admin' : '/';
+            
+            // Check if there's a returnUrl in session (passed from login page)
+            if (req.body.returnUrl && req.body.returnUrl.startsWith('/')) {
+                // Make sure returnUrl is not /auth or /register
+                if (req.body.returnUrl !== '/auth' && req.body.returnUrl !== '/register') {
+                    redirectUrl = req.body.returnUrl;
+                }
+            }
 
             res.json({
                 success: true,

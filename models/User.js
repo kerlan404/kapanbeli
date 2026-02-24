@@ -507,6 +507,8 @@ const User = {
             for (const [key, value] of Object.entries(stats)) {
                 if (value === 'increment') {
                     updates.push(`${key} = ${key} + 1`);
+                } else if (value === 'decrement') {
+                    updates.push(`${key} = GREATEST(0, ${key} - 1)`); // Prevent negative values
                 } else {
                     updates.push(`${key} = ?`);
                     values.push(value);
@@ -516,7 +518,7 @@ const User = {
             if (updates.length > 0) {
                 values.push(userId);
                 const updateQuery = `
-                    UPDATE user_stats 
+                    UPDATE user_stats
                     SET ${updates.join(', ')}, updated_at = NOW()
                     WHERE user_id = ?
                 `;
@@ -547,11 +549,11 @@ const User = {
             const [bannedUsersResult] = await db.execute("SELECT COUNT(*) as count FROM users WHERE status = 'banned'");
             stats.bannedUsers = bannedUsersResult[0].count;
 
-            // Total products
+            // Total products - direct count from products table for accuracy
             const [totalProductsResult] = await db.execute('SELECT COUNT(*) as count FROM products');
             stats.totalProducts = totalProductsResult[0].count;
 
-            // Total notes
+            // Total notes - direct count from notes table for accuracy
             const [totalNotesResult] = await db.execute('SELECT COUNT(*) as count FROM notes');
             stats.totalNotes = totalNotesResult[0].count;
 
@@ -560,6 +562,12 @@ const User = {
                 "SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_time) = CURDATE()"
             );
             stats.usersOnlineToday = onlineTodayResult[0].count;
+
+            // Low stock items - count products where stock_quantity <= min_stock_level
+            const [lowStockResult] = await db.execute(
+                'SELECT COUNT(*) as count FROM products WHERE stock_quantity <= min_stock_level AND stock_quantity > 0'
+            );
+            stats.lowStockItems = lowStockResult[0].count || 0;
 
             // Products by category
             const [productsByCategoryResult] = await db.execute(`

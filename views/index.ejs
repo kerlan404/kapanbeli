@@ -16,6 +16,9 @@
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
 
+    <!-- Dashboard Stats Script -->
+    <script src="/js/dashboard-stats.js" defer></script>
+
     <style>
         /* --- VARIABEL & TEMA --- */
         :root {
@@ -418,8 +421,8 @@
         .stat-value { font-size: 3rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem; line-height: 1; }
         .stat-label { color: var(--text-muted); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
 
-        /* --- PRODUCTS GRID (BAHAN SAYA) --- */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+        /* --- PRODUCTS GRID (BAHAN SAYA) - UPDATED FOR LARGER IMAGES --- */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
 
         .product-card {
             background: var(--bg-card); border-radius: var(--border-radius); overflow: hidden;
@@ -430,24 +433,36 @@
         .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); }
 
         .card-top {
-            height: 150px; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+            height: 200px; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
             display: flex; align-items: center; justify-content: center; position: relative;
             overflow: hidden;
         }
 
         body.dark-mode-active .card-top { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
 
-        .card-icon { font-size: 4.5rem; color: var(--primary-orange); z-index: 2; transition: 0.3s; }
+        .card-top img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .card-top img { transform: scale(1.05); }
+
+        .card-icon { font-size: 5rem; color: var(--primary-orange); z-index: 2; transition: 0.3s; }
         .product-card:hover .card-icon { transform: scale(1.1) rotate(-5deg); }
 
         .category-tag {
-            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9);
+            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.95);
             padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
             color: var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 3; backdrop-filter: blur(4px);
         }
 
         .card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
-        
+
         .prod-name { font-size: 1.25rem; font-weight: 700; margin: 0; cursor: pointer; transition: color 0.2s; }
         .prod-name:hover { color: var(--primary-orange); }
 
@@ -459,6 +474,133 @@
 
         .label { color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-weight: 500; }
         .value { font-weight: 700; color: var(--text-main); font-size: 1rem; }
+
+        /* --- NOTES GRID (CATATAN SAYA) - NEW --- */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .note-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-card);
+            border-left: 4px solid var(--primary-blue);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .note-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .note-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+            cursor: pointer;
+            transition: color 0.2s;
+            flex: 1;
+        }
+
+        .note-title:hover {
+            color: var(--primary-blue);
+        }
+
+        .note-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .note-content {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-height: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+        }
+
+        .note-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .note-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+        }
+
+        .note-btn-edit {
+            color: var(--primary-blue);
+            background: rgba(46, 134, 222, 0.1);
+        }
+
+        .note-btn-edit:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .note-btn-delete {
+            color: var(--accent-red);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .note-btn-delete:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .empty-notes {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-notes i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
 
         /* --- ACTIVITY LIST (AKTIVITAS TERKINI) --- */
         .activity-container {
@@ -565,35 +707,35 @@
         <div class="container">
             <h2 class="section-title animate-entry delay-1" style="display:block; text-align:center;">Ringkasan Dapur</h2>
             <div class="stats-grid" id="statsGrid">
-                <!-- Statistik akan dimuat via JS -->
+                <!-- Statistik dari server (EJS) -->
                 <div class="stat-card animate-entry delay-1">
                     <div class="stat-icon"><i class="fas fa-box-open"></i></div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value" id="totalBahan"><%= typeof stats !== 'undefined' ? stats.totalBahan : 0 %></div>
                     <div class="stat-label">Total Bahan</div>
                 </div>
                 <div class="stat-card danger animate-entry delay-2">
                     <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value" id="stokMenipis"><%= typeof stats !== 'undefined' ? stats.stokMenipis : 0 %></div>
                     <div class="stat-label">Stok Menipis</div>
                 </div>
                 <div class="stat-card warning animate-entry delay-3">
-                    <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="stat-value" id="daftarBelanja"><%= typeof stats !== 'undefined' ? stats.daftarBelanja : 0 %></div>
                     <div class="stat-label">Daftar Belanja</div>
                 </div>
                 <div class="stat-card expired animate-entry delay-4">
                     <div class="stat-icon"><i class="fas fa-skull-crossbones"></i></div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value" id="kadaluarsa"><%= typeof stats !== 'undefined' ? stats.kadaluarsa : 0 %></div>
                     <div class="stat-label">Kadaluarsa</div>
                 </div>
                 <div class="stat-card expiring animate-entry delay-4">
                     <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value" id="hampirKadaluarsa"><%= typeof stats !== 'undefined' ? stats.hampirKadaluarsa : 0 %></div>
                     <div class="stat-label">Hampir Kadaluarsa</div>
                 </div>
                 <div class="stat-card notes animate-entry delay-4">
                     <div class="stat-icon"><i class="fas fa-sticky-note"></i></div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value" id="totalCatatan"><%= typeof stats !== 'undefined' ? stats.totalCatatan : 0 %></div>
                     <div class="stat-label">Catatan</div>
                 </div>
             </div>
@@ -611,15 +753,28 @@
         </div>
     </section>
 
-    <!-- PRODUCTS SECTION -->
-    <section class="section" id="productsSection" style="display: none;">
+    <!-- PRODUCTS SECTION - UPDATED WITH LARGER IMAGES -->
+    <section class="section" id="productsSection">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Bahan Saya Terbaru</h2>
+                <h2 class="section-title"><i class="fas fa-box-open" style="color: var(--primary-orange);"></i> Bahan Saya</h2>
                 <a href="/products" class="view-all-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
             </div>
             <div class="products-grid" id="recentProductsGrid">
                 <!-- Products will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- NOTES SECTION - NEW -->
+    <section class="section" id="notesSection" style="background-color: rgba(0,0,0,0.02);">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-sticky-note" style="color: var(--primary-blue);"></i> Catatan Saya</h2>
+                <a href="/notes" class="view-all-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="notes-grid" id="notesGrid">
+                <!-- Notes will be loaded dynamically -->
             </div>
         </div>
     </section>
@@ -904,86 +1059,127 @@
             return "Baru saja";
         }
 
-        // Fungsi Utama Load Data
+        // Fungsi Utama Load Data - UPDATED TO USE SERVER-SIDE STATS
         async function loadDashboardData() {
-            console.log('Loading dashboard data...');
-
-            // 1. Fetch Stats (Ringkasan Dapur)
-            try {
-                const statsRes = await fetch('/api/products/stats', { credentials: 'same-origin' });
-                console.log('Stats API response status:', statsRes.status); // Debug log
-                if(statsRes.ok) {
-                    const stats = await statsRes.json();
-                    console.log('Stats received:', stats); // Debug log
-                    // Update UI Stats dengan animasi angka sederhana
-                    document.querySelector('#statsGrid .stat-card:nth-child(1) .stat-value').textContent = stats.total || 0;
-                    document.querySelector('#statsGrid .stat-card:nth-child(2) .stat-value').textContent = stats.lowStock || 0;
-                    document.querySelector('#statsGrid .stat-card:nth-child(3) .stat-value').textContent = stats.shoppingList || 0;
-                    
-                    // Update additional stats if they exist
-                    if(document.querySelector('.stat-card.expired')) {
-                        document.querySelector('.stat-card.expired .stat-value').textContent = stats.outOfStock || 0;
-                    }
-                } else {
-                    console.error('Stats API returned error:', statsRes.status);
-                    // Set default values if API fails
-                    document.querySelector('#statsGrid .stat-card:nth-child(1) .stat-value').textContent = '0';
-                    document.querySelector('#statsGrid .stat-card:nth-child(2) .stat-value').textContent = '0';
-                    document.querySelector('#statsGrid .stat-card:nth-child(3) .stat-value').textContent = '0';
-                }
-            } catch (e) { 
-                console.error('Stats API error:', e); 
-                // Set default values if API fails
-                document.querySelector('#statsGrid .stat-card:nth-child(1) .stat-value').textContent = '0';
-                document.querySelector('#statsGrid .stat-card:nth-child(2) .stat-value').textContent = '0';
-                document.querySelector('#statsGrid .stat-card:nth-child(3) .stat-value').textContent = '0';
+            console.log('=== Loading dashboard data... ===');
+            
+            // Check if stats grid exists
+            const statsGrid = document.getElementById('statsGrid');
+            if (!statsGrid) {
+                console.error('Stats grid not found in DOM!');
+                return;
             }
+            
+            const statCards = statsGrid.querySelectorAll('.stat-card .stat-value');
+            console.log('Found', statCards.length, 'stat cards in DOM');
 
-            // 2. Fetch Products (Bahan Saya & Stok Rendah)
+            // Track all stats in one object
+            let dashboardStats = {
+                total: 0,
+                lowStock: 0,
+                shoppingList: 0,
+                expired: 0,
+                expiring: 0,
+                notes: 0
+            };
+
+            // 1. Fetch Products (untuk render grid dan low stock section)
             try {
                 const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
-                console.log('Products API response status:', prodRes.status); // Debug log
+                console.log('Products API response status:', prodRes.status);
                 if(prodRes.ok) {
                     const data = await prodRes.json();
-                    console.log('Products received:', data); // Debug log
-                    if(data.success && data.products) {
-                        renderProducts(data.products);
-                        renderLowStockProducts(data.products); // Logic Deteksi Stok Rendah
+                    console.log('Products received:', data);
+                    if(data.success && Array.isArray(data.products)) {
+                        dashboardStats.total = data.products.length;
                         
-                        // Update kitchen summary with additional data
-                        updateKitchenSummary(data.products);
+                        // Calculate stats from products
+                        const lowStockProducts = data.products.filter(p => {
+                            const stock = parseFloat(p.stock_quantity) || 0;
+                            const minLevel = parseFloat(p.min_stock_level) || 5;
+                            return stock > 0 && stock <= minLevel;
+                        });
+                        
+                        const outOfStockProducts = data.products.filter(p => {
+                            const stock = parseFloat(p.stock_quantity) || 0;
+                            return stock <= 0;
+                        });
+                        
+                        const expiredProducts = data.products.filter(p => {
+                            if (!p.expiry_date) return false;
+                            const expiryDate = new Date(p.expiry_date);
+                            const today = new Date();
+                            return expiryDate < today;
+                        });
+                        
+                        const expiringSoonProducts = data.products.filter(p => {
+                            if (!p.expiry_date) return false;
+                            const expiryDate = new Date(p.expiry_date);
+                            const today = new Date();
+                            const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                            return diffDays > 0 && diffDays <= 7;
+                        });
+                        
+                        dashboardStats.lowStock = lowStockProducts.length;
+                        dashboardStats.shoppingList = lowStockProducts.length + outOfStockProducts.length;
+                        dashboardStats.expired = expiredProducts.length;
+                        dashboardStats.expiring = expiringSoonProducts.length;
+                        
+                        renderProducts(data.products);
+                        renderLowStockProducts(data.products);
+                        updateKitchenSummary(data.products, dashboardStats);
                     } else {
-                        console.error('Products API returned error:', data);
+                        console.error('Products API returned invalid data:', data);
                     }
+                } else if (prodRes.status === 401) {
+                    console.log('User not authenticated for products API');
                 } else {
                     console.error('Products API returned error:', prodRes.status);
                 }
-            } catch (e) { 
-                console.error('Products API error', e); 
+            } catch (e) {
+                console.error('Products API error', e);
             }
 
-            // 3. Fetch Notes
+            // 2. Fetch Notes (untuk update notes count DAN render notes section)
             try {
                 const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
-                console.log('Notes API response status:', notesRes.status); // Debug log
+                console.log('Notes API response status:', notesRes.status);
                 if(notesRes.ok) {
                     const notesData = await notesRes.json();
-                    console.log('Notes received:', notesData); // Debug log
-                    if(notesData.success && notesData.notes) {
-                        // Update kitchen summary with notes count
-                        updateNotesSummary(notesData.notes);
+                    console.log('Notes received:', notesData);
+                    if(notesData.success && Array.isArray(notesData.notes)) {
+                        dashboardStats.notes = notesData.notes.length;
+                        console.log('✅ Notes count set to:', dashboardStats.notes);
+                        
+                        // RENDER NOTES DI HALAMAN UTAMA
+                        renderNotes(notesData.notes);
                     } else {
-                        console.error('Notes API returned error:', notesData);
+                        console.error('Notes API returned invalid data:', notesData);
                     }
-                } else {
-                    console.error('Notes API returned error:', notesRes.status);
+                } else if (notesRes.status === 401) {
+                    console.log('User not authenticated for notes API');
                 }
-            } catch (e) { 
-                console.error('Notes API error', e); 
+            } catch (e) {
+                console.error('Notes API error', e);
             }
+
+            // 3. Update Notes display (stats card)
+            updateNotesSummary([]);
 
             // 4. Fetch & Render Activities
             await loadActivities();
+
+            // FINAL: Update all stats one more time to ensure consistency
+            console.log('=== Final dashboard stats ===');
+            console.log('Total:', dashboardStats.total);
+            console.log('Low Stock:', dashboardStats.lowStock);
+            console.log('Shopping List:', dashboardStats.shoppingList);
+            console.log('Expired:', dashboardStats.expired);
+            console.log('Expiring:', dashboardStats.expiring);
+            console.log('Notes:', dashboardStats.notes);
+            
+            // Force update all stat cards
+            updateAllStats(dashboardStats);
         }
 
         // Function to force refresh dashboard data
@@ -1017,8 +1213,37 @@
             setTimeout(refreshDashboardData, 1000);
         });
 
+        // Force update all stat cards
+        function updateAllStats(stats) {
+            console.log('Force updating all stat cards...');
+            
+            const statCards = document.querySelectorAll('#statsGrid .stat-card .stat-value');
+            console.log('Found', statCards.length, 'stat cards');
+            
+            if (statCards.length >= 6) {
+                // Update dengan nilai dari stats object
+                // Jika stats bernilai 0, pertahankan nilai dari server (EJS)
+                if (stats.total > 0) statCards[0].textContent = stats.total;
+                if (stats.lowStock > 0) statCards[1].textContent = stats.lowStock;
+                if (stats.shoppingList > 0) statCards[2].textContent = stats.shoppingList;
+                if (stats.expired > 0) statCards[3].textContent = stats.expired;
+                if (stats.expiring > 0) statCards[4].textContent = stats.expiring;
+                if (stats.notes > 0) statCards[5].textContent = stats.notes;
+                
+                console.log('All stats updated:');
+                console.log('1. Total:', statCards[0].textContent);
+                console.log('2. Low Stock:', statCards[1].textContent);
+                console.log('3. Shopping List:', statCards[2].textContent);
+                console.log('4. Expired:', statCards[3].textContent);
+                console.log('5. Expiring:', statCards[4].textContent);
+                console.log('6. Notes:', statCards[5].textContent);
+            } else {
+                console.error('Could not find all 6 stat cards!');
+            }
+        }
+
         // Update kitchen summary with additional data
-        function updateKitchenSummary(products) {
+        function updateKitchenSummary(products, dashboardStats = {}) {
             // Calculate additional stats for kitchen summary
             const expiredProducts = products.filter(p => {
                 if (!p.expiry_date) return false;
@@ -1026,7 +1251,7 @@
                 const today = new Date();
                 return expiryDate < today;
             });
-            
+
             const expiringSoon = products.filter(p => {
                 if (!p.expiry_date) return false;
                 const expiryDate = new Date(p.expiry_date);
@@ -1035,62 +1260,93 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 return diffDays > 0 && diffDays <= 7;
             });
-            
+
             const lowStockProducts = products.filter(p => {
                 const stock = parseFloat(p.stock_quantity) || 0;
                 const minLevel = parseFloat(p.min_stock_level) || 5;
                 return stock <= minLevel && stock > 0;
             });
-            
+
             const outOfStockProducts = products.filter(p => {
                 const stock = parseFloat(p.stock_quantity) || 0;
                 return stock <= 0;
             });
+
+            // Update all stat cards with calculated or passed values
+            const totalProducts = dashboardStats.total || products.length;
+            const lowStockCount = dashboardStats.lowStock || lowStockProducts.length;
+            const shoppingListCount = dashboardStats.shoppingList || (lowStockProducts.length + outOfStockProducts.length);
+            const expiredCount = dashboardStats.expired || expiredProducts.length;
+            const expiringCount = dashboardStats.expiring || expiringSoon.length;
+            const notesCount = dashboardStats.notes || 0;
+
+            // Update each stat card
+            const statCards = document.querySelectorAll('#statsGrid .stat-card .stat-value');
             
-            // Update existing values (the elements are already in HTML)
-            if(document.querySelector('.stat-card.expired .stat-value')) {
-                document.querySelector('.stat-card.expired .stat-value').textContent = expiredProducts.length;
-            }
-            if(document.querySelector('.stat-card.expiring .stat-value')) {
-                document.querySelector('.stat-card.expiring .stat-value').textContent = expiringSoon.length;
-            }
-            if(document.querySelector('.stat-card.danger .stat-value')) {
-                document.querySelector('.stat-card.danger .stat-value').textContent = lowStockProducts.length;
-            }
-            if(document.querySelector('.stat-card.warning .stat-value')) {
-                document.querySelector('.stat-card.warning .stat-value').textContent = (lowStockProducts.length + outOfStockProducts.length);
-            }
-            if(document.querySelector('.stat-card:nth-child(1) .stat-value')) {
-                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = products.length;
+            if (statCards.length >= 6) {
+                // 1. Total Bahan
+                statCards[0].textContent = totalProducts;
+                // 2. Stok Menipis
+                statCards[1].textContent = lowStockCount;
+                // 3. Daftar Belanja
+                statCards[2].textContent = shoppingListCount;
+                // 4. Kadaluarsa (expired)
+                statCards[3].textContent = expiredCount;
+                // 5. Hampir Kadaluarsa (expiring soon)
+                statCards[4].textContent = expiringCount;
+                // 6. Catatan (notes) - will be updated by updateNotesSummary
+                statCards[5].textContent = notesCount;
             }
         }
 
         // Update notes summary
         function updateNotesSummary(notes) {
-            // Update existing value (the element is already in HTML)
-            if(document.querySelector('.stat-card.notes .stat-value')) {
-                document.querySelector('.stat-card.notes .stat-value').textContent = notes.length;
+            const notesCount = notes.length;
+            console.log('Updating notes count to:', notesCount);
+            
+            // Update the 6th stat card (Notes) - use multiple selectors for reliability
+            const statCards = document.querySelectorAll('#statsGrid .stat-card .stat-value');
+            console.log('Found stat cards:', statCards.length);
+            
+            if (statCards.length >= 6) {
+                statCards[5].textContent = notesCount;
+                console.log('Notes card updated via index 5');
             }
+            
+            // Also try by class name as backup
+            const notesCard = document.querySelector('#statsGrid .stat-card.notes .stat-value');
+            if (notesCard) {
+                notesCard.textContent = notesCount;
+                console.log('Notes card updated via class selector');
+            }
+            
+            console.log('Final notes count in DOM:', document.querySelector('#statsGrid .stat-card:nth-child(6) .stat-value')?.textContent);
         }
 
-        // RENDER: Bahan Saya Terbaru
+        // RENDER: Bahan Saya Terbaru - UPDATED WITH LARGER IMAGES
         function renderProducts(products) {
             const container = document.getElementById('recentProductsGrid');
             const section = document.getElementById('productsSection');
-            
-            if(products.length === 0) {
+
+            console.log('=== Rendering Products ===');
+            console.log('Products:', products);
+            console.log('Products length:', products ? products.length : 0);
+
+            if(!products || products.length === 0) {
+                console.log('No products to display');
                 section.style.display = 'none';
                 return;
             }
 
+            console.log('Displaying products section');
             section.style.display = 'block';
             container.innerHTML = '';
-            
+
             // Ambil 6 terakhir
             products.slice(0, 6).forEach((prod, index) => {
                 const expiryInfo = getExpiryStatus(prod.expiry_date);
                 const isLow = parseFloat(prod.stock_quantity) <= parseFloat(prod.min_stock_level || 0);
-                
+
                 // Animasi delay bertahap
                 const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
 
@@ -1098,15 +1354,15 @@
                     <div class="product-card animate-entry ${delayClass}">
                         <div class="card-top">
                             <span class="category-tag">${prod.category_id || 'Umum'}</span>
-                            ${prod.image_url 
-                                ? `<img src="${prod.image_url}" style="width:100%; height:100%; object-fit:cover; position:absolute;">` 
-                                : `<i class="fas ${getIconForProduct(prod.name)} card-icon"></i>`
+                            ${prod.image_url
+                                ? `<img src="${prod.image_url}" alt="${prod.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                                : ''
                             }
+                            <i class="fas ${getIconForProduct(prod.name)} card-icon" style="${prod.image_url ? 'display:none;' : ''}"></i>
                         </div>
                         <div class="card-body">
                             <h3 class="prod-name" onclick="window.location='/products/detail/${prod.id}'">${prod.name}</h3>
-                            
-                            <!-- MENAMPILKAN STOK & EXPIRY SESUAI REQUEST -->
+
                             <div class="info-row">
                                 <span class="label"><i class="fas fa-boxes"></i> Stok</span>
                                 <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'var(--text-main)'}">
@@ -1114,7 +1370,7 @@
                                     ${isLow ? '<i class="fas fa-exclamation-circle" style="margin-left:5px; font-size:0.8rem;"></i>' : ''}
                                 </span>
                             </div>
-                            
+
                             <div class="info-row" style="border:none;">
                                 <span class="label"><i class="fas fa-calendar-check"></i> Kedaluwarsa</span>
                                 <span class="value" style="color: ${expiryInfo.color}">${expiryInfo.text}</span>
@@ -1124,6 +1380,130 @@
                 `;
                 container.innerHTML += card;
             });
+
+            console.log('Products rendered successfully!');
+        }
+
+        // RENDER: Catatan Saya - NEW FUNCTION
+        function renderNotes(notes) {
+            const container = document.getElementById('notesGrid');
+            const section = document.getElementById('notesSection');
+
+            console.log('=== Rendering Notes ===');
+            console.log('Notes data:', notes);
+            console.log('Notes length:', notes ? notes.length : 0);
+            console.log('Container exists:', !!container);
+            console.log('Section exists:', !!section);
+
+            if(!notes || notes.length === 0) {
+                console.log('No notes to display');
+                section.style.display = 'none';
+                return;
+            }
+
+            console.log('Displaying notes section');
+            section.style.display = 'block';
+            container.innerHTML = '';
+
+            // Ambil 6 catatan terakhir
+            notes.slice(0, 6).forEach((note, index) => {
+                const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
+                const date = new Date(note.created_at);
+                const formattedDate = date.toLocaleDateString('id-ID', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric' 
+                });
+
+                console.log('Rendering note:', note.title);
+
+                const card = `
+                    <div class="note-card animate-entry ${delayClass}">
+                        <div class="note-card-header">
+                            <h3 class="note-title" onclick="window.location='/notes'">${note.title}</h3>
+                            <span class="note-date">${formattedDate}</span>
+                        </div>
+                        <div class="note-content">${note.content || 'Tidak ada isi catatan...'}</div>
+                        <div class="note-footer">
+                            <button class="note-btn note-btn-edit" onclick="editNote(${note.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="note-btn note-btn-delete" onclick="deleteNote(${note.id}, '${note.title.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+
+            console.log('Notes rendered successfully!');
+        }
+
+        // Edit note function
+        function editNote(noteId) {
+            window.location.href = `/notes?id=${noteId}`;
+        }
+
+        // Delete note function
+        async function deleteNote(noteId, noteTitle) {
+            const result = await Swal.fire({
+                title: 'Hapus Catatan?',
+                text: `Apakah Anda yakin ingin menghapus catatan "${noteTitle}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--accent-red)',
+                cancelButtonColor: 'var(--text-muted)',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/notes/${noteId}`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin'
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Catatan Berhasil Dihapus!',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        // Dispatch event untuk refresh data
+                        window.dispatchEvent(new CustomEvent('noteDeleted'));
+                        
+                        // Reload notes
+                        loadNotes();
+                    } else {
+                        Swal.fire('Gagal', data.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Delete note error:', error);
+                    Swal.fire('Error', 'Terjadi kesalahan saat menghapus catatan.', 'error');
+                }
+            }
+        }
+
+        // LOAD: Catatan Saya
+        async function loadNotes() {
+            try {
+                const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
+                
+                if(notesRes.ok) {
+                    const notesData = await notesRes.json();
+                    if(notesData.success && Array.isArray(notesData.notes)) {
+                        renderNotes(notesData.notes);
+                    }
+                }
+            } catch (e) {
+                console.error('Load notes error:', e);
+            }
         }
 
         // RENDER: Stok Menipis (Otomatis muncul jika ada)
@@ -1422,6 +1802,7 @@
                 // Wait a bit to ensure DOM is fully loaded, then load data
                 setTimeout(async () => {
                     await loadDashboardData();
+                    await loadNotes(); // Load notes on page init
                 }, 500);
             } else {
                 // Jika belum login, biarkan nilai tetap 0 seperti yang sudah ditentukan di HTML
@@ -1429,7 +1810,10 @@
 
             // Refresh data tiap 30 detik
             setInterval(() => {
-                if(isAuth) loadDashboardData();
+                if(isAuth) {
+                    loadDashboardData();
+                    loadNotes();
+                }
             }, 30000);
 
             setInterval(updateGreeting, 60000);

@@ -340,6 +340,9 @@
             <a href="#" class="nav-item" onclick="showPage('products', this)">
                 <i class="fas fa-box"></i> Semua Produk
             </a>
+            <a href="#" class="nav-item" onclick="showPage('suggestions', this)">
+                <i class="fas fa-clipboard-list"></i> Saran Pembelian
+            </a>
 
             <div class="menu-label">Sistem</div>
             <a href="#" class="nav-item" onclick="showPage('settings', this)">
@@ -612,6 +615,28 @@
             </div>
         </div>
 
+        <!-- SUGGESTIONS VIEW -->
+        <div id="suggestions-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Saran Pembelian Semua Pengguna</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="stat-pill" style="background: rgba(255, 107, 107, 0.1); color: var(--accent-red); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="adminLowStockCount">0</span> Stok Rendah
+                        </div>
+                        <div class="stat-pill" style="background: rgba(254, 202, 87, 0.1); color: var(--primary-orange); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem;">
+                            <i class="fas fa-clock"></i>
+                            <span id="adminExpiringCount">0</span> Kadaluarsa
+                        </div>
+                    </div>
+                </div>
+                <div id="suggestionsContainer" style="min-height: 400px;">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
@@ -667,6 +692,7 @@
                 'user-detail': 'Detail Pengguna',
                 'settings': 'Pengaturan Sistem',
                 'products': 'Database Produk',
+                'suggestions': 'Saran Pembelian',
                 'activity-log': 'Log Aktivitas'
             };
             document.getElementById('pageTitle').textContent = titles[pageId] || 'Admin';
@@ -714,7 +740,10 @@
                     renderActivityLog([]); // Render empty
                 }
 
-                // 4. Initialize/Update Charts
+                // 4. Load Suggestions Stats
+                loadSuggestionsData();
+
+                // 5. Initialize/Update Charts
                 // Note: Real chart history data requires a specific endpoint. 
                 // We init with 0 to respect "no dummy data" rule unless API provides history.
                 initCharts(); 
@@ -932,6 +961,125 @@
                     }
                 }
             });
+        }
+
+        // --- SUGGESTIONS DATA LOADING ---
+        async function loadSuggestionsData() {
+            try {
+                const res = await fetch('/api/suggestions/admin/all', { credentials: 'same-origin' });
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('adminLowStockCount').textContent = data.suggestions.filter(s => s.type === 'low-stock').length;
+                    document.getElementById('adminExpiringCount').textContent = data.suggestions.filter(s => s.type === 'expiring').length;
+                    renderSuggestionsTable(data.suggestions);
+                } else {
+                    renderSuggestionsTable([]);
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+                document.getElementById('suggestionsContainer').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <p>Gagal memuat data saran pembelian</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSuggestionsTable(suggestions) {
+            const container = document.getElementById('suggestionsContainer');
+
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-green);"></i>
+                        <p>Tidak ada saran pembelian saat ini</p>
+                        <p style="font-size: 0.9rem;">Stok semua pengguna dalam kondisi aman</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by type
+            const lowStock = suggestions.filter(s => s.type === 'low-stock');
+            const expiring = suggestions.filter(s => s.type === 'expiring');
+
+            let html = '';
+
+            if (lowStock.length > 0) {
+                html += `
+                    <h4 style="margin: 20px 0 15px 0; color: var(--accent-red); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i> Stok Rendah (${lowStock.length})
+                    </h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pengguna</th>
+                                    <th>Produk</th>
+                                    <th>Stok Saat Ini</th>
+                                    <th>Min. Stok</th>
+                                    <th>Kadaluarsa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${lowStock.map(s => `
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 600;">${s.user_name}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">${s.user_email}</div>
+                                        </td>
+                                        <td><strong>${s.name}</strong></td>
+                                        <td><span class="badge badge-warning">${s.stock_quantity} ${s.unit || ''}</span></td>
+                                        <td>${s.min_stock_level || 0} ${s.unit || ''}</td>
+                                        <td>${s.expiry_date ? new Date(s.expiry_date).toLocaleDateString('id-ID') : '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (expiring.length > 0) {
+                html += `
+                    <h4 style="margin: 30px 0 15px 0; color: var(--primary-orange); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-clock"></i> Hampir Kadaluarsa (${expiring.length})
+                    </h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pengguna</th>
+                                    <th>Produk</th>
+                                    <th>Stok</th>
+                                    <th>Sisa Hari</th>
+                                    <th>Kadaluarsa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${expiring.map(s => {
+                                    const diffDays = Math.ceil((new Date(s.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                                    return `
+                                        <tr>
+                                            <td>
+                                                <div style="font-weight: 600;">${s.user_name}</div>
+                                                <div style="font-size: 0.8rem; color: var(--text-muted);">${s.user_email}</div>
+                                            </td>
+                                            <td><strong>${s.name}</strong></td>
+                                            <td>${s.stock_quantity} ${s.unit || ''}</td>
+                                            <td><span class="badge ${diffDays <= 3 ? 'badge-danger' : 'badge-warning'}">${diffDays} hari</span></td>
+                                            <td>${s.expiry_date ? new Date(s.expiry_date).toLocaleDateString('id-ID') : '-'}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
         }
 
         // Handle logout function

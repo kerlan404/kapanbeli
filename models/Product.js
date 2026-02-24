@@ -104,6 +104,18 @@ const Product = {
                 min_stock_level, image_url, unit, quantity, expiry_date, notes
             ]);
 
+            // Update user stats after creating product (lazy require to avoid circular dependency)
+            setImmediate(async () => {
+                try {
+                    const User = require('../models/User');
+                    await User.updateUserStats(user_id, { total_products: 'increment' }).catch(err => {
+                        console.error('Failed to update user stats after product creation:', err);
+                    });
+                } catch (err) {
+                    console.error('Error loading User model:', err);
+                }
+            });
+
             // Kembalikan data produk yang baru dibuat
             return {
                 id: result.insertId,
@@ -311,6 +323,18 @@ const Product = {
         if (result.affectedRows === 0) {
             throw new Error('Product tidak ditemukan atau tidak memiliki izin untuk menghapus');
         }
+
+        // Update user stats after deleting product (lazy require to avoid circular dependency)
+        setImmediate(async () => {
+            try {
+                const User = require('../models/User');
+                await User.updateUserStats(userId, { total_products: 'decrement' }).catch(err => {
+                    console.error('Failed to update user stats after product deletion:', err);
+                });
+            } catch (err) {
+                console.error('Error loading User model:', err);
+            }
+        });
 
         return { id: productId };
     },

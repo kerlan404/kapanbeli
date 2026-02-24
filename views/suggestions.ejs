@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catatan Belanja - Kapan Beli</title>
+    <title>Saran Pembelian - Kapan Beli</title>
 
     <!-- Google Fonts: Poppins & Handlee (Handwriting) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,48 +12,60 @@
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" type="image/x-icon">
 
     <style>
-        /* --- CSS VARIABLES (DARI KODE ANDA) --- */
+        /* --- CSS VARIABLES --- */
         :root {
             --primary-blue: #2E86DE;
             --primary-orange: #FF9F43;
-            --bg-body: #F0F4F8;
+            --accent-purple: #5f27cd;
+            --bg-body: #E6E9ED;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
             --text-muted: #636E72;
-            --border-radius: 16px;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
-            --shadow-md: 0 10px 25px rgba(46, 134, 222, 0.15);
+            --border-radius: 2px;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 20px rgba(0,0,0,0.1);
             --danger: #FF6B6B;
             --success: #1DD1A1;
             --warning: #FECA57;
-            --border-light: #eee;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+
+            /* Variabel Buku Tulis */
+            --line-color: rgba(46, 134, 222, 0.2);
+            --margin-color: rgba(255, 107, 107, 0.6);
+            --line-height: 2rem;
         }
 
         body.dark-mode-active {
-            --bg-body: #1E272E;
-            --bg-card: #2C3E50;
-            --text-main: #DFE6E9;
+            --bg-body: #1a2228;
+            --bg-card: #2d3b45;
+            --text-main: #ECF0F1;
             --text-muted: #B2BEC3;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.3);
-            --shadow-md: 0 10px 25px rgba(0,0,0,0.4);
-            --border-light: #444;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.2);
+            --shadow-md: 0 10px 20px rgba(0,0,0,0.4);
+            --glass-bg: rgba(44, 62, 80, 0.9);
+            --line-color: rgba(255, 255, 255, 0.05);
+            --margin-color: rgba(255, 107, 107, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s, box-shadow 0.3s; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
-            /* Pola Dot Grid halus seperti buku tulis */
-            background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image: radial-gradient(var(--text-muted) 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -64,119 +76,140 @@
         nav {
             position: sticky;
             top: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            box-shadow: var(--shadow-sm);
             z-index: 100;
-            padding: 12px 5%;
+            padding: 15px 5%;
+            box-shadow: var(--shadow-sm);
         }
-        body.dark-mode-active nav { background: rgba(30, 39, 46, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
+
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-main);
             text-decoration: none;
-            /* Font Tulisan Tangan untuk Logo */
-            font-family: 'Handlee', cursive;
         }
-        .logo i { color: var(--primary-orange); }
-        .nav-menu { display: flex; gap: 25px; }
-        .nav-link { 
-            text-decoration: none; 
-            color: var(--text-muted); 
-            font-weight: 500; 
-            transition: 0.3s; 
+
+        .logo i { color: var(--primary-orange); font-size: 1.8rem; }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 12px;
             position: relative;
-            padding: 5px 0;
         }
+
         .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
-        .nav-link::after {
-            content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0;
-            background-color: var(--primary-orange); transition: width 0.3s ease; border-radius: 2px;
+        .nav-link.active::after {
+            content: ''; position: absolute; width: 100%; height: 3px; bottom: 0; left: 0;
+            background-color: var(--primary-orange); border-radius: 10px 10px 0 0;
         }
-        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
         .nav-buttons { display: flex; align-items: center; gap: 20px; }
+
         .dark-mode-toggle {
-            background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer;
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-main);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .dark-mode-toggle:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
+
+        /* --- MAIN CONTENT --- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            width: 100%;
+            flex: 1;
         }
 
-        /* --- MAIN CONTAINER --- */
-        .container { 
-            max-width: 1000px; 
-            margin: 30px auto; 
-            padding: 0 20px; 
-            width: 100%; 
-            flex: 1; 
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: var(--bg-card);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border-left: 5px solid var(--primary-orange);
         }
 
-        /* Header Section */
-        .page-header {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .page-title { 
-            font-size: 2.2rem; 
-            color: var(--text-main); 
-            font-weight: 700; 
-            margin-bottom: 20px;
+        .page-title {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            font-weight: 700;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            /* Font Tulisan Tangan */
+            gap: 15px;
             font-family: 'Handlee', cursive;
         }
 
-        /* Stats Pills (Sticky Notes Style) */
+        /* Stats Pills */
         .stats-row {
             display: flex;
             gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
             flex-wrap: wrap;
         }
+
         .stat-pill {
             background: var(--bg-card);
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 50px;
             box-shadow: var(--shadow-sm);
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid var(--border-light);
+            font-size: 0.85rem;
+            border: 1px solid rgba(0,0,0,0.05);
             position: relative;
         }
-        /* Efek Selotip (Tape) di pinggir stat */
+
         .stat-pill::before {
-            content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg);
-            width: 40px; height: 16px; background: rgba(255,255,255,0.4);
+            content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 35px; height: 14px; background: rgba(255,255,255,0.4);
             backdrop-filter: blur(2px);
         }
-        
-        .stat-pill i { font-size: 1.2rem; }
+
+        .stat-pill i { font-size: 1.1rem; }
         .stat-pill.red { color: var(--danger); border-bottom: 3px solid var(--danger); }
         .stat-pill.yellow { color: var(--warning); border-bottom: 3px solid var(--warning); }
         .stat-pill.green { color: var(--success); border-bottom: 3px solid var(--success); }
 
-        /* --- SEARCH BAR --- */
-        .search-container {
+        /* Search Bar */
+        .search-wrapper {
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
+
         .search-input {
             width: 100%;
             padding: 18px 25px 18px 55px;
@@ -189,10 +222,12 @@
             box-shadow: var(--shadow-md);
             outline: none;
         }
+
         .search-input:focus {
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
         }
+
         .search-icon {
             position: absolute;
             left: 22px;
@@ -202,11 +237,12 @@
             font-size: 1.1rem;
         }
 
-        /* --- LIST CONTAINER (NOTEBOOK CARDS) --- */
-        .list-wrapper {
+        /* --- SUGGESTIONS LIST (NOTEBOOK STYLE) --- */
+        .suggestions-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
+            padding-bottom: 80px;
         }
 
         /* List Group Header */
@@ -220,98 +256,121 @@
             gap: 10px;
             opacity: 0.8;
         }
+
         .list-group-header::before {
             content: ''; display: block; width: 6px; height: 24px; background: var(--primary-blue); border-radius: 3px;
         }
 
-        /* Note Card Style */
-        .note-card {
+        /* Suggestion Card - Notebook Paper Style */
+        .suggestion-card {
             background: var(--bg-card);
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
             padding: 0;
-            border: 1px solid var(--border-light);
             position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            min-height: 100px;
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+            background-size: 100% var(--line-height);
+            background-position: 0 20px;
             overflow: hidden;
-            transition: all 0.2s ease;
-        }
-        .note-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
         }
 
-        /* Garis warna di kiri kartu (Highlighter) */
-        .note-card.type-low { border-left: 6px solid var(--danger); }
-        .note-card.type-exp { border-left: 6px solid var(--warning); }
-
-        .item-checkbox {
-            width: 28px;
-            height: 28px;
-            border: 2px solid var(--text-muted);
-            border-radius: 6px;
-            margin: 0 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.2s;
+        .suggestion-card::before {
+            content: ''; position: absolute; left: 40px; top: 20px; bottom: 20px; width: 2px;
+            background-color: var(--margin-color);
+            z-index: 1;
         }
-        .item-checkbox:hover { border-color: var(--primary-blue); background: rgba(46, 134, 222, 0.05); }
+
+        /* Garis warna di kiri kartu berdasarkan tipe */
+        .suggestion-card.type-low-stock { border-left: 6px solid var(--danger); }
+        .suggestion-card.type-expiring { border-left: 6px solid var(--warning); }
+
+        .suggestion-card:hover {
+            transform: translateY(-3px) rotate(0.5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            z-index: 5;
+        }
+
+        /* Pita Perekat (Tape) */
+        .tape {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 100px; height: 30px;
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            backdrop-filter: blur(2px);
+            z-index: 10;
+            border-left: 2px dashed rgba(0,0,0,0.05);
+            border-right: 2px dashed rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode-active .tape { background-color: rgba(0, 0, 0, 0.3); }
 
         .item-icon {
-            width: 55px;
-            height: 55px;
+            width: 60px;
+            height: 60px;
             border-radius: 12px;
             background: rgba(0,0,0,0.03);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 20px;
-            font-size: 1.5rem;
+            margin: 20px 0 20px 60px;
+            font-size: 1.8rem;
             color: var(--primary-orange);
             flex-shrink: 0;
+            z-index: 2;
         }
-        
-        .item-details { flex: 1; min-width: 0; padding: 18px 0; }
-        .item-name { 
-            font-weight: 600; 
-            font-size: 1.1rem; 
-            color: var(--text-main); 
-            margin-bottom: 6px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+
+        .item-details { 
+            flex: 1; 
+            min-width: 0; 
+            padding: 20px 20px 20px 25px;
+            z-index: 2;
         }
-        
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            cursor: pointer;
+            line-height: var(--line-height);
+        }
+
+        .item-name:hover { color: var(--primary-blue); text-decoration: underline; text-decoration-color: var(--primary-orange); }
+
         .item-meta {
             display: flex;
             gap: 15px;
             font-size: 0.85rem;
             color: var(--text-muted);
             flex-wrap: wrap;
+            line-height: var(--line-height);
         }
+
         .badge {
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
         }
+
         .badge-low { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
         .badge-exp { background: rgba(254, 202, 87, 0.15); color: #d35400; }
 
         .item-action {
-            margin-left: 20px;
-            padding: 0 20px;
+            padding: 0 25px 0 20px;
+            z-index: 2;
         }
-        .btn-buy {
+
+        .btn-approve {
             background: var(--primary-blue);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
+            padding: 12px 24px;
+            border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -319,38 +378,50 @@
             gap: 8px;
             transition: transform 0.2s, box-shadow 0.2s;
             white-space: nowrap;
-        }
-        .btn-buy:hover { 
-            background: #2575c9; 
-            transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3);
+        }
+
+        .btn-approve:hover {
+            background: #2575c9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 134, 222, 0.4);
         }
 
         /* Empty State */
         .empty-state {
-            text-align: center; 
-            padding: 80px 20px; 
-            color: var(--text-muted);
+            text-align: center;
+            padding: 80px 20px;
             background: var(--bg-card);
-            border-radius: 12px;
-            border: 2px dashed var(--border-light);
+            border-radius: 16px;
+            border: 2px dashed var(--primary-blue);
+            box-shadow: var(--shadow-sm);
         }
-        .empty-state i { 
-            font-size: 4rem; 
-            margin-bottom: 20px; 
-            opacity: 0.3; 
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 25px;
+            color: var(--primary-orange);
+        }
+
+        .empty-state h3 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
         }
 
         /* Responsive */
-        @media (max-width: 600px) {
-            .note-card { flex-direction: column; align-items: flex-start; padding: 15px; }
-            .item-checkbox { display: none; }
-            .item-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-right: 15px; }
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .header-section { flex-direction: column; align-items: stretch; text-align: center; }
+            .stats-row { justify-content: center; }
+            .suggestion-card { flex-direction: column; align-items: flex-start; padding: 15px; }
+            .item-icon { margin: 15px; }
             .item-details { width: 100%; padding: 0 0 15px 0; }
-            .item-action { width: 100%; padding: 0; }
-            .btn-buy { width: 100%; justify-content: center; }
-            .stats-row { flex-direction: column; }
-            .stat-pill { width: 100%; justify-content: center; }
+            .item-action { width: 100%; padding: 0 0 15px 0; }
+            .btn-approve { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -377,10 +448,11 @@
 
     <div class="container">
         <!-- Header -->
-        <div class="page-header">
-            <h1 class="page-title"><i class="fas fa-clipboard-list" style="color: var(--primary-blue);"></i> Catatan Belanja</h1>
-            
-            <!-- Stats (Red/Yellow/Green from your code) -->
+        <div class="header-section">
+            <div class="page-title">
+                <i class="fas fa-clipboard-list" style="color: var(--primary-orange);"></i>
+                Saran Pembelian
+            </div>
             <div class="stats-row">
                 <div class="stat-pill red">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -392,22 +464,22 @@
                 </div>
                 <div class="stat-pill green">
                     <i class="fas fa-check-circle"></i>
-                    <span><span id="totalSuggestionsCount">0</span> Total Item</span>
+                    <span><span id="totalSuggestionsCount">0</span> Total</span>
                 </div>
             </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
+        <!-- Search -->
+        <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="searchInput" class="search-input" placeholder="Cari item belanjaan (contoh: bawang, telur)...">
         </div>
 
         <!-- List Container -->
-        <div id="listContainer" class="list-wrapper">
+        <div id="suggestionsList" class="suggestions-list">
             <div id="loadingSpinner" style="text-align: center; padding: 60px;">
-                <i class="fas fa-pen-nib fa-spin" style="font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
-                <p style="color: var(--text-muted);">Menulis catatan...</p>
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px;"></i>
+                <p style="color: var(--text-muted); font-weight: 500;">Membaca catatan belanja...</p>
             </div>
         </div>
     </div>
@@ -416,6 +488,7 @@
         // --- 1. DARK MODE LOGIC ---
         const toggleBtn = document.querySelector('.dark-mode-toggle');
         const body = document.body;
+        const themeIcon = toggleBtn.querySelector('i');
 
         if (localStorage.getItem('theme') === 'dark' ||
            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -429,14 +502,25 @@
         function enableDarkMode() {
             body.classList.add('dark-mode-active');
             localStorage.setItem('theme', 'dark');
+            if(themeIcon) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.style.color = '#F1C40F';
+            }
         }
+
         function disableDarkMode() {
             body.classList.remove('dark-mode-active');
             localStorage.setItem('theme', 'light');
+            if(themeIcon) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIcon.style.color = '';
+            }
         }
 
         // --- 2. DATA MANAGEMENT ---
-        let allSuggestions = []; // Store all items globally for filtering
+        let allSuggestions = [];
 
         // Helper: Get Icon
         function getIcon(name) {
@@ -460,58 +544,41 @@
 
         async function loadSuggestions() {
             try {
-                const response = await fetch('/api/products');
+                const response = await fetch('/api/suggestions');
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    processProducts(data.products);
+                    processSuggestions(data.suggestions, data.stats);
                 } else {
                     showErrorState();
                 }
             } catch (error) {
-                console.error(error);
+                console.error('Error loading suggestions:', error);
                 showErrorState();
             }
         }
 
-        function processProducts(products) {
-            // 1. Categorize
-            const lowStock = products.filter(p => p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0);
-            const expiring = products.filter(p => {
-                if (!p.expiry_date) return false;
-                const diffDays = Math.ceil((new Date(p.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
-                return diffDays >= 0 && diffDays <= 7;
-            });
+        function processSuggestions(suggestions, stats) {
+            // Update Stats
+            document.getElementById('lowStockCount').textContent = stats.lowStockCount;
+            document.getElementById('expiringSoonCount').textContent = stats.expiringCount;
+            document.getElementById('totalSuggestionsCount').textContent = stats.totalCount;
 
-            // 2. Update Stats
-            document.getElementById('lowStockCount').textContent = lowStock.length;
-            document.getElementById('expiringSoonCount').textContent = expiring.length;
-            document.getElementById('totalSuggestionsCount').textContent = lowStock.length + expiring.length;
-
-            // 3. Create Unified List Object
-            allSuggestions = [
-                ...lowStock.map(p => ({ ...p, category: 'Stok Rendah', type: 'low-stock', color: 'red' })),
-                ...expiring.map(p => ({ ...p, category: 'Hampir Kadaluarsa', type: 'expiring', color: 'yellow' }))
-            ];
-
-            // 4. Sort by Category then Name
-            allSuggestions.sort((a, b) => {
-                if (a.type === b.type) return a.name.localeCompare(b.name);
-                return a.type.localeCompare(b.type);
-            });
+            // Store for filtering
+            allSuggestions = suggestions;
 
             renderList(allSuggestions);
         }
 
-        // --- 3. RENDER LIST (CATATAN STYLE) ---
+        // --- 3. RENDER LIST (NOTEBOOK STYLE) ---
         function renderList(items) {
-            const container = document.getElementById('listContainer');
+            const container = document.getElementById('suggestionsList');
             container.innerHTML = '';
 
             if (items.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-check-circle" style="color: var(--success); opacity: 0.2; font-size: 5rem;"></i>
+                        <i class="fas fa-check-circle" style="color: var(--success); opacity: 0.3; font-size: 5rem;"></i>
                         <h3>Catatan Kosong</h3>
                         <p>Stok dapur Anda aman dan terjaga!</p>
                     </div>
@@ -532,38 +599,35 @@
                 }
 
                 const row = document.createElement('div');
-                // Tambahkan class type-low (Merah) atau type-exp (Kuning) untuk border kiri
-                row.className = `note-card type-${item.type === 'low-stock' ? 'low' : 'exp'}`;
-                
-                // Badge Logic (Menggunakan warna dari prompt: danger/warning)
+                row.className = `suggestion-card type-${item.type === 'low-stock' ? 'low-stock' : 'expiring'}`;
+
+                // Badge Logic
                 let badgeHTML = '';
                 if(item.type === 'low-stock') {
-                    badgeHTML = `<span class="badge badge-low">Sisa: ${item.stock_quantity} ${item.unit || ''}</span>`;
+                    badgeHTML = `<span class="badge badge-low">${item.badge || `Sisa: ${item.stock_quantity} ${item.unit || ''}`}</span>`;
                 } else {
                     const diffDays = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
-                    badgeHTML = `<span class="badge badge-exp">Sisa: ${diffDays} hari</span>`;
+                    badgeHTML = `<span class="badge badge-exp">${item.badge || `Sisa: ${diffDays} hari`}</span>`;
                 }
 
                 row.innerHTML = `
-                    <div class="item-checkbox" onclick="approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">
-                        <i class="fas fa-check" style="color:var(--primary-blue); font-size:0.8rem; opacity:0;"></i>
-                    </div>
+                    <div class="tape"></div>
                     <div class="item-icon">
-                        ${item.image_url 
-                            ? `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">` 
+                        ${item.image_url
+                            ? `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`
                             : `<i class="fas ${getIcon(item.name)}"></i>`
                         }
                     </div>
                     <div class="item-details">
-                        <div class="item-name" onclick="viewProductDetail(${item.id})" style="cursor:pointer;">${item.name}</div>
+                        <div class="item-name" onclick="viewProductDetail(${item.id})">${item.name}</div>
                         <div class="item-meta">
                             <span><i class="far fa-calendar"></i> ${formatDate(item.expiry_date)}</span>
                             ${badgeHTML}
                         </div>
                     </div>
                     <div class="item-action">
-                        <button class="btn-buy" onclick="approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">
-                            <i class="fas fa-shopping-basket"></i> Beli
+                        <button class="btn-approve" onclick="approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">
+                            <i class="fas fa-shopping-basket"></i> ${item.type === 'low-stock' ? 'Beli' : 'Pakai'}
                         </button>
                     </div>
                 `;
@@ -572,7 +636,7 @@
         }
 
         function showErrorState() {
-            document.getElementById('listContainer').innerHTML = `
+            document.getElementById('suggestionsList').innerHTML = `
                 <div class="empty-state" style="border-color: var(--danger);">
                     <i class="fas fa-exclamation-circle" style="color: var(--danger);"></i>
                     <h3>Gagal Memuat</h3>
@@ -584,27 +648,26 @@
         // --- 4. SEARCH LOGIC ---
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            const filtered = allSuggestions.filter(item => 
+            const filtered = allSuggestions.filter(item =>
                 item.name.toLowerCase().includes(query)
             );
             renderList(filtered);
         });
 
-        // --- 5. ACTIONS (LOGIC UTAMA) ---
+        // --- 5. ACTIONS ---
         function viewProductDetail(id) {
             window.location.href = `/products/detail/${id}`;
         }
 
         async function approveSuggestion(productId, productName, type) {
-            // Gunakan SweetAlert untuk input data pembelian/penggunaan
             const result = await Swal.fire({
                 title: type === 'low-stock' ? 'Catat Pembelian' : 'Tandai Digunakan',
                 html: `
                     <div style="text-align:left; margin-bottom:15px; font-family: 'Poppins', sans-serif;">
                         <p style="font-size:1.2rem; font-weight:600; margin-bottom:5px; color:var(--text-main);">${productName}</p>
                         <p style="font-size:0.9rem; color:var(--text-muted);">
-                            ${type === 'low-stock' 
-                                ? 'Masukkan jumlah stok baru dan tanggal kadaluarsa.' 
+                            ${type === 'low-stock'
+                                ? 'Masukkan jumlah stok baru dan tanggal kadaluarsa.'
                                 : 'Anda yakin ingin menandai bahan ini sudah digunakan/habis?'}
                         </p>
                     </div>
@@ -634,14 +697,15 @@
                 },
                 showCancelButton: true,
                 confirmButtonText: type === 'low-stock' ? 'Simpan Stok' : 'Ya, Habis',
-                confirmButtonColor: type === 'low-stock' ? 'var(--primary-blue)' : 'var(--danger)',
+                confirmButtonColor: type === 'low-stock' ? 'var(--primary-blue)' : 'var(--primary-orange)',
+                cancelButtonColor: '#95a5a6',
                 cancelButtonText: 'Batal'
             });
 
             if (result.isConfirmed) {
                 try {
                     let updatedData = {};
-                    
+
                     if (type === 'low-stock') {
                         const [newStock, newExpiry] = result.value;
                         updatedData = {
@@ -649,7 +713,6 @@
                             expiry_date: newExpiry || null
                         };
                     } else {
-                        // Expiring item marked as used
                         updatedData = { stock_quantity: 0 };
                     }
 
@@ -675,7 +738,6 @@
                             title: type === 'low-stock' ? 'Stok Diperbarui!' : 'Bahan Ditandai Habis'
                         });
 
-                        // Reload data to refresh list
                         loadSuggestions();
                     } else {
                         Swal.fire('Gagal', data.message, 'error');
