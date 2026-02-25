@@ -1484,31 +1484,50 @@
                 const color = colors[type] || colors.warning;
                 
                 const confirmDiv = document.createElement('div');
+                confirmDiv.className = 'modal active';
+                confirmDiv.id = 'customConfirmModal';
+                confirmDiv.style.zIndex = '9999';
+
                 confirmDiv.innerHTML = `
-                    <div class="modal active" id="customConfirmModal" style="z-index: 9999;">
-                        <div class="modal-content" style="max-width: 400px;">
-                            <div class="modal-header">
-                                <h3 class="modal-title" style="display: flex; align-items: center; gap: 10px;">
-                                    <i class="fas ${color.icon}" style="color: ${color.bg}; font-size: 1.5rem;"></i>
-                                    Konfirmasi
-                                </h3>
-                                <button class="modal-close" onclick="document.getElementById('customConfirmModal').remove()">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                <p style="font-size: 1rem; line-height: 1.6;">${message}</p>
-                            </div>
-                            <div class="modal-footer" style="justify-content: center; gap: 10px;">
-                                <button class="btn btn-outline" onclick="resolve(false); document.getElementById('customConfirmModal').remove()">
-                                    Batal
-                                </button>
-                                <button class="btn" style="background: ${color.bg}; color: white;" onclick="resolve(true); document.getElementById('customConfirmModal').remove()">
-                                    <i class="fas fa-check"></i> Ya, Lanjutkan
-                                </button>
-                            </div>
+                    <div class="modal-content" style="max-width: 400px;">
+                        <div class="modal-header">
+                            <h3 class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas ${color.icon}" style="color: ${color.bg}; font-size: 1.5rem;"></i>
+                                Konfirmasi
+                            </h3>
+                            <button class="modal-close" id="customConfirmClose">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="font-size: 1rem; line-height: 1.6;">${message}</p>
+                        </div>
+                        <div class="modal-footer" style="justify-content: center; gap: 10px;">
+                            <button class="btn btn-outline" id="customConfirmCancel">
+                                Batal
+                            </button>
+                            <button class="btn" id="customConfirmOk" style="background: ${color.bg}; color: white;">
+                                <i class="fas fa-check"></i> Ya, Lanjutkan
+                            </button>
                         </div>
                     </div>
                 `;
                 document.body.appendChild(confirmDiv);
+
+                const closeModal = () => {
+                    confirmDiv.remove();
+                };
+
+                document.getElementById('customConfirmOk').onclick = () => {
+                    resolve(true);
+                    closeModal();
+                };
+                document.getElementById('customConfirmCancel').onclick = () => {
+                    resolve(false);
+                    closeModal();
+                };
+                document.getElementById('customConfirmClose').onclick = () => {
+                    resolve(false);
+                    closeModal();
+                };
             });
         }
 

@@ -176,7 +176,7 @@ app.get('/about', (req, res) => {
 });
 
 // Serve login/register page
-app.get('/auth', isNotAuthenticated, (req, res) => {
+app.get('/auth', (req, res) => {
     // Check for confirmation query parameter
     const confirmed = req.query.confirmed === 'true';
     const returnUrl = req.query.returnUrl || '/';

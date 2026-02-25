@@ -239,12 +239,12 @@ const authController = {
                 });
             }
 
-            // Validasi panjang password minimum (opsional, bisa disesuaikan)
-            if (password.length < 1) {
+            // Validasi panjang password minimum
+            if (password.length < 6) {
                 console.log('Validation failed: Password too short for email:', email);
                 return res.status(400).json({
                     success: false,
-                    message: 'Password harus diisi'
+                    message: 'password minimal 6 kata'
                 });
             }
 
