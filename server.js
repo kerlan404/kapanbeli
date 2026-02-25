@@ -479,6 +479,12 @@ app.get('/admin/user/:id', isAuthenticated, (req, res) => {
     }
 });
 
+// Current user's profile page (MUST BE BEFORE /profile/:id)
+app.get('/user-profile', isAuthenticated, (req, res) => {
+    console.log('User profile page accessed. Session user:', req.session.user);
+    res.render('user-profile', { currentPage: 'profile' });
+});
+
 // Public user profile page
 app.get('/profile/:id', async (req, res) => {
     res.render('user-profile', { currentPage: 'profile' });

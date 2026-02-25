@@ -1089,6 +1089,11 @@
 
                 const delayClass = index < 4 ? `delay-${index+1}` : 'delay-4';
 
+                // Format stock quantity - remove .0 if whole number
+                const stockNum = parseFloat(prod.stock_quantity) || 0;
+                const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
+                const unit = prod.unit || '';
+
                 const card = `
                     <div class="product-card animate-entry ${delayClass}">
                         <div class="card-top">
@@ -1105,7 +1110,7 @@
                             <div class="info-row">
                                 <span class="label"><i class="fas fa-boxes"></i> Stok</span>
                                 <span class="value" style="color: ${isLow ? 'var(--accent-red)' : 'var(--text-main)'}">
-                                    ${prod.stock_quantity} ${prod.unit || ''}
+                                    ${stockDisplay} ${unit}
                                     ${isLow ? '<i class="fas fa-exclamation-circle" style="margin-left:5px; font-size:0.8rem;"></i>' : ''}
                                 </span>
                             </div>
@@ -1170,14 +1175,14 @@
         // Fungsi Utama Load Data - UPDATED TO USE SERVER-SIDE STATS
         async function loadDashboardData() {
             console.log('=== Loading dashboard data... ===');
-            
+
             // Check if stats grid exists
             const statsGrid = document.getElementById('statsGrid');
             if (!statsGrid) {
                 console.error('Stats grid not found in DOM!');
                 return;
             }
-            
+
             const statCards = statsGrid.querySelectorAll('.stat-card .stat-value');
             console.log('Found', statCards.length, 'stat cards in DOM');
 
@@ -1191,35 +1196,44 @@
                 notes: 0
             };
 
+            // Helper function to fetch with timeout
+            const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(id);
+                return response;
+            };
+
             // 1. Fetch Products (untuk render grid dan low stock section)
             try {
-                const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
+                const prodRes = await fetchWithTimeout('/api/products', { credentials: 'same-origin' }, 5000);
                 console.log('Products API response status:', prodRes.status);
                 if(prodRes.ok) {
                     const data = await prodRes.json();
                     console.log('Products received:', data);
                     if(data.success && Array.isArray(data.products)) {
                         dashboardStats.total = data.products.length;
-                        
+
                         // Calculate stats from products
                         const lowStockProducts = data.products.filter(p => {
                             const stock = parseFloat(p.stock_quantity) || 0;
                             const minLevel = parseFloat(p.min_stock_level) || 5;
                             return stock > 0 && stock <= minLevel;
                         });
-                        
+
                         const outOfStockProducts = data.products.filter(p => {
                             const stock = parseFloat(p.stock_quantity) || 0;
                             return stock <= 0;
                         });
-                        
+
                         const expiredProducts = data.products.filter(p => {
                             if (!p.expiry_date) return false;
                             const expiryDate = new Date(p.expiry_date);
                             const today = new Date();
                             return expiryDate < today;
                         });
-                        
+
                         const expiringSoonProducts = data.products.filter(p => {
                             if (!p.expiry_date) return false;
                             const expiryDate = new Date(p.expiry_date);
@@ -1227,7 +1241,7 @@
                             const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
                             return diffDays > 0 && diffDays <= 7;
                         });
-                        
+
                         dashboardStats.lowStock = lowStockProducts.length;
                         dashboardStats.shoppingList = lowStockProducts.length + outOfStockProducts.length;
                         dashboardStats.expired = expiredProducts.length;
@@ -1251,7 +1265,7 @@
 
             // 2. Fetch Notes (untuk update notes count DAN render notes section)
             try {
-                const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
+                const notesRes = await fetchWithTimeout('/api/notes', { credentials: 'same-origin' }, 5000);
                 console.log('Notes API response status:', notesRes.status);
                 if(notesRes.ok) {
                     const notesData = await notesRes.json();
@@ -1502,16 +1516,22 @@
         function renderLowStockProducts(products) {
             const container = document.getElementById('emptyStockGrid');
             const section = document.getElementById('emptyStockSection');
-            
+
             // Filter stok <= 0 (habis) atau stok <= min_stock (menipis)
             const lowStock = products.filter(p => parseFloat(p.stock_quantity) <= parseFloat(p.min_stock_level || 0));
 
             if(lowStock.length > 0) {
                 section.style.display = 'block';
                 container.innerHTML = '';
-                
+
                 lowStock.forEach((prod, index) => {
                     const delayClass = index < 3 ? `delay-${index+1}` : 'delay-3';
+                    
+                    // Format stock quantity - remove .0 if whole number
+                    const stockNum = parseFloat(prod.stock_quantity) || 0;
+                    const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
+                    const unit = prod.unit || '';
+                    
                     const card = `
                         <div class="product-card animate-entry ${delayClass}" style="border: 1px solid rgba(255, 107, 107, 0.3);">
                             <div class="card-top" style="background: rgba(255, 107, 107, 0.1);">
@@ -1522,7 +1542,7 @@
                                 <h3 class="prod-name">${prod.name}</h3>
                                 <div class="info-row">
                                     <span class="label">Sisa Stok</span>
-                                    <span class="value" style="color: var(--accent-red); font-weight:800;">${prod.stock_quantity} ${prod.unit}</span>
+                                    <span class="value" style="color: var(--accent-red); font-weight:800;">${stockDisplay} ${unit}</span>
                                 </div>
                                 <div class="info-row" style="border:none;">
                                     <a href="/suggestions" class="cta-button" style="width:100%; justify-content:center; padding:10px; font-size:0.9rem; margin-top:10px;">
@@ -1545,135 +1565,117 @@
             list.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat aktivitas...</div>';
 
             try {
-                // Fetch combined activities from the API endpoint
+                // Get activities manually from products and notes
                 let activities = [];
-                
-                // Try to get activities from the API
-                try {
-                    const res = await fetch('/api/products/recent-activities', { credentials: 'same-origin' });
-                    console.log('Activities API response status:', res.status); // Debug log
-                    if(res.ok) {
-                        const data = await res.json();
-                        console.log('Activities API response data:', data); // Debug log
-                        if(data.success && Array.isArray(data.activities)) {
-                            activities = data.activities;
-                            console.log('Activities loaded from API:', activities.length); // Debug log
-                        } else {
-                            console.error('API returned error or invalid data:', data);
-                        }
-                    } else {
-                        console.error('API returned HTTP error:', res.status);
-                    }
-                } catch(e) {
-                    console.error('Network error fetching activities from API:', e);
-                }
 
-                // If API didn't return activities, get them manually from products and notes
-                if(activities.length === 0) {
-                    console.log('Fetching activities manually...');
-                    
-                    // Fetch products to create activity entries
-                    try {
-                        const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
-                        if(prodRes.ok) {
-                            const prodData = await prodRes.json();
-                            if(prodData.success && Array.isArray(prodData.products)) {
-                                // Add product activities (creation and updates)
-                                prodData.products.forEach(product => {
-                                    // Add creation/update activity
+                console.log('Fetching activities manually...');
+
+                // Fetch products to create activity entries
+                try {
+                    const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
+                    if(prodRes.ok) {
+                        const prodData = await prodRes.json();
+                        if(prodData.success && Array.isArray(prodData.products)) {
+                            // Add product activities (creation and updates)
+                            prodData.products.forEach(product => {
+                                // Format stock quantity - remove .0 if whole number
+                                const stockNum = parseFloat(product.stock_quantity) || 0;
+                                const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
+                                const unit = product.unit || '';
+                                
+                                // Add creation/update activity
+                                activities.push({
+                                    id: `prod-${product.id}`,
+                                    type: 'product',
+                                    title: `Menambahkan bahan: ${product.name}`,
+                                    description: `Stok: ${stockDisplay} ${unit}`,
+                                    timestamp: product.created_at || product.updated_at || new Date().toISOString(),
+                                    icon: 'fa-box-open',
+                                    colorClass: 'act-add'
+                                });
+
+                                // Add low stock warning if applicable
+                                if(parseFloat(product.stock_quantity) <= parseFloat(product.min_stock_level || 0)) {
                                     activities.push({
-                                        id: `prod-${product.id}`,
-                                        type: 'product',
-                                        title: `Menambahkan bahan: ${product.name}`,
-                                        description: `Stok: ${product.stock_quantity} ${product.unit || ''}`,
-                                        timestamp: product.created_at || product.updated_at || new Date().toISOString(),
-                                        icon: 'fa-box-open',
-                                        colorClass: 'act-add'
+                                        id: `low-stock-${product.id}`,
+                                        type: 'system_warning',
+                                        title: `Peringatan: Stok ${product.name} menipis`,
+                                        description: `Stok: ${stockDisplay} ${unit}. Segera isi ulang.`,
+                                        timestamp: product.updated_at || product.created_at || new Date().toISOString(),
+                                        icon: 'fa-exclamation-triangle',
+                                        colorClass: 'act-warning'
                                     });
-                                    
-                                    // Add low stock warning if applicable
-                                    if(parseFloat(product.stock_quantity) <= parseFloat(product.min_stock_level || 0)) {
+                                }
+
+                                // Add expiry warning if applicable
+                                if(product.expiry_date) {
+                                    const expiryDate = new Date(product.expiry_date);
+                                    const today = new Date();
+                                    const diffTime = expiryDate - today;
+                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                                    if(diffDays <= 7 && diffDays >= 0) {
                                         activities.push({
-                                            id: `low-stock-${product.id}`,
+                                            id: `expiring-${product.id}`,
                                             type: 'system_warning',
-                                            title: `Peringatan: Stok ${product.name} menipis`,
-                                            description: `Stok: ${product.stock_quantity} ${product.unit || ''}. Segera isi ulang.`,
+                                            title: `Peringatan: ${product.name} akan kadaluarsa`,
+                                            description: `Kadaluarsa dalam ${diffDays} hari`,
                                             timestamp: product.updated_at || product.created_at || new Date().toISOString(),
-                                            icon: 'fa-exclamation-triangle',
+                                            icon: 'fa-clock',
+                                            colorClass: 'act-warning'
+                                        });
+                                    } else if(diffDays < 0) {
+                                        activities.push({
+                                            id: `expired-${product.id}`,
+                                            type: 'system_warning',
+                                            title: `Peringatan: ${product.name} telah kadaluarsa`,
+                                            description: `Harus diganti segera`,
+                                            timestamp: product.updated_at || product.created_at || new Date().toISOString(),
+                                            icon: 'fa-skull-crossbones',
                                             colorClass: 'act-warning'
                                         });
                                     }
-                                    
-                                    // Add expiry warning if applicable
-                                    if(product.expiry_date) {
-                                        const expiryDate = new Date(product.expiry_date);
-                                        const today = new Date();
-                                        const diffTime = expiryDate - today;
-                                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                        
-                                        if(diffDays <= 7 && diffDays >= 0) {
-                                            activities.push({
-                                                id: `expiring-${product.id}`,
-                                                type: 'system_warning',
-                                                title: `Peringatan: ${product.name} akan kadaluarsa`,
-                                                description: `Kadaluarsa dalam ${diffDays} hari`,
-                                                timestamp: product.updated_at || product.created_at || new Date().toISOString(),
-                                                icon: 'fa-clock',
-                                                colorClass: 'act-warning'
-                                            });
-                                        } else if(diffDays < 0) {
-                                            activities.push({
-                                                id: `expired-${product.id}`,
-                                                type: 'system_warning',
-                                                title: `Peringatan: ${product.name} telah kadaluarsa`,
-                                                description: `Harus diganti segera`,
-                                                timestamp: product.updated_at || product.created_at || new Date().toISOString(),
-                                                icon: 'fa-skull-crossbones',
-                                                colorClass: 'act-warning'
-                                            });
-                                        }
-                                    }
-                                });
-                            }
+                                }
+                            });
                         }
-                    } catch(e) {
-                        console.error('Error fetching products for activities:', e);
                     }
+                } catch(e) {
+                    console.error('Error fetching products for activities:', e);
+                }
 
-                    // Fetch notes to create activity entries
-                    try {
-                        const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
-                        if(notesRes.ok) {
-                            const notesData = await notesRes.json();
-                            if(notesData.success && Array.isArray(notesData.notes)) {
-                                // Add note activities
-                                notesData.notes.forEach(note => {
-                                    activities.push({
-                                        id: `note-${note.id}`,
-                                        type: 'note',
-                                        title: `Menambahkan catatan: ${note.title}`,
-                                        description: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
-                                        timestamp: note.created_at || note.updated_at || new Date().toISOString(),
-                                        icon: 'fa-sticky-note',
-                                        colorClass: 'act-note'
-                                    });
+                // Fetch notes to create activity entries
+                try {
+                    const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
+                    if(notesRes.ok) {
+                        const notesData = await notesRes.json();
+                        if(notesData.success && Array.isArray(notesData.notes)) {
+                            // Add note activities
+                            notesData.notes.forEach(note => {
+                                activities.push({
+                                    id: `note-${note.id}`,
+                                    type: 'note',
+                                    title: `Menambahkan catatan: ${note.title}`,
+                                    description: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
+                                    timestamp: note.created_at || note.updated_at || new Date().toISOString(),
+                                    icon: 'fa-sticky-note',
+                                    colorClass: 'act-note'
                                 });
-                            }
+                            });
                         }
-                    } catch(e) {
-                        console.error('Error fetching notes for activities:', e);
                     }
+                } catch(e) {
+                    console.error('Error fetching notes for activities:', e);
                 }
 
                 // Sort activities by timestamp (newest first)
                 activities.sort((a, b) => {
                     const dateA = new Date(a.timestamp);
                     const dateB = new Date(b.timestamp);
-                    
+
                     // Handle invalid dates
                     if (isNaN(dateA.getTime())) return 1;
                     if (isNaN(dateB.getTime())) return -1;
-                    
+
                     return dateB - dateA; // Descending order (newest first)
                 });
 
@@ -1771,13 +1773,6 @@
             recordActivity('note', 'Menghapus catatan', e.detail?.title || '');
         });
 
-        // Also listen for page loads to ensure activities are updated
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                loadActivities();
-            }, 2000); // Delay to ensure everything is loaded
-        });
-
         // Listen for storage events from other tabs/windows
         window.addEventListener('storage', (e) => {
             if (e.key === 'activityUpdate') {
@@ -1791,10 +1786,11 @@
             const isAuth = await checkAuthStatus();
 
             if(isAuth) {
-                setTimeout(async () => {
-                    await loadDashboardData();
-                    await loadNotes();
-                }, 500);
+                // Load data immediately without delay
+                loadDashboardData();
+                loadNotes();
+                // Load activities with slight delay to ensure DOM is ready
+                setTimeout(() => loadActivities(), 100);
             }
 
             // Refresh data tiap 30 detik

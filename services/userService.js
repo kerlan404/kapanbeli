@@ -123,13 +123,13 @@ const userService = {
 
             // Get users with login stats
             const dataQuery = `
-                SELECT 
+                SELECT
                     u.id,
                     u.name,
                     u.email,
                     u.role,
                     u.account_status,
-                    u.profile_image,
+                    u.profile_photo,
                     u.created_at,
                     u.last_login,
                     COUNT(DISTINCT ll.id) as total_logins
@@ -169,13 +169,13 @@ const userService = {
     async getUserById(userId) {
         try {
             const query = `
-                SELECT 
+                SELECT
                     u.id,
                     u.name,
                     u.email,
                     u.role,
                     u.account_status,
-                    u.profile_image,
+                    u.profile_photo,
                     u.created_at,
                     u.last_login,
                     COUNT(DISTINCT ll.id) as total_logins,
@@ -361,7 +361,7 @@ const userService = {
      */
     async updateUser(userId, updateData) {
         try {
-            const { name, email, role, account_status, profile_image } = updateData;
+            const { name, email, role, account_status, profile_photo } = updateData;
 
             // Check if user exists
             const existingUser = await this.findById(userId);
@@ -401,9 +401,9 @@ const userService = {
                 values.push(account_status);
             }
 
-            if (profile_image !== undefined) {
-                updates.push('profile_image = ?');
-                values.push(profile_image);
+            if (profile_photo !== undefined) {
+                updates.push('profile_photo = ?');
+                values.push(profile_photo);
             }
 
             if (updates.length === 0) {
@@ -474,11 +474,11 @@ const userService = {
             }
 
             // Delete old image if exists
-            if (user.profile_image) {
+            if (user.profile_photo) {
                 const fs = require('fs').promises;
                 const path = require('path');
-                const oldPath = path.join(__dirname, '..', user.profile_image);
-                
+                const oldPath = path.join(__dirname, '..', user.profile_photo);
+
                 try {
                     await fs.access(oldPath);
                     await fs.unlink(oldPath);
@@ -489,8 +489,8 @@ const userService = {
 
             // Update database
             const query = `
-                UPDATE users 
-                SET profile_image = ?, updated_at = NOW()
+                UPDATE users
+                SET profile_photo = ?, updated_at = NOW()
                 WHERE id = ?
             `;
 
@@ -498,7 +498,7 @@ const userService = {
 
             return {
                 success: true,
-                data: { profile_image: imagePath },
+                data: { profile_photo: imagePath },
                 message: 'Foto profil berhasil diupdate'
             };
         } catch (error) {
@@ -577,15 +577,15 @@ const userService = {
             }
 
             // Delete profile image if exists
-            if (user.profile_image) {
+            if (user.profile_photo) {
                 try {
                     const fs = require('fs').promises;
                     const path = require('path');
-                    const imagePath = path.join(__dirname, '..', user.profile_image);
-                    
+                    const imagePath = path.join(__dirname, '..', user.profile_photo);
+
                     await fs.access(imagePath);
                     await fs.unlink(imagePath);
-                    console.log('[userService.hardDelete] Deleted profile image:', user.profile_image);
+                    console.log('[userService.hardDelete] Deleted profile image:', user.profile_photo);
                 } catch (err) {
                     // File doesn't exist or can't be accessed, ignore
                     console.log('[userService.hardDelete] Profile image not found or cannot be deleted:', err.message);

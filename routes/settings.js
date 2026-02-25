@@ -17,4 +17,7 @@ router.post('/photo', settingsController.uploadProfilePhoto);
 // Delete account
 router.delete('/account', settingsController.deleteAccount);
 
+// Get current user's data (products, suggestions, notes)
+router.get('/data', settingsController.getUserData);
+
 module.exports = router;

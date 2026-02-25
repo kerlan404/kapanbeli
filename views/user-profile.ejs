@@ -18,20 +18,14 @@
             --primary-blue: #2E86DE;
             --primary-orange: #FF9F43;
             --accent-green: #1DD1A1;
-            --bg-body: #F4F6F9;
-            --bg-card: #FFFFFF;
-            --text-main: #2C3E50;
-            --text-muted: #8395A7;
-            --border-color: #e9ecef;
-            --shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        body.dark-mode-active {
-            --bg-body: #121418;
-            --bg-card: #1e2128;
+            --accent-red: #FF6B6B;
+            --bg-body: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --bg-input: #2a2a2a;
             --text-main: #ecf0f1;
-            --text-muted: #bdc3c7;
-            --border-color: #2c3e50;
+            --text-muted: #95a5a6;
+            --border-color: #3a3a3a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -43,7 +37,7 @@
             padding: 20px;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
         /* Header */
         .page-header {
@@ -81,6 +75,8 @@
         .btn-primary:hover { background: #1a73c9; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .btn-danger { background: var(--accent-red); color: white; }
+        .btn-danger:hover { background: #ee5253; }
 
         /* Profile Card */
         .profile-card {
@@ -89,6 +85,7 @@
             padding: 30px;
             box-shadow: var(--shadow);
             margin-bottom: 30px;
+            border: 1px solid var(--border-color);
         }
 
         .profile-header {
@@ -98,19 +95,38 @@
             flex-wrap: wrap;
         }
 
+        .profile-avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
         .profile-avatar {
             width: 150px;
             height: 150px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid var(--primary-blue);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(46, 134, 222, 0.3);
+        }
+
+        .profile-avatar-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            border: 4px solid var(--primary-blue);
+            box-shadow: 0 4px 15px rgba(46, 134, 222, 0.3);
         }
 
         .profile-info { flex: 1; min-width: 250px; }
         .profile-name { font-size: 2rem; font-weight: 700; margin-bottom: 5px; color: var(--text-main); }
         .profile-email { font-size: 1rem; color: var(--text-muted); margin-bottom: 15px; }
-        
+
         .profile-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .badge {
             padding: 6px 16px;
@@ -121,10 +137,10 @@
             align-items: center;
             gap: 6px;
         }
-        .badge-admin { background: rgba(162, 155, 254, 0.15); color: #A29BFE; }
-        .badge-user { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
-        .badge-active { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
-        .badge-inactive { background: rgba(149, 165, 166, 0.15); color: var(--text-muted); }
+        .badge-admin { background: rgba(162, 155, 254, 0.2); color: #A29BFE; }
+        .badge-user { background: rgba(46, 134, 222, 0.2); color: var(--primary-blue); }
+        .badge-active { background: rgba(29, 209, 161, 0.2); color: var(--accent-green); }
+        .badge-inactive { background: rgba(149, 165, 166, 0.2); color: var(--text-muted); }
 
         .profile-meta {
             font-size: 0.9rem;
@@ -142,23 +158,25 @@
         }
 
         .stat-card {
-            background: var(--bg-body);
+            background: var(--bg-input);
             padding: 20px;
             border-radius: 12px;
             text-align: center;
             transition: transform 0.2s;
+            border: 1px solid var(--border-color);
         }
-        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--primary-blue); }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary-blue); margin-bottom: 5px; }
         .stat-label { font-size: 0.85rem; color: var(--text-muted); }
 
-        /* Data Sections */
-        .data-section {
+        /* Settings Sections */
+        .settings-section {
             background: var(--bg-card);
             border-radius: 16px;
             padding: 25px;
             box-shadow: var(--shadow);
             margin-bottom: 30px;
+            border: 1px solid var(--border-color);
         }
 
         .section-title {
@@ -170,20 +188,42 @@
             align-items: center;
             gap: 10px;
         }
-        .section-title i { color: var(--primary-blue); }
+        .section-title i { color: var(--primary-orange); }
 
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid var(--border-color); }
-        td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.95rem; }
-        tr:hover td { background-color: rgba(0,0,0,0.02); }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
         }
-        .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
         /* Loading */
         .loading {
@@ -200,10 +240,32 @@
         }
         .error-state i { font-size: 3rem; color: var(--accent-red); margin-bottom: 15px; }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: var(--accent-green); }
+        .toast.error { background: var(--accent-red); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             .profile-header { flex-direction: column; text-align: center; }
             .profile-badges { justify-content: center; }
             .profile-meta p { justify-content: center; }
+            .form-actions { flex-direction: column; }
         }
     </style>
 </head>
@@ -213,7 +275,7 @@
         <div class="page-header">
             <h1 class="page-title">
                 <i class="fas fa-user-circle"></i>
-                Profil Pengguna
+                <span id="pageTitle">Profil Saya</span>
             </h1>
             <button class="btn btn-outline" onclick="window.history.back()">
                 <i class="fas fa-arrow-left"></i> Kembali
@@ -241,7 +303,13 @@
             <!-- Profile Card -->
             <div class="profile-card">
                 <div class="profile-header">
-                    <img id="profileImage" src="" alt="Profile" class="profile-avatar">
+                    <div class="profile-avatar-container" onclick="document.getElementById('profilePhotoInput').click()">
+                        <img id="profileImage" src="" alt="Profile" class="profile-avatar" style="display: none;">
+                        <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="uploadProfilePhoto(event)">
+                    </div>
                     <div class="profile-info">
                         <h2 id="profileName" class="profile-name">-</h2>
                         <p id="profileEmail" class="profile-email">-</p>
@@ -274,91 +342,116 @@
                 </div>
             </div>
 
-            <!-- Products Section -->
-            <div id="productsSection" class="data-section" style="display: none;">
+            <!-- Edit Profile Section -->
+            <div class="settings-section">
                 <h3 class="section-title">
-                    <i class="fas fa-box"></i>
-                    Produk (<span id="productsCount">0</span>)
+                    <i class="fas fa-user-edit"></i>
+                    Edit Profil
                 </h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nama Produk</th>
-                                <th>Stok</th>
-                                <th>Min. Stok</th>
-                                <th>Dibuat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productsTable"></tbody>
-                    </table>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="editName" placeholder="Masukkan username">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="editEmail" placeholder="Masukkan email">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="updateProfile()">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                    <button class="btn btn-outline" onclick="cancelEdit()">
+                        <i class="fas fa-undo"></i> Batal
+                    </button>
                 </div>
             </div>
 
-            <!-- Suggestions Section -->
-            <div id="suggestionsSection" class="data-section" style="display: none;">
+            <!-- Change Password Section -->
+            <div class="settings-section">
                 <h3 class="section-title">
-                    <i class="fas fa-clipboard-list"></i>
-                    Saran Pembelian (<span id="suggestionsCount">0</span>)
+                    <i class="fas fa-key"></i>
+                    Ganti Password
                 </h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Tipe</th>
-                                <th>Deskripsi</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="suggestionsTable"></tbody>
-                    </table>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password Baru</label>
+                    <input type="password" id="newPassword" placeholder="Masukkan password baru">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Konfirmasi Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Konfirmasi password baru">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="changePassword()">
+                        <i class="fas fa-key"></i> Ubah Password
+                    </button>
                 </div>
             </div>
 
-            <!-- Notes Section -->
-            <div id="notesSection" class="data-section" style="display: none;">
-                <h3 class="section-title">
-                    <i class="fas fa-sticky-note"></i>
-                    Catatan (<span id="notesCount">0</span>)
+            <!-- Delete Account Section -->
+            <div class="settings-section" style="border-color: var(--accent-red);">
+                <h3 class="section-title" style="color: var(--accent-red);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Zona Bahaya
                 </h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Judul</th>
-                                <th>Isi</th>
-                                <th>Dibuat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="notesTable"></tbody>
-                    </table>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i> Tindakan ini akan menghapus akun Anda secara permanen beserta semua data (produk, saran, catatan). Tidak dapat dibatalkan!
+                </p>
+                <div class="form-group">
+                    <label><i class="fas fa-shield-alt"></i> Konfirmasi Password</label>
+                    <input type="password" id="deleteConfirmPassword" placeholder="Masukkan password untuk konfirmasi">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-danger" onclick="deleteAccount()">
+                        <i class="fas fa-trash"></i> Hapus Akun Saya
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
     <script>
-        // Get user ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id');
+        let currentUser = null;
 
         // Load profile data
         async function loadProfile() {
-            if (!userId) {
-                showError();
-                return;
-            }
-
             try {
-                const response = await fetch(`/api/users/${userId}/data`);
+                console.log('Fetching auth status...');
+                const authResponse = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const authData = await authResponse.json();
+                console.log('Auth data:', authData);
+
+                if (!authData.authenticated) {
+                    window.location.href = '/auth?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
+
+                const userId = authData.user.id;
+                console.log('Current user ID:', userId);
+
+                console.log('Fetching user data from /api/profile/data');
+                const response = await fetch('/api/profile/data', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                console.log('Response status:', response.status);
                 const result = await response.json();
+                console.log('Response data:', result);
 
                 if (!result.success || !result.data.user) {
+                    console.error('No user data found');
                     showError();
                     return;
                 }
 
+                currentUser = result.data.user;
                 displayProfile(result.data);
             } catch (error) {
                 console.error('Error loading profile:', error);
@@ -372,18 +465,32 @@
 
             // Profile Image
             const profileImg = document.getElementById('profileImage');
-            profileImg.src = user.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2E86DE&color=fff&size=150`;
+            const placeholder = document.getElementById('profileAvatarPlaceholder');
+            
+            if (user.profile_photo) {
+                profileImg.src = user.profile_photo;
+                profileImg.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                profileImg.style.display = 'none';
+                placeholder.style.display = 'flex';
+                placeholder.innerHTML = `<i class="fas fa-user"></i>`;
+            }
 
             // Profile Info
             document.getElementById('profileName').textContent = user.name;
             document.getElementById('profileEmail').textContent = user.email;
+
+            // Pre-fill edit form
+            document.getElementById('editName').value = user.name;
+            document.getElementById('editEmail').value = user.email;
 
             // Badges
             const badgesContainer = document.getElementById('profileBadges');
             badgesContainer.innerHTML = `
                 <span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}">
                     <i class="fas fa-${user.role === 'admin' ? 'crown' : 'user'}"></i>
-                    ${user.role}
+                    ${user.role === 'admin' ? 'Administrator' : 'Pengguna'}
                 </span>
                 <span class="badge ${user.account_status === 'active' ? 'badge-active' : 'badge-inactive'}">
                     <i class="fas fa-${user.account_status === 'active' ? 'check-circle' : 'times-circle'}"></i>
@@ -395,56 +502,15 @@
             document.getElementById('joinDate').textContent = new Date(user.created_at).toLocaleDateString('id-ID', {
                 year: 'numeric', month: 'long', day: 'numeric'
             });
-            document.getElementById('lastLogin').textContent = user.last_login 
+            document.getElementById('lastLogin').textContent = user.last_login
                 ? new Date(user.last_login).toLocaleString('id-ID')
                 : 'Belum pernah';
 
-            // Stats
-            document.getElementById('statProducts').textContent = user.total_products || 0;
-            document.getElementById('statSuggestions').textContent = user.total_suggestions || 0;
-            document.getElementById('statNotes').textContent = user.total_notes || 0;
+            // Stats - Use actual data from API
+            document.getElementById('statProducts').textContent = products ? products.length : 0;
+            document.getElementById('statSuggestions').textContent = suggestions ? suggestions.length : 0;
+            document.getElementById('statNotes').textContent = notes ? notes.length : 0;
             document.getElementById('statLogins').textContent = user.total_logins || 0;
-
-            // Products
-            if (products && products.length > 0) {
-                document.getElementById('productsSection').style.display = 'block';
-                document.getElementById('productsCount').textContent = products.length;
-                document.getElementById('productsTable').innerHTML = products.slice(0, 10).map(p => `
-                    <tr>
-                        <td><strong>${p.name}</strong></td>
-                        <td>${p.stock_quantity} ${p.unit || ''}</td>
-                        <td>${p.min_stock_level || 0} ${p.unit || ''}</td>
-                        <td>${new Date(p.created_at).toLocaleDateString('id-ID')}</td>
-                    </tr>
-                `).join('');
-            }
-
-            // Suggestions
-            if (suggestions && suggestions.length > 0) {
-                document.getElementById('suggestionsSection').style.display = 'block';
-                document.getElementById('suggestionsCount').textContent = suggestions.length;
-                document.getElementById('suggestionsTable').innerHTML = suggestions.slice(0, 10).map(s => `
-                    <tr>
-                        <td><strong>${s.name}</strong></td>
-                        <td>${s.type}</td>
-                        <td>${s.description || '-'}</td>
-                        <td><span class="badge badge-${s.status === 'pending' ? 'warning' : 'success'}">${s.status}</span></td>
-                    </tr>
-                `).join('');
-            }
-
-            // Notes
-            if (notes && notes.length > 0) {
-                document.getElementById('notesSection').style.display = 'block';
-                document.getElementById('notesCount').textContent = notes.length;
-                document.getElementById('notesTable').innerHTML = notes.slice(0, 10).map(n => `
-                    <tr>
-                        <td><strong>${n.title}</strong></td>
-                        <td>${n.content ? n.content.substring(0, 50) + (n.content.length > 50 ? '...' : '') : '-'}</td>
-                        <td>${new Date(n.created_at).toLocaleDateString('id-ID')}</td>
-                    </tr>
-                `).join('');
-            }
 
             // Show content
             document.getElementById('loading').style.display = 'none';
@@ -455,6 +521,167 @@
         function showError() {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'block';
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Upload profile photo
+        async function uploadProfilePhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Ukuran file maksimal 5MB', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('profile_photo', file);
+
+            try {
+                const response = await fetch('/api/profile/photo', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Foto profil berhasil diupdate');
+                    loadProfile();
+                } else {
+                    showToast(result.message || 'Gagal upload foto', 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('Terjadi kesalahan saat upload foto', 'error');
+            }
+        }
+
+        // Update profile
+        async function updateProfile() {
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+
+            if (!name || name.length < 3) {
+                showToast('Username minimal 3 karakter', 'error');
+                return;
+            }
+
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showToast('Email tidak valid', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile/profile', {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Profil berhasil diupdate');
+                    loadProfile();
+                } else {
+                    showToast(result.message || 'Gagal update profil', 'error');
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast('Terjadi kesalahan saat update profil', 'error');
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            if (currentUser) {
+                document.getElementById('editName').value = currentUser.name;
+                document.getElementById('editEmail').value = currentUser.email;
+            }
+        }
+
+        // Change password
+        async function changePassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!newPassword || newPassword.length < 6) {
+                showToast('Password minimal 6 karakter', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showToast('Password tidak cocok', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile/password', {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Password berhasil diubah');
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showToast(result.message || 'Gagal ubah password', 'error');
+                }
+            } catch (error) {
+                console.error('Change password error:', error);
+                showToast('Terjadi kesalahan saat ubah password', 'error');
+            }
+        }
+
+        // Delete account
+        async function deleteAccount() {
+            const password = document.getElementById('deleteConfirmPassword').value;
+
+            if (!password) {
+                showToast('Masukkan password untuk konfirmasi', 'error');
+                return;
+            }
+
+            if (!confirm('YAKIN ingin menghapus akun? Semua data akan hilang permanen!')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile/account', {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Akun berhasil dihapus');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showToast(result.message || 'Password salah', 'error');
+                }
+            } catch (error) {
+                console.error('Delete account error:', error);
+                showToast('Terjadi kesalahan', 'error');
+            }
         }
 
         // Load on page load

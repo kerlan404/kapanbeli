@@ -485,6 +485,10 @@
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span id="userName" style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: none;">User</span>
+                <a href="/user-profile" id="profilePhotoLink" style="display:none;">
+                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                </a>
+                <a href="/user-profile" id="profileLink" class="nav-link" style="font-size: 0.85rem; display:none;" title="Profil"><i class="fas fa-user-circle"></i></a>
                 <a href="/auth/logout" class="nav-link" style="font-size: 0.85rem;">Keluar</a>
                 <button class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
             </div>
@@ -668,12 +672,34 @@
         // Load User Info
         async function loadUserInfo() {
             try {
-                const res = await fetch('/auth/status');
+                const res = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
                 const data = await res.json();
                 if (data.authenticated) {
                     const userEl = document.getElementById('userName');
+                    const profilePhotoLink = document.getElementById('profilePhotoLink');
+                    const profileLink = document.getElementById('profileLink');
+                    const navProfilePhoto = document.getElementById('navProfilePhoto');
+
                     userEl.textContent = data.user.name;
                     userEl.style.display = 'block';
+
+                    // Show profile photo if exists
+                    if (data.user.profile_photo) {
+                        navProfilePhoto.src = data.user.profile_photo;
+                        navProfilePhoto.style.display = 'inline-block';
+                        profilePhotoLink.style.display = 'inline-block';
+                        profileLink.style.display = 'none';
+                    } else {
+                        profilePhotoLink.style.display = 'none';
+                        profileLink.style.display = 'inline-block';
+                    }
+
                     loadProfile(data.user.id);
                     loadUserStats(data.user.id);
                 } else {

@@ -529,7 +529,10 @@
                 <a href="/suggestions" class="nav-link">Saran Pembelian</a>
             </div>
             <div class="nav-buttons">
-                <a href="/profile" class="nav-link" title="Profil" style="font-size: 0.9rem;"><i class="fas fa-user-circle"></i></a>
+                <a href="/user-profile" id="profilePhotoLink" style="display:none;">
+                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                </a>
+                <a href="/user-profile" id="profileLink" class="nav-link" title="Profil" style="font-size: 0.9rem; display:none;"><i class="fas fa-user-circle"></i></a>
                 <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
             </div>
         </div>
@@ -593,6 +596,44 @@
     </div>
 
     <script>
+        // --- 0. AUTH CHECK ---
+        async function checkAuth() {
+            try {
+                const res = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (!data.authenticated) {
+                    window.location.href = '/auth';
+                    return;
+                }
+
+                // Show profile photo if exists
+                const profilePhotoLink = document.getElementById('profilePhotoLink');
+                const profileLink = document.getElementById('profileLink');
+                const navProfilePhoto = document.getElementById('navProfilePhoto');
+
+                if (data.user.profile_photo) {
+                    navProfilePhoto.src = data.user.profile_photo;
+                    navProfilePhoto.style.display = 'inline-block';
+                    profilePhotoLink.style.display = 'inline-block';
+                    profileLink.style.display = 'none';
+                } else {
+                    profilePhotoLink.style.display = 'none';
+                    profileLink.style.display = 'inline-block';
+                }
+            } catch(e) {
+                window.location.href = '/auth';
+            }
+        }
+
+        // Call checkAuth on page load
+        checkAuth();
+
         // --- 1. DARK MODE LOGIC ---
         const toggleBtn = document.querySelector('.dark-mode-toggle');
         const body = document.body;
