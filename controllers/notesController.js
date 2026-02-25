@@ -98,6 +98,10 @@ const notesController = {
                 content: content || '' // Isi dengan string kosong jika tidak ada konten
             });
 
+            // Log to activity_logs
+            const activityLogsService = require('../services/activityLogsService');
+            await activityLogsService.log(userId, 'CREATE', `Menciptakan catatan: "${title}"`, req.ip || 'unknown', req.get('user-agent') || 'unknown');
+
             res.status(201).json({
                 success: true,
                 message: 'Catatan berhasil dibuat.',
@@ -200,6 +204,10 @@ const notesController = {
             }
 
             await NotesModel.delete(noteId, userId);
+
+            // Log to activity_logs
+            const activityLogsService = require('../services/activityLogsService');
+            await activityLogsService.log(userId, 'DELETE', `Menghapus catatan: "${existingNote.title}"`, req.ip || 'unknown', req.get('user-agent') || 'unknown');
 
             res.status(200).json({
                 success: true,

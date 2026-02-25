@@ -1,0 +1,78 @@
+<!--
+  Admin Sidebar Component
+  Direct HTML - No includes
+-->
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Kapan Beli Admin</span>
+        </div>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="menu-label">Main Menu</div>
+
+        <a href="/admin" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/admin/users" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'users' ? 'active' : '' %>">
+            <i class="fas fa-users"></i>
+            <span>Manajemen Pengguna</span>
+        </a>
+
+        <a href="/admin/products" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>">
+            <i class="fas fa-box"></i>
+            <span>Semua Produk</span>
+        </a>
+
+        <a href="/admin/shopping-suggestions" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'shopping-suggestions' ? 'active' : '' %>">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Saran Pembelian</span>
+        </a>
+
+        <div class="menu-label">Content</div>
+
+        <a href="/admin/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
+            <i class="fas fa-sticky-note"></i>
+            <span>Catatan User</span>
+        </a>
+
+        <a href="/admin/activity-logs" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'activity-logs' ? 'active' : '' %>">
+            <i class="fas fa-history"></i>
+            <span>Log Aktivitas</span>
+        </a>
+
+        <div class="menu-label">Analytics & System</div>
+
+        <a href="/admin/analytics" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'analytics' ? 'active' : '' %>">
+            <i class="fas fa-chart-line"></i>
+            <span>Analitik</span>
+        </a>
+
+        <a href="/admin/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
+            <i class="fas fa-cog"></i>
+            <span>Pengaturan</span>
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-mini-profile">
+            <div class="user-avatar">
+                <%= typeof user !== 'undefined' && user && user.name ? user.name[0].toUpperCase() : 'A' %>
+            </div>
+            <div class="user-info" style="flex: 1; min-width: 0;">
+                <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= typeof user !== 'undefined' && user && user.name ? user.name : 'Admin' %></h4>
+                <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= typeof user !== 'undefined' && user && user.email ? user.email : 'admin@kapanbeli.com' %></p>
+            </div>
+            <form action="/auth/logout" method="POST" style="display: inline;">
+                <button type="submit" class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

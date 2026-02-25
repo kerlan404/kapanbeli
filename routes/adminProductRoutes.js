@@ -1,7 +1,10 @@
 /**
- * Admin Product Routes
+ * Admin Product Routes - FIXED
  * Routes untuk manajemen produk di admin panel
- * Base path: /api/admin/products
+ * 
+ * PENTING: Pisahkan route VIEW dan route API!
+ * - Route VIEW: GET /admin/products (render EJS)
+ * - Route API: GET /api/admin/products (return JSON)
  */
 
 const express = require('express');
@@ -13,10 +16,14 @@ const isAuthenticated = (req, res, next) => {
     if (req.session && req.session.user) {
         next();
     } else {
-        res.status(401).json({
-            success: false,
-            message: 'Authentication required'
-        });
+        // PENTING: Untuk API, JANGAN redirect! Kirim JSON error
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required'
+            });
+        }
+        return res.redirect('/auth');
     }
 };
 
@@ -25,10 +32,14 @@ const isAdmin = (req, res, next) => {
     if (req.session && req.session.user && req.session.user.role === 'admin') {
         next();
     } else {
-        res.status(403).json({
-            success: false,
-            message: 'Access denied. Admin only.'
-        });
+        // PENTING: Untuk API, JANGAN redirect! Kirim JSON error
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied. Admin only.'
+            });
+        }
+        return res.status(403).send('Access denied. Admins only.');
     }
 };
 
@@ -36,23 +47,13 @@ const isAdmin = (req, res, next) => {
 router.use(isAuthenticated);
 router.use(isAdmin);
 
-/**
- * @route GET /admin/products
- * @desc Tampilkan halaman manajemen produk
- * @access Private (Admin)
- */
-router.get('/', adminProductController.showProductsPage);
+// ============================================
+// API ROUTES - Return JSON
+// ============================================
 
 /**
  * @route GET /api/admin/products
  * @desc API endpoint untuk mendapatkan daftar produk
- * @query {number} page - Page number (default: 1)
- * @query {number} limit - Items per page (default: 20, max: 100)
- * @query {string} search - Search by product name or user name/email
- * @query {string} category - Filter by category
- * @query {string} stockStatus - Filter by stock status (all, low, out, good)
- * @query {string} sortBy - Sort column (name, stock_quantity, created_at)
- * @query {string} sortOrder - Sort order (ASC, DESC)
  * @access Private (Admin)
  */
 router.get('/', adminProductController.getProducts);

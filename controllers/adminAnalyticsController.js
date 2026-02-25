@@ -57,28 +57,28 @@ const analyticsController = {
                     ORDER BY period ASC
                 `, [dateFormat, interval, dateFormat]),
 
-                // Current period logins
+                // Current period logins - use login_time for consistency
                 db.execute(`
-                    SELECT DATE_FORMAT(login_at, ?) as period, COUNT(*) as count
+                    SELECT DATE_FORMAT(login_time, ?) as period, COUNT(*) as count
                     FROM login_logs
-                    WHERE DATE(login_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-                    GROUP BY DATE_FORMAT(login_at, ?)
+                    WHERE DATE(login_time) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                    GROUP BY DATE_FORMAT(login_time, ?)
                     ORDER BY period ASC
                 `, [dateFormat, interval, dateFormat]),
 
                 // Total users
                 db.execute('SELECT COUNT(*) as count FROM users'),
 
-                // Total logins current period
+                // Total logins current period - use login_time
                 db.execute(`
                     SELECT COUNT(*) as count FROM login_logs
-                    WHERE DATE(login_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                    WHERE DATE(login_time) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
                 `, [interval]),
 
-                // DAU current period
+                // DAU current period - use login_time
                 db.execute(`
                     SELECT COUNT(DISTINCT user_id) as count FROM login_logs
-                    WHERE DATE(login_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                    WHERE DATE(login_time) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
                 `, [interval]),
 
                 // Previous period users
@@ -87,10 +87,10 @@ const analyticsController = {
                     WHERE DATE(created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL ? DAY) AND DATE_SUB(CURDATE(), INTERVAL ? DAY)
                 `, [interval + days, interval + 1]),
 
-                // Previous period logins
+                // Previous period logins - use login_time
                 db.execute(`
                     SELECT COUNT(*) as count FROM login_logs
-                    WHERE DATE(login_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL ? DAY) AND DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                    WHERE DATE(login_time) BETWEEN DATE_SUB(CURDATE(), INTERVAL ? DAY) AND DATE_SUB(CURDATE(), INTERVAL ? DAY)
                 `, [interval + days, interval + 1])
             ]);
 
@@ -175,9 +175,9 @@ const analyticsController = {
             const [totalUsers, todayUsers, todayLogins, dau, onlineUsers] = await Promise.all([
                 db.execute('SELECT COUNT(*) as count FROM users'),
                 db.execute('SELECT COUNT(*) as count FROM users WHERE DATE(created_at) = CURDATE()'),
-                db.execute('SELECT COUNT(*) as count FROM login_logs WHERE DATE(login_at) = CURDATE()'),
-                db.execute('SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_at) = CURDATE()'),
-                db.execute('SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE login_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)')
+                db.execute('SELECT COUNT(*) as count FROM login_logs WHERE DATE(login_time) = CURDATE()'),
+                db.execute('SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_time) = CURDATE()'),
+                db.execute('SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE login_time >= DATE_SUB(NOW(), INTERVAL 1 HOUR)')
             ]);
 
             res.json({

@@ -2,20 +2,23 @@
 const User = require('../models/User');
 const ProductModel = require('../models/Product');
 const NotesModel = require('../models/Notes');
+const adminService = require('../services/adminService');
 
 const adminController = {
-    // Fungsi untuk mendapatkan statistik dashboard
+    /**
+     * GET /api/admin/stats
+     * Unified stats endpoint for admin dashboard
+     */
     async getStats(req, res) {
         try {
-            // Gunakan fungsi baru di User model untuk statistik lengkap
-            const stats = await User.getDashboardStats();
+            const stats = await adminService.getStats();
 
             res.status(200).json({
                 success: true,
                 stats: stats
             });
         } catch (error) {
-            console.error('Error getting admin stats:', error);
+            console.error('[adminController.getStats] Error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Terjadi kesalahan saat mengambil statistik.'
@@ -23,16 +26,20 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk mendapatkan semua pengguna dengan detail lengkap
+    /**
+     * GET /api/admin/users
+     * Get all users with pagination and filters
+     */
     async getAllUsers(req, res) {
         try {
-            // Gunakan userService yang baru
-            const userService = require('../services/userService');
-            
-            const { page = 1, limit = 100 } = req.query;
-            const result = await userService.getUsers({ 
-                page: parseInt(page), 
-                limit: parseInt(limit) 
+            const { page = 1, limit = 100, search = '', status = '', role = '' } = req.query;
+
+            const result = await adminService.getUsersWithStats({
+                page: parseInt(page),
+                limit: parseInt(limit),
+                search,
+                status,
+                role
             });
 
             res.status(200).json({
@@ -41,7 +48,7 @@ const adminController = {
                 pagination: result.pagination
             });
         } catch (error) {
-            console.error('Error getting all users:', error);
+            console.error('[adminController.getAllUsers] Error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Terjadi kesalahan saat mengambil daftar pengguna: ' + error.message,
@@ -50,90 +57,10 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk mendapatkan log aktivitas (untuk backward compatibility)
-    async getActivityLogs(req, res) {
-        try {
-            // Gunakan activity_logs yang baru
-            const db = require('../config/database');
-            
-            const limit = parseInt(req.query.limit) || 100;
-            
-            // Query dari activity_logs table
-            const query = `
-                SELECT
-                    al.id,
-                    al.user_id,
-                    al.activity_type as action,
-                    al.description,
-                    al.ip_address,
-                    al.created_at as timestamp,
-                    u.name as user_name,
-                    u.email as user_email
-                FROM activity_logs al
-                LEFT JOIN users u ON al.user_id = u.id
-                ORDER BY al.created_at DESC
-                LIMIT ?
-            `;
-            
-            const [rows] = await db.execute(query, [limit]);
-            
-            // Format agar kompatibel dengan frontend lama
-            const formattedLogs = rows.map(log => ({
-                id: log.id,
-                user_id: log.user_id,
-                user_name: log.user_name,
-                user_email: log.user_email,
-                action: log.action,
-                description: log.description,
-                ip_address: log.ip_address,
-                timestamp: log.timestamp
-            }));
-
-            res.status(200).json({
-                success: true,
-                activities: formattedLogs
-            });
-        } catch (error) {
-            console.error('Error getting activity logs:', error);
-            
-            // Return empty array jika tabel activity_logs belum ada
-            res.status(200).json({
-                success: true,
-                activities: [],
-                message: 'Tabel activity_logs belum tersedia'
-            });
-        }
-    },
-
-    // Fungsi untuk mendapatkan semua produk dari semua pengguna
-    async getAllProducts(req, res) {
-        try {
-            const products = await ProductModel.getAllProductsFromAllUsers();
-
-            // Tambahkan informasi nama pengguna ke produk
-            const productsWithUser = await Promise.all(products.map(async (product) => {
-                const user = await User.findById(product.user_id);
-                return {
-                    ...product,
-                    user_name: user ? user.name : 'Unknown User',
-                    user_email: user ? user.email : 'Unknown'
-                };
-            }));
-
-            res.status(200).json({
-                success: true,
-                products: productsWithUser
-            });
-        } catch (error) {
-            console.error('Error getting all products:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Terjadi kesalahan saat mengambil daftar produk.'
-            });
-        }
-    },
-
-    // Fungsi untuk mendapatkan detail pengguna
+    /**
+     * GET /api/admin/user/:id
+     * Get user details by ID
+     */
     async getUserById(req, res) {
         try {
             const userId = req.params.id;
@@ -154,13 +81,8 @@ const adminController = {
                 });
             }
 
-            // Dapatkan login logs user
             const loginLogs = await User.getLoginLogs(userId, 10);
-
-            // Dapatkan produk user
             const userProducts = await ProductModel.getAllByUserId(userId);
-
-            // Dapatkan notes user
             const userNotes = await NotesModel.getAllByUserId(userId);
 
             res.status(200).json({
@@ -179,7 +101,10 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk mendapatkan produk dari pengguna tertentu
+    /**
+     * GET /api/admin/user/:id/products
+     * Get products by user ID
+     */
     async getUserProducts(req, res) {
         try {
             const userId = req.params.id;
@@ -206,7 +131,10 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk BAN user
+    /**
+     * POST /api/admin/user/:userId/ban
+     * Ban a user
+     */
     async banUser(req, res) {
         try {
             const { userId } = req.params;
@@ -227,7 +155,6 @@ const adminController = {
                 });
             }
 
-            // Cek apakah user yang akan di-ban adalah admin
             const userToBan = await User.findById(userId);
             if (!userToBan) {
                 return res.status(404).json({
@@ -243,7 +170,6 @@ const adminController = {
                 });
             }
 
-            // Ban user
             await User.banUser(userId, reason, adminId);
 
             res.status(200).json({
@@ -266,7 +192,10 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk UNBAN user
+    /**
+     * POST /api/admin/user/:userId/unban
+     * Unban a user
+     */
     async unbanUser(req, res) {
         try {
             const { userId } = req.params;
@@ -286,7 +215,6 @@ const adminController = {
                 });
             }
 
-            // Unban user
             await User.unbanUser(userId);
 
             res.status(200).json({
@@ -309,11 +237,14 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk mendapatkan user yang di-ban
+    /**
+     * GET /api/admin/users/banned
+     * Get all banned users
+     */
     async getBannedUsers(req, res) {
         try {
             const users = await User.getAllUsersWithDetails();
-            const bannedUsers = users.filter(u => u.is_banned || u.status === 'banned');
+            const bannedUsers = users.filter(u => u.is_banned || u.status === 'banned' || u.account_status === 'suspended');
 
             res.status(200).json({
                 success: true,
@@ -328,42 +259,24 @@ const adminController = {
         }
     },
 
-    // Fungsi untuk mendapatkan statistik produk per user
-    async getProductStatsByUser(req, res) {
+    /**
+     * GET /api/admin/stats/active-users
+     * Get most active users for dashboard widget
+     */
+    async getActiveUsers(req, res) {
         try {
-            const stats = await User.getDashboardStats();
-            
-            res.status(200).json({
-                success: true,
-                stats: {
-                    productsByUser: stats.productsByUser,
-                    productsByCategory: stats.productsByCategory
-                }
-            });
-        } catch (error) {
-            console.error('Error getting product stats:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Terjadi kesalahan saat mengambil statistik produk.'
-            });
-        }
-    },
+            const limit = parseInt(req.query.limit) || 5;
+            const users = await adminService.getMostActiveUsers(limit);
 
-    // Fungsi untuk mendapatkan aktivitas login (grafik)
-    async getLoginActivity(req, res) {
-        try {
-            const stats = await User.getDashboardStats();
-            
             res.status(200).json({
                 success: true,
-                loginActivity: stats.loginActivity,
-                usersOnlineToday: stats.usersOnlineToday
+                users: users
             });
         } catch (error) {
-            console.error('Error getting login activity:', error);
+            console.error('[adminController.getActiveUsers] Error:', error);
             res.status(500).json({
                 success: false,
-                message: 'Terjadi kesalahan saat mengambil aktivitas login.'
+                message: 'Terjadi kesalahan saat mengambil pengguna aktif.'
             });
         }
     }

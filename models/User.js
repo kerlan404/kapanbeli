@@ -316,16 +316,17 @@ const User = {
         try {
             // Update user last login
             const updateQuery = `
-                UPDATE users 
-                SET last_login = NOW(), 
-                    last_ip = ?, 
+                UPDATE users
+                SET last_login = NOW(),
+                    last_ip = ?,
                     login_count = login_count + 1,
+                    account_status = 'active',
                     status = 'active'
                 WHERE id = ?
             `;
             await db.execute(updateQuery, [ipAddress, userId]);
 
-            // Insert login log
+            // Insert login log - use login_time for consistency
             const logQuery = `
                 INSERT INTO login_logs (user_id, login_time, ip_address, session_id, user_agent, created_at)
                 VALUES (?, NOW(), ?, ?, ?, NOW())
@@ -372,12 +373,14 @@ const User = {
     // Fungsi untuk ban user
     banUser: async (userId, reason, bannedBy) => {
         try {
+            // Update both is_banned and account_status for consistency
             const query = `
-                UPDATE users 
-                SET is_banned = TRUE, 
-                    ban_reason = ?, 
-                    banned_by = ?, 
+                UPDATE users
+                SET is_banned = TRUE,
+                    ban_reason = ?,
+                    banned_by = ?,
                     banned_at = NOW(),
+                    account_status = 'suspended',
                     status = 'banned'
                 WHERE id = ?
             `;
@@ -392,12 +395,14 @@ const User = {
     // Fungsi untuk unban user
     unbanUser: async (userId) => {
         try {
+            // Update both is_banned and account_status for consistency
             const query = `
-                UPDATE users 
-                SET is_banned = FALSE, 
-                    ban_reason = NULL, 
-                    banned_by = NULL, 
+                UPDATE users
+                SET is_banned = FALSE,
+                    ban_reason = NULL,
+                    banned_by = NULL,
                     banned_at = NULL,
+                    account_status = 'active',
                     status = 'active'
                 WHERE id = ?
             `;
@@ -413,10 +418,11 @@ const User = {
     getAllUsersWithDetails: async () => {
         try {
             const query = `
-                SELECT 
-                    u.id, u.name, u.email, u.role, u.is_banned, u.ban_reason, 
+                SELECT
+                    u.id, u.name, u.email, u.role, u.is_banned, u.ban_reason,
                     u.banned_at, u.last_login, u.last_logout, u.login_count,
-                    u.status, u.created_at,
+                    COALESCE(u.account_status, u.status, 'active') as status,
+                    u.created_at,
                     COALESCE(s.total_products, 0) as total_products,
                     COALESCE(s.total_notes, 0) as total_notes
                 FROM users u
@@ -575,29 +581,43 @@ const User = {
             const [totalUsersResult] = await db.execute('SELECT COUNT(*) as count FROM users');
             stats.totalUsers = totalUsersResult[0].count;
 
-            // Active users
-            const [activeUsersResult] = await db.execute("SELECT COUNT(*) as count FROM users WHERE status = 'active'");
+            // Active users - support both account_status and status
+            const [activeUsersResult] = await db.execute(`
+                SELECT COUNT(*) as count FROM users
+                WHERE COALESCE(account_status, status, 'active') = 'active'
+            `);
             stats.activeUsers = activeUsersResult[0].count;
 
-            // Banned users
-            const [bannedUsersResult] = await db.execute("SELECT COUNT(*) as count FROM users WHERE status = 'banned'");
+            // Suspended/Banned users
+            const [bannedUsersResult] = await db.execute(`
+                SELECT COUNT(*) as count FROM users
+                WHERE COALESCE(account_status, status, 'active') IN ('suspended', 'banned')
+                OR is_banned = TRUE
+            `);
             stats.bannedUsers = bannedUsersResult[0].count;
 
-            // Total products - direct count from products table for accuracy
+            // Inactive users
+            const [inactiveUsersResult] = await db.execute(`
+                SELECT COUNT(*) as count FROM users
+                WHERE COALESCE(account_status, status, 'active') = 'inactive'
+            `);
+            stats.inactiveUsers = inactiveUsersResult[0].count;
+
+            // Total products
             const [totalProductsResult] = await db.execute('SELECT COUNT(*) as count FROM products');
             stats.totalProducts = totalProductsResult[0].count;
 
-            // Total notes - direct count from notes table for accuracy
+            // Total notes
             const [totalNotesResult] = await db.execute('SELECT COUNT(*) as count FROM notes');
             stats.totalNotes = totalNotesResult[0].count;
 
-            // Users online today (logged in today)
+            // Users online today (logged in today) - use login_time for consistency
             const [onlineTodayResult] = await db.execute(
-                "SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_time) = CURDATE()"
+                'SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_time) = CURDATE()'
             );
             stats.usersOnlineToday = onlineTodayResult[0].count;
 
-            // Low stock items - count products where stock_quantity <= min_stock_level
+            // Low stock items
             const [lowStockResult] = await db.execute(
                 'SELECT COUNT(*) as count FROM products WHERE stock_quantity <= min_stock_level AND stock_quantity > 0'
             );
@@ -624,7 +644,7 @@ const User = {
             `);
             stats.productsByUser = productsByUserResult;
 
-            // Login activity (last 7 days)
+            // Login activity (last 7 days) - use login_time for consistency
             const [loginActivityResult] = await db.execute(`
                 SELECT DATE(login_time) as date, COUNT(*) as count
                 FROM login_logs

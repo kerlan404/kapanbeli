@@ -153,12 +153,49 @@
             justify-content: center;
             font-weight: 700;
             color: white;
+            flex-shrink: 0;
         }
 
-        .user-info h4 { font-size: 0.9rem; color: white; margin-bottom: 2px; }
-        .user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
-        .logout-btn { margin-left: auto; color: rgba(255,255,255,0.5); cursor: pointer; }
-        .logout-btn:hover { color: var(--accent-red); }
+        .user-info { 
+            flex: 1; 
+            min-width: 0; 
+            overflow: hidden; 
+        }
+        .user-info h4 { 
+            font-size: 0.9rem; 
+            color: white; 
+            margin-bottom: 2px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .user-info p { 
+            font-size: 0.75rem; 
+            color: rgba(255,255,255,0.5); 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            width: 32px; 
+            height: 32px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
 
         /* --- MAIN CONTENT --- */
         .main-content {
@@ -620,50 +657,7 @@
 <body>
 
     <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-shield-alt"></i> KB ADMIN
-            </div>
-        </div>
-
-        <div class="sidebar-menu">
-            <div class="menu-label">Utama</div>
-            <a href="#" class="nav-item active" onclick="showPage('dashboard', this)">
-                <i class="fas fa-th-large"></i> Dashboard
-            </a>
-            <a href="/admin/users" class="nav-item">
-                <i class="fas fa-users"></i> Pengguna
-            </a>
-            <a href="#" class="nav-item" onclick="showPage('products', this)">
-                <i class="fas fa-box"></i> Semua Produk
-            </a>
-            <a href="#" class="nav-item" onclick="showPage('suggestions', this)">
-                <i class="fas fa-clipboard-list"></i> Saran Pembelian
-            </a>
-
-            <div class="menu-label">Sistem</div>
-            <a href="#" class="nav-item" onclick="showPage('settings', this)">
-                <i class="fas fa-cog"></i> Pengaturan
-            </a>
-            <a href="#" class="nav-item" onclick="showPage('activity-log', this)">
-                <i class="fas fa-history"></i> Log Aktivitas
-            </a>
-        </div>
-
-        <div class="sidebar-footer">
-            <div class="user-mini-profile">
-                <div class="user-avatar">AD</div>
-                <div class="user-info">
-                    <h4>Super Admin</h4>
-                    <p>admin@kapanbeli.id</p>
-                </div>
-                <div class="logout-btn" onclick="handleLogout()" title="Keluar">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-            </div>
-        </div>
-    </aside>
+    <%- include('./partials/admin-sidebar', { currentPage: 'dashboard', user: typeof user !== 'undefined' ? user : null }) %>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
@@ -1222,7 +1216,7 @@
 
         // Activity Logs Variables
         let activityLogsData = [];
-        let activityLogsPagination = { page: 1, limit: 10, total: 0, totalPages: 0 };
+        let activityLogsPagination = { page: 1, limit: 20, total: 0, totalPages: 0 };
         let activityLogsSearchTimer = null;
 
         // Activity type badge mapping

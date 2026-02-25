@@ -1,0 +1,140 @@
+<!-- 
+  Topbar Component - Admin Panel Header
+  Usage: <%- include('../partials/admin-topbar', { 
+    title: 'Dashboard',
+    breadcrumbs: [{ label: 'Home', url: '/' }, { label: 'Admin', url: '/admin' }]
+  }) %>
+  
+  Parameters:
+  - title: String - Page title
+  - breadcrumbs: Array (optional) - Breadcrumb navigation
+  - actions: Array (optional) - Action buttons
+-->
+
+<div class="top-bar">
+    <div class="top-bar-left">
+        <% if (typeof breadcrumbs !== 'undefined' && breadcrumbs && breadcrumbs.length > 0) { %>
+            <nav class="breadcrumbs">
+                <% breadcrumbs.forEach((crumb, index) => { %>
+                    <% if (index < breadcrumbs.length - 1) { %>
+                        <a href="<%= crumb.url %>"><%= crumb.label %></a>
+                        <span class="breadcrumb-separator">/</span>
+                    <% } else { %>
+                        <span class="breadcrumb-current"><%= crumb.label %></span>
+                    <% } %>
+                <% }) %>
+            </nav>
+        <% } %>
+        <h1 class="page-title"><%= title %></h1>
+    </div>
+    <div class="top-actions">
+        <% if (typeof actions !== 'undefined' && actions && actions.length > 0) { %>
+            <% actions.forEach(action => { %>
+                <button class="btn btn-<%= action.style || 'primary' %>" 
+                        onclick="<%= action.onclick || '' %>"
+                        title="<%= action.title || '' %>">
+                    <% if (action.icon) { %>
+                        <i class="fas <%= action.icon %>"></i>
+                    <% } %>
+                    <%= action.label %>
+                </button>
+            <% }) %>
+        <% } %>
+        
+        <!-- Dark Mode Toggle -->
+        <button class="btn btn-outline" id="darkModeToggle" title="Toggle Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</div>
+
+<style>
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .top-bar-left {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .breadcrumbs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .breadcrumbs a:hover {
+        color: var(--primary-blue);
+    }
+
+    .breadcrumb-separator {
+        color: var(--text-muted);
+    }
+
+    .breadcrumb-current {
+        color: var(--text-main);
+        font-weight: 500;
+    }
+
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .top-bar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    // Dark Mode Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check localStorage for saved preference
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (isDarkMode) {
+            body.classList.add('dark-mode-active');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode-active');
+            const isDark = body.classList.contains('dark-mode-active');
+            localStorage.setItem('darkMode', isDark);
+            this.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+    });
+</script>

@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* Reuse Variables */
@@ -168,15 +169,46 @@
         function editProd() { window.location.href = `/products/edit/${id}`; }
 
         async function delProd() {
-            if(!confirm('Yakin hapus produk ini?')) return;
+            const result = await Swal.fire({
+                title: 'Hapus Produk?',
+                text: "Produk yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FF6B6B',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            });
+
+            if (!result.isConfirmed) return;
+
             try {
                 const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
                 const data = await res.json();
-                if(data.success) { alert('Produk dihapus'); window.location.href='/products'; }
-            } catch(e) { alert('Gagal menghapus'); }
+                if(data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Produk telah dihapus',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/products';
+                    });
+                } else {
+                    Swal.fire('Gagal!', data.message || 'Gagal menghapus produk', 'error');
+                }
+            } catch(e) {
+                console.error(e);
+                Swal.fire('Error!', 'Gagal menghapus produk', 'error');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', loadDetail);
     </script>
+
+    <!-- Footer -->
+    <%- include('./partials/footer') %>
 </body>
 </html>

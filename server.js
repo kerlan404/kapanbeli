@@ -3,6 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const multer = require('multer');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +14,11 @@ const PORT = process.env.PORT || 3000;
 // Set EJS as view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Disable view cache in development (reload templates on each request)
+if (process.env.NODE_ENV !== 'production') {
+    app.set('view cache', false);
+}
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -30,6 +36,7 @@ const upload = multer({ storage: storage });
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -41,6 +48,8 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         secure: false, // Set to true if using HTTPS
+        httpOnly: true,
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
@@ -59,13 +68,16 @@ const activityLogsRoutes = require('./routes/activityLogs');
 const userRoutes = require('./routes/userRoutes');
 const userProfileRoutes = require('./routes/userProfileRoutes');
 const adminProductRoutes = require('./routes/adminProductRoutes');
+const adminNotesRoutes = require('./routes/adminNotesRoutes');
+const adminActivityRoutes = require('./routes/adminActivityRoutes');
+const shoppingSuggestionsRoutes = require('./routes/shoppingSuggestionsRoutes');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
 
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
-    if (req.session.user) {
+    if (req.session && req.session.user) {
         next();
     } else {
         res.redirect('/auth');
@@ -202,204 +214,22 @@ app.put('/api/products/:id', upload.single('image'), isAuthenticated, productsCo
 // Use the regular routes for other operations
 app.use('/api/products', productRoutes);
 
-// ============================================
-// ANALYTICS ENDPOINTS (MUST BE BEFORE /api/admin)
-// ============================================
-// Public analytics endpoint (for admin dashboard)
-app.get('/api/admin/analytics', async (req, res) => {
-    try {
-        const db = require('./config/database');
-        await db.execute("SET time_zone = '+07:00'");
-        
-        const range = req.query.range || '7days';
-        const isToday = range === 'today';
-        const days = range === 'month' ? 30 : (range === 'today' ? 1 : 7);
-        const interval = days - 1;
-        const dateFormat = isToday ? '%H:00' : '%Y-%m-%d';
-        
-        // Get all data in parallel
-        const [
-            usersResult,
-            loginsResult,
-            totalUsersResult,
-            totalLoginsResult,
-            dauResult,
-            prevUsersResult,
-            prevLoginsResult
-        ] = await Promise.all([
-            // Current period users
-            db.execute(`
-                SELECT DATE_FORMAT(created_at, ?) as period, COUNT(*) as count
-                FROM users
-                WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-                GROUP BY DATE_FORMAT(created_at, ?)
-                ORDER BY period ASC
-            `, [dateFormat, interval, dateFormat]),
-            
-            // Current period logins
-            db.execute(`
-                SELECT DATE_FORMAT(login_at, ?) as period, COUNT(*) as count
-                FROM login_logs
-                WHERE DATE(login_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-                GROUP BY DATE_FORMAT(login_at, ?)
-                ORDER BY period ASC
-            `, [dateFormat, interval, dateFormat]),
-            
-            // Total users
-            db.execute('SELECT COUNT(*) as count FROM users'),
-            
-            // Total logins current period
-            db.execute(`
-                SELECT COUNT(*) as count FROM login_logs
-                WHERE DATE(login_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-            `, [interval]),
-            
-            // DAU
-            db.execute(`
-                SELECT COUNT(DISTINCT user_id) as count FROM login_logs
-                WHERE DATE(login_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-            `, [interval]),
-            
-            // Previous period users
-            db.execute(`
-                SELECT COUNT(*) as count FROM users
-                WHERE DATE(created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL ? DAY) AND DATE_SUB(CURDATE(), INTERVAL ? DAY)
-            `, [interval + days, interval + 1]),
-            
-            // Previous period logins
-            db.execute(`
-                SELECT COUNT(*) as count FROM login_logs
-                WHERE DATE(login_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL ? DAY) AND DATE_SUB(CURDATE(), INTERVAL ? DAY)
-            `, [interval + days, interval + 1])
-        ]);
-        
-        // Generate labels
-        const labels = [];
-        if (isToday) {
-            for (let i = 0; i < 24; i++) labels.push(i.toString().padStart(2, '0') + ':00');
-        } else {
-            for (let i = days - 1; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
-            }
-        }
-        
-        // Map data with zero-filling
-        const usersMap = new Map(usersResult[0].map(r => [r.period, parseInt(r.count)]));
-        const loginsMap = new Map(loginsResult[0].map(r => [r.period, parseInt(r.count)]));
-        
-        // Helper to get date key from label
-        const getDateKey = (label, idx) => {
-            if (isToday) return label;
-            const d = new Date();
-            d.setDate(d.getDate() - (days - 1 - idx));
-            return d.toISOString().split('T')[0];
-        };
-        
-        const usersData = labels.map((_, i) => {
-            const key = getDateKey(_, i);
-            return usersMap.get(key) || 0;
-        });
-        
-        const loginsData = labels.map((_, i) => {
-            const key = getDateKey(_, i);
-            return loginsMap.get(key) || 0;
-        });
-        
-        // Calculate growth
-        const currUsers = usersResult[0].reduce((sum, r) => sum + parseInt(r.count), 0);
-        const prevUsers = prevUsersResult[0][0].count;
-        const currLogins = totalLoginsResult[0][0].count;
-        const prevLogins = prevLoginsResult[0][0].count;
-        
-        const calcGrowth = (prev, curr) => {
-            if (prev === 0) return curr > 0 ? 100 : 0;
-            return parseFloat((((curr - prev) / prev) * 100).toFixed(2));
-        };
-        
-        const periodLabels = { today: 'Hari Ini', '7days': '7 Hari Terakhir', month: 'Bulan Ini' };
-        
-        res.json({
-            success: true,
-            range: range,
-            period: periodLabels[range] || '7 Hari Terakhir',
-            timestamp: new Date().toISOString(),
-            timezone: 'Asia/Jakarta',
-            summary: {
-                totalUsers: totalUsersResult[0][0].count,
-                totalLogins: currLogins,
-                dailyActiveUsers: dauResult[0][0].count,
-                newUsers: currUsers,
-                growth: {
-                    users: {
-                        current: currUsers,
-                        previous: prevUsers,
-                        percentage: calcGrowth(prevUsers, currUsers),
-                        trend: currUsers >= prevUsers ? 'up' : 'down'
-                    },
-                    logins: {
-                        current: currLogins,
-                        previous: prevLogins,
-                        percentage: calcGrowth(prevLogins, currLogins),
-                        trend: currLogins >= prevLogins ? 'up' : 'down'
-                    }
-                }
-            },
-            chart: {
-                labels: labels,
-                users: usersData,
-                logins: loginsData
-            }
-        });
-    } catch (error) {
-        console.error('Analytics API error:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-// Analytics summary endpoint
-app.get('/api/admin/analytics/summary', async (req, res) => {
-    try {
-        const db = require('./config/database');
-        await db.execute("SET time_zone = '+07:00'");
-        
-        const [totalUsers, todayUsers, todayLogins, dau, onlineUsers] = await Promise.all([
-            db.execute('SELECT COUNT(*) as count FROM users'),
-            db.execute('SELECT COUNT(*) as count FROM users WHERE DATE(created_at) = CURDATE()'),
-            db.execute('SELECT COUNT(*) as count FROM login_logs WHERE DATE(login_at) = CURDATE()'),
-            db.execute('SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE DATE(login_at) = CURDATE()'),
-            db.execute('SELECT COUNT(DISTINCT user_id) as count FROM login_logs WHERE login_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)')
-        ]);
-        
-        res.json({
-            success: true,
-            data: {
-                totalUsers: totalUsers[0][0].count,
-                newUsersToday: todayUsers[0][0].count,
-                loginsToday: todayLogins[0][0].count,
-                dailyActiveUsers: dau[0][0].count,
-                onlineUsers: onlineUsers[0][0].count
-            },
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-// ============================================
-
-// Use admin analytics routes (protected) - MUST BE BEFORE /api/admin
+// Use admin analytics routes (protected)
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
+
+// Use admin notes routes (protected)
+app.use('/api/admin/notes', adminNotesRoutes);
+
+// Use admin activity routes (protected)
+app.use('/api/admin/activity', adminActivityRoutes);
 
 // Use admin routes (protected)
 app.use('/api/admin', adminRoutes);
 
 // Use activity logs routes (protected)
 app.use('/api/activity-logs', activityLogsRoutes);
+// Alias for admin panel compatibility
+app.use('/api/admin/activity-logs', activityLogsRoutes);
 
 // Use user management routes (protected)
 app.use('/api/users', userRoutes);
@@ -408,8 +238,34 @@ app.use('/api/users', userRoutes);
 app.use('/admin/user', userProfileRoutes);
 
 // Use admin product routes (protected)
-app.use('/admin/products', adminProductRoutes);
+// PENTING: Route VIEW harus terpisah dari route API!
+app.get('/admin/products', isAuthenticated, (req, res) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-products', {
+            currentPage: 'products',
+            pageTitle: 'Manajemen Produk',
+            user: req.session.user
+        });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+// API routes untuk products (return JSON)
 app.use('/api/admin/products', adminProductRoutes);
+
+// Shopping suggestions routes
+app.get('/admin/shopping-suggestions', isAuthenticated, (req, res) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-shopping-suggestions', {
+            currentPage: 'shopping-suggestions',
+            pageTitle: 'Saran Pembelian',
+            user: req.session.user
+        });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+app.use('/api/admin/shopping-suggestions', shoppingSuggestionsRoutes);
 
 // Use suggestions routes (protected)
 app.use('/api/suggestions', suggestionsRoutes);
@@ -437,7 +293,12 @@ app.get('/profile', isAuthenticated, (req, res) => {
 app.get('/admin', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.render('admin-dashboard', { currentPage: 'admin' });
+        res.render('admin-dashboard', {
+            currentPage: 'dashboard',
+            user: req.session.user,
+            title: 'Dashboard',
+            stats: {}  // Empty stats - will be loaded via AJAX
+        });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -446,7 +307,10 @@ app.get('/admin', isAuthenticated, (req, res) => {
 app.get('/admin/users', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.render('admin-users', { currentPage: 'users' });
+        res.render('admin-users', {
+            currentPage: 'users',
+            user: req.session.user
+        });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }
@@ -465,6 +329,24 @@ app.get('/admin/settings', isAuthenticated, (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
         res.render('admin-dashboard', { currentPage: 'admin' });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/notes', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-notes', { currentPage: 'notes' });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+app.get('/admin/activity-logs', isAuthenticated, (req, res) => {
+    // Check if user is admin
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-activity-logs', { currentPage: 'activity-logs' });
     } else {
         res.status(403).send('Access denied. Admins only.');
     }

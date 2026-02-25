@@ -164,6 +164,11 @@ const authController = {
             try {
                 await User.trackLogin(user.id, clientIp, sessionId, userAgent);
                 console.log('Login tracked for user:', user.email);
+                
+                // Log to activity_logs
+                const activityLogsService = require('../services/activityLogsService');
+                await activityLogsService.log(user.id, 'LOGIN', 'User login berhasil', clientIp, userAgent);
+                console.log('Activity logged: LOGIN for user:', user.email);
             } catch (trackError) {
                 console.error('Failed to track login:', trackError);
                 // Continue with login even if tracking fails
@@ -429,12 +434,19 @@ const authController = {
         try {
             const userId = req.session.userId;
             const sessionId = req.sessionID;
+            const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+            const userAgent = req.get('user-agent') || 'unknown';
 
             // Track logout before destroying session
             if (userId && userId !== 'default_admin') {
                 try {
                     await User.trackLogout(userId, sessionId);
                     console.log('Logout tracked for user ID:', userId);
+                    
+                    // Log to activity_logs
+                    const activityLogsService = require('../services/activityLogsService');
+                    await activityLogsService.log(userId, 'LOGOUT', 'User logout', clientIp, userAgent);
+                    console.log('Activity logged: LOGOUT for user ID:', userId);
                 } catch (trackError) {
                     console.error('Failed to track logout:', trackError);
                 }

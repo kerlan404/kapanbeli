@@ -52,8 +52,8 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-body);
-            background-image: radial-gradient(var(--text-muted) 1px, transparent 1px); /* Pola titik di background body */
-            background-size: 30px 30px; /* Pola titik jarang */
+            background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
+            background-size: 30px 30px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -78,7 +78,7 @@
             font-weight: 700; font-size: 1.4rem; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
         .nav-menu { display: flex; gap: 30px; }
-        .nav-link { 
+        .nav-link {
             text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem;
             position: relative; padding: 5px 0;
         }
@@ -913,5 +913,8 @@
             await loadProducts();
         });
     </script>
+
+    <!-- Footer -->
+    <%- include('./partials/footer') %>
 </body>
 </html>

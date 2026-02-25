@@ -1,0 +1,48 @@
+<!-- 
+  StatCard Component - Reusable Statistics Card
+  Usage: <%- include('../partials/stat-card', { 
+    title: 'Total Users', 
+    value: 150, 
+    icon: 'fa-users', 
+    color: 'blue',
+    subtitle: '12% dari bulan lalu'
+  }) %>
+  
+  Parameters:
+  - title: String - Card title
+  - value: Number/String - Statistic value
+  - icon: String - FontAwesome icon class (e.g., 'fa-users')
+  - color: String - Color variant ('blue', 'green', 'orange', 'red')
+  - subtitle: String (optional) - Additional info text
+  - trend: String (optional) - Trend indicator ('up', 'down', 'neutral')
+-->
+
+<div class="stat-card">
+    <div class="stat-info">
+        <h3><%= typeof value === 'number' ? value.toLocaleString() : value %></h3>
+        <p><%= title %></p>
+        <% if (typeof subtitle !== 'undefined' && subtitle) { %>
+            <small class="stat-subtitle">
+                <% if (typeof trend !== 'undefined' && trend) { %>
+                    <i class="fas fa-arrow-<%= trend === 'up' ? 'up text-success' : trend === 'down' ? 'down text-danger' : 'right' %>"></i>
+                <% } %>
+                <%= subtitle %>
+            </small>
+        <% } %>
+    </div>
+    <div class="stat-icon bg-<%= color %>-light">
+        <i class="fas <%= icon %>"></i>
+    </div>
+</div>
+
+<style>
+    .stat-subtitle {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .stat-subtitle .text-success { color: var(--accent-green); }
+    .stat-subtitle .text-danger { color: var(--accent-red); }
+</style>

@@ -816,31 +816,47 @@
         }
 
         // --- LOGIC 2: DARK MODE ---
-        const toggleBtn = document.querySelector('.dark-mode-toggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const body = document.body;
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.querySelector('.dark-mode-toggle');
+            const body = document.body;
 
-        if (localStorage.getItem('theme') === 'dark') {
-            enableDarkMode();
-        }
+            // Helper to get/set theme icon
+            function getThemeIcon() {
+                return toggleBtn ? toggleBtn.querySelector('i') : null;
+            }
 
-        toggleBtn.addEventListener('click', () => {
-            body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
+            // Check localStorage and apply theme (only if toggle button exists)
+            if (toggleBtn) {
+                if (localStorage.getItem('theme') === 'dark') {
+                    enableDarkMode();
+                }
+
+                toggleBtn.addEventListener('click', () => {
+                    body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
+                });
+            }
+
+            function enableDarkMode() {
+                body.classList.add('dark-mode-active');
+                localStorage.setItem('theme', 'dark');
+                const icon = getThemeIcon();
+                if (icon) {
+                    icon.className = "fas fa-sun";
+                    icon.style.color = "#F1C40F";
+                }
+            }
+
+            function disableDarkMode() {
+                body.classList.remove('dark-mode-active');
+                localStorage.setItem('theme', 'light');
+                const icon = getThemeIcon();
+                if (icon) {
+                    icon.className = "fas fa-moon";
+                    icon.style.color = "";
+                }
+            }
         });
-
-        function enableDarkMode() {
-            body.classList.add('dark-mode-active');
-            localStorage.setItem('theme', 'dark');
-            themeIcon.className = "fas fa-sun";
-            themeIcon.style.color = "#F1C40F"; 
-        }
-
-        function disableDarkMode() {
-            body.classList.remove('dark-mode-active');
-            localStorage.setItem('theme', 'light');
-            themeIcon.className = "fas fa-moon";
-            themeIcon.style.color = ""; 
-        }
 
         // --- LOGIC 3: SEARCH BAR (IMPROVED UI) ---
         const searchInput = document.getElementById('heroSearch');
@@ -1068,12 +1084,28 @@
         }
 
         // RENDER: Bahan Saya - Display user's products (show latest 6)
-        function renderProducts(products) {
+        function renderProducts(products, isAuthenticated = false) {
             const container = document.getElementById('recentProductsGrid');
             const section = document.getElementById('productsSection');
 
-            if(!products || products.length === 0) {
+            // Jika user belum login, sembunyikan section
+            if (!isAuthenticated) {
                 section.style.display = 'none';
+                return;
+            }
+
+            // Jika user sudah login tapi tidak ada produk, tampilkan empty state
+            if(!products || products.length === 0) {
+                section.style.display = 'block';
+                container.innerHTML = `
+                    <div class="empty-notes">
+                        <i class="fas fa-box-open"></i>
+                        <p>Belum ada bahan. Yuk tambahkan bahan pertama kamu!</p>
+                        <a href="/products" class="cta-button" style="margin-top: 15px; font-size: 0.9rem; padding: 12px 28px;">
+                            <i class="fas fa-plus"></i> Tambah Bahan
+                        </a>
+                    </div>
+                `;
                 return;
             }
 
@@ -1127,12 +1159,28 @@
         }
 
         // RENDER: Catatan Saya - Display user's notes (show latest 6)
-        function renderNotes(notes) {
+        function renderNotes(notes, isAuthenticated = false) {
             const container = document.getElementById('notesGrid');
             const section = document.getElementById('notesSection');
 
-            if(!notes || notes.length === 0) {
+            // Jika user belum login, sembunyikan section
+            if (!isAuthenticated) {
                 section.style.display = 'none';
+                return;
+            }
+
+            // Jika user sudah login tapi tidak ada catatan, tampilkan empty state
+            if(!notes || notes.length === 0) {
+                section.style.display = 'block';
+                container.innerHTML = `
+                    <div class="empty-notes">
+                        <i class="fas fa-sticky-note"></i>
+                        <p>Belum ada catatan. Yuk buat catatan pertama kamu!</p>
+                        <a href="/notes" class="cta-button" style="margin-top: 15px; font-size: 0.9rem; padding: 12px 28px;">
+                            <i class="fas fa-plus"></i> Tambah Catatan
+                        </a>
+                    </div>
+                `;
                 return;
             }
 
@@ -1186,6 +1234,9 @@
             const statCards = statsGrid.querySelectorAll('.stat-card .stat-value');
             console.log('Found', statCards.length, 'stat cards in DOM');
 
+            // Track authentication status
+            let isAuthenticated = false;
+
             // Track all stats in one object
             let dashboardStats = {
                 total: 0,
@@ -1210,6 +1261,7 @@
                 const prodRes = await fetchWithTimeout('/api/products', { credentials: 'same-origin' }, 5000);
                 console.log('Products API response status:', prodRes.status);
                 if(prodRes.ok) {
+                    isAuthenticated = true;
                     const data = await prodRes.json();
                     console.log('Products received:', data);
                     if(data.success && Array.isArray(data.products)) {
@@ -1248,7 +1300,7 @@
                         dashboardStats.expiring = expiringSoonProducts.length;
 
                         // Render products on home page (latest 6)
-                        renderProducts(data.products);
+                        renderProducts(data.products, true);
                         renderLowStockProducts(data.products);
                         updateKitchenSummary(data.products, dashboardStats);
                     } else {
@@ -1256,6 +1308,8 @@
                     }
                 } else if (prodRes.status === 401) {
                     console.log('User not authenticated for products API');
+                    // Render empty state for unauthenticated user
+                    renderProducts([], false);
                 } else {
                     console.error('Products API returned error:', prodRes.status);
                 }
@@ -1268,6 +1322,7 @@
                 const notesRes = await fetchWithTimeout('/api/notes', { credentials: 'same-origin' }, 5000);
                 console.log('Notes API response status:', notesRes.status);
                 if(notesRes.ok) {
+                    isAuthenticated = true;
                     const notesData = await notesRes.json();
                     console.log('Notes received:', notesData);
                     if(notesData.success && Array.isArray(notesData.notes)) {
@@ -1275,12 +1330,14 @@
                         console.log('✅ Notes count set to:', dashboardStats.notes);
 
                         // Render notes on home page (latest 6)
-                        renderNotes(notesData.notes);
+                        renderNotes(notesData.notes, true);
                     } else {
                         console.error('Notes API returned invalid data:', notesData);
                     }
                 } else if (notesRes.status === 401) {
                     console.log('User not authenticated for notes API');
+                    // Render empty state for unauthenticated user
+                    renderNotes([], false);
                 }
             } catch (e) {
                 console.error('Notes API error', e);
@@ -1562,101 +1619,61 @@
         // LOGIC BARU: Aktivitas Terkini Cerdas
         async function loadActivities() {
             const list = document.getElementById('activityList');
+            
             list.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat aktivitas...</div>';
 
             try {
-                // Get activities manually from products and notes
                 let activities = [];
+                let isAuthenticated = false;
 
-                console.log('Fetching activities manually...');
+                console.log('Loading activities from products and notes...');
 
                 // Fetch products to create activity entries
                 try {
                     const prodRes = await fetch('/api/products', { credentials: 'same-origin' });
                     if(prodRes.ok) {
+                        isAuthenticated = true;
                         const prodData = await prodRes.json();
                         if(prodData.success && Array.isArray(prodData.products)) {
-                            // Add product activities (creation and updates)
                             prodData.products.forEach(product => {
-                                // Format stock quantity - remove .0 if whole number
                                 const stockNum = parseFloat(product.stock_quantity) || 0;
                                 const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
                                 const unit = product.unit || '';
-                                
-                                // Add creation/update activity
+
                                 activities.push({
                                     id: `prod-${product.id}`,
                                     type: 'product',
-                                    title: `Menambahkan bahan: ${product.name}`,
+                                    title: `Bahan ditambahkan: ${product.name}`,
                                     description: `Stok: ${stockDisplay} ${unit}`,
-                                    timestamp: product.created_at || product.updated_at || new Date().toISOString(),
+                                    timestamp: product.created_at,
                                     icon: 'fa-box-open',
                                     colorClass: 'act-add'
                                 });
-
-                                // Add low stock warning if applicable
-                                if(parseFloat(product.stock_quantity) <= parseFloat(product.min_stock_level || 0)) {
-                                    activities.push({
-                                        id: `low-stock-${product.id}`,
-                                        type: 'system_warning',
-                                        title: `Peringatan: Stok ${product.name} menipis`,
-                                        description: `Stok: ${stockDisplay} ${unit}. Segera isi ulang.`,
-                                        timestamp: product.updated_at || product.created_at || new Date().toISOString(),
-                                        icon: 'fa-exclamation-triangle',
-                                        colorClass: 'act-warning'
-                                    });
-                                }
-
-                                // Add expiry warning if applicable
-                                if(product.expiry_date) {
-                                    const expiryDate = new Date(product.expiry_date);
-                                    const today = new Date();
-                                    const diffTime = expiryDate - today;
-                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                                    if(diffDays <= 7 && diffDays >= 0) {
-                                        activities.push({
-                                            id: `expiring-${product.id}`,
-                                            type: 'system_warning',
-                                            title: `Peringatan: ${product.name} akan kadaluarsa`,
-                                            description: `Kadaluarsa dalam ${diffDays} hari`,
-                                            timestamp: product.updated_at || product.created_at || new Date().toISOString(),
-                                            icon: 'fa-clock',
-                                            colorClass: 'act-warning'
-                                        });
-                                    } else if(diffDays < 0) {
-                                        activities.push({
-                                            id: `expired-${product.id}`,
-                                            type: 'system_warning',
-                                            title: `Peringatan: ${product.name} telah kadaluarsa`,
-                                            description: `Harus diganti segera`,
-                                            timestamp: product.updated_at || product.created_at || new Date().toISOString(),
-                                            icon: 'fa-skull-crossbones',
-                                            colorClass: 'act-warning'
-                                        });
-                                    }
-                                }
                             });
                         }
+                    } else if (prodRes.status === 401) {
+                        console.log('User not authenticated');
+                        list.innerHTML = '<li style="text-align:center; color:var(--text-muted); padding:20px;">Silakan login untuk melihat aktivitas.</li>';
+                        return;
                     }
                 } catch(e) {
-                    console.error('Error fetching products for activities:', e);
+                    console.error('Error fetching products:', e);
                 }
 
                 // Fetch notes to create activity entries
                 try {
                     const notesRes = await fetch('/api/notes', { credentials: 'same-origin' });
                     if(notesRes.ok) {
+                        isAuthenticated = true;
                         const notesData = await notesRes.json();
                         if(notesData.success && Array.isArray(notesData.notes)) {
-                            // Add note activities
                             notesData.notes.forEach(note => {
                                 activities.push({
                                     id: `note-${note.id}`,
                                     type: 'note',
-                                    title: `Menambahkan catatan: ${note.title}`,
+                                    title: `Catatan: ${note.title}`,
                                     description: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
-                                    timestamp: note.created_at || note.updated_at || new Date().toISOString(),
+                                    timestamp: note.created_at,
                                     icon: 'fa-sticky-note',
                                     colorClass: 'act-note'
                                 });
@@ -1664,19 +1681,16 @@
                         }
                     }
                 } catch(e) {
-                    console.error('Error fetching notes for activities:', e);
+                    console.error('Error fetching notes:', e);
                 }
 
                 // Sort activities by timestamp (newest first)
                 activities.sort((a, b) => {
                     const dateA = new Date(a.timestamp);
                     const dateB = new Date(b.timestamp);
-
-                    // Handle invalid dates
                     if (isNaN(dateA.getTime())) return 1;
                     if (isNaN(dateB.getTime())) return -1;
-
-                    return dateB - dateA; // Descending order (newest first)
+                    return dateB - dateA;
                 });
 
                 // Limit to 10 most recent activities

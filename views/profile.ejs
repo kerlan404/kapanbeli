@@ -21,39 +21,50 @@
     <style>
         :root {
             --primary-blue: #2E86DE;
+            --primary-blue-dark: #1B5F9E;
             --primary-orange: #FF9F43;
+            --primary-orange-dark: #E67E22;
             --bg-body: #E3E9EF;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
             --text-muted: #636E72;
-            --border-radius: 12px;
-            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
-            --shadow-md: 0 8px 20px rgba(0,0,0,0.12);
+            --border-radius: 16px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.10);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.15);
             --danger: #FF6B6B;
+            --danger-dark: #EE5A5A;
             --success: #1DD1A1;
+            --success-dark: #10B981;
+            --warning: #FFB74D;
+            --purple: #9C27B0;
         }
 
         body.dark-mode-active {
-            --bg-body: #1a2228;
-            --bg-card: #2d3b45;
+            --bg-body: #0F1419;
+            --bg-card: #1E2933;
             --text-main: #ECF0F1;
-            --text-muted: #B2BEC3;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.3);
-            --shadow-md: 0 8px 20px rgba(0,0,0,0.5);
+            --text-muted: #94A3B8;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: background 0.3s, color 0.3s, border-color 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-body);
-            background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-body) 100%);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(46, 134, 222, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 159, 67, 0.08) 0%, transparent 50%),
+                radial-gradient(var(--text-muted) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -62,14 +73,19 @@
 
         /* Navbar */
         nav {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 15px 5%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 12px 5%;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        body.dark-mode-active nav {
+            background: rgba(30, 41, 51, 0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         .nav-container {
@@ -82,19 +98,29 @@
 
         .logo {
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: var(--text-main);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s;
         }
 
-        .logo i { color: var(--primary-orange); }
+        .logo:hover {
+            background: rgba(46, 134, 222, 0.1);
+        }
+
+        .logo i { 
+            color: var(--primary-orange);
+            filter: drop-shadow(0 2px 4px rgba(255, 159, 67, 0.3));
+        }
 
         .nav-menu {
             display: flex;
-            gap: 30px;
+            gap: 8px;
         }
 
         .nav-link {
@@ -103,197 +129,368 @@
             font-weight: 500;
             font-size: 0.95rem;
             position: relative;
-            padding: 5px 0;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: all 0.3s;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover {
+            color: var(--text-main);
+            background: rgba(46, 134, 222, 0.08);
+        }
+        
+        .nav-link.active {
             color: var(--primary-blue);
+            background: rgba(46, 134, 222, 0.1);
         }
 
         .nav-link::after {
             content: '';
             position: absolute;
             width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--primary-orange);
+            height: 3px;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
             transition: width 0.3s ease;
             border-radius: 2px;
         }
 
         .nav-link:hover::after, .nav-link.active::after {
-            width: 100%;
+            width: 60%;
         }
 
         .dark-mode-toggle {
-            background: transparent;
+            background: rgba(0,0,0,0.05);
             border: none;
             color: var(--text-main);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s;
         }
 
         .dark-mode-toggle:hover {
-            background: rgba(0,0,0,0.05);
+            background: rgba(46, 134, 222, 0.15);
+            transform: rotate(15deg);
+        }
+
+        /* Navbar User Elements */
+        .nav-user-name {
+            padding: 0 8px;
+        }
+
+        .nav-profile-photo-link {
+            display: none;
+        }
+
+        .nav-profile-photo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-orange);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-profile-photo:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(46, 134, 222, 0.3);
+        }
+
+        .nav-profile-icon {
+            padding: 8px 12px;
+            font-size: 1.2rem;
+        }
+
+        .nav-logout {
+            padding: 8px 16px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-logout:hover {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--danger);
         }
 
         /* Main Content */
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
             width: 100%;
             flex: 1;
         }
 
         .page-header {
-            background: var(--bg-card);
-            padding: 30px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            padding: 35px 40px;
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 30px;
-            border-left: 5px solid var(--primary-orange);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
         }
 
         .page-title {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         /* Profile Header Card */
         .profile-header-card {
             background: var(--bg-card);
             border-radius: var(--border-radius);
-            padding: 40px;
+            padding: 45px;
             margin-bottom: 30px;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
-            gap: 30px;
-            border-left: 5px solid var(--primary-blue);
+            gap: 35px;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange), var(--purple));
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: white;
             font-weight: 700;
-            flex-shrink: 0;
+            box-shadow: 0 8px 25px rgba(46, 134, 222, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .profile-avatar-wrapper:hover .profile-avatar {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(46, 134, 222, 0.4);
+        }
+
+        .profile-avatar-wrapper:hover .avatar-edit-badge {
+            transform: scale(1.1);
+            background: var(--primary-orange);
+        }
+
+        .avatar-edit-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--primary-blue);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--bg-card);
+            transition: all 0.3s;
+        }
+
+        .profile-info {
+            flex: 1;
         }
 
         .profile-info h2 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: var(--text-main);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            font-weight: 700;
         }
 
         .profile-info p {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 5px;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-info p i {
+            color: var(--primary-blue);
+            width: 20px;
         }
 
         .profile-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            background: rgba(46, 134, 222, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, rgba(46, 134, 222, 0.1), rgba(46, 134, 222, 0.05));
             color: var(--primary-blue);
-            border-radius: 20px;
-            font-size: 0.8rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 15px;
+            border: 1px solid rgba(46, 134, 222, 0.2);
+        }
+
+        .profile-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* Settings Cards */
         .settings-section {
             background: var(--bg-card);
             border-radius: var(--border-radius);
-            padding: 30px;
+            padding: 35px;
             margin-bottom: 25px;
             box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .settings-section:hover {
+            box-shadow: var(--shadow-md);
         }
 
         .section-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0,0,0,0.06);
         }
 
         .section-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .section-icon.profile {
-            background: rgba(46, 134, 222, 0.1);
-            color: var(--primary-blue);
+            background: linear-gradient(135deg, #2E86DE, #1B5F9E);
+            color: white;
         }
 
         .section-icon.password {
-            background: rgba(255, 159, 67, 0.1);
-            color: var(--primary-orange);
+            background: linear-gradient(135deg, #FF9F43, #E67E22);
+            color: white;
         }
 
         .section-icon.danger {
-            background: rgba(255, 107, 107, 0.1);
-            color: var(--danger);
+            background: linear-gradient(135deg, #FF6B6B, #EE5A5A);
+            color: white;
+        }
+
+        .section-info {
+            flex: 1;
         }
 
         .section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.35rem;
+            font-weight: 700;
             color: var(--text-main);
+            margin-bottom: 5px;
         }
 
         .section-description {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            margin-top: 3px;
+            line-height: 1.5;
         }
 
         /* Form Styles */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+            margin-bottom: 10px;
+            font-weight: 600;
             color: var(--text-main);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label i {
+            color: var(--primary-blue);
             font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
+            padding: 14px 18px;
+            border: 2px solid rgba(0,0,0,0.08);
+            border-radius: 12px;
             background: var(--bg-body);
             color: var(--text-main);
             font-family: inherit;
@@ -303,8 +500,14 @@
 
         .form-control:focus {
             outline: none;
-            border-color: var(--primary-orange);
+            border-color: var(--primary-blue);
             background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
         }
 
         .form-row {
@@ -315,81 +518,115 @@
 
         /* Buttons */
         .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
             border: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
-            background: var(--primary-blue);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
             color: white;
-            box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3);
+            box-shadow: 0 4px 15px rgba(46, 134, 222, 0.35);
         }
 
         .btn-primary:hover {
-            background: #2373c7;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(46, 134, 222, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(46, 134, 222, 0.45);
         }
 
         .btn-warning {
-            background: var(--primary-orange);
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-dark));
             color: white;
-            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.35);
         }
 
         .btn-warning:hover {
-            background: #f08c38;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 159, 67, 0.45);
         }
 
         .btn-danger {
-            background: var(--danger);
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
             color: white;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.35);
         }
 
         .btn-danger:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.45);
         }
 
         .btn-block {
             width: 100%;
-            justify-content: center;
+        }
+
+        .btn i {
+            font-size: 1rem;
         }
 
         /* Info Box */
         .info-box {
-            background: rgba(46, 134, 222, 0.05);
+            background: linear-gradient(135deg, rgba(46, 134, 222, 0.08), rgba(46, 134, 222, 0.02));
             border-left: 4px solid var(--primary-blue);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .info-box i {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            margin-top: 2px;
         }
 
         .info-box p {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
             margin: 0;
+            line-height: 1.6;
         }
 
         .info-box.danger {
-            background: rgba(255, 107, 107, 0.05);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.08), rgba(255, 107, 107, 0.02));
             border-left-color: var(--danger);
+        }
+
+        .info-box.danger i {
+            color: var(--danger);
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -397,52 +634,89 @@
         .stat-card {
             background: var(--bg-card);
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 25px;
             box-shadow: var(--shadow-sm);
             text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-card:nth-child(1)::before {
+            background: linear-gradient(90deg, var(--primary-blue), #5FA8F0);
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: linear-gradient(90deg, var(--primary-orange), #FFC278);
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: linear-gradient(90deg, var(--success), #5CE1B8);
+        }
+
+        .stat-card:nth-child(4)::before {
+            background: linear-gradient(90deg, var(--danger), #FF9E9E);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
 
         .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 15px;
+            font-size: 1.6rem;
+            margin: 0 auto 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .stat-icon.products {
-            background: rgba(46, 134, 222, 0.1);
-            color: var(--primary-blue);
+            background: linear-gradient(135deg, var(--primary-blue), #5FA8F0);
+            color: white;
         }
 
         .stat-icon.notes {
-            background: rgba(255, 159, 67, 0.1);
-            color: var(--primary-orange);
+            background: linear-gradient(135deg, var(--primary-orange), #FFC278);
+            color: white;
         }
 
         .stat-icon.shopping {
-            background: rgba(29, 209, 161, 0.1);
-            color: var(--success);
+            background: linear-gradient(135deg, var(--success), #5CE1B8);
+            color: white;
         }
 
         .stat-icon.warning {
-            background: rgba(255, 107, 107, 0.1);
-            color: var(--danger);
+            background: linear-gradient(135deg, var(--danger), #FF9E9E);
+            color: white;
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: var(--text-main);
             margin-bottom: 5px;
+            line-height: 1;
         }
 
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         /* Responsive */
@@ -460,12 +734,53 @@
             }
 
             .settings-section {
-                padding: 20px;
+                padding: 25px;
             }
 
             .profile-header-card {
                 flex-direction: column;
                 text-align: center;
+                padding: 30px 20px;
+            }
+
+            .profile-info {
+                text-align: center;
+            }
+
+            .profile-info p {
+                justify-content: center;
+            }
+
+            .page-header {
+                padding: 25px 20px;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-card {
+                padding: 20px 15px;
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -483,13 +798,13 @@
                 <a href="/products" class="nav-link">Bahan Saya</a>
                 <a href="/suggestions" class="nav-link">Saran Pembelian</a>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span id="userName" style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: none;">User</span>
-                <a href="/user-profile" id="profilePhotoLink" style="display:none;">
-                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="userName" class="nav-user-name" style="font-size: 0.9rem; font-weight: 600; color: var(--text-main); display: none;">User</span>
+                <a href="/user-profile" id="profilePhotoLink" class="nav-profile-photo-link" style="display:none;">
+                    <img id="navProfilePhoto" src="" alt="Profile" class="nav-profile-photo" />
                 </a>
-                <a href="/user-profile" id="profileLink" class="nav-link" style="font-size: 0.85rem; display:none;" title="Profil"><i class="fas fa-user-circle"></i></a>
-                <a href="/auth/logout" class="nav-link" style="font-size: 0.85rem;">Keluar</a>
+                <a href="/user-profile" id="profileLink" class="nav-link nav-profile-icon" style="font-size: 0.9rem; display:none;" title="Profil"><i class="fas fa-user-circle"></i></a>
+                <a href="/auth/logout" class="nav-link nav-logout" style="font-size: 0.9rem;"><i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>Keluar</a>
                 <button class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
             </div>
         </div>
@@ -505,22 +820,23 @@
 
         <!-- Profile Header Card -->
         <div class="profile-header-card">
-            <div class="profile-avatar" id="profileAvatarContainer" style="position: relative; cursor: pointer;" onclick="document.getElementById('profilePhotoInput').click()">
+            <div class="profile-avatar-wrapper" onclick="document.getElementById('profilePhotoInput').click()">
                 <div class="profile-avatar" id="profileAvatar">U</div>
-                <img id="profileAvatarImg" src="" alt="Profile" style="display: none; width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-orange);">
-                <div style="position: absolute; bottom: 0; right: 0; background: var(--primary-orange); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;">
-                    <i class="fas fa-camera" style="font-size: 0.9rem;"></i>
+                <img id="profileAvatarImg" src="" alt="Profile" style="display: none; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 8px 25px rgba(46, 134, 222, 0.3);">
+                <div class="avatar-edit-badge">
+                    <i class="fas fa-camera"></i>
                 </div>
                 <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="previewProfilePhoto(event)">
             </div>
             <div class="profile-info">
                 <h2 id="profileNameDisplay">Loading...</h2>
                 <p><i class="fas fa-envelope"></i> <span id="profileEmailDisplay">-</span></p>
-                <p><i class="fas fa-calendar"></i> Bergabung <span id="memberSince">-</span></p>
-                <span class="profile-badge"><i class="fas fa-user"></i> Akun Pengguna</span>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
-                    <i class="fas fa-info-circle"></i> Klik foto untuk mengubah
-                </p>
+                <p><i class="fas fa-calendar-alt"></i> Bergabung <span id="memberSince">-</span></p>
+                <span class="profile-badge"><i class="fas fa-user-circle"></i> Akun Pengguna</span>
+                <div class="profile-hint">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Klik foto profil untuk mengubah foto Anda</span>
+                </div>
             </div>
         </div>
 
@@ -562,7 +878,7 @@
                 <div class="section-icon profile">
                     <i class="fas fa-user-edit"></i>
                 </div>
-                <div>
+                <div class="section-info">
                     <div class="section-title">Edit Profil</div>
                     <div class="section-description">Perbarui informasi profil Anda sesuai keinginan</div>
                 </div>
@@ -570,17 +886,24 @@
 
             <form id="profileForm">
                 <div class="form-group">
-                    <label class="form-label">Nama Lengkap</label>
-                    <input type="text" id="profileName" class="form-control" required>
+                    <label class="form-label">
+                        <i class="fas fa-user"></i>
+                        Nama Lengkap
+                    </label>
+                    <input type="text" id="profileName" class="form-control" placeholder="Masukkan nama lengkap Anda" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="profileEmail" class="form-control" required>
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="profileEmail" class="form-control" placeholder="Masukkan email Anda" required>
                 </div>
 
                 <div class="info-box">
-                    <p><i class="fas fa-info-circle"></i> Email Anda digunakan untuk login dan notifikasi penting.</p>
+                    <i class="fas fa-info-circle"></i>
+                    <p>Email Anda digunakan untuk login dan notifikasi penting.</p>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
@@ -595,7 +918,7 @@
                 <div class="section-icon password">
                     <i class="fas fa-lock"></i>
                 </div>
-                <div>
+                <div class="section-info">
                     <div class="section-title">Ubah Password</div>
                     <div class="section-description">Ganti password akun Anda untuk keamanan</div>
                 </div>
@@ -603,24 +926,34 @@
 
             <form id="passwordForm">
                 <div class="form-group">
-                    <label class="form-label">Password Saat Ini</label>
-                    <input type="password" id="currentPassword" class="form-control" required>
+                    <label class="form-label">
+                        <i class="fas fa-key"></i>
+                        Password Saat Ini <span style="color: var(--danger);">*</span>
+                    </label>
+                    <input type="password" id="currentPassword" class="form-control" placeholder="Masukkan password saat ini" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Password Baru</label>
-                        <input type="password" id="newPassword" class="form-control" required minlength="6">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Password Baru
+                        </label>
+                        <input type="password" id="newPassword" class="form-control" placeholder="Minimal 6 karakter" required minlength="6">
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" id="confirmPassword" class="form-control" required minlength="6">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Konfirmasi Password Baru
+                        </label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Ulangi password baru" required minlength="6">
                     </div>
                 </div>
 
                 <div class="info-box">
-                    <p><i class="fas fa-shield-alt"></i> Password minimal 6 karakter. Gunakan kombinasi huruf, angka, dan simbol untuk keamanan lebih.</p>
+                    <i class="fas fa-shield-alt"></i>
+                    <p>Password minimal 6 karakter. Gunakan kombinasi huruf, angka, dan simbol untuk keamanan lebih.</p>
                 </div>
 
                 <button type="submit" class="btn btn-warning">
@@ -635,14 +968,15 @@
                 <div class="section-icon danger">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <div>
+                <div class="section-info">
                     <div class="section-title">Zona Bahaya</div>
                     <div class="section-description">Tindakan permanen dan tidak dapat dibatalkan</div>
                 </div>
             </div>
 
             <div class="info-box danger">
-                <p><i class="fas fa-triangle-exclamation"></i> <strong>Perhatian!</strong> Menghapus akun akan menghapus semua data Anda termasuk bahan dan catatan secara permanen.</p>
+                <i class="fas fa-triangle-exclamation"></i>
+                <p><strong>Perhatian!</strong> Menghapus akun akan menghapus semua data Anda termasuk bahan dan catatan secara permanen.</p>
             </div>
 
             <button type="button" class="btn btn-danger btn-block" onclick="confirmDeleteAccount()">
@@ -921,45 +1255,45 @@
                 title: 'Hapus Akun?',
                 html: `
                     <div style="text-align: left;">
-                        <p style="color: var(--danger); font-weight: 600; margin-bottom: 15px;">
+                        <p style="color: var(--danger); font-weight: 600; margin-bottom: 15px; font-size: 1.1rem;">
                             ⚠️ Peringatan: Tindakan ini tidak dapat dibatalkan!
                         </p>
-                        <p>Semua data berikut akan dihapus permanen:</p>
-                        <ul style="margin: 10px 0;">
-                            <li>Semua bahan dapur Anda</li>
-                            <li>Semua catatan Anda</li>
-                            <li>Data akun Anda</li>
+                        <p style="margin-bottom: 15px;">Semua data berikut akan dihapus permanen:</p>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li style="margin: 8px 0;">Semua bahan dapur Anda</li>
+                            <li style="margin: 8px 0;">Semua catatan Anda</li>
+                            <li style="margin: 8px 0;">Data akun Anda</li>
                         </ul>
-                        <p style="margin-top: 15px;">Masukkan password Anda untuk melanjutkan:</p>
+                        <div style="background: rgba(255, 107, 107, 0.1); padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 3px solid var(--danger);">
+                            <p style="color: var(--danger); font-weight: 600; margin: 0; font-size: 0.9rem;">
+                                <i class="fas fa-exclamation-circle"></i> Pastikan Anda sudah export data penting sebelum melanjutkan!
+                            </p>
+                        </div>
                     </div>
                 `,
-                input: 'password',
-                inputPlaceholder: 'Password Anda',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FF6B6B',
-                cancelButtonColor: '#2E86DE',
+                cancelButtonColor: '#636E72',
                 confirmButtonText: 'Ya, Hapus Akun',
                 cancelButtonText: 'Batal',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Password harus diisi!';
-                    }
+                reverseButtons: true,
+                customClass: {
+                    container: 'delete-account-modal'
                 }
             });
 
             if (result.isConfirmed) {
-                deleteAccount(result.value);
+                deleteAccount();
             }
         }
 
         // Delete Account
-        async function deleteAccount(password) {
+        async function deleteAccount() {
             try {
                 const res = await fetch('/api/profile/account', {
                     method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 const data = await res.json();
@@ -968,9 +1302,10 @@
                     await Swal.fire({
                         icon: 'success',
                         title: 'Akun Dihapus',
-                        text: 'Akun Anda telah dihapus. Selamat tinggal!',
+                        text: 'Akun Anda telah dihapus. Terima kasih telah menggunakan Kapan Beli!',
                         confirmButtonText: 'OK',
-                        timer: 2000
+                        confirmButtonColor: '#2E86DE',
+                        timer: 3000
                     });
 
                     window.location.href = data.redirect || '/';
@@ -978,7 +1313,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: data.message || 'Password salah.',
+                        text: data.message || 'Terjadi kesalahan saat menghapus akun.',
                         confirmButtonText: 'OK'
                     });
                 }
@@ -1082,5 +1417,8 @@
             }
         }
     </script>
+
+    <!-- Footer -->
+    <%- include('./partials/footer') %>
 </body>
 </html>

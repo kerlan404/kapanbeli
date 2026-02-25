@@ -16,38 +16,36 @@
 
         <div class="nav-actions">
             <div id="authContainer">
-                <!-- Unauthenticated: Show Login & Register buttons -->
                 <div id="unauthButtons" style="display: none;">
-                    <a href="/auth" class="btn-text" style="margin-right: 15px;">Masuk</a>
-                    <a href="/register" class="btn-primary" style="padding: 8px 20px; background: var(--primary-orange); color: white; border-radius: 8px; font-weight: 500;">Daftar</a>
+                    <a href="/auth" class="btn-text">Masuk</a>
+                    <a href="/register" class="btn-primary">Daftar</a>
                 </div>
-                <!-- Authenticated: Show Profile & Logout -->
-                <a href="/user-profile" id="profilePhotoLink" style="display:none; text-decoration: none;">
-                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); margin-right: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 0 10px rgba(255, 165, 0, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'" />
+                <a href="/user-profile" id="profilePhotoLink" style="display:none;">
+                    <img id="navProfilePhoto" src="" alt="Profile" class="nav-profile-photo" />
                 </a>
-                <a href="/user-profile" class="btn-text" id="profileLink" style="display:none; margin-right: 15px; text-decoration: none;" title="Profil">
-                    <i class="fas fa-user-circle" style="font-size: 28px; color: var(--primary-orange); cursor: pointer; transition: transform 0.2s, color 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.color='#FF8C00'" onmouseout="this.style.transform='scale(1)'; this.style.color='var(--primary-orange)'"></i>
+                <a href="/user-profile" id="profileLink" style="display:none;" class="profile-icon" title="Profil">
+                    <i class="fas fa-user-circle"></i>
                 </a>
-                <a href="/auth/logout" class="btn-text" id="logoutLink" style="display:none; color: var(--accent-red);">Keluar</a>
+                <a href="/auth/logout" id="logoutLink" style="display:none;" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar</span>
+                </a>
             </div>
 
-            <button class="dark-mode-toggle" title="Ganti Mode">
-                <i class="fas fa-moon" id="themeIcon"></i>
+            <button class="dark-mode-toggle" id="darkModeToggle" title="Ganti Mode">
+                <i class="fas fa-moon"></i>
             </button>
         </div>
     </div>
 </nav>
 
 <script>
-    // Check authentication status and update navbar
     async function checkAuthStatus() {
         try {
             const response = await fetch('/auth/status', {
                 method: 'GET',
                 credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             });
             const data = await response.json();
 
@@ -58,24 +56,25 @@
             const navProfilePhoto = document.getElementById('navProfilePhoto');
 
             if (data.authenticated) {
-                // User is logged in
+                // Hide login/register buttons
                 unauthButtons.style.display = 'none';
-                logoutLink.style.display = 'inline';
-                
-                // Show profile photo if exists
-                if (data.user.profile_photo) {
+                // Show logout and profile
+                logoutLink.style.display = 'flex';
+
+                if (data.user && data.user.profile_photo) {
                     navProfilePhoto.src = data.user.profile_photo;
-                    navProfilePhoto.style.display = 'inline-block';
-                    profilePhotoLink.style.display = 'inline-block';
+                    navProfilePhoto.style.display = 'block';
+                    profilePhotoLink.style.display = 'block';
                     profileLink.style.display = 'none';
                 } else {
                     navProfilePhoto.style.display = 'none';
-                    profilePhotoLink.style.display = 'inline-block';
-                    profileLink.style.display = 'inline';
+                    profilePhotoLink.style.display = 'block';
+                    profileLink.style.display = 'flex';
                 }
             } else {
-                // User is not logged in
-                unauthButtons.style.display = 'inline-block';
+                // Show login/register buttons
+                unauthButtons.style.display = 'flex';
+                // Hide logout and profile
                 logoutLink.style.display = 'none';
                 profileLink.style.display = 'none';
                 profilePhotoLink.style.display = 'none';
@@ -86,14 +85,12 @@
         }
     }
 
-    // Check auth when page loads
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', checkAuthStatus);
     } else {
         checkAuthStatus();
     }
 
-    // Function to check auth before accessing protected pages
     function checkAuth(event) {
         event.preventDefault();
         const targetUrl = event.currentTarget.href;
@@ -101,16 +98,13 @@
         fetch('/auth/status', {
             method: 'GET',
             credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         })
             .then(res => res.json())
             .then(data => {
                 if (data.authenticated) {
                     window.location.href = targetUrl;
                 } else {
-                    // Redirect to login with return URL
                     window.location.href = '/auth?returnUrl=' + encodeURIComponent(targetUrl);
                 }
             })
@@ -120,3 +114,285 @@
             });
     }
 </script>
+
+<style>
+    .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px) saturate(180%);
+        border-bottom: 1px solid rgba(46, 134, 222, 0.1);
+        padding: 12px 5%;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode-active .navbar {
+        background: rgba(30, 41, 51, 0.95);
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: var(--text-main, #2C3E50);
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+
+    body.dark-mode-active .nav-brand {
+        color: var(--text-main-dark, #ECF0F1);
+    }
+
+    .nav-brand:hover {
+        background: rgba(46, 134, 222, 0.1);
+    }
+
+    .nav-brand i {
+        color: var(--primary-orange, #FF9F43);
+        font-size: 1.5rem;
+        filter: drop-shadow(0 2px 4px rgba(255, 159, 67, 0.3));
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: var(--text-muted, #636E72);
+        font-weight: 500;
+        font-size: 0.92rem;
+        padding: 10px 16px;
+        border-radius: 10px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    body.dark-mode-active .nav-link {
+        color: var(--text-muted-dark, #94A3B8);
+    }
+
+    .nav-link:hover {
+        color: var(--text-main, #2C3E50);
+        background: rgba(46, 134, 222, 0.08);
+    }
+
+    body.dark-mode-active .nav-link:hover {
+        color: var(--text-main-dark, #ECF0F1);
+    }
+
+    .nav-link.active {
+        color: var(--primary-blue, #2E86DE);
+        background: rgba(46, 134, 222, 0.1);
+    }
+
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-blue, #2E86DE), var(--primary-orange, #FF9F43));
+        border-radius: 2px;
+    }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    #authContainer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    #unauthButtons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-text {
+        text-decoration: none;
+        color: var(--text-muted, #636E72);
+        font-weight: 600;
+        font-size: 0.92rem;
+        padding: 8px 14px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+    }
+
+    body.dark-mode-active .btn-text {
+        color: var(--text-muted-dark, #94A3B8);
+    }
+
+    .btn-text:hover {
+        color: var(--text-main, #2C3E50);
+        background: rgba(46, 134, 222, 0.08);
+    }
+
+    body.dark-mode-active .btn-text:hover {
+        color: var(--text-main-dark, #ECF0F1);
+    }
+
+    .btn-primary {
+        background: var(--primary-orange, #FF9F43);
+        color: white !important;
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(255, 159, 67, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-orange-dark, #E67E22);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 159, 67, 0.4);
+    }
+
+    .nav-profile-photo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary-orange, #FF9F43);
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: block;
+    }
+
+    .nav-profile-photo:hover {
+        transform: scale(1.1);
+        border-color: var(--primary-blue, #2E86DE);
+        box-shadow: 0 4px 12px rgba(46, 134, 222, 0.3);
+    }
+
+    .profile-icon {
+        color: var(--primary-orange, #FF9F43);
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        padding: 6px;
+        border-radius: 8px;
+    }
+
+    .profile-icon:hover {
+        color: var(--primary-orange-dark, #FF8C00);
+        transform: scale(1.1);
+        background: rgba(255, 159, 67, 0.1);
+    }
+
+    .logout-btn {
+        color: var(--accent-red, #FF6B6B);
+        font-weight: 600;
+        font-size: 0.92rem;
+        padding: 8px 14px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .logout-btn i {
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .logout-btn:hover {
+        background: rgba(255, 107, 107, 0.1);
+        color: var(--accent-red-dark, #EE5A5A);
+    }
+
+    .dark-mode-toggle {
+        background: rgba(46, 134, 222, 0.1);
+        border: none;
+        color: var(--primary-blue, #2E86DE);
+        font-size: 1rem;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        flex-shrink: 0;
+    }
+
+    .dark-mode-toggle:hover {
+        background: rgba(46, 134, 222, 0.2);
+        transform: rotate(15deg);
+    }
+
+    body.dark-mode-active .dark-mode-toggle {
+        background: rgba(255, 159, 67, 0.15);
+        color: var(--primary-orange, #FF9F43);
+    }
+
+    body.dark-mode-active .dark-mode-toggle:hover {
+        background: rgba(255, 159, 67, 0.25);
+    }
+
+    @media (max-width: 768px) {
+        .nav-menu {
+            display: none;
+        }
+
+        .nav-actions {
+            gap: 8px;
+        }
+
+        .btn-text,
+        .btn-primary {
+            padding: 6px 12px;
+            font-size: 0.88rem;
+        }
+
+        .logout-btn span {
+            display: none;
+        }
+
+        .nav-brand span {
+            display: none;
+        }
+    }
+</style>

@@ -39,7 +39,7 @@
             }
         }
     </script>
-    
+
     <style>
         body { font-family: 'Inter', sans-serif; }
         .badge { @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1; }
@@ -48,16 +48,22 @@
         .badge-suspended { @apply bg-red-100 text-red-700; }
         .badge-admin { @apply bg-purple-100 text-purple-700; }
         .badge-user { @apply bg-blue-100 text-blue-700; }
+        
+        /* Dark Background for User Detail */
+        body {
+            background-color: #0a0a0a;
+            color: #ecf0f1;
+        }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-black">
     <% if (!user) { %>
         <!-- User Not Found -->
         <div class="min-h-screen flex items-center justify-center">
             <div class="text-center">
-                <i class="fas fa-user-times text-6xl text-gray-300 mb-4"></i>
-                <h1 class="text-2xl font-bold text-gray-700 mb-2">User Tidak Ditemukan</h1>
-                <p class="text-gray-500 mb-6">Data user yang Anda cari tidak tersedia.</p>
+                <i class="fas fa-user-times text-6xl text-gray-500 mb-4"></i>
+                <h1 class="text-2xl font-bold text-gray-400 mb-2">User Tidak Ditemukan</h1>
+                <p class="text-gray-600 mb-6">Data user yang Anda cari tidak tersedia.</p>
                 <a href="/admin/users" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
                     <i class="fas fa-arrow-left"></i>
                     Kembali ke Daftar User
@@ -66,21 +72,21 @@
         </div>
     <% } else { %>
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <header class="bg-gray-900 shadow-sm border-b border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
                     <div class="flex items-center gap-4">
-                        <a href="/admin/users" class="text-gray-500 hover:text-gray-700 transition">
+                        <a href="/admin/users" class="text-gray-400 hover:text-gray-300 transition">
                             <i class="fas fa-arrow-left text-xl"></i>
                         </a>
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900"><%= pageTitle %></h1>
-                            <p class="text-sm text-gray-500">Detail lengkap profil dan aktivitas user</p>
+                            <h1 class="text-2xl font-bold text-white"><%= pageTitle %></h1>
+                            <p class="text-sm text-gray-400">Detail lengkap profil dan aktivitas user</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <a href="/admin/users" 
-                           class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        <a href="/admin/users"
+                           class="inline-flex items-center gap-2 px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition">
                             <i class="fas fa-arrow-left"></i>
                             <span class="hidden sm:inline">Kembali</span>
                         </a>
@@ -91,12 +97,12 @@
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- User Info Card -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
                 <div class="p-6">
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                         <!-- Profile Photo -->
                         <div class="flex-shrink-0">
-                            <% 
+                            <%
                                 // Get profile image - use uploaded image or generate avatar
                                 var profileImage = user.profile_image;
                                 if (!profileImage || profileImage === 'null') {
@@ -107,19 +113,19 @@
                                     profileImage = profileImage.startsWith('/uploads/') ? profileImage : '/uploads/' + profileImage;
                                 }
                             %>
-                            <img src="<%= profileImage %>" 
-                                 alt="<%= user.name %>" 
-                                 class="w-32 h-32 rounded-full object-cover border-4 border-primary-100 shadow-lg"
+                            <img src="<%= profileImage %>"
+                                 alt="<%= user.name %>"
+                                 class="w-32 h-32 rounded-full object-cover border-4 border-primary-600 shadow-lg"
                                  onerror="this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.name) %>&background=3b82f6&color=fff&size=200'">
                         </div>
                         
                         <!-- User Info -->
                         <div class="flex-1 text-center sm:text-left">
                             <div class="mb-4">
-                                <h2 class="text-3xl font-bold text-gray-900 mb-2"><%= user.name %></h2>
-                                <p class="text-gray-600 text-lg"><i class="fas fa-envelope mr-2"></i><%= user.email %></p>
+                                <h2 class="text-3xl font-bold text-white mb-2"><%= user.name %></h2>
+                                <p class="text-gray-400 text-lg"><i class="fas fa-envelope mr-2"></i><%= user.email %></p>
                             </div>
-                            
+
                             <div class="flex flex-wrap justify-center sm:justify-start gap-3 mb-4">
                                 <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-user' %>">
                                     <i class="fas fa-<%= user.role === 'admin' ? 'crown' : 'user' %>"></i>
@@ -130,8 +136,8 @@
                                     <%= user.account_status === 'active' ? 'Aktif' : user.account_status === 'suspended' ? 'Suspended' : 'Non-Aktif' %>
                                 </span>
                             </div>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-400">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-calendar text-primary-600"></i>
                                     <span>Bergabung: <strong><%= new Date(user.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></strong></span>
@@ -202,29 +208,29 @@
             </div>
 
             <!-- Activity Logs -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <i class="fas fa-history text-primary-600"></i>
+            <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
+                <div class="px-6 py-4 border-b border-gray-800">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fas fa-history text-primary-500"></i>
                         Log Aktivitas User
                     </h3>
-                    <p class="text-sm text-gray-500 mt-1">10 aktivitas terakhir</p>
+                    <p class="text-sm text-gray-400 mt-1">10 aktivitas terakhir</p>
                 </div>
                 <div class="overflow-x-auto">
                     <% if (activityLogs && activityLogs.length > 0) { %>
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-gray-800">
+                            <thead class="bg-gray-800">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal & Waktu</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktivitas</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Tanggal & Waktu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Aktivitas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">IP Address</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-gray-900 divide-y divide-gray-800">
                                 <% activityLogs.forEach(log => { %>
-                                    <tr class="hover:bg-gray-50 transition">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <tr class="hover:bg-gray-800 transition">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                             <%= new Date(log.created_at).toLocaleString('id-ID') %>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -232,10 +238,10 @@
                                                 <%= log.activity_type %>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-700 max-w-md truncate">
+                                        <td class="px-6 py-4 text-sm text-gray-300 max-w-md truncate">
                                             <%= log.description %>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
                                             <%= log.ip_address || '-' %>
                                         </td>
                                     </tr>
@@ -244,7 +250,7 @@
                         </table>
                     <% } else { %>
                         <div class="text-center py-12">
-                            <i class="fas fa-inbox text-5xl text-gray-300 mb-4"></i>
+                            <i class="fas fa-inbox text-5xl text-gray-600 mb-4"></i>
                             <p class="text-gray-500">Belum ada aktivitas user</p>
                         </div>
                     <% } %>
@@ -253,10 +259,10 @@
 
             <!-- Products Section -->
             <% if (products && products.length > 0) { %>
-                <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <i class="fas fa-box text-orange-600"></i>
+                <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
+                    <div class="px-6 py-4 border-b border-gray-800">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="fas fa-box text-orange-500"></i>
                             Bahan/User (<%= products.length %>)
                         </h3>
                     </div>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Activity Logs</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #ecf0f1; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #FF9F43; }
+        .btn { padding: 10px 20px; margin: 10px 5px; cursor: pointer; border: none; border-radius: 5px; font-size: 14px; }
+        .btn-primary { background: #2E86DE; color: white; }
+        .btn-success { background: #1DD1A1; color: white; }
+        .btn-danger { background: #FF6B6B; color: white; }
+        .result { background: #2a2a2a; padding: 20px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; }
+        .error { color: #FF6B6B; }
+        .success { color: #1DD1A1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a3a3a; }
+        th { background: #2E86DE; color: white; }
+        tr:hover { background: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Activity Logs</h1>
+        
+        <div>
+            <button class="btn btn-primary" onclick="testAPI()">Test API Endpoint</button>
+            <button class="btn btn-success" onclick="insertTestData()">Insert Test Data</button>
+            <button class="btn btn-danger" onclick="clearLogs()">Clear All Logs</button>
+        </div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div id="logsTable" style="margin-top: 30px;"></div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultEl = document.getElementById('result');
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = 'Loading...';
+            
+            try {
+                const response = await fetch('/api/activity-logs?range=7days&page=1&limit=10');
+                const data = await response.json();
+                
+                resultEl.innerHTML = '<strong class="success">✓ API Response:</strong>\n' + JSON.stringify(data, null, 2);
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    displayLogs(data.data);
+                } else {
+                    document.getElementById('logsTable').innerHTML = '<p class="error">No activity logs found. Click "Insert Test Data" to add some.</p>';
+                }
+            } catch (error) {
+                resultEl.innerHTML = '<strong class="error">✗ Error:</strong> ' + error.message;
+            }
+        }
+        
+        async function insertTestData() {
+            const resultEl = document.getElementById('result');
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = 'Inserting test data...';
+            
+            try {
+                const response = await fetch('/api/activity-logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        userId: 1,
+                        activityType: 'CREATE',
+                        description: 'Test activity log from test page',
+                        ip: '127.0.0.1',
+                        userAgent: 'Test Browser'
+                    })
+                });
+                
+                const data = await response.json();
+                resultEl.innerHTML = '<strong class="success">✓ Test Data Inserted:</strong>\n' + JSON.stringify(data, null, 2);
+                
+                // Refresh logs
+                testAPI();
+            } catch (error) {
+                resultEl.innerHTML = '<strong class="error">✗ Error:</strong> ' + error.message;
+            }
+        }
+        
+        async function clearLogs() {
+            if (!confirm('Are you sure you want to clear all activity logs?')) return;
+            
+            const resultEl = document.getElementById('result');
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = 'Clearing logs...';
+            
+            try {
+                // Note: You'll need to create a DELETE endpoint for this
+                resultEl.innerHTML = 'Manual clear needed. Run: TRUNCATE TABLE activity_logs;';
+            } catch (error) {
+                resultEl.innerHTML = '<strong class="error">✗ Error:</strong> ' + error.message;
+            }
+        }
+        
+        function displayLogs(logs) {
+            const tableEl = document.getElementById('logsTable');
+            
+            if (!logs || logs.length === 0) {
+                tableEl.innerHTML = '<p>No logs found</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>ID</th><th>User</th><th>Type</th><th>Description</th><th>IP</th><th>Time</th></tr></thead><tbody>';
+            
+            logs.forEach(log => {
+                html += `<tr>
+                    <td>${log.id}</td>
+                    <td>${log.user_name || 'N/A'}<br><small>${log.user_email || ''}</small></td>
+                    <td><span style="background: #2E86DE; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${log.activity_type}</span></td>
+                    <td>${log.description}</td>
+                    <td style="font-family: monospace;">${log.ip_address || '-'}</td>
+                    <td>${new Date(log.created_at).toLocaleString('id-ID')}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            tableEl.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

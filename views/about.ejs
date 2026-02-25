@@ -710,22 +710,28 @@
             enableDarkMode();
         }
 
-        toggleBtn.addEventListener('click', () => {
-            body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
-        });
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                body.classList.contains('dark-mode-active') ? disableDarkMode() : enableDarkMode();
+            });
+        }
 
         function enableDarkMode() {
             body.classList.add('dark-mode-active');
             localStorage.setItem('theme', 'dark');
-            themeIcon.className = "fas fa-sun";
-            themeIcon.style.color = "#F1C40F";
+            if (themeIcon) {
+                themeIcon.className = "fas fa-sun";
+                themeIcon.style.color = "#F1C40F";
+            }
         }
 
         function disableDarkMode() {
             body.classList.remove('dark-mode-active');
             localStorage.setItem('theme', 'light');
-            themeIcon.className = "fas fa-moon";
-            themeIcon.style.color = "";
+            if (themeIcon) {
+                themeIcon.className = "fas fa-moon";
+                themeIcon.style.color = "";
+            }
         }
 
         // --- SCROLL ANIMATION ---

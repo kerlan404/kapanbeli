@@ -4,6 +4,7 @@
  */
 
 const activityLogsService = require('../services/activityLogsService');
+const { getPaginationParams } = require('../helpers/paginationHelper');
 
 const activityLogsController = {
     /**
@@ -13,13 +14,15 @@ const activityLogsController = {
      */
     async getLogs(req, res) {
         try {
+            // Use safe pagination helper
+            const pagination = getPaginationParams(req.query);
+            const { page, limit } = pagination;
+            
             const {
                 range = '7days',
                 search = '',
-                page = 1,
-                limit = 10,
                 activityType = ''
-            } = req.query;
+            } = req.query || {};
 
             // Validate range
             const validRanges = ['today', '7days', 'month'];
@@ -32,16 +35,12 @@ const activityLogsController = {
                 });
             }
 
-            // Validate page and limit
-            const pageNum = Math.max(1, parseInt(page) || 1);
-            const limitNum = Math.max(1, Math.min(100, parseInt(limit) || 10));
-
             // Get logs from service
             const result = await activityLogsService.getLogs({
                 range,
                 search,
-                page: pageNum,
-                limit: limitNum,
+                page,
+                limit,
                 activityType
             });
 
@@ -67,8 +66,8 @@ const activityLogsController = {
                         data: [],
                         pagination: {
                             total: 0,
-                            page: pageNum,
-                            limit: limitNum,
+                            page,
+                            limit,
                             totalPages: 0
                         },
                         filters: {
@@ -78,7 +77,7 @@ const activityLogsController = {
                         }
                     });
                 }
-                
+
                 res.status(500).json({
                     success: false,
                     message: result.error || 'Failed to get activity logs',
@@ -88,7 +87,7 @@ const activityLogsController = {
             }
         } catch (error) {
             console.error('Error in getLogs controller:', error);
-            
+
             // Handle table not exists
             if (error.code === 'ER_NO_SUCH_TABLE' || (error.message && error.message.includes('activity_logs'))) {
                 return res.json({
@@ -97,18 +96,18 @@ const activityLogsController = {
                     data: [],
                     pagination: {
                         total: 0,
-                        page: 1,
-                        limit: 10,
+                        page,
+                        limit,
                         totalPages: 0
                     },
                     filters: {
-                        range: req.query.range || '7days',
-                        search: req.query.search || '',
-                        activityType: req.query.activityType || ''
+                        range,
+                        search,
+                        activityType
                     }
                 });
             }
-            
+
             res.status(500).json({
                 success: false,
                 message: 'Internal server error',

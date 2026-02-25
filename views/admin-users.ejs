@@ -128,11 +128,28 @@
             background: var(--primary-orange);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; color: white;
+            flex-shrink: 0;
         }
-        .user-info h4 { font-size: 0.9rem; color: white; margin-bottom: 2px; }
-        .user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
-        .logout-btn { margin-left: auto; color: rgba(255,255,255,0.5); cursor: pointer; }
-        .logout-btn:hover { color: var(--accent-red); }
+        .user-info { flex: 1; min-width: 0; overflow: hidden; }
+        .user-info h4 { font-size: 0.9rem; color: white; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
 
         /* Main Content */
         .main-content {
@@ -517,50 +534,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-shield-alt"></i> KB ADMIN
-            </div>
-        </div>
-
-        <div class="sidebar-menu">
-            <div class="menu-label">Utama</div>
-            <a href="/admin" class="nav-item">
-                <i class="fas fa-th-large"></i> Dashboard
-            </a>
-            <a href="#" class="nav-item active">
-                <i class="fas fa-users"></i> Pengguna
-            </a>
-            <a href="/admin#products" class="nav-item">
-                <i class="fas fa-box"></i> Semua Produk
-            </a>
-            <a href="/admin#suggestions" class="nav-item">
-                <i class="fas fa-clipboard-list"></i> Saran Pembelian
-            </a>
-
-            <div class="menu-label">Sistem</div>
-            <a href="/admin#settings" class="nav-item">
-                <i class="fas fa-cog"></i> Pengaturan
-            </a>
-            <a href="/admin#activity-log" class="nav-item">
-                <i class="fas fa-history"></i> Log Aktivitas
-            </a>
-        </div>
-
-        <div class="sidebar-footer">
-            <div class="user-mini-profile">
-                <div class="user-avatar">AD</div>
-                <div class="user-info">
-                    <h4>Super Admin</h4>
-                    <p>admin@kapanbeli.id</p>
-                </div>
-                <div class="logout-btn" onclick="handleLogout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-            </div>
-        </div>
-    </aside>
+    <%- include('./partials/admin-sidebar', { currentPage: 'users', user: typeof user !== 'undefined' ? user : null }) %>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -650,6 +624,9 @@
                     </div>
                     <div class="filter-group">
                         <label class="filter-label" style="visibility: hidden;">Action</label>
+                        <button class="btn btn-outline" onclick="resetFilters()" style="margin-right: 10px;">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
                         <button class="btn btn-primary" onclick="loadUsers()">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
@@ -843,6 +820,18 @@
         }
 
         // ============================================
+        // RESET FILTERS
+        // ============================================
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('roleFilter').value = '';
+            currentPage = 1;
+            loadUsers();
+            showToast('Filter berhasil direset', 'success');
+        }
+
+        // ============================================
         // LOAD USERS
         // ============================================
         async function loadUsers() {
@@ -923,7 +912,7 @@
             tbody.innerHTML = users.map(user => {
                 const profileImg = user.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2E86DE&color=fff`;
                 const statusBadge = getStatusBadge(user.account_status);
-                const roleBadge = user.role === 'admin' ? 'badge-admin' : 'badge-user';
+                const roleBadgeHtml = getRoleBadge(user.role);
                 const lastLogin = user.last_login ? new Date(user.last_login).toLocaleString('id-ID') : '<span style="color: var(--text-muted);">Belum pernah</span>';
 
                 return `
@@ -940,7 +929,7 @@
                             </div>
                         </td>
                         <td>${user.email}</td>
-                        <td><span class="badge ${roleBadge}">${user.role}</span></td>
+                        <td>${roleBadgeHtml}</td>
                         <td>${statusBadge}</td>
                         <td style="text-align: center;">${user.total_logins || 0}</td>
                         <td>${new Date(user.created_at).toLocaleDateString('id-ID')}</td>
@@ -952,8 +941,8 @@
                                 <button class="btn btn-sm btn-outline" onclick="openEditModal(${user.id})" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm ${user.account_status === 'active' ? 'btn-warning' : 'btn-success'}" 
-                                    onclick="toggleUserStatus(${user.id})" 
+                                <button class="btn btn-sm ${user.account_status === 'active' ? 'btn-warning' : 'btn-success'}"
+                                    onclick="toggleUserStatus(${user.id})"
                                     title="${user.account_status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}">
                                     <i class="fas fa-${user.account_status === 'active' ? 'pause' : 'play'}"></i>
                                 </button>
@@ -968,12 +957,28 @@
         }
 
         function getStatusBadge(status) {
+            // Status badge logic - MUST match partials/status-badge.ejs
+            // active → Aktif (hijau)
+            // inactive → Non-Aktif (merah)
+            // suspended/banned → Ditangguhkan (kuning)
             const badges = {
                 'active': '<span class="badge badge-success">Aktif</span>',
-                'inactive': '<span class="badge badge-secondary">Non-Aktif</span>',
-                'suspended': '<span class="badge badge-danger">Suspended</span>'
+                'inactive': '<span class="badge badge-danger">Non-Aktif</span>',
+                'suspended': '<span class="badge badge-warning">Ditangguhkan</span>',
+                'banned': '<span class="badge badge-warning">Ditangguhkan</span>'
             };
             return badges[status] || badges['inactive'];
+        }
+
+        function getRoleBadge(role) {
+            // Role badge logic - MUST match partials/role-badge.ejs
+            // admin → Administrator (biru)
+            // user → Pengguna (abu-abu)
+            const badges = {
+                'admin': '<span class="badge badge-primary">Administrator</span>',
+                'user': '<span class="badge badge-secondary">Pengguna</span>'
+            };
+            return badges[role] || badges['user'];
         }
 
         // ============================================

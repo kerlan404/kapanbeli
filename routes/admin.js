@@ -18,47 +18,22 @@ const isAdmin = (req, res, next) => {
 // Semua route admin memerlukan otentikasi sebagai admin
 router.use(isAdmin);
 
-// Endpoint untuk mendapatkan statistik dashboard
+// Dashboard stats
 router.get('/stats', adminController.getStats);
 
-// Endpoint untuk mendapatkan semua pengguna (deprecated - gunakan /api/users)
-router.get('/users', async (req, res) => {
-    try {
-        // Redirect ke endpoint baru atau gunakan userService
-        const userService = require('../services/userService');
-        const result = await userService.getUsers({ page: 1, limit: 100 });
-        res.json({ success: true, users: result.data });
-    } catch (error) {
-        console.error('Error in /api/admin/users:', error);
-        res.status(500).json({ success: false, message: error.message, users: [] });
-    }
-});
-
-// Endpoint untuk mendapatkan log aktivitas
-router.get('/activity', adminController.getActivityLogs);
-
-// Endpoint untuk mendapatkan semua produk dari semua pengguna
-router.get('/products', adminController.getAllProducts);
-
-// Endpoint untuk mendapatkan detail pengguna
-router.get('/user/:id', adminController.getUserById);
-
-// Endpoint untuk mendapatkan produk dari pengguna tertentu
-router.get('/user/:id/products', adminController.getUserProducts);
-
-// Endpoint untuk BAN user
-router.post('/user/:userId/ban', adminController.banUser);
-
-// Endpoint untuk UNBAN user
-router.post('/user/:userId/unban', adminController.unbanUser);
-
-// Endpoint untuk mendapatkan user yang di-ban
+// Users management
+router.get('/users', adminController.getAllUsers);
 router.get('/users/banned', adminController.getBannedUsers);
 
-// Endpoint untuk mendapatkan statistik produk per user
-router.get('/stats/products-by-user', adminController.getProductStatsByUser);
+// User detail
+router.get('/user/:id', adminController.getUserById);
+router.get('/user/:id/products', adminController.getUserProducts);
 
-// Endpoint untuk mendapatkan aktivitas login
-router.get('/stats/login-activity', adminController.getLoginActivity);
+// Ban/Unban user
+router.post('/user/:userId/ban', adminController.banUser);
+router.post('/user/:userId/unban', adminController.unbanUser);
+
+// Active users widget
+router.get('/stats/active-users', adminController.getActiveUsers);
 
 module.exports = router;

@@ -34,14 +34,18 @@ const activityLogsService = {
      */
     async log(userId, activityType, description, ip = null, userAgent = null) {
         try {
+            console.log('[ActivityLogsService.log] Logging activity:', { userId, activityType, description, ip });
+            
             // Set timezone ke Asia/Jakarta
             await db.execute("SET time_zone = '+07:00'");
-            
+
             const query = `
                 INSERT INTO activity_logs (user_id, activity_type, description, ip_address, user_agent)
                 VALUES (?, ?, ?, ?, ?)
             `;
-            
+
+            console.log('[ActivityLogsService.log] Executing query:', query);
+
             const [result] = await db.execute(query, [
                 userId,
                 activityType,
@@ -49,14 +53,22 @@ const activityLogsService = {
                 ip,
                 userAgent
             ]);
-            
+
+            console.log('[ActivityLogsService.log] Activity logged successfully, ID:', result.insertId);
+
             return {
                 success: true,
                 id: result.insertId,
                 timestamp: new Date()
             };
         } catch (error) {
-            console.error('Error logging activity:', error);
+            console.error('[ActivityLogsService.log] Error logging activity:', error);
+            console.error('[ActivityLogsService.log] Error details:', {
+                code: error.code,
+                errno: error.errno,
+                sqlMessage: error.sqlMessage,
+                sql: error.sql
+            });
             return {
                 success: false,
                 error: error.message
@@ -76,11 +88,13 @@ const activityLogsService = {
      */
     async getLogs(options = {}) {
         try {
+            console.log('[ActivityLogsService.getLogs] Getting logs with options:', options);
+
             const {
                 range = '7days',
                 search = '',
                 page = 1,
-                limit = 10,
+                limit = 20,
                 activityType = ''
             } = options;
 
@@ -119,13 +133,15 @@ const activityLogsService = {
                 JOIN users u ON al.user_id = u.id
                 WHERE 1=1 ${dateFilter} ${searchFilter} ${activityTypeFilter}
             `;
-            
+
+            console.log('[ActivityLogsService.getLogs] Count query:', countQuery);
+
             const [countResult] = await db.execute(countQuery, [...searchParams, ...activityTypeParams]);
             const total = countResult[0].total;
 
             // Get paginated data
             const dataQuery = `
-                SELECT 
+                SELECT
                     al.id,
                     al.user_id,
                     al.activity_type,
@@ -141,13 +157,18 @@ const activityLogsService = {
                 ORDER BY al.created_at DESC
                 LIMIT ? OFFSET ?
             `;
-            
+
+            console.log('[ActivityLogsService.getLogs] Data query:', dataQuery);
+            console.log('[ActivityLogsService.getLogs] Params:', [...searchParams, ...activityTypeParams, limit, offset]);
+
             const [dataResult] = await db.execute(dataQuery, [
                 ...searchParams,
                 ...activityTypeParams,
                 limit,
                 offset
             ]);
+
+            console.log('[ActivityLogsService.getLogs] Retrieved', dataResult.length, 'logs');
 
             return {
                 success: true,
@@ -160,7 +181,12 @@ const activityLogsService = {
                 }
             };
         } catch (error) {
-            console.error('Error getting activity logs:', error);
+            console.error('[ActivityLogsService.getLogs] Error:', error);
+            console.error('[ActivityLogsService.getLogs] Error details:', {
+                code: error.code,
+                errno: error.errno,
+                sqlMessage: error.sqlMessage
+            });
             return {
                 success: false,
                 error: error.message,
@@ -168,7 +194,7 @@ const activityLogsService = {
                 pagination: {
                     total: 0,
                     page: 1,
-                    limit: 10,
+                    limit: 20,
                     totalPages: 0
                 }
             };

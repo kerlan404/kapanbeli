@@ -6,11 +6,46 @@
 
 const db = require('../config/database');
 
+/**
+ * Format weight/quantity to avoid unnecessary decimal places
+ * Examples: 1 → "1 kg", 1.0 → "1 kg", 1.5 → "1.5 kg", 2.0 → "2 kg"
+ */
+function formatWeight(weight, unit = 'kg') {
+    if (weight === null || weight === undefined) {
+        return '-';
+    }
+    const numWeight = parseFloat(weight);
+    if (isNaN(numWeight)) {
+        return '-';
+    }
+    if (Number.isInteger(numWeight)) {
+        return numWeight + ' ' + unit;
+    }
+    return parseFloat(numWeight.toFixed(1)) + ' ' + unit;
+}
+
+/**
+ * Format stock quantity to avoid unnecessary decimal places
+ * Examples: 1.0 → "1", 2.0 → "2", 1.5 → "1.5"
+ */
+function formatStockQuantity(quantity) {
+    if (quantity === null || quantity === undefined) {
+        return '-';
+    }
+    const numQty = parseFloat(quantity);
+    if (isNaN(numQty)) {
+        return '-';
+    }
+    if (Number.isInteger(numQty)) {
+        return numQty.toString();
+    }
+    return parseFloat(numQty.toFixed(1)).toString();
+}
+
 const adminProductService = {
     /**
      * Get all products with pagination, search, and filters
-     * @param {Object} options - Query options
-     * @returns {Promise<Object>} Paginated products
+     * For ADMIN - shows ALL products from ALL users
      */
     async getProducts(options = {}) {
         try {
@@ -35,10 +70,10 @@ const adminProductService = {
             const whereClauses = [];
             const params = [];
 
-            // Search filter (product name, user name/email, or category)
+            // Search filter (product name or category)
             if (search) {
-                whereClauses.push('(p.name LIKE ? OR u.name LIKE ? OR u.email LIKE ? OR p.category LIKE ?)');
-                params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+                whereClauses.push('(p.name LIKE ? OR p.category LIKE ?)');
+                params.push(`%${search}%`, `%${search}%`);
             }
 
             // Stock status filter
@@ -69,7 +104,7 @@ const adminProductService = {
 
             // Category filter
             if (category) {
-                whereClauses.push('p.category = ?');
+                whereClauses.push('c.name = ?');
                 params.push(category);
             }
 
@@ -79,16 +114,16 @@ const adminProductService = {
             const countQuery = `
                 SELECT COUNT(*) as total
                 FROM products p
-                JOIN users u ON p.user_id = u.id
+                LEFT JOIN categories c ON p.category_id = c.id
                 ${whereClause}
             `;
 
             const [countResult] = await db.execute(countQuery, params);
             const total = countResult[0].total;
 
-            // Get products with user info
+            // Get ALL products from ALL users with user info
             const dataQuery = `
-                SELECT 
+                SELECT
                     p.id,
                     p.name,
                     p.description,
@@ -96,19 +131,22 @@ const adminProductService = {
                     p.min_stock_level,
                     p.unit,
                     p.expiry_date,
-                    p.category,
+                    p.category_id,
+                    c.name as category_name,
                     p.is_active,
                     p.created_at,
                     p.updated_at,
-                    u.id as user_id,
+                    p.user_id,
+                    p.image_url,
                     u.name as user_name,
                     u.email as user_email,
-                    CASE 
+                    CASE
                         WHEN p.stock_quantity <= 0 THEN 'out_of_stock'
                         WHEN p.stock_quantity <= p.min_stock_level THEN 'low_stock'
                         ELSE 'good'
                     END as stock_status
                 FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
                 JOIN users u ON p.user_id = u.id
                 ${whereClause}
                 ORDER BY p.${sortColumn} ${order}
@@ -117,9 +155,17 @@ const adminProductService = {
 
             const [dataResult] = await db.execute(dataQuery, [...params, limit, offset]);
 
+            // Format stock quantity and weight for each product
+            const formattedData = dataResult.map(p => ({
+                ...p,
+                stockQuantityFormatted: formatStockQuantity(p.stock_quantity),
+                minStockLevelFormatted: formatStockQuantity(p.min_stock_level),
+                weightFormatted: formatWeight(p.weight)
+            }));
+
             return {
                 success: true,
-                data: dataResult,
+                data: formattedData,
                 pagination: {
                     total,
                     page: parseInt(page),
@@ -137,18 +183,18 @@ const adminProductService = {
 
     /**
      * Get product by ID with user info
-     * @param {number} productId - Product ID
-     * @returns {Promise<Object|null>} Product data
      */
     async getProductById(productId) {
         try {
             const query = `
-                SELECT 
+                SELECT
                     p.*,
+                    c.name as category_name,
                     u.id as user_id,
                     u.name as user_name,
                     u.email as user_email
                 FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
                 JOIN users u ON p.user_id = u.id
                 WHERE p.id = ?
             `;
@@ -168,9 +214,6 @@ const adminProductService = {
 
     /**
      * Update product
-     * @param {number} productId - Product ID
-     * @param {Object} updateData - Data to update
-     * @returns {Promise<Object>} Updated product
      */
     async updateProduct(productId, updateData) {
         try {
@@ -184,8 +227,8 @@ const adminProductService = {
             const updates = [];
             const values = [];
 
-            const allowedFields = ['name', 'description', 'stock_quantity', 'min_stock_level', 'unit', 'expiry_date', 'category'];
-            
+            const allowedFields = ['name', 'description', 'stock_quantity', 'min_stock_level', 'unit', 'expiry_date', 'category', 'is_active'];
+
             for (const field of allowedFields) {
                 if (updateData[field] !== undefined) {
                     updates.push(`${field} = ?`);
@@ -219,8 +262,6 @@ const adminProductService = {
 
     /**
      * Delete product
-     * @param {number} productId - Product ID
-     * @returns {Promise<Object>} Result
      */
     async deleteProduct(productId) {
         try {
@@ -246,8 +287,6 @@ const adminProductService = {
 
     /**
      * Toggle product active/inactive status
-     * @param {number} productId - Product ID
-     * @returns {Promise<Object>} Result
      */
     async toggleStatus(productId) {
         try {
@@ -275,12 +314,11 @@ const adminProductService = {
 
     /**
      * Get product statistics
-     * @returns {Promise<Object>} Statistics
      */
     async getStatistics() {
         try {
             const query = `
-                SELECT 
+                SELECT
                     COUNT(*) as total_products,
                     SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_products,
                     SUM(CASE WHEN stock_quantity <= 0 THEN 1 ELSE 0 END) as out_of_stock,
@@ -300,13 +338,12 @@ const adminProductService = {
 
     /**
      * Get categories (distinct)
-     * @returns {Promise<Array>} Categories
      */
     async getCategories() {
         try {
             const query = `
-                SELECT DISTINCT category 
-                FROM products 
+                SELECT DISTINCT category
+                FROM products
                 WHERE category IS NOT NULL AND category != ''
                 ORDER BY category
             `;

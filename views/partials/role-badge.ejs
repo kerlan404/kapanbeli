@@ -1,0 +1,37 @@
+<!--
+  Role Badge Component - UNIFIED
+  Usage: <%- include('../partials/role-badge', { role: role }) %>
+  
+  Parameters:
+  - role: String - User role ('admin', 'user')
+  
+  Role values (database standard):
+  - admin → Administrator (biru)
+  - user → Pengguna (abu-abu)
+  
+  All role values are lowercase in database.
+  Display labels are in Indonesian.
+-->
+
+<%
+const roleValue = (typeof role !== 'undefined' && role) ? role.toLowerCase() : 'user';
+
+let badgeClass = 'badge-secondary';
+let badgeText = 'Pengguna';
+
+switch(roleValue) {
+    case 'admin':
+        badgeClass = 'badge-primary';
+        badgeText = 'Administrator';
+        break;
+    case 'user':
+        badgeClass = 'badge-secondary';
+        badgeText = 'Pengguna';
+        break;
+    default:
+        badgeClass = 'badge-secondary';
+        badgeText = 'Pengguna';
+}
+%>
+
+<span class="badge <%= badgeClass %>"><%= badgeText %></span>

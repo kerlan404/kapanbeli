@@ -207,14 +207,14 @@ const settingsController = {
                 });
             }
 
-            const { currentPassword, newPassword, confirmPassword } = req.body;
+            const { newPassword, confirmPassword } = req.body;
             const userId = req.session.user.id;
 
             // Validate input
-            if (!currentPassword || !newPassword || !confirmPassword) {
+            if (!newPassword || !confirmPassword) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Semua field password harus diisi'
+                    message: 'Password baru dan konfirmasi harus diisi'
                 });
             }
 
@@ -229,26 +229,6 @@ const settingsController = {
                 return res.status(400).json({
                     success: false,
                     message: 'Password baru harus minimal 6 karakter'
-                });
-            }
-
-            // Get user from database
-            const user = await User.findById(userId);
-
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'User not found'
-                });
-            }
-
-            // Verify current password
-            const isMatch = await bcrypt.compare(currentPassword, user.password);
-
-            if (!isMatch) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Password saat ini salah'
                 });
             }
 
@@ -285,7 +265,15 @@ const settingsController = {
             const { password } = req.body;
             const userId = req.session.user.id;
 
-            // Verify password
+            // Validate password
+            if (!password) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Password harus diisi'
+                });
+            }
+
+            // Get user from database to verify password
             const user = await User.findById(userId);
 
             if (!user) {
@@ -295,6 +283,7 @@ const settingsController = {
                 });
             }
 
+            // Verify password
             const isMatch = await bcrypt.compare(password, user.password);
 
             if (!isMatch) {
@@ -338,7 +327,7 @@ const settingsController = {
     async getUserData(req, res) {
         try {
             console.log('[getUserData] Request from user:', req.session.user);
-            
+
             if (!req.session.user) {
                 return res.status(401).json({
                     success: false,
@@ -348,8 +337,8 @@ const settingsController = {
 
             const userId = req.session.user.id;
 
-            // Get user info
-            const user = await User.findById(userId);
+            // Get user info with stats
+            const user = await User.findByIdWithDetails(userId);
             if (!user) {
                 return res.status(404).json({
                     success: false,
@@ -386,7 +375,8 @@ const settingsController = {
                         role: user.role,
                         account_status: user.account_status,
                         created_at: user.created_at,
-                        last_login: user.last_login
+                        last_login: user.last_login,
+                        total_logins: user.total_logins || user.login_count || 0
                     },
                     products,
                     suggestions,

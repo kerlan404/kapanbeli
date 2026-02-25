@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Aktivitas User - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' }
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .badge { @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1; }
+        .badge-login { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
+        .badge-logout { @apply bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400; }
+        .badge-register { @apply bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400; }
+        .badge-add-product { @apply bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400; }
+        .badge-delete-product { @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400; }
+        .badge-add-note { @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400; }
+        .badge-delete-note { @apply bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300; }
+        .badge-edit { @apply bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400; }
+        .badge-view { @apply bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400; }
+        .badge-export { @apply bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400; }
+        .badge-import { @apply bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400; }
+        .badge-ban { @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400; }
+        .badge-unban { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
+        .status-online { @apply relative; }
+        .status-online::before { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #1DD1A1; border-radius: 50%; border: 2px solid white; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center gap-4">
+                    <a href="/admin" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">
+                        <i class="fas fa-home text-xl"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Log Aktivitas User</h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Monitoring aktivitas dan status online user secara real-time</p>
+                    </div>
+                </div>
+                <button onclick="toggleTheme()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Statistics -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8" id="statsGrid">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total User</p><p id="statTotalUsers" class="text-3xl font-bold text-primary-600">0</p></div>
+                    <div class="w-14 h-14 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center"><i class="fas fa-users text-2xl text-primary-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Online</p><p id="statOnline" class="text-3xl font-bold text-green-600">0</p></div>
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"><i class="fas fa-signal text-2xl text-green-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Offline</p><p id="statOffline" class="text-3xl font-bold text-gray-600">0</p></div>
+                    <div class="w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"><i class="fas fa-user-times text-2xl text-gray-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Login Hari Ini</p><p id="statTodayLogins" class="text-3xl font-bold text-blue-600">0</p></div>
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center"><i class="fas fa-sign-in-alt text-2xl text-blue-600"></i></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Aktivitas</p><p id="statTotalActivity" class="text-3xl font-bold text-purple-600">0</p></div>
+                    <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center"><i class="fas fa-activity text-2xl text-purple-600"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-search text-primary-600 mr-1"></i> Cari</label>
+                    <input type="text" id="searchInput" placeholder="Nama user, email, atau aktivitas..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onkeyup="debounceSearch()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-activity text-primary-600 mr-1"></i> Tipe Aktivitas</label>
+                    <select id="activityTypeFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadActivityLogs()">
+                        <option value="">Semua Aktivitas</option>
+                        <option value="LOGIN">Login</option>
+                        <option value="LOGOUT">Logout</option>
+                        <option value="REGISTER">Registrasi</option>
+                        <option value="CREATE">Tambah Produk</option>
+                        <option value="DELETE">Hapus Produk</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="resetFilters()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"><i class="fas fa-redo"></i> Reset Filter</button>
+            </div>
+        </div>
+
+        <!-- User Status Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Status User Real-time</h3>
+                <button onclick="loadUserStatus()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Online Sejak</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Durasi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Terakhir Offline</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="userStatusTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Activity Logs Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Riwayat Aktivitas</h3>
+                <button onclick="loadActivityLogs()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div id="tableLoading" class="text-center py-12" style="display: none;"><i class="fas fa-circle-notch fa-spin text-4xl text-primary-600 mb-4"></i><p class="text-gray-500 dark:text-gray-400">Memuat data...</p></div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="activityTable">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipe</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Deskripsi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">IP</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="activityTableBody"></tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4" id="paginationContainer" style="display: none;">
+                <div class="text-sm text-gray-600 dark:text-gray-400">Menampilkan <span id="showingFrom" class="font-medium">0</span> - <span id="showingTo" class="font-medium">0</span> dari <span id="totalItems" class="font-medium">0</span> aktivitas</div>
+                <div class="flex gap-2" id="paginationButtons"></div>
+            </div>
+            <div id="emptyState" class="text-center py-12" style="display: none;"><i class="fas fa-history text-5xl text-gray-300 mb-4"></i><p class="text-gray-500 dark:text-gray-400">Belum ada aktivitas</p></div>
+        </div>
+    </main>
+
+    <div id="toastContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <script>
+        let currentPage = 1, currentLimit = 20, searchTimer = null, userStatusInterval = null;
+        let activityLogsData = [], activityLogsPagination = { page: 1, limit: 20, total: 0, totalPages: 0 };
+        
+        // Activity badge classes - SAME AS DASHBOARD
+        const activityBadgeClasses = {
+            'LOGIN': 'badge-login',
+            'LOGOUT': 'badge-logout',
+            'REGISTER': 'badge-register',
+            'CREATE': 'badge-add-product',
+            'UPDATE': 'badge-edit',
+            'DELETE': 'badge-delete-product',
+            'VIEW': 'badge-view',
+            'EXPORT': 'badge-export',
+            'IMPORT': 'badge-import',
+            'BAN': 'badge-ban',
+            'UNBAN': 'badge-unban'
+        };
+
+        // Format activity type - SAME AS DASHBOARD
+        function formatActivityType(type) {
+            const formats = {
+                'LOGIN': 'Login',
+                'LOGOUT': 'Logout',
+                'REGISTER': 'Registrasi',
+                'CREATE': 'Tambah',
+                'UPDATE': 'Update',
+                'DELETE': 'Hapus',
+                'VIEW': 'Lihat',
+                'EXPORT': 'Ekspor',
+                'IMPORT': 'Impor',
+                'BAN': 'Banned',
+                'UNBAN': 'Unbanned'
+            };
+            return formats[type] || type;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatistics();
+            loadUserStatus();
+            loadActivityLogs();
+            // Refresh user status setiap 30 detik
+            userStatusInterval = setInterval(loadUserStatus, 30000);
+        });
+
+        // Cleanup interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (userStatusInterval) clearInterval(userStatusInterval);
+        });
+
+        // Theme toggle
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
+
+        function debounceSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => { currentPage = 1; loadActivityLogs(); }, 500);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('activityTypeFilter').value = '';
+            currentPage = 1;
+            loadActivityLogs();
+            showToast('Filter berhasil direset', 'success');
+        }
+
+        async function loadStatistics() {
+            try {
+                const res = await fetch('/api/admin/activity/statistics', { credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById('statTotalUsers').textContent = result.data.totalUsers || 0;
+                    document.getElementById('statOnline').textContent = result.data.online || 0;
+                    document.getElementById('statOffline').textContent = result.data.offline || 0;
+                    document.getElementById('statTodayLogins').textContent = result.data.todayLogins || 0;
+                    document.getElementById('statTotalActivity').textContent = result.data.totalActivity || 0;
+                }
+            } catch (e) { console.error('Stats error:', e); }
+        }
+
+        async function loadUserStatus() {
+            try {
+                const res = await fetch('/api/admin/activity/user-status', { credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) {
+                    renderUserStatus(result.data);
+                    // Update stats
+                    document.getElementById('statOnline').textContent = result.data.filter(u => u.is_online).length;
+                    document.getElementById('statOffline').textContent = result.data.filter(u => !u.is_online).length;
+                }
+            } catch (e) { console.error('User status error:', e); }
+        }
+
+        function renderUserStatus(users) {
+            const tbody = document.getElementById('userStatusTableBody');
+            if (!users?.length) { tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Tidak ada data user</td></tr>'; return; }
+            tbody.innerHTML = users.map(u => {
+                const statusBadge = u.is_online 
+                    ? '<span class="badge status-online bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Online</span>' 
+                    : '<span class="badge bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">Offline</span>';
+                const onlineSince = u.last_login ? formatTimeAgo(new Date(u.last_login)) : '-';
+                const duration = u.is_online && u.last_login ? calculateDuration(new Date(u.last_login)) : '-';
+                const lastOffline = u.last_logout && !u.is_online ? formatTimeAgo(new Date(u.last_logout)) : '-';
+                const lastOfflineMinutes = u.last_logout && !u.is_online ? getMinutesAgo(new Date(u.last_logout)) : '-';
+                return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold">${u.name.charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div class="font-medium text-gray-900 dark:text-white">${u.name}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">${u.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${onlineSince}</td>
+                    <td class="px-6 py-4 text-sm ${u.is_online ? 'text-green-600 font-medium' : 'text-gray-500'}">${duration}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${lastOffline} <span class="text-xs text-gray-500">(${lastOfflineMinutes})</span></td>
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 font-mono">${u.last_ip || '-'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function loadActivityLogs() {
+            const search = document.getElementById('searchInput').value;
+            const activityType = document.getElementById('activityTypeFilter').value;
+            const range = '7days'; // Default range like dashboard
+            const page = currentPage;
+            const limit = currentLimit;
+
+            const params = new URLSearchParams({
+                range,
+                page,
+                limit,
+                ...(activityType && { activityType }),
+                ...(search && { search })
+            });
+
+            document.getElementById('tableLoading').style.display = 'block';
+            try {
+                const res = await fetch(`/api/activity-logs?${params}`, { credentials: 'same-origin' });
+                const result = await res.json();
+                if (result.success) {
+                    activityLogsData = result.data;
+                    activityLogsPagination = result.pagination;
+                    renderActivityLogs(result.data);
+                    renderPagination(result.pagination);
+                    updatePaginationInfo(result.pagination);
+                } else {
+                    showToast('Gagal: ' + result.message, 'error');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+            finally { document.getElementById('tableLoading').style.display = 'none'; }
+        }
+
+        function renderActivityLogs(logs) {
+            const tbody = document.getElementById('activityTableBody'), empty = document.getElementById('emptyState'), pag = document.getElementById('paginationContainer');
+            if (!logs?.length) { tbody.innerHTML = ''; empty.style.display = 'block'; pag.style.display = 'none'; return; }
+            empty.style.display = 'none'; pag.style.display = 'flex';
+            tbody.innerHTML = logs.map(log => {
+                const badgeClass = activityBadgeClasses[log.activity_type] || '';
+                const typeText = formatActivityType(log.activity_type);
+                const timestamp = new Date(log.created_at).toLocaleString('id-ID', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-500 dark:text-gray-400">#${log.id}</td>
+                    <td class="px-6 py-4">
+                        <div>
+                            <div class="font-medium text-gray-900 dark:text-white">${log.user_name || 'Unknown'}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">${log.user_email || ''}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="badge ${badgeClass}">${typeText}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-md truncate" title="${log.description}">
+                        ${log.description || '-'}
+                    </td>
+                    <td class="px-6 py-4 text-sm font-mono text-gray-500 dark:text-gray-400">
+                        ${log.ip_address || '-'}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        ${timestamp}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderPagination(pagination) {
+            const container = document.getElementById('paginationButtons');
+            if (!pagination || pagination.totalPages <= 1) { container.innerHTML = ''; return; }
+            
+            const { page, totalPages } = pagination;
+            let html = '';
+            
+            // Previous button
+            html += `<button ${page <= 1 ? 'disabled class="opacity-50 cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded"' : 'class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"'} onclick="goToPage(${page - 1})"><i class="fas fa-chevron-left"></i></button>`;
+            
+            // Page numbers
+            const maxVisible = 5;
+            const startPage = Math.max(1, page - Math.floor(maxVisible / 2));
+            const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button ${i === page ? 'class="px-3 py-2 bg-primary-600 text-white border border-primary-600 rounded"' : 'class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"'} onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            // Next button
+            html += `<button ${page >= totalPages ? 'disabled class="opacity-50 cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded"' : 'class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"'} onclick="goToPage(${page + 1})"><i class="fas fa-chevron-right"></i></button>`;
+            
+            container.innerHTML = html;
+        }
+
+        function updatePaginationInfo(pagination) {
+            const { page, limit, total } = pagination;
+            const from = (page - 1) * limit + 1;
+            const to = Math.min(page * limit, total);
+            
+            document.getElementById('showingFrom').textContent = total > 0 ? from : 0;
+            document.getElementById('showingTo').textContent = to;
+            document.getElementById('totalItems').textContent = total;
+        }
+
+        function goToPage(page) { currentPage = page; loadActivityLogs(); }
+
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Baru saja';
+            if (diffMins < 60) return `${diffMins} menit yang lalu`;
+            if (diffHours < 24) return `${diffHours} jam yang lalu`;
+            if (diffDays < 7) return `${diffDays} hari yang lalu`;
+            return date.toLocaleDateString('id-ID');
+        }
+
+        function calculateDuration(startDate) {
+            const now = new Date();
+            const diffMs = now - startDate;
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffMins = Math.floor((diffMs % 3600000) / 60000);
+            
+            if (diffHours > 0) {
+                return `${diffHours}j ${diffMins}m`;
+            }
+            return `${diffMins}m`;
+        }
+
+        function getMinutesAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return '< 1m';
+            if (diffMins < 60) return `${diffMins}m`;
+            const diffHours = Math.floor(diffMins / 60);
+            return `${diffHours}j`;
+        }
+
+        function showToast(message, type = 'info') {
+            const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            const toast = document.createElement('div');
+            toast.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg mb-2 flex items-center gap-2 animate-slide-in`;
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+
+    <style>
+        @keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-slide-in { animation: slide-in 0.3s ease-out; }
+    </style>
+</body>
+</html>

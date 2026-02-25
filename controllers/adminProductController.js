@@ -21,7 +21,7 @@ const adminProductController = {
 
     /**
      * GET /api/admin/products
-     * API endpoint untuk mendapatkan daftar produk
+     * API endpoint untuk mendapatkan daftar produk (ALL products from ALL users)
      */
     getProducts: errorHandler.asyncHandler(async (req, res) => {
         const { page, limit, search, category, stockStatus, sortBy, sortOrder } = req.query;
@@ -30,7 +30,7 @@ const adminProductController = {
         const pageNum = Math.max(1, parseInt(page) || 1);
         const limitNum = Math.max(1, Math.min(100, parseInt(limit) || 20));
 
-        // Get products
+        // Get ALL products from ALL users (admin only)
         const result = await adminProductService.getProducts({
             page: pageNum,
             limit: limitNum,

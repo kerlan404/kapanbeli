@@ -36,7 +36,7 @@ const productsController = {
         try {
             const userId = req.session.user?.id;
             // Handle both JSON and FormData requests
-            let { name, description, category_id, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+            let { name, description, category, category_id, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
 
             // Convert string values to appropriate types if they come from FormData
             stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) || 0 : (stock_quantity || 0);
@@ -68,9 +68,15 @@ const productsController = {
                 });
             }
 
+            // VALIDASI KATEGORI: Jika tidak ada, default ke "Lainnya"
+            let categoryToUse = category || category_id;
+            if (!categoryToUse || categoryToUse === '' || categoryToUse === null) {
+                categoryToUse = 'Lainnya';
+            }
+
             // Validasi category_id - konversi dari nama kategori ke ID
             let categoryIdToUse = null;
-            if (category_id) {
+            if (categoryToUse) {
                 // Mapping nama kategori ke ID (sesuai database categories)
                 const categoryToId = {
                     'Bumbu Dapur': 1,
@@ -80,24 +86,24 @@ const productsController = {
                     'Bahan Kering': 5,
                     'Lainnya': 6
                 };
-                
-                // Cek apakah category_id adalah nama kategori
-                let numericCategoryId = category_id;
-                if (typeof category_id === 'string') {
-                    // Jika string, coba convert dari nama ke ID
-                    numericCategoryId = categoryToId[category_id] || category_id;
+
+                // Cek apakah category adalah nama kategori
+                let numericCategoryId = categoryToUse;
+                if (typeof categoryToUse === 'string') {
+                    // Jika string, convert dari nama ke ID
+                    numericCategoryId = categoryToId[categoryToUse] || categoryToUse;
                 }
-                
+
                 // Cek apakah category_id valid (numeric ID)
                 const CategoryModel = require('../models/Category');
                 const categoryExists = await CategoryModel.getById(numericCategoryId);
                 if (categoryExists) {
                     categoryIdToUse = numericCategoryId;
-                    console.log('Category set to ID:', numericCategoryId, 'from:', category_id);
+                    console.log('Category set to ID:', numericCategoryId, 'from:', categoryToUse);
                 } else {
-                    // Jika kategori tidak ditemukan, gunakan null
-                    categoryIdToUse = null;
-                    console.log('Category not found, setting to null');
+                    // Jika kategori tidak ditemukan, gunakan ID "Lainnya" (6)
+                    categoryIdToUse = 6;
+                    console.log('Category not found, defaulting to Lainnya (ID: 6)');
                 }
             }
 
@@ -115,6 +121,10 @@ const productsController = {
                 expiry_date: expiry_date, // NULL untuk produk tanpa kadaluarsa
                 notes: notes || ''
             });
+
+            // Log to activity_logs
+            const activityLogsService = require('../services/activityLogsService');
+            await activityLogsService.log(userId, 'CREATE', `Menciptakan produk baru: "${name}"`, req.ip || 'unknown', req.get('user-agent') || 'unknown');
 
             res.status(201).json({
                 success: true,
@@ -180,7 +190,7 @@ const productsController = {
             const userId = req.session.user?.id;
             const productId = req.params.id;
             // Handle both JSON and FormData requests
-            let { name, description, category_id, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
+            let { name, description, category, category_id, stock_quantity, min_stock_level, image_url, unit, quantity, expiry_date, notes } = req.body;
 
             // Convert string values to appropriate types if they come from FormData
             stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) || 0 : (stock_quantity || 0);
@@ -222,9 +232,15 @@ const productsController = {
                 });
             }
 
+            // VALIDASI KATEGORI: Jika tidak ada, default ke "Lainnya"
+            let categoryToUse = category || category_id;
+            if (!categoryToUse || categoryToUse === '' || categoryToUse === null) {
+                categoryToUse = 'Lainnya';
+            }
+
             // Validasi category_id - konversi dari nama kategori ke ID
-            let categoryIdToUpdate = existingProduct.category_id; // Gunakan kategori lama sebagai default
-            if (category_id !== undefined && category_id !== null) { // Jika category_id disediakan
+            let categoryIdToUpdate = null;
+            if (categoryToUse) {
                 // Mapping nama kategori ke ID (sesuai database categories)
                 const categoryToId = {
                     'Bumbu Dapur': 1,
@@ -234,24 +250,24 @@ const productsController = {
                     'Bahan Kering': 5,
                     'Lainnya': 6
                 };
-                
-                // Cek apakah category_id adalah nama kategori
-                let numericCategoryId = category_id;
-                if (typeof category_id === 'string') {
-                    // Jika string, coba convert dari nama ke ID
-                    numericCategoryId = categoryToId[category_id] || category_id;
+
+                // Cek apakah category adalah nama kategori
+                let numericCategoryId = categoryToUse;
+                if (typeof categoryToUse === 'string') {
+                    // Jika string, convert dari nama ke ID
+                    numericCategoryId = categoryToId[categoryToUse] || categoryToUse;
                 }
-                
+
                 // Cek apakah category_id valid (numeric ID)
                 const CategoryModel = require('../models/Category');
                 const categoryExists = await CategoryModel.getById(numericCategoryId);
                 if (categoryExists) {
                     categoryIdToUpdate = numericCategoryId;
-                    console.log('Category updated to ID:', numericCategoryId, 'from:', category_id);
+                    console.log('Category updated to ID:', numericCategoryId, 'from:', categoryToUse);
                 } else {
-                    // Jika kategori tidak ditemukan, gunakan null
-                    categoryIdToUpdate = null;
-                    console.log('Category not found, setting to null');
+                    // Jika kategori tidak ditemukan, gunakan ID "Lainnya" (6)
+                    categoryIdToUpdate = 6;
+                    console.log('Category not found, defaulting to Lainnya (ID: 6)');
                 }
             }
 
@@ -273,6 +289,10 @@ const productsController = {
                 expiry_date: expiry_date, // NULL untuk produk tanpa kadaluarsa
                 notes: notes || existingProduct.notes
             });
+
+            // Log to activity_logs
+            const activityLogsService = require('../services/activityLogsService');
+            await activityLogsService.log(userId, 'UPDATE', `Mengupdate produk "${name}"`, req.ip || 'unknown', req.get('user-agent') || 'unknown');
 
             res.status(200).json({
                 success: true,
@@ -319,6 +339,10 @@ const productsController = {
             }
 
             await ProductModel.delete(productId, userId);
+
+            // Log to activity_logs
+            const activityLogsService = require('../services/activityLogsService');
+            await activityLogsService.log(userId, 'DELETE', `Menghapus produk "${existingProduct.name}"`, req.ip || 'unknown', req.get('user-agent') || 'unknown');
 
             res.status(200).json({
                 success: true,
