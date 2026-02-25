@@ -63,10 +63,11 @@ const Product = {
     getByIdAndUserId: async (productId, userId) => {
         try {
             const query = `
-                SELECT id, name, description, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at, unit, quantity, 
-                DATE_FORMAT(expiry_date, '%Y-%m-%d') as expiry_date, notes
-                FROM products
-                WHERE id = ? AND user_id = ?
+                SELECT p.id, p.name, p.description, p.category_id, c.name as category_name, p.stock_quantity, p.min_stock_level, p.image_url, p.user_id, p.created_at, p.updated_at, p.unit, p.quantity,
+                DATE_FORMAT(p.expiry_date, '%Y-%m-%d') as expiry_date, p.notes
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.id = ? AND p.user_id = ?
             `;
             const [rows] = await db.execute(query, [productId, userId]);
 
@@ -80,9 +81,10 @@ const Product = {
             if (error.code === 'ER_BAD_FIELD_ERROR') {
                 console.warn('Some columns may not exist in products table, querying with available fields');
                 const query = `
-                    SELECT id, name, category_id, stock_quantity, min_stock_level, image_url, user_id, created_at, updated_at
-                    FROM products
-                    WHERE id = ? AND user_id = ?
+                    SELECT p.id, p.name, p.category_id, c.name as category_name, p.stock_quantity, p.min_stock_level, p.image_url, p.user_id, p.created_at, p.updated_at
+                    FROM products p
+                    LEFT JOIN categories c ON p.category_id = c.id
+                    WHERE p.id = ? AND p.user_id = ?
                 `;
                 const [rows] = await db.execute(query, [productId, userId]);
 

@@ -332,6 +332,77 @@ const settingsController = {
                 message: 'Terjadi kesalahan saat menghapus akun'
             });
         }
+    },
+
+    // Get current user's data (products, suggestions, notes)
+    async getUserData(req, res) {
+        try {
+            console.log('[getUserData] Request from user:', req.session.user);
+            
+            if (!req.session.user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Unauthorized'
+                });
+            }
+
+            const userId = req.session.user.id;
+
+            // Get user info
+            const user = await User.findById(userId);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
+
+            // Get user's products, suggestions, and notes
+            const db = require('../config/database');
+
+            const [products] = await db.execute(
+                'SELECT * FROM products WHERE user_id = ? ORDER BY created_at DESC',
+                [userId]
+            );
+
+            const [suggestions] = await db.execute(
+                'SELECT * FROM suggestions WHERE user_id = ? ORDER BY created_at DESC',
+                [userId]
+            );
+
+            const [notes] = await db.execute(
+                'SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC',
+                [userId]
+            );
+
+            const responseData = {
+                success: true,
+                data: {
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        profile_photo: user.profile_photo || null,
+                        role: user.role,
+                        account_status: user.account_status,
+                        created_at: user.created_at,
+                        last_login: user.last_login
+                    },
+                    products,
+                    suggestions,
+                    notes
+                }
+            };
+
+            console.log('[getUserData] Response:', responseData);
+            res.json(responseData);
+        } catch (error) {
+            console.error('[getUserData] Error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat mengambil data user'
+            });
+        }
     }
 };
 

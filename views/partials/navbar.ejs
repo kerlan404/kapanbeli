@@ -22,9 +22,11 @@
                     <a href="/register" class="btn-primary" style="padding: 8px 20px; background: var(--primary-orange); color: white; border-radius: 8px; font-weight: 500;">Daftar</a>
                 </div>
                 <!-- Authenticated: Show Profile & Logout -->
-                <img id="navProfilePhoto" src="" alt="Profile" style="display:none; width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); margin-right: 10px;" />
-                <a href="/profile" class="btn-text" id="profileLink" style="display:none; margin-right: 15px;" title="Profil">
-                    <i class="fas fa-user-circle"></i>
+                <a href="/user-profile" id="profilePhotoLink" style="display:none; text-decoration: none;">
+                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); margin-right: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 0 10px rgba(255, 165, 0, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'" />
+                </a>
+                <a href="/user-profile" class="btn-text" id="profileLink" style="display:none; margin-right: 15px; text-decoration: none;" title="Profil">
+                    <i class="fas fa-user-circle" style="font-size: 28px; color: var(--primary-orange); cursor: pointer; transition: transform 0.2s, color 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.color='#FF8C00'" onmouseout="this.style.transform='scale(1)'; this.style.color='var(--primary-orange)'"></i>
                 </a>
                 <a href="/auth/logout" class="btn-text" id="logoutLink" style="display:none; color: var(--accent-red);">Keluar</a>
             </div>
@@ -40,27 +42,35 @@
     // Check authentication status and update navbar
     async function checkAuthStatus() {
         try {
-            const response = await fetch('/auth/status');
+            const response = await fetch('/auth/status', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
             const data = await response.json();
 
             const unauthButtons = document.getElementById('unauthButtons');
             const logoutLink = document.getElementById('logoutLink');
             const profileLink = document.getElementById('profileLink');
+            const profilePhotoLink = document.getElementById('profilePhotoLink');
             const navProfilePhoto = document.getElementById('navProfilePhoto');
 
             if (data.authenticated) {
                 // User is logged in
                 unauthButtons.style.display = 'none';
                 logoutLink.style.display = 'inline';
-                profileLink.style.display = 'inline';
                 
                 // Show profile photo if exists
                 if (data.user.profile_photo) {
                     navProfilePhoto.src = data.user.profile_photo;
                     navProfilePhoto.style.display = 'inline-block';
-                    profileLink.style.display = 'none'; // Hide icon when photo exists
+                    profilePhotoLink.style.display = 'inline-block';
+                    profileLink.style.display = 'none';
                 } else {
                     navProfilePhoto.style.display = 'none';
+                    profilePhotoLink.style.display = 'inline-block';
                     profileLink.style.display = 'inline';
                 }
             } else {
@@ -68,6 +78,7 @@
                 unauthButtons.style.display = 'inline-block';
                 logoutLink.style.display = 'none';
                 profileLink.style.display = 'none';
+                profilePhotoLink.style.display = 'none';
                 navProfilePhoto.style.display = 'none';
             }
         } catch (error) {
@@ -76,14 +87,24 @@
     }
 
     // Check auth when page loads
-    document.addEventListener('DOMContentLoaded', checkAuthStatus);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAuthStatus);
+    } else {
+        checkAuthStatus();
+    }
 
     // Function to check auth before accessing protected pages
     function checkAuth(event) {
         event.preventDefault();
         const targetUrl = event.currentTarget.href;
 
-        fetch('/auth/status')
+        fetch('/auth/status', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(res => res.json())
             .then(data => {
                 if (data.authenticated) {

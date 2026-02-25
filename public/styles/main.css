@@ -1130,3 +1130,44 @@ body {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* Profile Photo in Navbar */
+#profilePhotoLink {
+    display: inline-block;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+#navProfilePhoto {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: inline-block;
+}
+
+#navProfilePhoto:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(255, 165, 0, 0.6);
+}
+
+#profileLink {
+    display: inline-block;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+#profileLink i {
+    transition: transform 0.2s ease, color 0.2s ease;
+    display: inline-block;
+}
+
+#profileLink:hover i {
+    transform: scale(1.15);
+    color: #FF8C00 !important;
+}
+
+/* Nav actions container */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
