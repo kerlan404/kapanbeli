@@ -25,22 +25,12 @@
                     },
                     colors: {
                         primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a'
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+                            400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+                            800: '#1e40af', 900: '#1e3a8a', 950: '#172554'
                         },
                         accent: {
-                            orange: '#FF9F43',
-                            green: '#1DD1A1',
-                            red: '#FF6B6B',
-                            yellow: '#FECA57'
+                            orange: '#FF9F43', green: '#1DD1A1', red: '#FF6B6B', yellow: '#FECA57'
                         }
                     }
                 }
@@ -52,14 +42,13 @@
         body { font-family: 'Inter', sans-serif; }
         .font-display { font-family: 'Poppins', sans-serif; }
         
+        /* Badge Styles */
         .badge { @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-all; }
         .badge-active { @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md shadow-green-500/30; }
         .badge-inactive { @apply bg-gradient-to-r from-gray-500 to-slate-500 text-white shadow-md shadow-gray-500/30; }
         .badge-suspended { @apply bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md shadow-red-500/30; }
         .badge-admin { @apply bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-md shadow-purple-500/30; }
         .badge-user { @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/30; }
-
-        /* Activity Badge Colors */
         .badge-success { @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md shadow-green-500/30; }
         .badge-secondary { @apply bg-gradient-to-r from-gray-500 to-slate-500 text-white shadow-md shadow-gray-500/30; }
         .badge-info { @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/30; }
@@ -70,26 +59,29 @@
         /* Card Hover Effects */
         .stat-card { @apply relative overflow-hidden; }
         .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s;
+            opacity: 0; transition: opacity 0.3s;
         }
         .stat-card:hover::before { opacity: 1; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* Table Row Animation */
+        .table-row-enter { animation: rowEnter 0.3s ease-out; }
+        @keyframes rowEnter {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-black min-h-screen">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
     <% if (!user) { %>
         <!-- User Not Found -->
         <div class="min-h-screen flex items-center justify-center">
@@ -97,8 +89,8 @@
                 <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-500 to-rose-500 rounded-full flex items-center justify-center shadow-2xl shadow-red-500/40">
                     <i class="fas fa-user-times text-5xl text-white"></i>
                 </div>
-                <h1 class="text-3xl font-bold font-display text-white mb-3">User Tidak Ditemukan</h1>
-                <p class="text-gray-400 mb-8 max-w-md">Data user yang Anda cari tidak tersedia atau telah dihapus.</p>
+                <h1 class="text-3xl font-bold font-display text-gray-900 mb-3">User Tidak Ditemukan</h1>
+                <p class="text-gray-600 mb-8 max-w-md">Data user yang Anda cari tidak tersedia atau telah dihapus.</p>
                 <a href="/admin/users" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl hover:from-primary-700 hover:to-primary-600 transition-all shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-1 font-semibold">
                     <i class="fas fa-arrow-left"></i>
                     Kembali ke Daftar User
@@ -107,26 +99,26 @@
         </div>
     <% } else { %>
         <!-- Header -->
-        <header class="bg-gray-900/80 backdrop-blur-xl shadow-xl border-b border-gray-800 sticky top-0 z-50">
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-5">
+                <div class="flex justify-between items-center py-4">
                     <div class="flex items-center gap-4">
-                        <a href="/admin/users" class="group inline-flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300">
+                        <a href="/admin/users" class="group inline-flex items-center gap-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-all duration-300">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary-500/30">
                                 <i class="fas fa-arrow-left text-white"></i>
                             </div>
                         </a>
                         <div>
-                            <h1 class="text-2xl font-bold font-display text-white flex items-center gap-3">
+                            <h1 class="text-2xl font-bold font-display text-gray-900 dark:text-white flex items-center gap-3">
                                 <i class="fas fa-user-circle text-primary-500"></i>
                                 <%= pageTitle %>
                             </h1>
-                            <p class="text-sm text-gray-400 mt-0.5">Detail lengkap profil dan aktivitas user</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Detail lengkap profil dan aktivitas user</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <a href="/admin/users"
-                           class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-700 text-gray-300 rounded-xl hover:bg-gray-800 hover:border-gray-600 transition-all duration-300 hover:-translate-y-0.5 font-medium">
+                           class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 hover:-translate-y-0.5 font-medium">
                             <i class="fas fa-users"></i>
                             <span class="hidden sm:inline">Daftar User</span>
                         </a>
@@ -137,39 +129,49 @@
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- User Info Card -->
-            <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200 dark:border-gray-700">
+                <!-- Cover Background -->
+                <div class="h-48 bg-gradient-to-r from-primary-600 via-primary-500 to-accent-orange relative">
+                    <div class="absolute inset-0 bg-black/10"></div>
+                </div>
+                
                 <div class="p-6">
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                         <!-- Profile Photo -->
-                        <div class="flex-shrink-0">
+                        <div class="flex-shrink-0 relative">
                             <%
-                                // Get profile image - use uploaded image or generate avatar
                                 var profileImage = user.profile_image;
                                 if (!profileImage || profileImage === 'null') {
-                                    // Generate avatar from name
                                     profileImage = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=3b82f6&color=fff&size=200';
                                 } else if (!profileImage.startsWith('http')) {
-                                    // Local image path - make sure it's relative to public folder
                                     profileImage = profileImage.startsWith('/uploads/') ? profileImage : '/uploads/' + profileImage;
                                 }
                             %>
-                            <img src="<%= profileImage %>"
-                                 alt="<%= user.name %>"
-                                 class="w-32 h-32 rounded-full object-cover border-4 border-primary-600 shadow-lg"
-                                 onerror="this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.name) %>&background=3b82f6&color=fff&size=200'">
+                            <div class="relative">
+                                <img src="<%= profileImage %>"
+                                     alt="<%= user.name %>"
+                                     class="w-40 h-40 rounded-2xl object-cover border-4 border-white dark:border-gray-800 shadow-2xl -mt-24"
+                                     onerror="this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.name) %>&background=3b82f6&color=fff&size=200'">
+                                <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-gradient-to-br from-<%= user.role === 'admin' ? 'purple-500 to-violet-500' : 'blue-500 to-cyan-500' %> flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-<%= user.role === 'admin' ? 'crown' : 'user' %> text-white text-sm"></i>
+                                </div>
+                            </div>
                         </div>
-                        
+
                         <!-- User Info -->
-                        <div class="flex-1 text-center sm:text-left">
+                        <div class="flex-1 text-center sm:text-left mt-2">
                             <div class="mb-4">
-                                <h2 class="text-3xl font-bold text-white mb-2"><%= user.name %></h2>
-                                <p class="text-gray-400 text-lg"><i class="fas fa-envelope mr-2"></i><%= user.email %></p>
+                                <h2 class="text-3xl font-bold font-display text-gray-900 dark:text-white mb-2"><%= user.name %></h2>
+                                <p class="text-gray-700 dark:text-gray-300 text-base flex items-center justify-center sm:justify-start gap-2 font-medium">
+                                    <i class="fas fa-envelope text-primary-500"></i>
+                                    <%= user.email %>
+                                </p>
                             </div>
 
                             <div class="flex flex-wrap justify-center sm:justify-start gap-3 mb-4">
                                 <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-user' %>">
                                     <i class="fas fa-<%= user.role === 'admin' ? 'crown' : 'user' %>"></i>
-                                    <%= user.role %>
+                                    <%= user.role === 'admin' ? 'Administrator' : 'User' %>
                                 </span>
                                 <span class="badge <%= user.account_status === 'active' ? 'badge-active' : user.account_status === 'suspended' ? 'badge-suspended' : 'badge-inactive' %>">
                                     <i class="fas fa-<%= user.account_status === 'active' ? 'check-circle' : user.account_status === 'suspended' ? 'exclamation-circle' : 'times-circle' %>"></i>
@@ -177,14 +179,14 @@
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-400">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-calendar text-primary-600"></i>
-                                    <span>Bergabung: <strong><%= new Date(user.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></strong></span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                <div class="flex items-center justify-center sm:justify-start gap-2 text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-calendar text-primary-500"></i>
+                                    <span>Bergabung: <strong class="text-gray-900 dark:text-gray-200"><%= new Date(user.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></strong></span>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-sign-in-alt text-primary-600"></i>
-                                    <span>Last Login: <strong><%= user.last_login ? new Date(user.last_login).toLocaleString('id-ID') : 'Belum pernah' %></strong></span>
+                                <div class="flex items-center justify-center sm:justify-start gap-2 text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-sign-in-alt text-primary-500"></i>
+                                    <span>Last Login: <strong class="text-gray-900 dark:text-gray-200"><%= user.last_login ? new Date(user.last_login).toLocaleString('id-ID') : 'Belum pernah' %></strong></span>
                                 </div>
                             </div>
                         </div>
@@ -195,71 +197,71 @@
             <!-- Statistics Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Total Login -->
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+                <div class="stat-card bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500 mb-1">Total Login</p>
-                            <p class="text-3xl font-bold text-primary-600"><%= user.total_logins || 0 %></p>
+                            <p class="text-sm text-blue-100 mb-2 font-medium">Total Login</p>
+                            <p class="text-4xl font-bold font-display text-white"><%= user.total_logins || 0 %></p>
                         </div>
-                        <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-sign-in-alt text-2xl text-primary-600"></i>
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-sign-in-alt text-2xl text-white"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Products -->
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+                <div class="stat-card bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500 mb-1">Total Bahan</p>
-                            <p class="text-3xl font-bold text-orange-600"><%= user.total_products || 0 %></p>
+                            <p class="text-sm text-orange-100 mb-2 font-medium">Total Bahan</p>
+                            <p class="text-4xl font-bold font-display text-white"><%= user.total_products || 0 %></p>
                         </div>
-                        <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-box text-2xl text-orange-600"></i>
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-box text-2xl text-white"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Notes -->
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+                <div class="stat-card bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500 mb-1">Total Catatan</p>
-                            <p class="text-3xl font-bold text-green-600"><%= user.total_notes || 0 %></p>
+                            <p class="text-sm text-green-100 mb-2 font-medium">Total Catatan</p>
+                            <p class="text-4xl font-bold font-display text-white"><%= user.total_notes || 0 %></p>
                         </div>
-                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-sticky-note text-2xl text-green-600"></i>
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-sticky-note text-2xl text-white"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Suggestions -->
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+                <div class="stat-card bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500 mb-1">Total Saran</p>
-                            <p class="text-3xl font-bold text-purple-600"><%= user.total_suggestions || 0 %></p>
+                            <p class="text-sm text-purple-100 mb-2 font-medium">Total Saran</p>
+                            <p class="text-4xl font-bold font-display text-white"><%= user.total_suggestions || 0 %></p>
                         </div>
-                        <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-clipboard-list text-2xl text-purple-600"></i>
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-clipboard-list text-2xl text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Activity Logs -->
-            <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
-                <div class="px-6 py-5 border-b border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <h3 class="text-lg font-bold font-display text-gray-900 dark:text-white flex items-center gap-2">
                             <i class="fas fa-history text-primary-500"></i>
                             Log Aktivitas User
                         </h3>
-                        <p class="text-sm text-gray-400 mt-1">10 aktivitas terakhir</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Riwayat aktivitas user</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <!-- Filter Dropdown -->
-                        <select id="activityFilter" class="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block px-4 py-2.5 hover:bg-gray-750 transition cursor-pointer">
+                        <select id="activityFilter" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-600 transition cursor-pointer">
                             <option value="all">Semua Aktivitas</option>
                             <option value="login">Login</option>
                             <option value="logout">Logout</option>
@@ -269,7 +271,7 @@
                             <option value="delete">Delete</option>
                         </select>
                         <!-- Refresh Button -->
-                        <button onclick="refreshActivityLogs()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg hover:from-primary-700 hover:to-primary-600 transition-all shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5">
+                        <button onclick="refreshActivityLogs()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl hover:from-primary-700 hover:to-primary-600 transition-all shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5">
                             <i class="fas fa-sync-alt"></i>
                             <span class="font-medium">Refresh</span>
                         </button>
@@ -277,17 +279,26 @@
                 </div>
                 <div class="overflow-x-auto">
                     <% if (activityLogs && activityLogs.length > 0) { %>
-                        <table class="min-w-full divide-y divide-gray-800">
-                            <thead class="bg-gray-800">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Tanggal & Waktu</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Aktivitas</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Deskripsi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">IP Address</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tanggal & Waktu</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Aktivitas</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">IP Address</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-gray-900 divide-y divide-gray-800">
-                                <% activityLogs.forEach(log => { 
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800" id="activityLogsBody">
+                                <% 
+                                // Pagination for Activity Logs - Show 20 per page
+                                const activityPerPage = 20;
+                                const totalActivityPages = Math.ceil(activityLogs.length / activityPerPage);
+                                const activityPage = 1; // Default to first page
+                                const activityStart = (activityPage - 1) * activityPerPage;
+                                const activityEnd = Math.min(activityStart + activityPerPage, activityLogs.length);
+                                const activityLogsPaginated = activityLogs.slice(activityStart, activityEnd);
+                                
+                                activityLogsPaginated.forEach(log => {
                                     const activityType = (log.activity_type || '').toLowerCase();
                                     let badgeClass = 'badge-secondary';
                                     if (activityType === 'login') badgeClass = 'badge-success';
@@ -298,29 +309,78 @@
                                     else if (activityType === 'delete') badgeClass = 'badge-danger';
                                     else if (activityType === 'error') badgeClass = 'badge-danger';
                                 %>
-                                    <tr class="hover:bg-gray-800 transition">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                            <%= new Date(log.created_at).toLocaleString('id-ID') %>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition table-row-enter">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                            <div class="flex items-center gap-2">
+                                                <i class="far fa-clock text-gray-400"></i>
+                                                <%= new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="badge <%= badgeClass %>">
+                                                <i class="fas <%= activityType === 'login' ? 'fa-sign-in-alt' : activityType === 'logout' ? 'fa-sign-out-alt' : activityType === 'view' ? 'fa-eye' : activityType === 'create' ? 'fa-plus-circle' : activityType === 'update' ? 'fa-edit' : activityType === 'delete' ? 'fa-trash' : 'fa-exclamation-circle' %>"></i>
                                                 <%= log.activity_type %>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-300 max-w-md truncate">
+                                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-md truncate">
                                             <%= log.description %>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
-                                            <%= log.ip_address || '-' %>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-globe text-gray-400"></i>
+                                                <%= log.ip_address || '-' %>
+                                            </div>
                                         </td>
                                     </tr>
                                 <% }) %>
                             </tbody>
                         </table>
+                        
+                        <!-- Pagination Controls -->
+                        <% if (totalActivityPages > 1) { %>
+                            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600">
+                                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                                        Menampilkan <span class="font-semibold text-gray-900 dark:text-white"><%= activityStart + 1 %></span> - 
+                                        <span class="font-semibold text-gray-900 dark:text-white"><%= activityEnd %></span> dari 
+                                        <span class="font-semibold text-primary-600 dark:text-primary-400"><%= activityLogs.length %></span> aktivitas
+                                    </div>
+                                    <div class="flex items-center gap-2" id="activityPagination">
+                                        <button onclick="changeActivityPage(1)" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed" <%= activityPage === 1 ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </button>
+                                        <button onclick="changeActivityPage(<%= activityPage - 1 %>)" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed" <%= activityPage === 1 ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-left"></i>
+                                        </button>
+                                        
+                                        <% 
+                                        // Show page numbers
+                                        let startPage = Math.max(1, activityPage - 2);
+                                        let endPage = Math.min(totalActivityPages, activityPage + 2);
+                                        for (let i = startPage; i <= endPage; i++) { 
+                                        %>
+                                            <button onclick="changeActivityPage(<%= i %>)" class="px-4 py-2 <%= i === activityPage ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-500/30' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' %> rounded-lg transition font-medium">
+                                                <%= i %>
+                                            </button>
+                                        <% } %>
+                                        
+                                        <button onclick="changeActivityPage(<%= activityPage + 1 %>)" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed" <%= activityPage === totalActivityPages ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-right"></i>
+                                        </button>
+                                        <button onclick="changeActivityPage(<%= totalActivityPages %>)" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed" <%= activityPage === totalActivityPages ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
                     <% } else { %>
-                        <div class="text-center py-12">
-                            <i class="fas fa-inbox text-5xl text-gray-600 mb-4"></i>
-                            <p class="text-gray-500">Belum ada aktivitas user</p>
+                        <div class="text-center py-16">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-inbox text-4xl text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada aktivitas user</p>
+                            <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Aktivitas login dan aktivitas lainnya akan muncul di sini</p>
                         </div>
                     <% } %>
                 </div>
@@ -328,43 +388,114 @@
 
             <!-- Products Section -->
             <% if (products && products.length > 0) { %>
-                <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
-                    <div class="px-6 py-4 border-b border-gray-800">
-                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <div class="bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden mb-8 border border-gray-800">
+                    <div class="px-6 py-5 border-b border-gray-800">
+                        <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
                             <i class="fas fa-box text-orange-500"></i>
                             Bahan/User (<%= products.length %>)
                         </h3>
+                        <p class="text-sm text-gray-400 mt-1">Semua produk yang dimiliki user</p>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-gray-800">
+                            <thead class="bg-gradient-to-r from-gray-800 to-gray-700">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Bahan</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stok</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Min. Stok</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kadaluarsa</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dibuat</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Nama Bahan</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Stok</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Min. Stok</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Kadaluarsa</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Dibuat</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <% products.forEach(product => { %>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900"><%= product.name %></td>
-                                        <td class="px-6 py-4 text-sm text-gray-700">
-                                            <%= product.stock_quantity %> <%= product.unit || '' %>
-                                            <% if (product.stock_quantity <= 5) { %>
-                                                <span class="badge bg-red-100 text-red-700 ml-2">Rendah</span>
-                                            <% } %>
+                            <tbody class="divide-y divide-gray-800 bg-gray-900">
+                                <% 
+                                // Pagination for Products - Show 20 per page
+                                const productsPerPage = 20;
+                                const totalProductPages = Math.ceil(products.length / productsPerPage);
+                                const productPage = 1;
+                                const productStart = (productPage - 1) * productsPerPage;
+                                const productEnd = Math.min(productStart + productsPerPage, products.length);
+                                const productsPaginated = products.slice(productStart, productEnd);
+                                
+                                productsPaginated.forEach(product => { 
+                                %>
+                                    <tr class="hover:bg-gray-800/50 transition table-row-enter">
+                                        <td class="px-6 py-4 text-sm font-medium text-white">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas fa-box text-white text-sm"></i>
+                                                </div>
+                                                <%= product.name %>
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-700"><%= product.min_stock_level || 0 %> <%= product.unit || '' %></td>
-                                        <td class="px-6 py-4 text-sm text-gray-700">
-                                            <%= product.expiry_date ? new Date(product.expiry_date).toLocaleDateString('id-ID') : '-' %>
+                                        <td class="px-6 py-4 text-sm text-gray-300">
+                                            <div class="flex items-center gap-2">
+                                                <%= product.stock_quantity %> <%= product.unit || '' %>
+                                                <% if (product.stock_quantity <= 5) { %>
+                                                    <span class="badge badge-danger">
+                                                        <i class="fas fa-exclamation-triangle"></i> Rendah
+                                                    </span>
+                                                <% } else if (product.stock_quantity <= 0) { %>
+                                                    <span class="badge badge-secondary">
+                                                        <i class="fas fa-times-circle"></i> Habis
+                                                    </span>
+                                                <% } %>
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500"><%= new Date(product.created_at).toLocaleDateString('id-ID') %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-300"><%= product.min_stock_level || 0 %> <%= product.unit || '' %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-300">
+                                            <% if (product.expiry_date) { 
+                                                const expiryDate = new Date(product.expiry_date);
+                                                const today = new Date();
+                                                const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                                                if (diffDays < 0) { %>
+                                                    <span class="badge badge-danger">
+                                                        <i class="fas fa-skull-crossbones"></i> <%= expiryDate.toLocaleDateString('id-ID', { dateStyle: 'medium' }) %>
+                                                    </span>
+                                                <% } else if (diffDays <= 7) { %>
+                                                    <span class="badge badge-warning">
+                                                        <i class="fas fa-hourglass-half"></i> <%= diffDays %> hari lagi
+                                                    </span>
+                                                <% } else { %>
+                                                    <%= expiryDate.toLocaleDateString('id-ID', { dateStyle: 'medium' }) %>
+                                                <% } } else { %> - <% } %>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-400"><%= new Date(product.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' }) %></td>
                                     </tr>
                                 <% }) %>
                             </tbody>
                         </table>
+                        
+                        <% if (totalProductPages > 1) { %>
+                            <div class="px-6 py-4 border-t border-gray-800 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+                                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div class="text-sm text-gray-400">
+                                        Menampilkan <span class="font-semibold text-white"><%= productStart + 1 %></span> - 
+                                        <span class="font-semibold text-white"><%= productEnd %></span> dari 
+                                        <span class="font-semibold text-primary-400"><%= products.length %></span> produk
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="changeProductPage(1)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= productPage === 1 ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </button>
+                                        <button onclick="changeProductPage(<%= productPage - 1 %>)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= productPage === 1 ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-left"></i>
+                                        </button>
+                                        <% for (let i = 1; i <= totalProductPages; i++) { %>
+                                            <button onclick="changeProductPage(<%= i %>)" class="px-4 py-2 <%= i === productPage ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-500/30' : 'bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700' %> rounded-lg transition font-medium">
+                                                <%= i %>
+                                            </button>
+                                        <% } %>
+                                        <button onclick="changeProductPage(<%= productPage + 1 %>)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= productPage === totalProductPages ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-right"></i>
+                                        </button>
+                                        <button onclick="changeProductPage(<%= totalProductPages %>)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= productPage === totalProductPages ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             <% } %>
@@ -411,34 +542,91 @@
 
             <!-- Notes Section -->
             <% if (notes && notes.length > 0) { %>
-                <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <i class="fas fa-sticky-note text-green-600"></i>
+                <div class="bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden mb-8 border border-gray-800">
+                    <div class="px-6 py-5 border-b border-gray-800">
+                        <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
+                            <i class="fas fa-sticky-note text-green-500"></i>
                             Catatan (<%= notes.length %>)
                         </h3>
+                        <p class="text-sm text-gray-400 mt-1">Semua catatan yang dibuat user</p>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-gray-800">
+                            <thead class="bg-gradient-to-r from-gray-800 to-gray-700">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Judul</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Isi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dibuat</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Judul</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Isi</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Dibuat</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <% notes.forEach(n => { %>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900"><%= n.title %></td>
-                                        <td class="px-6 py-4 text-sm text-gray-700 max-w-md truncate">
-                                            <%= n.content ? n.content.substring(0, 80) + (n.content.length > 80 ? '...' : '') : '-' %>
+                            <tbody class="divide-y divide-gray-800 bg-gray-900">
+                                <% 
+                                // Pagination for Notes - Show 20 per page
+                                const notesPerPage = 20;
+                                const totalNotePages = Math.ceil(notes.length / notesPerPage);
+                                const notePage = 1;
+                                const noteStart = (notePage - 1) * notesPerPage;
+                                const noteEnd = Math.min(noteStart + notesPerPage, notes.length);
+                                const notesPaginated = notes.slice(noteStart, noteEnd);
+                                
+                                notesPaginated.forEach(n => { 
+                                %>
+                                    <tr class="hover:bg-gray-800/50 transition table-row-enter">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas fa-sticky-note text-white text-sm"></i>
+                                                </div>
+                                                <span class="text-sm font-medium text-white"><%= n.title || 'Tanpa Judul' %></span>
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500"><%= new Date(n.created_at).toLocaleDateString('id-ID') %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-300 max-w-md">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-align-left text-gray-600"></i>
+                                                <%= n.content ? n.content.substring(0, 100) + (n.content.length > 100 ? '...' : '') : '-' %>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-400">
+                                            <div class="flex items-center gap-2">
+                                                <i class="far fa-calendar text-gray-600"></i>
+                                                <%= new Date(n.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                                            </div>
+                                        </td>
                                     </tr>
                                 <% }) %>
                             </tbody>
                         </table>
+                        
+                        <% if (totalNotePages > 1) { %>
+                            <div class="px-6 py-4 border-t border-gray-800 bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+                                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div class="text-sm text-gray-400">
+                                        Menampilkan <span class="font-semibold text-white"><%= noteStart + 1 %></span> - 
+                                        <span class="font-semibold text-white"><%= noteEnd %></span> dari 
+                                        <span class="font-semibold text-primary-400"><%= notes.length %></span> catatan
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="changeNotePage(1)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= notePage === 1 ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </button>
+                                        <button onclick="changeNotePage(<%= notePage - 1 %>)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= notePage === 1 ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-left"></i>
+                                        </button>
+                                        <% for (let i = 1; i <= totalNotePages; i++) { %>
+                                            <button onclick="changeNotePage(<%= i %>)" class="px-4 py-2 <%= i === notePage ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-500/30' : 'bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700' %> rounded-lg transition font-medium">
+                                                <%= i %>
+                                            </button>
+                                        <% } %>
+                                        <button onclick="changeNotePage(<%= notePage + 1 %>)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= notePage === totalNotePages ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-right"></i>
+                                        </button>
+                                        <button onclick="changeNotePage(<%= totalNotePages %>)" class="px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 transition disabled:opacity-50" <%= notePage === totalNotePages ? 'disabled' : '' %>>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             <% } %>
@@ -447,6 +635,11 @@
 
     <% if (user) { %>
     <script>
+        // Current pages
+        let currentActivityPage = 1;
+        let currentProductPage = 1;
+        let currentNotePage = 1;
+        
         // Refresh activity logs
         function refreshActivityLogs() {
             const btn = event.currentTarget;
@@ -462,10 +655,31 @@
             }, 500);
         }
 
+        // Change Activity Page
+        function changeActivityPage(page) {
+            currentActivityPage = page;
+            // In a real implementation, you would fetch new data from server
+            // For now, this is a placeholder for future implementation
+            console.log('Changing activity page to:', page);
+            // You would need to implement server-side pagination or load all data and filter client-side
+        }
+        
+        // Change Product Page
+        function changeProductPage(page) {
+            currentProductPage = page;
+            console.log('Changing product page to:', page);
+        }
+        
+        // Change Note Page
+        function changeNotePage(page) {
+            currentNotePage = page;
+            console.log('Changing note page to:', page);
+        }
+
         // Filter activity logs
         document.getElementById('activityFilter')?.addEventListener('change', function() {
             const filterValue = this.value;
-            const rows = document.querySelectorAll('tbody tr');
+            const rows = document.querySelectorAll('#activityLogsBody tr');
             
             rows.forEach(row => {
                 const activityCell = row.querySelector('td:nth-child(2)');
