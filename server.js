@@ -352,10 +352,32 @@ app.get('/admin/activity-logs', isAuthenticated, (req, res) => {
     }
 });
 
-app.get('/admin/user/:id', isAuthenticated, (req, res) => {
+app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
     // Check if user is admin
     if (req.session.user && req.session.user.role === 'admin') {
-        res.render('admin-user-profile', { currentPage: 'admin' });
+        try {
+            const userId = req.params.id;
+            
+            // Fetch user data
+            const User = require('./models/User');
+            const user = await User.findByIdWithDetails(userId);
+            
+            if (!user) {
+                return res.status(404).send('User not found');
+            }
+            
+            // Fetch activity logs
+            const activityLogs = await User.getLoginLogs(userId, 10);
+            
+            res.render('admin-user-profile', { 
+                currentPage: 'admin',
+                user: user,
+                activityLogs: activityLogs
+            });
+        } catch (error) {
+            console.error('Error loading user profile:', error);
+            res.status(500).send('Error loading user profile');
+        }
     } else {
         res.status(403).send('Access denied. Admins only.');
     }

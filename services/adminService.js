@@ -112,6 +112,14 @@ const adminService = {
             );
             stats.loginsToday = loginsTodayResult[0].count;
 
+            // Low stock items (products with stock <= min_stock_level)
+            const [lowStockResult] = await db.execute(`
+                SELECT COUNT(*) as count
+                FROM products
+                WHERE stock_quantity <= min_stock_level
+            `);
+            stats.lowStockItems = lowStockResult[0].count;
+
             return stats;
         } catch (error) {
             console.error('[AdminService] Error getting stats:', error);

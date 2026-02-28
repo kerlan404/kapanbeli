@@ -346,7 +346,7 @@ const settingsController = {
                 });
             }
 
-            // Get user's products, suggestions, and notes
+            // Get user's products, suggestions (product-based), and notes
             const db = require('../config/database');
 
             const [products] = await db.execute(
@@ -354,8 +354,34 @@ const settingsController = {
                 [userId]
             );
 
+            // Get product-based suggestions (low stock + expired)
             const [suggestions] = await db.execute(
-                'SELECT * FROM suggestions WHERE user_id = ? ORDER BY created_at DESC',
+                `SELECT 
+                    id,
+                    name,
+                    stock_quantity,
+                    min_stock_level,
+                    expiry_date,
+                    CASE 
+                        WHEN stock_quantity <= 0 THEN 'out_of_stock'
+                        WHEN stock_quantity <= min_stock_level THEN 'low_stock'
+                        WHEN expiry_date < CURDATE() THEN 'expired'
+                        ELSE 'normal'
+                    END as suggestion_type,
+                    created_at
+                FROM products
+                WHERE user_id = ?
+                AND (
+                    stock_quantity <= min_stock_level 
+                    OR expiry_date < CURDATE()
+                )
+                ORDER BY 
+                    CASE 
+                        WHEN expiry_date < CURDATE() THEN 1
+                        WHEN stock_quantity <= 0 THEN 2
+                        ELSE 3
+                    END,
+                    created_at DESC`,
                 [userId]
             );
 

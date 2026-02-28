@@ -102,23 +102,40 @@ const userProfileService = {
     },
 
     /**
-     * Get user's suggestions
+     * Get user's suggestions (Product-based: low stock + expired)
      * @param {number} userId - User ID
-     * @returns {Promise<Array>} User's suggestions
+     * @returns {Promise<Array>} User's product suggestions count
      */
     async getUserSuggestions(userId) {
         try {
+            // Get product-based suggestions (low stock + expired)
             const query = `
                 SELECT 
                     id,
-                    content as name,
-                    'suggestion' as type,
-                    content as description,
-                    'pending' as status,
+                    name,
+                    stock_quantity,
+                    min_stock_level,
+                    expiry_date,
+                    CASE 
+                        WHEN stock_quantity <= 0 THEN 'out_of_stock'
+                        WHEN stock_quantity <= min_stock_level THEN 'low_stock'
+                        WHEN expiry_date < CURDATE() THEN 'expired'
+                        ELSE 'normal'
+                    END as suggestion_type,
                     created_at
-                FROM suggestions
+                FROM products
                 WHERE user_id = ?
-                ORDER BY created_at DESC
+                AND (
+                    stock_quantity <= min_stock_level 
+                    OR expiry_date < CURDATE()
+                )
+                ORDER BY 
+                    CASE 
+                        WHEN expiry_date < CURDATE() THEN 1
+                        WHEN stock_quantity <= 0 THEN 2
+                        ELSE 3
+                    END,
+                    created_at DESC
                 LIMIT 20
             `;
 

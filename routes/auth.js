@@ -21,20 +21,34 @@ router.get('/confirm/:token', authController.confirmAccount);
 // Route untuk memeriksa status otentikasi
 router.get('/status', async (req, res) => {
     if (req.session.user) {
-        // Get user with profile photo from database
-        const User = require('../models/User');
-        const user = await User.findById(req.session.user.id);
-        
-        res.json({
-            authenticated: true,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                profile_photo: user.profile_photo || null,
-                role: user.role || 'user'
+        try {
+            // Get user with profile photo from database
+            const User = require('../models/User');
+            const user = await User.findById(req.session.user.id);
+
+            if (user) {
+                res.json({
+                    authenticated: true,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        profile_photo: user.profile_photo || null,
+                        role: user.role || 'user'
+                    }
+                });
+            } else {
+                // User not found in database, clear session
+                req.session.destroy();
+                res.json({ authenticated: false });
             }
-        });
+        } catch (error) {
+            console.error('Auth status error:', error);
+            res.status(500).json({ 
+                authenticated: false,
+                message: 'Error checking auth status' 
+            });
+        }
     } else {
         res.json({ authenticated: false });
     }

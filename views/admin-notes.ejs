@@ -4,17 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen Catatan - Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    },
                     colors: {
-                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' }
+                        primary: { 
+                            50: '#eff6ff', 
+                            100: '#dbeafe', 
+                            200: '#bfdbfe', 
+                            300: '#93c5fd', 
+                            400: '#60a5fa', 
+                            500: '#3b82f6', 
+                            600: '#2563eb', 
+                            700: '#1d4ed8', 
+                            800: '#1e40af', 
+                            900: '#1e3a8a',
+                            950: '#172554'
+                        },
+                        accent: {
+                            orange: '#FF9F43',
+                            green: '#1DD1A1',
+                            red: '#FF6B6B',
+                            yellow: '#FECA57'
+                        }
                     }
                 }
             }
@@ -22,27 +51,83 @@
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .badge { @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1; }
-        .badge-good { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
-        .badge-low { @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400; }
+        .font-display { font-family: 'Poppins', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* Badge Styles */
+        .badge { @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-all; }
+        .badge-good { @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md shadow-green-500/30; }
+        .badge-low { @apply bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md shadow-yellow-500/30; }
+        .badge-recipe { @apply bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-md shadow-purple-500/30; }
+        .badge-shopping { @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/30; }
+        .badge-other { @apply bg-gradient-to-r from-gray-500 to-slate-500 text-white shadow-md shadow-gray-500/30; }
+        .badge-active { @apply bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md shadow-green-500/30; }
+        .badge-inactive { @apply bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-md shadow-gray-500/30; }
+        
+        /* Card Hover Effects */
+        .stat-card { @apply relative overflow-hidden; }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .stat-card:hover::before { opacity: 1; }
+        
+        /* Table Row Animation */
+        .table-row-enter { animation: rowEnter 0.3s ease-out; }
+        @keyframes rowEnter {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button Styles */
+        .btn-primary { 
+            @apply bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold py-2.5 px-5 rounded-xl 
+            hover:from-primary-700 hover:to-primary-600 transition-all duration-300 shadow-lg shadow-primary-500/30 
+            hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5;
+        }
+        .btn-secondary { 
+            @apply bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold py-2.5 px-5 rounded-xl 
+            border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 
+            hover:-translate-y-0.5;
+        }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 transition-colors">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 transition-colors">
     <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 dark:border-gray-800/50 sticky top-0 z-50">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
+            <div class="flex justify-between items-center py-5">
                 <div class="flex items-center gap-4">
-                    <a href="/admin" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">
-                        <i class="fas fa-home text-xl"></i>
+                    <a href="/admin" class="group inline-flex items-center gap-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-all duration-300">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary-500/30">
+                            <i class="fas fa-home text-white"></i>
+                        </div>
                     </a>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Manajemen Catatan</h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Melihat dan mengelola semua catatan dari seluruh pengguna</p>
+                        <h1 class="text-2xl font-bold font-display text-gray-900 dark:text-white flex items-center gap-3">
+                            <i class="fas fa-sticky-note text-primary-600"></i>
+                            Manajemen Catatan
+                        </h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Melihat dan mengelola semua catatan dari seluruh pengguna</p>
                     </div>
                 </div>
-                <button onclick="toggleTheme()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                    <i class="fas fa-moon"></i> Tema
+                <button onclick="toggleTheme()" class="inline-flex items-center gap-2.5 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md">
+                    <i class="fas fa-moon"></i> 
+                    <span class="font-medium">Tema</span>
                 </button>
             </div>
         </div>
@@ -51,86 +136,155 @@
     <main class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Statistics -->
         <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-6 mb-8" id="statsGrid">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                 <div class="flex items-center justify-between">
-                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Catatan</p><p id="statTotal" class="text-3xl font-bold text-primary-600">0</p></div>
-                    <div class="w-14 h-14 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center"><i class="fas fa-sticky-note text-2xl text-primary-600"></i></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
+                            <i class="fas fa-sticky-note"></i>
+                            Total Catatan
+                        </p>
+                        <p id="statTotal" class="text-4xl font-bold font-display bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/40">
+                        <i class="fas fa-sticky-note text-2xl text-white"></i>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                 <div class="flex items-center justify-between">
-                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Selesai</p><p id="statCompleted" class="text-3xl font-bold text-green-600">0</p></div>
-                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"><i class="fas fa-check-circle text-2xl text-green-600"></i></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            Selesai
+                        </p>
+                        <p id="statCompleted" class="text-4xl font-bold font-display bg-gradient-to-r from-green-600 to-emerald-400 bg-clip-text text-transparent">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/40">
+                        <i class="fas fa-check-circle text-2xl text-white"></i>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                 <div class="flex items-center justify-between">
-                    <div><p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Belum Selesai</p><p id="statPending" class="text-3xl font-bold text-yellow-600">0</p></div>
-                    <div class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center"><i class="fas fa-clock text-2xl text-yellow-600"></i></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
+                            <i class="fas fa-clock"></i>
+                            Belum Selesai
+                        </p>
+                        <p id="statPending" class="text-4xl font-bold font-display bg-gradient-to-r from-yellow-600 to-amber-400 bg-clip-text text-transparent">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/40">
+                        <i class="fas fa-clock text-2xl text-white"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-gray-700">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-search text-primary-600 mr-1"></i> Cari</label>
-                    <input type="text" id="searchInput" placeholder="Judul catatan, nama user, atau isi catatan..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onkeyup="debounceSearch()">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5 flex items-center gap-2">
+                        <i class="fas fa-search text-primary-600"></i> 
+                        Cari Catatan
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" id="searchInput" placeholder="Judul catatan, nama user, atau isi catatan..." 
+                            class="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 transition-all" 
+                            onkeyup="debounceSearch()">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-user text-primary-600 mr-1"></i> User</label>
-                    <select id="userFilter" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadNotes()">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5 flex items-center gap-2">
+                        <i class="fas fa-user text-primary-600"></i> 
+                        Filter User
+                    </label>
+                    <select id="userFilter" 
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all cursor-pointer" 
+                        onchange="loadNotes()">
                         <option value="">Semua User</option>
                     </select>
                 </div>
             </div>
-            <div class="flex justify-end mt-4">
-                <button onclick="resetFilters()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"><i class="fas fa-redo"></i> Reset Filter</button>
+            <div class="flex justify-end mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button onclick="resetFilters()" class="btn-secondary inline-flex items-center gap-2">
+                    <i class="fas fa-redo"></i> 
+                    <span>Reset Filter</span>
+                </button>
             </div>
         </div>
 
         <!-- Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Daftar Catatan</h3>
-                <button onclick="loadNotes()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/50">
+                <h3 class="text-lg font-bold font-display text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-list text-primary-600"></i>
+                    Daftar Catatan
+                </h3>
+                <button onclick="loadNotes()" class="btn-primary inline-flex items-center gap-2">
+                    <i class="fas fa-sync-alt"></i> 
+                    <span>Refresh</span>
+                </button>
             </div>
-            <div id="tableLoading" class="text-center py-12" style="display: none;"><i class="fas fa-circle-notch fa-spin text-4xl text-primary-600 mb-4"></i><p class="text-gray-500 dark:text-gray-400">Memuat data...</p></div>
+            <div id="tableLoading" class="text-center py-16" style="display: none;">
+                <div class="relative inline-block">
+                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-primary-200 dark:border-gray-700"></div>
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-primary-600 absolute top-0 left-0"></div>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 mt-6 font-medium">Memuat data catatan...</p>
+            </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="notesTable">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-700/50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Catatan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">User</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Dibuat</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Detail</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Catatan</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Dibuat</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="notesTableBody"></tbody>
                 </table>
             </div>
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4" id="paginationContainer" style="display: none;">
-                <div class="text-sm text-gray-600 dark:text-gray-400">Menampilkan <span id="showingFrom" class="font-medium">0</span> - <span id="showingTo" class="font-medium">0</span> dari <span id="totalItems" class="font-medium">0</span> catatan</div>
+            <div class="px-6 py-5 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/50 flex flex-col sm:flex-row justify-between items-center gap-4" id="paginationContainer" style="display: none;">
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Menampilkan <span id="showingFrom" class="font-semibold text-gray-900 dark:text-white">0</span> - 
+                    <span id="showingTo" class="font-semibold text-gray-900 dark:text-white">0</span> dari 
+                    <span id="totalItems" class="font-semibold text-primary-600">0</span> catatan
+                </div>
                 <div class="flex gap-2" id="paginationButtons"></div>
             </div>
-            <div id="emptyState" class="text-center py-12" style="display: none;"><i class="fas fa-sticky-note text-5xl text-gray-300 mb-4"></i><p class="text-gray-500 dark:text-gray-400">Belum ada catatan</p></div>
+            <div id="emptyState" class="text-center py-16" style="display: none;">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-sticky-note text-5xl text-gray-400 dark:text-gray-500"></i>
+                </div>
+                <p class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Belum ada catatan</p>
+                <p class="text-gray-500 dark:text-gray-400">Catatan dari pengguna akan muncul di sini</p>
+            </div>
         </div>
     </main>
 
     <!-- Detail Modal -->
-    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 rounded-t-xl">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detail Catatan</h3>
-                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+    <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
+            <div class="px-8 py-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 rounded-t-3xl z-10">
+                <h3 class="text-xl font-bold font-display text-gray-900 dark:text-white flex items-center gap-3">
+                    <i class="fas fa-sticky-note text-primary-600"></i>
+                    Detail Catatan
+                </h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-10 h-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <div class="p-6" id="detailContent"></div>
+            <div class="p-8" id="detailContent"></div>
         </div>
     </div>
 
-    <div id="toastContainer" class="fixed top-4 right-4 z-50"></div>
+    <div id="toastContainer" class="fixed top-6 right-6 z-50 space-y-3"></div>
 
     <script>
         let currentPage = 1, currentLimit = 20, searchTimer = null, allUsers = [];
@@ -210,24 +364,50 @@
             const tbody = document.getElementById('notesTableBody'), empty = document.getElementById('emptyState'), pag = document.getElementById('paginationContainer');
             if (!notes?.length) { tbody.innerHTML = ''; empty.style.display = 'block'; pag.style.display = 'none'; return; }
             empty.style.display = 'none'; pag.style.display = 'flex';
-            tbody.innerHTML = notes.map(n => {
+            tbody.innerHTML = notes.map((n, idx) => {
                 const statusClass = n.is_completed ? 'badge-good' : 'badge-low';
                 const statusText = n.is_completed ? 'Selesai' : 'Belum Selesai';
+                const statusIcon = n.is_completed ? 'fa-check-circle' : 'fa-clock';
                 const created = new Date(n.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                return `<tr class="table-row-enter hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-transparent dark:hover:from-gray-700/30 transition-all duration-200" style="animation-delay: ${idx * 50}ms">
                     <td class="px-6 py-4">
-                        <div class="font-medium text-gray-900 dark:text-white">${n.title || 'Tanpa Judul'}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">${n.content ? n.content.substring(0, 80) + '...' : '-'}</div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                                <i class="fas fa-sticky-note text-white text-sm"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-semibold text-gray-900 dark:text-white mb-1 truncate">${n.title || 'Tanpa Judul'}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-md">${n.content ? n.content.substring(0, 100) + (n.content.length > 100 ? '...' : '') : '-'}</div>
+                            </div>
+                        </div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-sm text-gray-900 dark:text-white">${n.user_name || 'Unknown'}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">${n.user_email || '-'}</div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white font-semibold text-sm">
+                                ${(n.user_name || 'U')[0].toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">${n.user_name || 'Unknown'}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">${n.user_email || '-'}</div>
+                            </div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4"><span class="${statusClass}">${statusText}</span></td>
-                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">${created}</td>
                     <td class="px-6 py-4">
-                        <button onclick="openDetailModal(${n.id})" class="btn btn-sm btn-primary" title="Lihat Detail">
-                            <i class="fas fa-eye"></i> Detail
+                        <span class="${statusClass}">
+                            <i class="fas ${statusIcon}"></i>
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <i class="far fa-calendar text-gray-400"></i>
+                            ${created}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick="openDetailModal(${n.id})" class="btn-primary py-2 px-4 text-sm inline-flex items-center gap-2" title="Lihat Detail">
+                            <i class="fas fa-eye"></i>
+                            <span>Detail</span>
                         </button>
                     </td>
                 </tr>`;
@@ -269,17 +449,86 @@
                     const n = result.data;
                     const typeClass = n.type === 'recipe' ? 'badge-recipe' : n.type === 'shopping' ? 'badge-shopping' : 'badge-other';
                     const typeText = n.type === 'recipe' ? 'Resep' : n.type === 'shopping' ? 'Belanja' : 'Lainnya';
+                    const typeIcon = n.type === 'recipe' ? 'fa-utensils' : n.type === 'shopping' ? 'fa-shopping-cart' : 'fa-tag';
+                    const statusClass = n.is_completed ? 'badge-good' : 'badge-low';
+                    const statusText = n.is_completed ? 'Selesai' : 'Belum Selesai';
+                    const statusIcon = n.is_completed ? 'fa-check-circle' : 'fa-clock';
+                    
                     document.getElementById('detailContent').innerHTML = `
-                        <div class="space-y-4">
-                            <div><span class="text-sm text-gray-500 dark:text-gray-400">Judul</span><p class="text-lg font-semibold text-gray-900 dark:text-white">${n.title || 'Tanpa Judul'}</p></div>
-                            <div><span class="text-sm text-gray-500 dark:text-gray-400">Isi Catatan</span><p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mt-1">${n.content || '-'}</p></div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><span class="text-sm text-gray-500 dark:text-gray-400">Tipe</span><br><span class="${typeClass}">${typeText}</span></div>
-                                <div><span class="text-sm text-gray-500 dark:text-gray-400">Status</span><br><span class="${n.is_active ? 'badge-active' : 'badge-inactive'}">${n.is_active ? 'Aktif' : 'Non-Aktif'}</span></div>
+                        <div class="space-y-6">
+                            <!-- Title -->
+                            <div>
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                                    <i class="fas fa-heading"></i> Judul
+                                </span>
+                                <p class="text-xl font-bold font-display text-gray-900 dark:text-white">${n.title || 'Tanpa Judul'}</p>
                             </div>
+                            
+                            <!-- Content -->
+                            <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-700 rounded-2xl p-5 border border-gray-200 dark:border-gray-600">
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-3">
+                                    <i class="fas fa-align-left"></i> Isi Catatan
+                                </span>
+                                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">${n.content || '-'}</p>
+                            </div>
+                            
+                            <!-- Info Grid -->
                             <div class="grid grid-cols-2 gap-4">
-                                <div><span class="text-sm text-gray-500 dark:text-gray-400">User</span><p class="text-gray-900 dark:text-white">${n.user_name || 'Unknown'}<br><span class="text-sm text-gray-500">${n.user_email || '-'}</span></p></div>
-                                <div><span class="text-sm text-gray-500 dark:text-gray-400">Waktu</span><p class="text-gray-900 dark:text-white">Dibuat: ${new Date(n.created_at).toLocaleString('id-ID')}<br>Diperbarui: ${new Date(n.updated_at).toLocaleString('id-ID')}</p></div>
+                                <div class="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                                        <i class="fas fa-tag"></i> Tipe
+                                    </span>
+                                    <div class="mt-2">
+                                        <span class="${typeClass}">
+                                            <i class="fas ${typeIcon}"></i>
+                                            ${typeText}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                                        <i class="fas fa-toggle-on"></i> Status
+                                    </span>
+                                    <div class="mt-2">
+                                        <span class="${statusClass}">
+                                            <i class="fas ${statusIcon}"></i>
+                                            ${statusText}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- User & Time -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                                        <i class="fas fa-user"></i> User
+                                    </span>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold">
+                                            ${(n.user_name || 'U')[0].toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900 dark:text-white">${n.user_name || 'Unknown'}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">${n.user_email || '-'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                                        <i class="fas fa-clock"></i> Waktu
+                                    </span>
+                                    <div class="mt-2 space-y-2">
+                                        <div class="flex items-center gap-2 text-sm">
+                                            <i class="fas fa-calendar-plus text-primary-600"></i>
+                                            <span class="text-gray-700 dark:text-gray-300">Dibuat: ${new Date(n.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-sm">
+                                            <i class="fas fa-calendar-edit text-primary-600"></i>
+                                            <span class="text-gray-700 dark:text-gray-300">Diperbarui: ${new Date(n.updated_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -292,19 +541,26 @@
         function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); document.getElementById('detailModal').classList.remove('flex'); }
 
         function showToast(message, type = 'info') {
-            const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            const colors = { 
+                success: 'from-green-500 to-emerald-500 shadow-green-500/40', 
+                error: 'from-red-500 to-rose-500 shadow-red-500/40', 
+                info: 'from-blue-500 to-cyan-500 shadow-blue-500/40' 
+            };
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
             const toast = document.createElement('div');
-            toast.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg mb-2 flex items-center gap-2 animate-slide-in`;
-            toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+            toast.className = `bg-gradient-to-r ${colors[type]} text-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 min-w-[320px] animate-[slideIn_0.3s_ease-out]`;
+            toast.innerHTML = `
+                <i class="fas ${icons[type]} text-xl"></i>
+                <span class="font-medium">${message}</span>
+            `;
             document.getElementById('toastContainer').appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(400px)';
+                toast.style.transition = 'all 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
     </script>
-
-    <style>
-        @keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .animate-slide-in { animation: slide-in 0.3s ease-out; }
-    </style>
 </body>
 </html>

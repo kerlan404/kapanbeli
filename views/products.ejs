@@ -209,8 +209,8 @@
 
         /* Grid & Cards - FIXED SIZE CONSISTENT LAYOUT */
         .products-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 20px;
         }
 
@@ -225,7 +225,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(0,0,0,0.05);
-            height: 450px; /* Normal height - not too big, not too small */
+            height: 420px; /* Balanced - shows all content with good spacing */
         }
 
         .product-card:hover {
@@ -238,7 +238,7 @@
         .card-header {
             position: relative;
             width: 100%;
-            height: 200px; /* Normal height for image */
+            height: 130px; /* Balanced image height */
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             overflow: hidden;
             flex-shrink: 0; /* Don't shrink */
@@ -260,7 +260,7 @@
         }
 
         .card-header .card-icon {
-            font-size: 4rem;
+            font-size: 2.8rem;
             color: var(--primary-orange);
             position: absolute;
             top: 50%;
@@ -313,30 +313,74 @@
 
         /* Card Body - FLEXIBLE CONTENT */
         .card-body {
-            padding: 15px 18px;
+            padding: 12px 14px;
             flex: 1; /* Takes remaining space */
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
             overflow: hidden;
         }
 
         .prod-name {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             margin: 0;
             color: var(--text-main);
             cursor: pointer;
             transition: color 0.2s;
-            line-height: 1.4;
+            line-height: 1.35;
             display: -webkit-box;
             -webkit-line-clamp: 2; /* Max 2 lines */
             -webkit-box-orient: vertical;
             overflow: hidden;
-            min-height: 32px; /* Fixed height for 2 lines */
+            min-height: 26px; /* Fixed height for 2 lines */
         }
 
         .prod-name:hover {
+            color: var(--primary-orange);
+        }
+
+        .prod-description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.35;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 2.6em;
+            background: rgba(255, 159, 67, 0.08);
+            border-left: 2px solid var(--primary-orange);
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        body.dark-mode-active .prod-description {
+            background: rgba(255, 159, 67, 0.12);
+        }
+
+        .prod-notes {
+            background: rgba(255, 159, 67, 0.08);
+            border-left: 3px solid var(--primary-orange);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        body.dark-mode-active .prod-notes {
+            background: rgba(255, 159, 67, 0.12);
+        }
+
+        .prod-notes i {
+            margin-right: 6px;
             color: var(--primary-orange);
         }
 
@@ -352,11 +396,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 14px;
+            padding: 7px 10px;
             background: rgba(0,0,0,0.03);
-            border-radius: 10px;
+            border-radius: 6px;
             transition: background 0.2s;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         body.dark-mode-active .info-row {
@@ -407,10 +451,10 @@
 
         /* Card Footer - FIXED POSITION AT BOTTOM */
         .card-footer {
-            padding: 15px 18px;
+            padding: 10px 14px;
             border-top: 1px solid rgba(0,0,0,0.05);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0; /* Don't shrink */
         }
 
@@ -420,17 +464,17 @@
 
         .action-btn {
             flex: 1;
-            padding: 11px 16px;
-            border-radius: 10px;
+            padding: 9px 14px;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
             font-weight: 600;
             font-family: inherit;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             transition: all 0.2s;
         }
 
@@ -774,6 +818,11 @@
                             </div>
                             ` : ''}
                         </div>
+                        
+                        ${item.notes && item.notes.trim() !== ''
+                            ? `<p class="prod-description"><i class="fas fa-sticky-note" style="margin-right:4px;"></i>${item.notes}</p>`
+                            : '<p class="prod-description" style="color: var(--text-muted); font-style: italic; background: rgba(0,0,0,0.02); border-left-color: var(--primary-blue);">Tidak ada catatan</p>'
+                        }
                     </div>
 
                     <div class="card-footer">

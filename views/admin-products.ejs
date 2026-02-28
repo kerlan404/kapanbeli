@@ -572,12 +572,14 @@
                     </div>
                     <div class="filter-group">
                         <label class="filter-label" style="visibility: hidden;">Action</label>
-                        <button class="btn btn-outline" onclick="resetFilters()" style="margin-right: 10px;">
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                        <button class="btn btn-primary" onclick="loadProducts()">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" onclick="resetFilters()" style="flex: 1; min-width: 120px;">
+                                <i class="fas fa-redo"></i> Reset Filter
+                            </button>
+                            <button class="btn btn-primary" onclick="loadProducts()" style="flex: 1; min-width: 120px;">
+                                <i class="fas fa-sync-alt"></i> Refresh Data
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

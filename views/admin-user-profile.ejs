@@ -4,22 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %> - Admin Panel</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif']
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
                     },
                     colors: {
                         primary: {
@@ -33,38 +35,71 @@
                             700: '#1d4ed8',
                             800: '#1e40af',
                             900: '#1e3a8a'
+                        },
+                        accent: {
+                            orange: '#FF9F43',
+                            green: '#1DD1A1',
+                            red: '#FF6B6B',
+                            yellow: '#FECA57'
                         }
                     }
                 }
             }
-        }
+        };
     </script>
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .badge { @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1; }
-        .badge-active { @apply bg-green-100 text-green-700; }
-        .badge-inactive { @apply bg-gray-100 text-gray-600; }
-        .badge-suspended { @apply bg-red-100 text-red-700; }
-        .badge-admin { @apply bg-purple-100 text-purple-700; }
-        .badge-user { @apply bg-blue-100 text-blue-700; }
+        .font-display { font-family: 'Poppins', sans-serif; }
         
-        /* Dark Background for User Detail */
-        body {
-            background-color: #0a0a0a;
-            color: #ecf0f1;
+        .badge { @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-all; }
+        .badge-active { @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md shadow-green-500/30; }
+        .badge-inactive { @apply bg-gradient-to-r from-gray-500 to-slate-500 text-white shadow-md shadow-gray-500/30; }
+        .badge-suspended { @apply bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md shadow-red-500/30; }
+        .badge-admin { @apply bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-md shadow-purple-500/30; }
+        .badge-user { @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/30; }
+
+        /* Activity Badge Colors */
+        .badge-success { @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md shadow-green-500/30; }
+        .badge-secondary { @apply bg-gradient-to-r from-gray-500 to-slate-500 text-white shadow-md shadow-gray-500/30; }
+        .badge-info { @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/30; }
+        .badge-primary { @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md shadow-primary-500/30; }
+        .badge-warning { @apply bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md shadow-yellow-500/30; }
+        .badge-danger { @apply bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md shadow-red-500/30; }
+
+        /* Card Hover Effects */
+        .stat-card { @apply relative overflow-hidden; }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
+        .stat-card:hover::before { opacity: 1; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
     </style>
 </head>
-<body class="bg-black">
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-black min-h-screen">
     <% if (!user) { %>
         <!-- User Not Found -->
         <div class="min-h-screen flex items-center justify-center">
             <div class="text-center">
-                <i class="fas fa-user-times text-6xl text-gray-500 mb-4"></i>
-                <h1 class="text-2xl font-bold text-gray-400 mb-2">User Tidak Ditemukan</h1>
-                <p class="text-gray-600 mb-6">Data user yang Anda cari tidak tersedia.</p>
-                <a href="/admin/users" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-500 to-rose-500 rounded-full flex items-center justify-center shadow-2xl shadow-red-500/40">
+                    <i class="fas fa-user-times text-5xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold font-display text-white mb-3">User Tidak Ditemukan</h1>
+                <p class="text-gray-400 mb-8 max-w-md">Data user yang Anda cari tidak tersedia atau telah dihapus.</p>
+                <a href="/admin/users" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl hover:from-primary-700 hover:to-primary-600 transition-all shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-1 font-semibold">
                     <i class="fas fa-arrow-left"></i>
                     Kembali ke Daftar User
                 </a>
@@ -72,23 +107,28 @@
         </div>
     <% } else { %>
         <!-- Header -->
-        <header class="bg-gray-900 shadow-sm border-b border-gray-800">
+        <header class="bg-gray-900/80 backdrop-blur-xl shadow-xl border-b border-gray-800 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-4">
+                <div class="flex justify-between items-center py-5">
                     <div class="flex items-center gap-4">
-                        <a href="/admin/users" class="text-gray-400 hover:text-gray-300 transition">
-                            <i class="fas fa-arrow-left text-xl"></i>
+                        <a href="/admin/users" class="group inline-flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary-500/30">
+                                <i class="fas fa-arrow-left text-white"></i>
+                            </div>
                         </a>
                         <div>
-                            <h1 class="text-2xl font-bold text-white"><%= pageTitle %></h1>
-                            <p class="text-sm text-gray-400">Detail lengkap profil dan aktivitas user</p>
+                            <h1 class="text-2xl font-bold font-display text-white flex items-center gap-3">
+                                <i class="fas fa-user-circle text-primary-500"></i>
+                                <%= pageTitle %>
+                            </h1>
+                            <p class="text-sm text-gray-400 mt-0.5">Detail lengkap profil dan aktivitas user</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <a href="/admin/users"
-                           class="inline-flex items-center gap-2 px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition">
-                            <i class="fas fa-arrow-left"></i>
-                            <span class="hidden sm:inline">Kembali</span>
+                           class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-700 text-gray-300 rounded-xl hover:bg-gray-800 hover:border-gray-600 transition-all duration-300 hover:-translate-y-0.5 font-medium">
+                            <i class="fas fa-users"></i>
+                            <span class="hidden sm:inline">Daftar User</span>
                         </a>
                     </div>
                 </div>
@@ -209,12 +249,31 @@
 
             <!-- Activity Logs -->
             <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden mb-8 border border-gray-800">
-                <div class="px-6 py-4 border-b border-gray-800">
-                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
-                        <i class="fas fa-history text-primary-500"></i>
-                        Log Aktivitas User
-                    </h3>
-                    <p class="text-sm text-gray-400 mt-1">10 aktivitas terakhir</p>
+                <div class="px-6 py-5 border-b border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="fas fa-history text-primary-500"></i>
+                            Log Aktivitas User
+                        </h3>
+                        <p class="text-sm text-gray-400 mt-1">10 aktivitas terakhir</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <!-- Filter Dropdown -->
+                        <select id="activityFilter" class="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block px-4 py-2.5 hover:bg-gray-750 transition cursor-pointer">
+                            <option value="all">Semua Aktivitas</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="view">View</option>
+                            <option value="create">Create</option>
+                            <option value="update">Update</option>
+                            <option value="delete">Delete</option>
+                        </select>
+                        <!-- Refresh Button -->
+                        <button onclick="refreshActivityLogs()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg hover:from-primary-700 hover:to-primary-600 transition-all shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5">
+                            <i class="fas fa-sync-alt"></i>
+                            <span class="font-medium">Refresh</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <% if (activityLogs && activityLogs.length > 0) { %>
@@ -228,13 +287,23 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-gray-900 divide-y divide-gray-800">
-                                <% activityLogs.forEach(log => { %>
+                                <% activityLogs.forEach(log => { 
+                                    const activityType = (log.activity_type || '').toLowerCase();
+                                    let badgeClass = 'badge-secondary';
+                                    if (activityType === 'login') badgeClass = 'badge-success';
+                                    else if (activityType === 'logout') badgeClass = 'badge-secondary';
+                                    else if (activityType === 'view') badgeClass = 'badge-info';
+                                    else if (activityType === 'create') badgeClass = 'badge-primary';
+                                    else if (activityType === 'update') badgeClass = 'badge-warning';
+                                    else if (activityType === 'delete') badgeClass = 'badge-danger';
+                                    else if (activityType === 'error') badgeClass = 'badge-danger';
+                                %>
                                     <tr class="hover:bg-gray-800 transition">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                             <%= new Date(log.created_at).toLocaleString('id-ID') %>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="badge <%= getActivityBadge(log.activity_type) %>">
+                                            <span class="badge <%= badgeClass %>">
                                                 <%= log.activity_type %>
                                             </span>
                                         </td>
@@ -378,20 +447,39 @@
 
     <% if (user) { %>
     <script>
-        // Helper function for activity badge colors
-        function getActivityBadge(type) {
-            const badges = {
-                'LOGIN': 'bg-green-100 text-green-700',
-                'LOGOUT': 'bg-gray-100 text-gray-600',
-                'CREATE': 'bg-yellow-100 text-yellow-700',
-                'UPDATE': 'bg-blue-100 text-blue-700',
-                'DELETE': 'bg-red-100 text-red-700',
-                'VIEW': 'bg-indigo-100 text-indigo-700',
-                'BAN': 'bg-red-100 text-red-700',
-                'UNBAN': 'bg-green-100 text-green-700'
-            };
-            return badges[type] || 'bg-gray-100 text-gray-600';
+        // Refresh activity logs
+        function refreshActivityLogs() {
+            const btn = event.currentTarget;
+            const icon = btn.querySelector('i');
+            
+            // Add spinning animation
+            icon.classList.add('fa-spin');
+            btn.disabled = true;
+            
+            // Reload page or fetch new data
+            setTimeout(() => {
+                location.reload();
+            }, 500);
         }
+
+        // Filter activity logs
+        document.getElementById('activityFilter')?.addEventListener('change', function() {
+            const filterValue = this.value;
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const activityCell = row.querySelector('td:nth-child(2)');
+                if (activityCell) {
+                    const activityType = activityCell.textContent.trim().toLowerCase();
+                    
+                    if (filterValue === 'all' || activityType === filterValue) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
     </script>
     <% } %>
 </body>
