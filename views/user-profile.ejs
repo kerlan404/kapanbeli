@@ -620,6 +620,200 @@
             transition: color 0.3s ease;
         }
 
+        /* Activity Section - Enhanced */
+        .activity-section {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-top: 25px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        body.dark-mode-active .activity-section {
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .activity-section:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0,0,0,0.06);
+        }
+
+        body.dark-mode-active .activity-header {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        .activity-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-title i {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            background: var(--gradient-blue);
+        }
+
+        .activity-refresh-btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(46, 134, 222, 0.3);
+        }
+
+        .activity-refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 134, 222, 0.4);
+        }
+
+        .activity-refresh-btn i {
+            transition: transform 0.5s;
+        }
+
+        .activity-refresh-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 20px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.04);
+            animation: slideInLeft 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        body.dark-mode-active .activity-item {
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: var(--primary-blue);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .activity-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .activity-icon.login { background: linear-gradient(135deg, #1DD1A1, #10B981); color: white; }
+        .activity-icon.logout { background: linear-gradient(135deg, #95A5A6, #7F8C8D); color: white; }
+        .activity-icon.create { background: linear-gradient(135deg, #FF9F43, #E67E22); color: white; }
+        .activity-icon.update { background: linear-gradient(135deg, #2E86DE, #1B5F9E); color: white; }
+        .activity-icon.delete { background: linear-gradient(135deg, #FF6B6B, #EE5A5A); color: white; }
+        .activity-icon.view { background: linear-gradient(135deg, #54A0FF, #2E86DE); color: white; }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-description {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .activity-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .activity-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .activity-meta i {
+            font-size: 0.75rem;
+            color: var(--primary-blue);
+        }
+
+        .activity-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .activity-empty i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            opacity: 0.4;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         /* Settings Sections */
         .settings-section {
             background: var(--bg-card);
@@ -1068,6 +1262,25 @@
                 </div>
             </div>
 
+            <!-- Activity Section - Enhanced -->
+            <div class="activity-section">
+                <div class="activity-header">
+                    <h3 class="activity-title">
+                        <i class="fas fa-history"></i>
+                        Aktivitas Saya
+                    </h3>
+                    <button class="activity-refresh-btn" onclick="loadUserActivity()" id="refreshActivityBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+                <div id="activityListContainer">
+                    <div class="activity-list" id="activityList">
+                        <!-- Activity items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Edit Profile Section -->
             <div class="settings-section">
                 <h3 class="section-title">
@@ -1274,9 +1487,114 @@
             document.getElementById('statNotes').textContent = notes ? notes.length : 0;
             document.getElementById('statLogins').textContent = user.total_logins || 0;
 
+            // Load user activity
+            loadUserActivity();
+
             // Show content
             document.getElementById('loading').style.display = 'none';
             document.getElementById('profileContent').style.display = 'block';
+        }
+
+        // Load user activity logs
+        async function loadUserActivity() {
+            const btn = document.getElementById('refreshActivityBtn');
+            const icon = btn?.querySelector('i');
+            
+            if (btn) {
+                btn.classList.add('spinning');
+                btn.disabled = true;
+            }
+
+            try {
+                const response = await fetch('/api/activity-logs?limit=10&range=7days', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    renderUserActivity(result.data);
+                } else {
+                    renderUserActivity([]);
+                }
+            } catch (error) {
+                console.error('Activity load error:', error);
+                renderUserActivity([]);
+            } finally {
+                if (btn) {
+                    btn.classList.remove('spinning');
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Render user activity
+        function renderUserActivity(activities) {
+            const container = document.getElementById('activityList');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = `
+                    <div class="activity-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>Belum ada aktivitas</p>
+                        <p style="font-size: 0.85rem; margin-top: 10px;">Aktivitas Anda akan muncul di sini</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Activity icons mapping
+            const activityIcons = {
+                'LOGIN': 'fa-sign-in-alt',
+                'LOGOUT': 'fa-sign-out-alt',
+                'CREATE': 'fa-plus-circle',
+                'UPDATE': 'fa-edit',
+                'DELETE': 'fa-trash-alt',
+                'VIEW': 'fa-eye'
+            };
+
+            // Activity type labels
+            const activityLabels = {
+                'LOGIN': 'Login',
+                'LOGOUT': 'Logout',
+                'CREATE': 'Membuat',
+                'UPDATE': 'Memperbarui',
+                'DELETE': 'Menghapus',
+                'VIEW': 'Melihat'
+            };
+
+            container.innerHTML = activities.map((log, index) => {
+                const icon = activityIcons[log.activity_type] || 'fa-circle';
+                const label = activityLabels[log.activity_type] || log.activity_type;
+                const timestamp = new Date(log.created_at).toLocaleString('id-ID', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="activity-item" style="animation-delay: ${index * 0.1}s">
+                        <div class="activity-icon ${log.activity_type.toLowerCase()}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-description">
+                                ${label}: ${log.description || 'Aktivitas user'}
+                            </div>
+                            <div class="activity-meta">
+                                <span>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    ${log.ip_address || 'IP tidak diketahui'}
+                                </span>
+                                <span>
+                                    <i class="far fa-clock"></i>
+                                    ${timestamp}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Show error

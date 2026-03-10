@@ -57,3 +57,42 @@ CREATE TABLE notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- 6. Tabel Activity Logs (Melacak Aktivitas User di Admin Dashboard)
+CREATE TABLE activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    activity_type ENUM('LOGIN', 'LOGOUT', 'CREATE', 'UPDATE', 'DELETE', 'VIEW', 'EXPORT', 'IMPORT', 'BAN', 'UNBAN') NOT NULL,
+    description TEXT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_activity_type (activity_type),
+    INDEX idx_created_at (created_at)
+);
+
+-- 7. Tabel Login Logs (Melacak Login/Logout User untuk Admin Activity)
+CREATE TABLE login_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    logout_time TIMESTAMP NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    activity_type ENUM('login', 'logout', 'register') DEFAULT 'login',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_login_time (login_time)
+);
+
+-- Update users table dengan kolom tambahan untuk tracking
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_logout TIMESTAMP NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_ip VARCHAR(45) NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS login_count INT DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS account_status ENUM('active', 'suspended', 'banned') DEFAULT 'active';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_photo VARCHAR(500) NULL;

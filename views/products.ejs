@@ -106,12 +106,37 @@
         }
         .page-title { font-size: 1.5rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
         
+        /* Enhanced Add Button - Clean & Simple */
         .add-btn {
-            background: var(--primary-blue); color: white; border: none; padding: 10px 25px; border-radius: 30px;
-            font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;
-            box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3);
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 8px rgba(46, 134, 222, 0.3);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
         }
-        .add-btn:hover { background: #2373c7; transform: translateY(-2px); }
+
+        .add-btn:hover {
+            background-color: #1e6bb8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 134, 222, 0.4);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        .add-btn i {
+            font-size: 0.85rem;
+        }
 
         /* Search Bar - IMPROVED UI/UX */
         .search-wrapper { 
@@ -550,7 +575,10 @@
     <div class="container">
         <div class="header-section">
             <div class="page-title"><i class="fas fa-clipboard" style="color: var(--primary-blue);"></i> Catatan Stok Dapur</div>
-            <a href="/products/add" class="add-btn"><i class="fas fa-pen-fancy"></i> Tulis Catatan Baru</a>
+            <a href="/products/add" class="add-btn">
+                <i class="fas fa-plus"></i>
+                <span>Tambah Produk</span>
+            </a>
         </div>
 
         <div class="search-wrapper">
