@@ -95,7 +95,8 @@ const activityLogsService = {
                 search = '',
                 page = 1,
                 limit = 20,
-                activityType = ''
+                activityType = '',
+                userId = ''
             } = options;
 
             // Set timezone
@@ -123,6 +124,10 @@ const activityLogsService = {
             const activityTypeFilter = activityType ? 'AND al.activity_type = ?' : '';
             const activityTypeParams = activityType ? [activityType] : [];
 
+            // Build user ID filter
+            const userIdFilter = userId ? 'AND al.user_id = ?' : '';
+            const userIdParams = userId ? [userId] : [];
+
             // Calculate offset
             const offset = (page - 1) * limit;
 
@@ -131,12 +136,12 @@ const activityLogsService = {
                 SELECT COUNT(*) as total
                 FROM activity_logs al
                 JOIN users u ON al.user_id = u.id
-                WHERE 1=1 ${dateFilter} ${searchFilter} ${activityTypeFilter}
+                WHERE 1=1 ${dateFilter} ${searchFilter} ${activityTypeFilter} ${userIdFilter}
             `;
 
             console.log('[ActivityLogsService.getLogs] Count query:', countQuery);
 
-            const [countResult] = await db.execute(countQuery, [...searchParams, ...activityTypeParams]);
+            const [countResult] = await db.execute(countQuery, [...searchParams, ...activityTypeParams, ...userIdParams]);
             const total = countResult[0].total;
 
             // Get paginated data
@@ -153,17 +158,18 @@ const activityLogsService = {
                     u.email as user_email
                 FROM activity_logs al
                 JOIN users u ON al.user_id = u.id
-                WHERE 1=1 ${dateFilter} ${searchFilter} ${activityTypeFilter}
+                WHERE 1=1 ${dateFilter} ${searchFilter} ${activityTypeFilter} ${userIdFilter}
                 ORDER BY al.created_at DESC
                 LIMIT ? OFFSET ?
             `;
 
             console.log('[ActivityLogsService.getLogs] Data query:', dataQuery);
-            console.log('[ActivityLogsService.getLogs] Params:', [...searchParams, ...activityTypeParams, limit, offset]);
+            console.log('[ActivityLogsService.getLogs] Params:', [...searchParams, ...activityTypeParams, ...userIdParams, limit, offset]);
 
             const [dataResult] = await db.execute(dataQuery, [
                 ...searchParams,
                 ...activityTypeParams,
+                ...userIdParams,
                 limit,
                 offset
             ]);

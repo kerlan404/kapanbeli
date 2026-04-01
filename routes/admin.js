@@ -15,25 +15,22 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-// Semua route admin memerlukan otentikasi sebagai admin
-router.use(isAdmin);
-
 // Dashboard stats
-router.get('/stats', adminController.getStats);
+router.get('/stats', isAdmin, adminController.getStats);
 
 // Users management
-router.get('/users', adminController.getAllUsers);
-router.get('/users/banned', adminController.getBannedUsers);
+router.get('/users', isAdmin, adminController.getAllUsers);
+router.get('/users/banned', isAdmin, adminController.getBannedUsers);
 
 // User detail
-router.get('/user/:id', adminController.getUserById);
-router.get('/user/:id/products', adminController.getUserProducts);
+router.get('/user/:id', isAdmin, adminController.getUserById);
+router.get('/user/:id/products', isAdmin, adminController.getUserProducts);
 
 // Ban/Unban user
-router.post('/user/:userId/ban', adminController.banUser);
-router.post('/user/:userId/unban', adminController.unbanUser);
+router.post('/user/:userId/ban', isAdmin, adminController.banUser);
+router.post('/user/:userId/unban', isAdmin, adminController.unbanUser);
 
 // Active users widget
-router.get('/stats/active-users', adminController.getActiveUsers);
+router.get('/stats/active-users', isAdmin, adminController.getActiveUsers);
 
 module.exports = router;

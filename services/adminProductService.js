@@ -354,6 +354,100 @@ const adminProductService = {
             console.error('[adminProductService.getCategories] Error:', error);
             return [];
         }
+    },
+
+    /**
+     * Create new product (admin)
+     */
+    async createProduct(productData) {
+        try {
+            const {
+                name,
+                description,
+                category_id,
+                stock_quantity,
+                min_stock_level,
+                unit,
+                expiry_date,
+                user_id,
+                image_url,
+                is_active = 1
+            } = productData;
+
+            console.log('[adminProductService.createProduct] Creating product with data:', productData);
+
+            // Validate required fields
+            if (!name || !user_id) {
+                throw new Error('Nama produk dan pemilik (user_id) harus diisi');
+            }
+
+            // Convert category_id if it's a string (category name)
+            let categoryIdToUse = category_id;
+            if (typeof category_id === 'string') {
+                const categoryToId = {
+                    'Bumbu Dapur': 1,
+                    'Sayuran': 2,
+                    'Buah-buahan': 3,
+                    'Protein': 4,
+                    'Bahan Kering': 5,
+                    'Lainnya': 6
+                };
+                categoryIdToUse = categoryToId[category_id] || 6;
+            }
+
+            const query = `
+                INSERT INTO products (
+                    name, description, category_id, stock_quantity, min_stock_level,
+                    unit, expiry_date, user_id, image_url, is_active, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+            `;
+
+            console.log('[adminProductService.createProduct] Executing query with values:', [
+                name,
+                description || null,
+                categoryIdToUse,
+                stock_quantity || 0,
+                min_stock_level || 5,
+                unit || 'pcs',
+                expiry_date || null,
+                user_id,
+                image_url || null,
+                is_active
+            ]);
+
+            const [result] = await db.execute(query, [
+                name,
+                description || null,
+                categoryIdToUse,
+                stock_quantity || 0,
+                min_stock_level || 5,
+                unit || 'pcs',
+                expiry_date || null,
+                user_id,
+                image_url || null,
+                is_active
+            ]);
+
+            console.log('[adminProductService.createProduct] Insert result:', result);
+
+            // Get the newly created product
+            const newProduct = await this.getProductById(result.insertId);
+
+            return {
+                success: true,
+                data: newProduct,
+                message: 'Produk berhasil ditambahkan'
+            };
+        } catch (error) {
+            console.error('[adminProductService.createProduct] Error:', error);
+            console.error('[adminProductService.createProduct] Error details:', {
+                code: error.code,
+                errno: error.errno,
+                sqlMessage: error.sqlMessage,
+                sql: error.sql
+            });
+            throw error;
+        }
     }
 };
 

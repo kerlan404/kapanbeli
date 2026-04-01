@@ -1035,6 +1035,69 @@
                 </div>
             </div>
 
+            <!-- PREVIEW SECTIONS - PRODUCTS, SUGGESTIONS, NOTES -->
+            <div style="margin-top: 40px;">
+                <!-- Products Preview -->
+                <div class="analytics-section" style="margin-bottom: 40px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-box-open" style="color: var(--primary-blue);"></i>
+                            Produk Terbaru
+                        </h3>
+                        <a href="/admin/products" class="btn btn-outline" style="border-radius: 8px; padding: 8px 16px;">
+                            Lihat Semua <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                    <div class="panel-card" style="padding: 0;">
+                        <div id="productsPreviewLoading" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                            <p style="margin-top: 10px; color: var(--text-muted);">Memuat data...</p>
+                        </div>
+                        <div id="productsPreviewContent" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Shopping Suggestions Preview -->
+                <div class="analytics-section" style="margin-bottom: 40px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-shopping-cart" style="color: var(--primary-orange);"></i>
+                            Saran Pembelian
+                        </h3>
+                        <a href="/admin/shopping-suggestions" class="btn btn-outline" style="border-radius: 8px; padding: 8px 16px;">
+                            Lihat Semua <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                    <div class="panel-card" style="padding: 0;">
+                        <div id="suggestionsPreviewLoading" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-orange);"></i>
+                            <p style="margin-top: 10px; color: var(--text-muted);">Memuat data...</p>
+                        </div>
+                        <div id="suggestionsPreviewContent" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Notes Preview -->
+                <div class="analytics-section" style="margin-bottom: 40px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-sticky-note" style="color: var(--accent-green);"></i>
+                            Catatan Pengguna
+                        </h3>
+                        <a href="/admin/notes" class="btn btn-outline" style="border-radius: 8px; padding: 8px 16px;">
+                            Lihat Semua <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                    <div class="panel-card" style="padding: 0;">
+                        <div id="notesPreviewLoading" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--accent-green);"></i>
+                            <p style="margin-top: 10px; color: var(--text-muted);">Memuat data...</p>
+                        </div>
+                        <div id="notesPreviewContent" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- LOG AKTIVITAS USER SECTION - ENHANCED -->
             <div class="analytics-section" style="margin-top: 40px;">
                 <div class="panel-header" style="margin-bottom: 25px; position: relative; overflow: hidden; border-radius: 12px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.05) 0%, rgba(255, 159, 67, 0.05) 100%); padding: 25px;">
@@ -1405,9 +1468,33 @@
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
-            loadDashboardData();
-            loadAnalytics();
-            loadActivityLogs();
+            
+            // Check if we should show a specific panel based on currentPage
+            const currentPage = '<%= typeof currentPage !== "undefined" ? currentPage : "dashboard" %>';
+            
+            if (currentPage === 'settings') {
+                showPage('settings', document.querySelector('.nav-item[href="/admin/settings"]'));
+            } else if (currentPage === 'analytics') {
+                showPage('analytics', document.querySelector('.nav-item[href="/admin/analytics"]'));
+            } else if (currentPage === 'activity-logs') {
+                showPage('activity-log', document.querySelector('.nav-item[href="/admin/activity-logs"]'));
+            } else if (currentPage === 'notes') {
+                showPage('activity-log', document.querySelector('.nav-item[href="/admin/notes"]'));
+            } else if (currentPage === 'products') {
+                showPage('products', document.querySelector('.nav-item[href="/admin/products"]'));
+            } else if (currentPage === 'users') {
+                showPage('users', document.querySelector('.nav-item[href="/admin/users"]'));
+            } else {
+                // Default to dashboard - load all data including previews
+                loadDashboardData();
+                loadAnalytics();
+                loadActivityLogs();
+                
+                // Load preview sections
+                loadProductsPreview();
+                loadSuggestionsPreview();
+                loadNotesPreview();
+            }
         });
 
         // --- THEME LOGIC ---
@@ -1944,6 +2031,227 @@
 
         // ============================================
         // === ACTIVITY LOGS FUNCTIONS ===
+        // ============================================
+        // PREVIEW SECTIONS - LOAD FUNCTIONS
+        // ============================================
+        
+        // Load Products Preview
+        async function loadProductsPreview() {
+            try {
+                const response = await fetch('/api/admin/products?limit=5', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                document.getElementById('productsPreviewLoading').style.display = 'none';
+                const contentEl = document.getElementById('productsPreviewContent');
+
+                if (result.success && result.data && result.data.length > 0) {
+                    contentEl.innerHTML = `
+                        <div class="table-responsive">
+                            <table style="width: 100%;">
+                                <thead style="background: rgba(0,0,0,0.02); border-bottom: 2px solid var(--border-color);">
+                                    <tr>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Produk</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Pemilik</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Stok</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.data.map(p => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 15px 20px;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img src="${p.image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.name) + '&background=2E86DE&color=fff'}" 
+                                                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                                    <div>
+                                                        <div style="font-weight: 600; color: var(--text-main);">${p.name}</div>
+                                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${p.category_name || 'Lainnya'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">${p.user_name || 'Unknown'}</td>
+                                            <td style="padding: 15px 20px; color: var(--text-main); font-weight: 500;">${p.stock_quantity} ${p.unit || ''}</td>
+                                            <td style="padding: 15px 20px;">
+                                                <span class="badge ${p.stock_status === 'good' ? 'badge-success' : p.stock_status === 'low' ? 'badge-warning' : 'badge-danger'}" 
+                                                      style="padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                                    ${p.stock_status === 'good' ? 'Aman' : p.stock_status === 'low' ? 'Rendah' : 'Habis'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                } else {
+                    contentEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>Belum ada produk</p>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading products preview:', error);
+                document.getElementById('productsPreviewLoading').style.display = 'none';
+                document.getElementById('productsPreviewContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--accent-red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Gagal memuat data</p>
+                    </div>
+                `;
+                document.getElementById('productsPreviewContent').style.display = 'block';
+            }
+        }
+
+        // Load Shopping Suggestions Preview
+        async function loadSuggestionsPreview() {
+            try {
+                const response = await fetch('/api/admin/shopping-suggestions?limit=5', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                document.getElementById('suggestionsPreviewLoading').style.display = 'none';
+                const contentEl = document.getElementById('suggestionsPreviewContent');
+
+                if (result.success && result.data && result.data.length > 0) {
+                    contentEl.innerHTML = `
+                        <div class="table-responsive">
+                            <table style="width: 100%;">
+                                <thead style="background: rgba(0,0,0,0.02); border-bottom: 2px solid var(--border-color);">
+                                    <tr>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Produk</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Pemilik</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Stok</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Prioritas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.data.map(p => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 15px 20px;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img src="${p.image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.name) + '&background=FF9F43&color=fff'}" 
+                                                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                                    <div>
+                                                        <div style="font-weight: 600; color: var(--text-main);">${p.name}</div>
+                                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${p.category_name || 'Lainnya'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">${p.user_name || 'Unknown'}</td>
+                                            <td style="padding: 15px 20px; color: var(--text-main); font-weight: 500;">${p.stock_quantity} ${p.unit || ''}</td>
+                                            <td style="padding: 15px 20px;">
+                                                <span class="badge ${p.priority === 1 ? 'badge-danger' : p.priority === 2 ? 'badge-warning' : 'badge-primary'}" 
+                                                      style="padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                                    ${p.priority === 1 ? 'Habis' : p.priority === 2 ? 'Rendah' : 'Kadaluarsa'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                } else {
+                    contentEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>Tidak ada saran pembelian saat ini</p>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading suggestions preview:', error);
+                document.getElementById('suggestionsPreviewLoading').style.display = 'none';
+                document.getElementById('suggestionsPreviewContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--accent-red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Gagal memuat data</p>
+                    </div>
+                `;
+                document.getElementById('suggestionsPreviewContent').style.display = 'block';
+            }
+        }
+
+        // Load Notes Preview
+        async function loadNotesPreview() {
+            try {
+                const response = await fetch('/api/admin/notes?limit=5', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                document.getElementById('notesPreviewLoading').style.display = 'none';
+                const contentEl = document.getElementById('notesPreviewContent');
+
+                if (result.success && result.data && result.data.length > 0) {
+                    contentEl.innerHTML = `
+                        <div class="table-responsive">
+                            <table style="width: 100%;">
+                                <thead style="background: rgba(0,0,0,0.02); border-bottom: 2px solid var(--border-color);">
+                                    <tr>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Judul</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Pemilik</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Status</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Tanggal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.data.map(n => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 15px 20px;">
+                                                <div style="font-weight: 600; color: var(--text-main);">${n.title}</div>
+                                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">${(n.content || '').substring(0, 50)}...</div>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">${n.user_name || 'Unknown'}</td>
+                                            <td style="padding: 15px 20px;">
+                                                <span class="badge ${n.is_completed ? 'badge-success' : 'badge-warning'}" 
+                                                      style="padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                                    ${n.is_completed ? 'Selesai' : 'Belum Selesai'}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.85rem;">
+                                                ${new Date(n.created_at).toLocaleDateString('id-ID')}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                } else {
+                    contentEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-sticky-note" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>Belum ada catatan</p>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading notes preview:', error);
+                document.getElementById('notesPreviewLoading').style.display = 'none';
+                document.getElementById('notesPreviewContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--accent-red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Gagal memuat data</p>
+                    </div>
+                `;
+                document.getElementById('notesPreviewContent').style.display = 'block';
+            }
+        }
+
+        // ============================================
+        // ACTIVITY LOGS FUNCTIONS
         // ============================================
 
         // Load activity logs from API

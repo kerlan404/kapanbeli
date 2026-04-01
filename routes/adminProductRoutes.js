@@ -73,6 +73,13 @@ router.get('/statistics', adminProductController.getStatistics);
 router.get('/:id', adminProductController.getProduct);
 
 /**
+ * @route POST /api/admin/products
+ * @desc API endpoint untuk create produk baru
+ * @access Private (Admin)
+ */
+router.post('/', adminProductController.createProduct);
+
+/**
  * @route PUT /api/admin/products/:id
  * @desc API endpoint untuk update produk
  * @access Private (Admin)

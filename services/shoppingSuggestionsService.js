@@ -17,7 +17,8 @@ const shoppingSuggestionsService = {
                 page = 1,
                 limit = 20,
                 search = '',
-                status = '' // all, out_of_stock, low_stock, expiring
+                status = '',
+                userId = '' // Filter by user ID
             } = options;
 
             const offset = (page - 1) * limit;
@@ -44,10 +45,16 @@ const shoppingSuggestionsService = {
             } else {
                 // Default: show out of stock OR low stock OR expiring soon
                 whereClauses.push(`(
-                    p.stock_quantity <= 0 OR 
+                    p.stock_quantity <= 0 OR
                     (p.stock_quantity > 0 AND p.stock_quantity <= p.min_stock_level) OR
                     (p.expiry_date IS NOT NULL AND p.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY))
                 )`);
+            }
+
+            // User filter
+            if (userId) {
+                whereClauses.push('p.user_id = ?');
+                params.push(userId);
             }
 
             const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';

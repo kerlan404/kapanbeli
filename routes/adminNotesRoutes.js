@@ -43,7 +43,7 @@ router.use(isAdmin);
  * @query {number} page - Page number (default: 1)
  * @query {number} limit - Items per page (default: 20)
  * @query {string} search - Search by title, content, or user name/email
- * @query {string} type - Filter by note type (recipe, shopping, other)
+ * @query {string} status - Filter by note status (completed/pending)
  * @query {string} userId - Filter by user ID
  * @access Private (Admin)
  */
@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
         const { page, limit, search } = pagination;
         const offset = calculateOffset(page, limit);
 
-        const { userId } = req.query;
+        const { userId, status } = req.query;
 
         let whereClause = '1=1';
         const params = [];
@@ -70,6 +70,15 @@ router.get('/', async (req, res) => {
             params.push(userId);
         }
 
+        // Add status filter (completed/pending)
+        if (status) {
+            if (status === 'completed') {
+                whereClause += ' AND n.is_completed = TRUE';
+            } else if (status === 'pending') {
+                whereClause += ' AND n.is_completed = FALSE';
+            }
+        }
+
         // Get total count
         const [countResult] = await db.execute(`
             SELECT COUNT(*) as total
@@ -80,7 +89,7 @@ router.get('/', async (req, res) => {
 
         const total = countResult[0].total;
 
-        // Get notes with user info (note: table doesn't have type or is_active columns)
+        // Get notes with user info
         const [notes] = await db.execute(`
             SELECT
                 n.id, n.title, n.content, n.is_completed, n.created_at, n.updated_at,
@@ -123,11 +132,7 @@ router.get('/statistics', async (req, res) => {
             data: {
                 total: totalResult[0].total,
                 completed: completedResult[0].total,
-                pending: pendingResult[0].total,
-                // Placeholder for type stats (table doesn't have type column)
-                recipe: 0,
-                shopping: 0,
-                other: totalResult[0].total
+                pending: pendingResult[0].total
             }
         });
     } catch (error) {

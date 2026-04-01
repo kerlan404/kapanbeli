@@ -151,6 +151,18 @@ const authController = {
                 });
             }
 
+            // Cek status akun - user non-aktif atau suspended tidak bisa login
+            if (user.account_status === 'inactive' || user.account_status === 'suspended') {
+                const statusMessages = {
+                    'inactive': 'Akun Anda sedang non-aktif. Silakan hubungi administrator untuk mengaktifkan kembali akun Anda.',
+                    'suspended': 'Akun Anda sedang ditangguhkan. Silakan hubungi administrator untuk informasi lebih lanjut.'
+                };
+                return res.status(403).json({
+                    success: false,
+                    message: statusMessages[user.account_status] || 'Status akun Anda tidak valid.'
+                });
+            }
+
             // Simpan token ke session (jika menggunakan session)
             req.session.userId = user.id;
             req.session.user = {

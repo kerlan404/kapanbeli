@@ -718,7 +718,15 @@
 
                     <div class="form-group" id="passwordGroup">
                         <label for="userPassword">Password *</label>
-                        <input type="password" id="userPassword" minlength="6">
+                        <div style="position: relative;">
+                            <input type="password" id="userPassword" minlength="6" style="padding-right: 45px;">
+                            <button type="button" onclick="togglePassword('userPassword', this)" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); 
+                                background: none; border: none; cursor: pointer; color: var(--text-muted); 
+                                padding: 5px; font-size: 1.1rem;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -837,6 +845,24 @@
                         ? 'fas fa-sun' 
                         : 'fas fa-moon';
                 }
+            }
+        }
+
+        // ============================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ============================================
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 

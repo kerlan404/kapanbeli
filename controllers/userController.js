@@ -50,10 +50,28 @@ const userController = {
             return errorHandler.notFoundError(res, 'User tidak ditemukan');
         }
 
+        console.log('[userController.getUserById] User data:', user);
+        console.log('[userController.getUserById] User profile_photo:', user.profile_photo);
+
+        // Add profile photo URL and password info for admin view
+        const userData = {
+            ...user,
+            profile_photo_url: user.profile_photo ?
+                (user.profile_photo.startsWith('http') ? user.profile_photo : 
+                 user.profile_photo.startsWith('/uploads/') ? user.profile_photo : 
+                 `/uploads/${user.profile_photo.replace('uploads/', '')}`) :
+                null,
+            password_hint: user.password ? 'Password terenkripsi (klik untuk melihat)' : 'Tidak ada password',
+            // Note: We don't send actual password hash for security reasons
+            // Admin can reset password if needed
+        };
+
+        console.log('[userController.getUserById] Sending userData:', userData);
+
         res.json({
             success: true,
             message: 'User retrieved successfully',
-            data: user
+            data: userData
         });
     }),
 

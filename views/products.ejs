@@ -476,54 +476,104 @@
 
         /* Card Footer - FIXED POSITION AT BOTTOM */
         .card-footer {
-            padding: 10px 14px;
+            padding: 12px 14px;
             border-top: 1px solid rgba(0,0,0,0.05);
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-shrink: 0; /* Don't shrink */
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.02));
         }
 
         body.dark-mode-active .card-footer {
             border-top-color: rgba(255,255,255,0.05);
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.02));
         }
 
+        /* Enhanced Action Buttons */
         .action-btn {
             flex: 1;
-            padding: 9px 14px;
-            border-radius: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
             font-weight: 600;
             font-family: inherit;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 5px;
-            transition: all 0.2s;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Edit Button - Enhanced Blue Gradient */
         .btn-edit {
-            background: var(--primary-blue);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #54a0ff 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(46, 134, 222, 0.25);
         }
 
         .btn-edit:hover {
-            background: #1e6bb8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(46, 134, 222, 0.3);
+            background: linear-gradient(135deg, #1e6bb8 0%, var(--primary-blue) 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(46, 134, 222, 0.4);
         }
 
+        .btn-edit:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Delete Button - Enhanced Red Gradient */
         .btn-delete {
-            background: rgba(255, 107, 107, 0.1);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 107, 107, 0.25) 100%);
             color: var(--danger);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.1);
         }
 
         .btn-delete:hover {
-            background: var(--danger);
+            background: linear-gradient(135deg, var(--danger) 0%, #ff5252 100%);
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            border-color: var(--danger);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.35);
+        }
+
+        .btn-delete:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Icon animations */
+        .action-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-edit:hover i {
+            transform: rotate(-15deg) scale(1.2);
+        }
+
+        .btn-delete:hover i {
+            transform: scale(1.2);
         }
 
         /* Empty State */
@@ -561,11 +611,11 @@
                 <a href="/suggestions" class="nav-link">Saran Pembelian</a>
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <span id="userName" style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: none;">User</span>
+                <span id="userName" style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: none;">User</span>
                 <a href="/user-profile" id="profilePhotoLink" style="display:none;">
-                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-orange); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-orange); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(255, 159, 67, 0.3);" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 20px rgba(255, 159, 67, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(255, 159, 67, 0.3)'" />
                 </a>
-                <a href="/user-profile" id="profileLink" class="nav-link" style="font-size: 0.85rem; display:none;" title="Profil"><i class="fas fa-user-circle"></i></a>
+                <a href="/user-profile" id="profileLink" class="nav-link" style="font-size: 0.95rem; display:none;" title="Profil"><i class="fas fa-user-circle" style="font-size: 1.8rem; color: var(--primary-orange);"></i></a>
                 <a href="/auth/logout" class="nav-link" style="font-size: 0.85rem;">Keluar</a>
                 <button class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
             </div>

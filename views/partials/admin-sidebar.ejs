@@ -1,9 +1,10 @@
 <!--
   Admin Sidebar Component
   Direct HTML - No includes
+  Theme-aware sidebar - follows selected theme
 -->
 
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
             <i class="fas fa-shopping-cart"></i>
@@ -76,3 +77,87 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Sidebar theme handler - follows selected theme
+    (function() {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' ||
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            if (isDark) {
+                // Dark theme - keep original dark sidebar
+                sidebar.style.setProperty('--bg-sidebar', '#1a1d23');
+                sidebar.style.setProperty('--text-light', '#ecf0f1');
+                sidebar.classList.remove('light-theme');
+            } else {
+                // Light theme - change sidebar to light color
+                sidebar.style.setProperty('--bg-sidebar', '#ffffff');
+                sidebar.style.setProperty('--text-light', '#2C3E50');
+                sidebar.classList.add('light-theme');
+            }
+        }
+
+        // Apply on load
+        applyTheme();
+
+        // Listen for theme changes via storage event
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'theme') {
+                applyTheme();
+            }
+        });
+    })();
+</script>
+
+<style>
+    /* Light theme sidebar styles */
+    .sidebar.light-theme {
+        background-color: var(--bg-sidebar, #ffffff) !important;
+        border-right: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .sidebar.light-theme .sidebar-header {
+        border-bottom-color: rgba(0,0,0,0.1) !important;
+    }
+
+    .sidebar.light-theme .nav-item {
+        color: rgba(44, 62, 80, 0.7) !important;
+    }
+
+    .sidebar.light-theme .nav-item:hover {
+        background-color: rgba(46, 134, 222, 0.08) !important;
+        color: #2C3E50 !important;
+    }
+
+    .sidebar.light-theme .nav-item.active {
+        background-color: rgba(46, 134, 222, 0.12) !important;
+        color: var(--primary-blue) !important;
+        border-left-color: var(--primary-blue) !important;
+    }
+
+    .sidebar.light-theme .menu-label {
+        color: rgba(44, 62, 80, 0.5) !important;
+    }
+
+    .sidebar.light-theme .user-info h4 {
+        color: #2C3E50 !important;
+    }
+
+    .sidebar.light-theme .user-info p {
+        color: rgba(44, 62, 80, 0.6) !important;
+    }
+
+    .sidebar.light-theme .logout-btn {
+        background: rgba(255, 107, 107, 0.1) !important;
+        border-color: rgba(255, 107, 107, 0.2) !important;
+    }
+
+    .sidebar.light-theme .logout-btn:hover {
+        background: var(--accent-red) !important;
+        color: white !important;
+    }
+</style>

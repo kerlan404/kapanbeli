@@ -1,12 +1,13 @@
 /**
  * Admin Activity Logs Routes
  * Routes untuk monitoring aktivitas user di admin panel
- * Base path: /api/admin/activity
+ * Base path: /api/admin/activity-logs
  */
 
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { getPaginationParams, buildPagination, sanitizeString, calculateOffset } = require('../helpers/paginationHelper');
 
 // Middleware untuk memeriksa apakah user terautentikasi
 const isAuthenticated = (req, res, next) => {
@@ -35,6 +36,12 @@ const isAdmin = (req, res, next) => {
 // Apply authentication and admin check to all routes
 router.use(isAuthenticated);
 router.use(isAdmin);
+
+// Debug logging
+router.use((req, res, next) => {
+    console.log('adminActivityRoutes received request:', req.method, req.path);
+    next();
+});
 
 /**
  * @route GET /api/admin/activity/statistics
@@ -118,21 +125,34 @@ router.get('/user-status', async (req, res) => {
 });
 
 /**
- * @route GET /api/admin/activity/activity-logs
+ * @route GET /api/admin/activity-logs
  * Get activity logs with pagination
  */
-router.get('/activity-logs', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const { page = 1, limit = 20, search, status, activity_type } = req.query;
-        const offset = (page - 1) * limit;
+        // Use safe pagination helper
+        const pagination = getPaginationParams(req.query);
+        const { page, limit } = pagination;
+        const offset = calculateOffset(page, limit);
+
+        const { search, activity_type, status } = req.query;
 
         let whereClause = '1=1';
         const params = [];
 
         if (search) {
-            whereClause += ' AND (u.name LIKE ? OR u.email LIKE ? OR ll.activity_type LIKE ?)';
-            const searchPattern = `%${search}%`;
-            params.push(searchPattern, searchPattern, searchPattern);
+            whereClause += ' AND (u.name LIKE ? OR u.email LIKE ?)';
+            const searchPattern = `%${sanitizeString(search)}%`;
+            params.push(searchPattern, searchPattern);
+        }
+
+        if (activity_type) {
+            // Filter by activity type (login/logout)
+            if (activity_type === 'login') {
+                whereClause += " AND ll.logout_time IS NULL";
+            } else if (activity_type === 'logout') {
+                whereClause += " AND ll.logout_time IS NOT NULL";
+            }
         }
 
         if (status) {
@@ -141,11 +161,6 @@ router.get('/activity-logs', async (req, res) => {
             } else if (status === 'offline') {
                 whereClause += " AND (u.last_logout > u.last_login OR u.last_login IS NULL)";
             }
-        }
-
-        if (activity_type) {
-            whereClause += ' AND ll.activity_type = ?';
-            params.push(activity_type);
         }
 
         // Get total count
@@ -161,7 +176,7 @@ router.get('/activity-logs', async (req, res) => {
         // Get activity logs with user info
         const [logs] = await db.execute(`
             SELECT
-                ll.id, ll.user_id, ll.login_time, ll.logout_time, ll.ip_address, ll.user_agent, ll.activity_type,
+                ll.id, ll.user_id, ll.login_time, ll.logout_time, ll.ip_address, ll.user_agent,
                 ll.created_at,
                 u.name as user_name, u.email as user_email, u.last_ip
             FROM login_logs ll
@@ -169,41 +184,38 @@ router.get('/activity-logs', async (req, res) => {
             WHERE ${whereClause}
             ORDER BY ll.created_at DESC
             LIMIT ? OFFSET ?
-        `, [...params, parseInt(limit), offset]);
+        `, [...params, limit, offset]);
 
-        // Format logs for display
+        // Format logs for display - determine activity type based on login/logout time
         const formattedLogs = logs.map(log => {
+            // Determine if this is a login or logout based on the presence of logout_time
+            const isLogin = !log.logout_time || log.login_time === log.created_at;
+            const activityType = isLogin ? 'login' : 'logout';
+            
             let description = '';
-            if (log.activity_type === 'login') {
+            if (isLogin) {
                 description = `User login dari ${log.ip_address || 'IP tidak diketahui'}`;
-            } else if (log.activity_type === 'logout') {
-                description = `User logout`;
             } else {
-                description = log.activity_type ? log.activity_type.replace(/_/g, ' ') : 'Aktivitas user';
+                description = `User logout`;
             }
 
             return {
                 ...log,
                 description,
-                activity_type: log.activity_type || 'login'
+                activity_type: activityType
             };
         });
 
         res.json({
             success: true,
             data: formattedLogs,
-            pagination: {
-                currentPage: parseInt(page),
-                limit: parseInt(limit),
-                totalItems: total,
-                totalPages: Math.ceil(total / limit)
-            }
+            pagination: buildPagination(total, page, limit)
         });
     } catch (error) {
-        console.error('Error getting activity logs:', error);
+        console.error('[adminActivityRoutes.activity-logs] Error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve activity logs: ' + error.message
         });
     }
 });

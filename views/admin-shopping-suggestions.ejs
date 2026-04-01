@@ -516,6 +516,15 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-user"></i> Pengguna
+                        </label>
+                        <select id="userFilter" class="form-control" onchange="loadSuggestions()">
+                            <option value="">Semua Pengguna</option>
+                            <!-- Options will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label class="filter-label" style="visibility: hidden;">Action</label>
                         <button class="btn btn-outline" onclick="resetFilters()" style="margin-right: 10px;">
                             <i class="fas fa-redo"></i> Reset
@@ -588,6 +597,7 @@
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            loadUsersForFilter(); // Load users for filter
             loadSuggestions();
             loadStatistics();
         });
@@ -620,9 +630,36 @@
         function resetFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('statusFilter').value = '';
+            document.getElementById('userFilter').value = '';
             currentPage = 1;
             loadSuggestions();
             showToast('Filter berhasil direset', 'success');
+        }
+
+        // ============================================
+        // LOAD USERS FOR FILTER
+        // ============================================
+        async function loadUsersForFilter() {
+            try {
+                const response = await fetch('/api/users?limit=100', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    const userSelect = document.getElementById('userFilter');
+                    userSelect.innerHTML = '<option value="">Semua Pengguna</option>';
+
+                    result.data.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = `${user.name} (${user.email})`;
+                        userSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading users for filter:', error);
+            }
         }
 
         // ============================================
@@ -631,12 +668,14 @@
         async function loadSuggestions() {
             const search = document.getElementById('searchInput').value;
             const status = document.getElementById('statusFilter').value;
+            const userId = document.getElementById('userFilter').value;
 
             const params = new URLSearchParams({
                 page: currentPage,
                 limit: currentLimit,
                 ...(search && { search }),
-                ...(status && { status })
+                ...(status && { status }),
+                ...(userId && { userId })
             });
 
             showTableLoading(true);

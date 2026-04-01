@@ -123,6 +123,190 @@
             z-index: 1;
         }
 
+        /* Enhanced Profile Card Styles */
+        .profile-header-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .profile-header-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .profile-cover {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-orange) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .profile-avatar-section {
+            padding: 0 40px;
+            margin-top: -80px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-avatar {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 5px solid var(--bg-card);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            object-fit: cover;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-avatar-wrapper:hover .profile-avatar {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+
+        .profile-avatar-edit-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-dark));
+            border: 4px solid var(--bg-card);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4);
+        }
+
+        .profile-avatar-edit-btn:hover {
+            transform: scale(1.15) rotate(15deg);
+            box-shadow: 0 10px 30px rgba(255, 159, 67, 0.6);
+        }
+
+        .profile-info-section {
+            padding: 30px 40px;
+        }
+
+        .profile-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .profile-email {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-badges {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .profile-badge {
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-badge-role {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            color: white;
+        }
+
+        .profile-badge-status {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            color: white;
+        }
+
+        .profile-badge:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .profile-stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.8));
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-stat-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+            background: linear-gradient(135deg, rgba(46, 134, 222, 0.08), rgba(255, 159, 67, 0.08));
+        }
+
+        .profile-stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .profile-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
         /* Navbar */
         nav {
             background: rgba(255, 255, 255, 0.95);
@@ -402,10 +586,11 @@
             position: relative;
         }
 
-        .profile-avatar-container {
+        .profile-avatar-wrapper {
             position: relative;
             cursor: pointer;
             flex-shrink: 0;
+            display: inline-block;
         }
 
         .profile-avatar {
@@ -413,14 +598,14 @@
             height: 160px;
             border-radius: 50%;
             object-fit: cover;
-            border: 5px solid var(--bg-body);
-            box-shadow: 0 8px 25px rgba(46, 134, 222, 0.3);
-            transition: all 0.3s;
+            border: 5px solid var(--bg-card);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .profile-avatar:hover {
+        .profile-avatar-wrapper:hover .profile-avatar {
             transform: scale(1.05);
-            box-shadow: 0 12px 35px rgba(46, 134, 222, 0.4);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
         }
 
         .profile-avatar-placeholder {
@@ -433,17 +618,18 @@
             justify-content: center;
             font-size: 4rem;
             color: white;
-            border: 5px solid var(--bg-body);
-            box-shadow: 0 8px 25px rgba(46, 134, 222, 0.3);
-            transition: all 0.3s;
+            border: 5px solid var(--bg-card);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .profile-avatar-container:hover .profile-avatar-placeholder {
+        .profile-avatar-wrapper:hover .profile-avatar-placeholder {
             transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
             background: var(--gradient-orange);
         }
 
-        .avatar-edit-badge {
+        .profile-avatar-edit-btn {
             position: absolute;
             bottom: 10px;
             right: 10px;
@@ -456,13 +642,14 @@
             align-items: center;
             justify-content: center;
             border: 4px solid var(--bg-card);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .profile-avatar-container:hover .avatar-edit-badge {
-            transform: scale(1.1) rotate(15deg);
-            background: var(--primary-blue);
+        .profile-avatar-wrapper:hover .profile-avatar-edit-btn {
+            transform: scale(1.15) rotate(15deg);
+            box-shadow: 0 10px 30px rgba(255, 159, 67, 0.6);
         }
 
         .profile-info {
@@ -1202,62 +1389,45 @@
 
         <!-- Profile Content -->
         <div id="profileContent" style="display: none;">
-            <!-- Profile Card -->
-            <div class="profile-card">
-                <div class="profile-header">
-                    <div class="profile-avatar-container" onclick="document.getElementById('profilePhotoInput').click()">
+            <!-- Profile Header Card - Enhanced -->
+            <div class="profile-header-card">
+                <div class="profile-cover"></div>
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-wrapper">
                         <img id="profileImage" src="" alt="Profile" class="profile-avatar" style="display: none;">
-                        <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder">
+                        <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder" style="display: none;">
                             <i class="fas fa-user"></i>
                         </div>
-                        <div class="avatar-edit-badge">
+                        <div class="profile-avatar-edit-btn" onclick="document.getElementById('profilePhotoInput').click()">
                             <i class="fas fa-camera"></i>
                         </div>
                         <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="uploadProfilePhoto(event)">
                     </div>
-                    <div class="profile-info">
-                        <h2 id="profileName" class="profile-name">-</h2>
-                        <p id="profileEmail" class="profile-email">
-                            <i class="fas fa-envelope"></i>
-                            <span>-</span>
-                        </p>
-                        <div id="profileBadges" class="profile-badges"></div>
-                        <div class="profile-meta">
-                            <p><i class="fas fa-calendar-alt"></i> Bergabung: <span id="joinDate">-</span></p>
-                            <p><i class="fas fa-sign-in-alt"></i> Login terakhir: <span id="lastLogin">-</span></p>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Stats -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon products">
-                            <i class="fas fa-box"></i>
+                <div class="profile-info-section">
+                    <h2 id="profileName" class="profile-name">-</h2>
+                    <p id="profileEmail" class="profile-email">
+                        <i class="fas fa-envelope"></i>
+                        <span>-</span>
+                    </p>
+                    <div id="profileBadges" class="profile-badges"></div>
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-value" id="statProducts">0</div>
+                            <div class="profile-stat-label"><i class="fas fa-box"></i> Produk</div>
                         </div>
-                        <div id="statProducts" class="stat-value">0</div>
-                        <div class="stat-label">Produk</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon suggestions">
-                            <i class="fas fa-lightbulb"></i>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-value" id="statSuggestions">0</div>
+                            <div class="profile-stat-label"><i class="fas fa-lightbulb"></i> Saran</div>
                         </div>
-                        <div id="statSuggestions" class="stat-value">0</div>
-                        <div class="stat-label">Saran</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon notes">
-                            <i class="fas fa-sticky-note"></i>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-value" id="statNotes">0</div>
+                            <div class="profile-stat-label"><i class="fas fa-sticky-note"></i> Catatan</div>
                         </div>
-                        <div id="statNotes" class="stat-value">0</div>
-                        <div class="stat-label">Catatan</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon logins">
-                            <i class="fas fa-sign-in-alt"></i>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-value" id="statLogins">0</div>
+                            <div class="profile-stat-label"><i class="fas fa-sign-in-alt"></i> Login</div>
                         </div>
-                        <div id="statLogins" class="stat-value">0</div>
-                        <div class="stat-label">Total Login</div>
                     </div>
                 </div>
             </div>
@@ -1324,11 +1494,27 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Password Baru</label>
-                        <input type="password" id="newPassword" placeholder="Minimal 6 karakter">
+                        <div style="position: relative;">
+                            <input type="password" id="newPassword" placeholder="Minimal 6 karakter" style="padding-right: 45px;">
+                            <button type="button" onclick="togglePassword('newPassword', this)" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); 
+                                background: none; border: none; cursor: pointer; color: var(--text-muted); 
+                                padding: 5px; font-size: 1.1rem; z-index: 10;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Konfirmasi Password</label>
-                        <input type="password" id="confirmPassword" placeholder="Ulangi password baru">
+                        <div style="position: relative;">
+                            <input type="password" id="confirmPassword" placeholder="Ulangi password baru" style="padding-right: 45px;">
+                            <button type="button" onclick="togglePassword('confirmPassword', this)" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); 
+                                background: none; border: none; cursor: pointer; color: var(--text-muted); 
+                                padding: 5px; font-size: 1.1rem; z-index: 10;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="form-actions">
@@ -1350,7 +1536,15 @@
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-shield-alt"></i> Konfirmasi Password</label>
-                    <input type="password" id="deleteConfirmPassword" placeholder="Masukkan password untuk konfirmasi">
+                    <div style="position: relative;">
+                        <input type="password" id="deleteConfirmPassword" placeholder="Masukkan password untuk konfirmasi" style="padding-right: 45px;">
+                        <button type="button" onclick="togglePassword('deleteConfirmPassword', this)" 
+                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); 
+                            background: none; border: none; cursor: pointer; color: var(--text-muted); 
+                            padding: 5px; font-size: 1.1rem; z-index: 10;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button class="btn btn-danger" onclick="deleteAccount()">
@@ -1499,19 +1693,27 @@
         async function loadUserActivity() {
             const btn = document.getElementById('refreshActivityBtn');
             const icon = btn?.querySelector('i');
-            
+
             if (btn) {
                 btn.classList.add('spinning');
                 btn.disabled = true;
             }
 
             try {
-                const response = await fetch('/api/activity-logs?limit=10&range=7days', {
+                // Get current user ID from loaded profile
+                const userId = currentUser?.id;
+                const url = userId 
+                    ? `/api/activity-logs?limit=10&range=7days&userId=${userId}`
+                    : '/api/activity-logs?limit=10&range=7days';
+                    
+                const response = await fetch(url, {
                     credentials: 'same-origin'
                 });
                 const result = await response.json();
 
-                if (result.success) {
+                console.log('Activity result:', result);
+
+                if (result.success && result.data) {
                     renderUserActivity(result.data);
                 } else {
                     renderUserActivity([]);
@@ -1612,6 +1814,22 @@
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 3000);
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
 
         // Upload profile photo

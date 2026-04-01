@@ -9,18 +9,23 @@ const activityLogsController = require('../controllers/activityLogsController');
 
 // Middleware untuk memeriksa apakah user terautentikasi
 const isAuthenticated = (req, res, next) => {
+    console.log('[activityLogs.isAuthenticated] Session exists:', !!req.session);
+    console.log('[activityLogs.isAuthenticated] Session user:', req.session?.user);
+    
     if (req.session && req.session.user) {
         next();
     } else {
         res.status(401).json({
             success: false,
-            message: 'Authentication required'
+            message: 'Authentication required. Silakan login terlebih dahulu.'
         });
     }
 };
 
 // Middleware untuk admin only
 const isAdmin = (req, res, next) => {
+    console.log('[activityLogs.isAdmin] User role:', req.session?.user?.role);
+    
     if (req.session && req.session.user && req.session.user.role === 'admin') {
         next();
     } else {
@@ -57,5 +62,43 @@ router.get('/statistics', isAuthenticated, isAdmin, activityLogsController.getSt
  * @access Private
  */
 router.post('/', isAuthenticated, activityLogsController.createLog.bind(activityLogsController));
+
+/**
+ * @route GET /api/activity-logs/login-history
+ * @desc Get login history for a user (fallback when activity_logs is empty)
+ * @access Private
+ */
+router.get('/login-history', isAuthenticated, async (req, res) => {
+    try {
+        const db = require('../config/database');
+        const userId = req.query.userId || req.session.user.id;
+        
+        const [logs] = await db.execute(`
+            SELECT 
+                id,
+                user_id,
+                'LOGIN' as activity_type,
+                CONCAT('Login dari ', ip_address) as description,
+                login_time as created_at,
+                ip_address
+            FROM login_logs
+            WHERE user_id = ?
+            ORDER BY login_time DESC
+            LIMIT 10
+        `, [userId]);
+        
+        res.json({
+            success: true,
+            data: logs
+        });
+    } catch (error) {
+        console.error('Login history error:', error);
+        res.json({
+            success: false,
+            data: [],
+            message: error.message
+        });
+    }
+});
 
 module.exports = router;

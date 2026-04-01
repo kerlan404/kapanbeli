@@ -123,14 +123,48 @@ const settingsController = {
 
             console.log('User found:', user);
 
+            // Get stats from database
+            const db = require('../config/database');
+            
+            // Get total products
+            const [productsResult] = await db.execute(
+                'SELECT COUNT(*) as total FROM products WHERE user_id = ?',
+                [user.id]
+            );
+            
+            // Get total suggestions
+            const [suggestionsResult] = await db.execute(
+                'SELECT COUNT(*) as total FROM products WHERE user_id = ? AND (stock_quantity <= 0 OR stock_quantity <= min_stock_level)',
+                [user.id]
+            );
+            
+            // Get total notes
+            const [notesResult] = await db.execute(
+                'SELECT COUNT(*) as total FROM notes WHERE user_id = ?',
+                [user.id]
+            );
+            
+            // Get total logins
+            const [loginsResult] = await db.execute(
+                'SELECT COUNT(*) as total FROM login_logs WHERE user_id = ?',
+                [user.id]
+            );
+
             res.json({
                 success: true,
                 user: {
                     id: user.id,
                     name: user.name,
                     email: user.email,
+                    role: user.role || 'user',
+                    account_status: user.account_status || 'active',
                     profile_photo: user.profile_photo || null,
-                    created_at: user.created_at
+                    created_at: user.created_at,
+                    last_login: user.last_login,
+                    total_products: productsResult[0].total || 0,
+                    total_suggestions: suggestionsResult[0].total || 0,
+                    total_notes: notesResult[0].total || 0,
+                    total_logins: loginsResult[0].total || 0
                 }
             });
         } catch (error) {

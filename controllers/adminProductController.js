@@ -146,6 +146,57 @@ const adminProductController = {
         const result = await adminProductService.toggleStatus(id);
 
         res.json(result);
+    }),
+
+    /**
+     * POST /api/admin/products
+     * API endpoint untuk create produk baru
+     */
+    createProduct: errorHandler.asyncHandler(async (req, res) => {
+        const createData = req.body;
+
+        // Get user_id - use admin's user_id or specified user_id
+        let userId = req.session.user?.id;
+        if (!userId || userId === 'default_admin') {
+            // If admin is creating, they must specify which user owns the product
+            // For admin-created products, we can use a default user or require selection
+            if (!createData.user_id) {
+                // Get first regular user or create product for admin
+                const db = require('../config/database');
+                const [users] = await db.execute('SELECT id FROM users WHERE role = "user" LIMIT 1');
+                if (users.length > 0) {
+                    createData.user_id = users[0].id;
+                } else {
+                    // No users exist, create for admin (will use admin's ID if not default_admin)
+                    createData.user_id = userId;
+                }
+            }
+        } else {
+            createData.user_id = userId;
+        }
+
+        const errors = [];
+
+        if (!createData.name || createData.name.trim().length < 3) {
+            errors.push('Nama produk minimal 3 karakter');
+        }
+
+        if (createData.stock_quantity !== undefined && createData.stock_quantity < 0) {
+            errors.push('Stok tidak boleh negatif');
+        }
+
+        if (createData.min_stock_level !== undefined && createData.min_stock_level < 0) {
+            errors.push('Minimum stok tidak boleh negatif');
+        }
+
+        if (errors.length > 0) {
+            return errorHandler.validationError(res, errors);
+        }
+
+        // Create product
+        const result = await adminProductService.createProduct(createData);
+
+        res.status(201).json(result);
     })
 };
 

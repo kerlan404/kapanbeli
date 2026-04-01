@@ -145,11 +145,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Jumlah Stok</label>
-                        <input type="number" id="productQuantity" class="form-control" placeholder="0" min="0" required>
+                        <input type="number" id="productQuantity" class="form-control" placeholder="0" min="0" step="0.01" required>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Supports desimal (contoh: 0.5 untuk 500 gram)
+                        </p>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Stok Minimal (Alert)</label>
-                        <input type="number" id="productMinStock" class="form-control" placeholder="1" min="0" value="1">
+                        <input type="number" id="productMinStock" class="form-control" placeholder="1" min="0" step="0.01" value="1">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Supports desimal (contoh: 0.5 untuk 500 gram)
+                        </p>
                     </div>
                 </div>
 
@@ -537,7 +543,14 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         window.dispatchEvent(new CustomEvent('productAdded'));
-                        window.location.href = '/products';
+                        // Redirect based on where the user came from
+                        // Check if user is admin and came from admin panel
+                        const referrer = document.referrer;
+                        if (referrer.includes('/admin')) {
+                            window.location.href = '/admin/products';
+                        } else {
+                            window.location.href = '/products';
+                        }
                     });
                 } else {
                     Swal.fire({

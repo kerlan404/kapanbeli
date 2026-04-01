@@ -82,6 +82,19 @@
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
+    <script>
+        // Maintain dark mode from localStorage
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark-mode-active');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark-mode-active');
+            }
+        })();
+    </script>
     <% if (!user) { %>
         <!-- User Not Found -->
         <div class="min-h-screen flex items-center justify-center">
@@ -140,11 +153,15 @@
                         <!-- Profile Photo -->
                         <div class="flex-shrink-0 relative">
                             <%
-                                var profileImage = user.profile_image;
-                                if (!profileImage || profileImage === 'null') {
+                                // Fix: Use profile_photo or profile_photo_url from user data
+                                var profileImage = user.profile_photo || user.profile_photo_url || user.profile_image;
+                                
+                                if (!profileImage || profileImage === 'null' || profileImage === '') {
+                                    // Generate avatar from name if no photo
                                     profileImage = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=3b82f6&color=fff&size=200';
-                                } else if (!profileImage.startsWith('http')) {
-                                    profileImage = profileImage.startsWith('/uploads/') ? profileImage : '/uploads/' + profileImage;
+                                } else if (!profileImage.startsWith('http') && !profileImage.startsWith('/')) {
+                                    // Handle relative paths
+                                    profileImage = '/uploads/' + profileImage.replace('uploads/', '');
                                 }
                             %>
                             <div class="relative">
@@ -166,6 +183,15 @@
                                     <i class="fas fa-envelope text-primary-500"></i>
                                     <%= user.email %>
                                 </p>
+                                <!-- Password View Section -->
+                                <div class="mt-3 flex items-center justify-center sm:justify-start gap-2">
+                                    <i class="fas fa-lock text-primary-500"></i>
+                                    <span id="passwordDisplay" class="text-gray-700 dark:text-gray-300 font-mono text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg">••••••••</span>
+                                    <button onclick="togglePasswordView()" class="text-primary-500 hover:text-primary-600 transition-colors" title="Lihat password">
+                                        <i id="passwordToggleIcon" class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="userPasswordHash" value="<%= user.password || '' %>">
                             </div>
 
                             <div class="flex flex-wrap justify-center sm:justify-start gap-3 mb-4">
@@ -450,17 +476,17 @@
                                                 const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
                                                 if (diffDays < 0) { %>
                                                     <span class="badge badge-danger">
-                                                        <i class="fas fa-skull-crossbones"></i> <%= expiryDate.toLocaleDateString('id-ID', { dateStyle: 'medium' }) %>
+                                                        <i class="fas fa-skull-crossbones"></i> <%= expiryDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) %>
                                                     </span>
                                                 <% } else if (diffDays <= 7) { %>
                                                     <span class="badge badge-warning">
                                                         <i class="fas fa-hourglass-half"></i> <%= diffDays %> hari lagi
                                                     </span>
                                                 <% } else { %>
-                                                    <%= expiryDate.toLocaleDateString('id-ID', { dateStyle: 'medium' }) %>
+                                                    <%= expiryDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) %>
                                                 <% } } else { %> - <% } %>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-400"><%= new Date(product.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' }) %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-400"><%= new Date(product.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
                                     </tr>
                                 <% }) %>
                             </tbody>
@@ -589,7 +615,13 @@
                                         <td class="px-6 py-4 text-sm text-gray-400">
                                             <div class="flex items-center gap-2">
                                                 <i class="far fa-calendar text-gray-600"></i>
-                                                <%= new Date(n.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                                                <%= new Date(n.created_at).toLocaleDateString('id-ID', { 
+                                                    year: 'numeric', 
+                                                    month: 'short', 
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) %>
                                             </div>
                                         </td>
                                     </tr>
@@ -639,7 +671,26 @@
         let currentActivityPage = 1;
         let currentProductPage = 1;
         let currentNotePage = 1;
-        
+
+        // Toggle password view
+        function togglePasswordView() {
+            const passwordDisplay = document.getElementById('passwordDisplay');
+            const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+            const passwordHash = document.getElementById('userPasswordHash').value;
+            
+            if (passwordDisplay.textContent === '••••••••') {
+                // Show password hash (first 20 chars only for display)
+                passwordDisplay.textContent = passwordHash.substring(0, 20) + '...';
+                passwordToggleIcon.classList.remove('fa-eye');
+                passwordToggleIcon.classList.add('fa-eye-slash');
+            } else {
+                // Hide password
+                passwordDisplay.textContent = '••••••••';
+                passwordToggleIcon.classList.remove('fa-eye-slash');
+                passwordToggleIcon.classList.add('fa-eye');
+            }
+        }
+
         // Refresh activity logs
         function refreshActivityLogs() {
             const btn = event.currentTarget;
