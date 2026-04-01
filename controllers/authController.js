@@ -122,6 +122,15 @@ const authController = {
             // Debug: Log user role
             console.log('User role retrieved:', user.role, 'for email:', email);
 
+            // Cek apakah akun nonaktif (account_status = inactive atau suspended)
+            const accountStatus = user.account_status || user.status || 'active';
+            if (accountStatus === 'inactive' || accountStatus === 'suspended') {
+                return res.status(403).json({
+                    success: false,
+                    message: `Akun Anda telah ${accountStatus === 'inactive' ? 'dinonaktifkan' : 'ditangguhkan'}. Silakan hubungi administrator untuk informasi lebih lanjut.`
+                });
+            }
+
             // Tidak perlu memeriksa konfirmasi email karena semua akun langsung dikonfirmasi saat registrasi
 
             // Bandingkan password

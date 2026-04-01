@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 // Configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'root');
 define('DB_NAME', 'kapanbeli');
 define('TIMEZONE', 'Asia/Jakarta');
 define('TIMEZONE_OFFSET', '+07:00');

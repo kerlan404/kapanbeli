@@ -20,7 +20,13 @@
             --primary-orange: #FF9F43;
             --accent-green: #1DD1A1;
             --accent-red: #FF6B6B;
-            --bg-sidebar: #1a1d23;
+            --bg-sidebar: #ffffff;
+            --bg-sidebar-hover: rgba(46, 134, 222, 0.08);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.12);
+            --text-sidebar: #546E7A;
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: #2C3E50;
+            --sidebar-border: #e9ecef;
             --bg-body: #F4F6F9;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
@@ -34,6 +40,13 @@
         }
 
         body.dark-mode-active {
+            --bg-sidebar: #1a1d23;
+            --bg-sidebar-hover: rgba(255,255,255,0.05);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.15);
+            --text-sidebar: rgba(255,255,255,0.7);
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: white;
+            --sidebar-border: rgba(255,255,255,0.1);
             --bg-body: #121418;
             --bg-card: #1e2128;
             --text-main: #ecf0f1;
@@ -57,7 +70,7 @@
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--bg-sidebar);
-            color: var(--text-light);
+            color: var(--text-sidebar);
             height: 100vh;
             position: fixed;
             top: 0;
@@ -65,6 +78,7 @@
             display: flex;
             flex-direction: column;
             z-index: 1000;
+            transition: all 0.3s ease;
         }
 
         .sidebar-header {
@@ -72,13 +86,13 @@
             display: flex;
             align-items: center;
             padding: 0 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--sidebar-border);
         }
 
         .logo {
             font-weight: 700;
             font-size: 1.25rem;
-            color: white;
+            color: var(--text-sidebar-heading);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -91,7 +105,7 @@
             padding: 0 24px 10px;
             font-size: 0.75rem;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.4);
+            color: var(--text-muted);
             font-weight: 600;
             letter-spacing: 1px;
             margin-top: 15px;
@@ -101,24 +115,27 @@
             display: flex;
             align-items: center;
             padding: 12px 24px;
-            color: rgba(255,255,255,0.7);
+            color: var(--text-sidebar);
             text-decoration: none;
             transition: all 0.2s;
             border-left: 3px solid transparent;
             cursor: pointer;
         }
 
-        .nav-item:hover { background-color: rgba(255,255,255,0.05); color: white; }
+        .nav-item:hover {
+            background-color: var(--bg-sidebar-hover);
+            color: var(--text-sidebar-heading);
+        }
         .nav-item.active {
-            background-color: rgba(46, 134, 222, 0.1);
-            color: var(--primary-blue);
+            background-color: var(--bg-sidebar-active);
+            color: var(--text-sidebar-active);
             border-left-color: var(--primary-blue);
         }
         .nav-item i { width: 24px; margin-right: 12px; text-align: center; }
 
         .sidebar-footer {
             padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid var(--sidebar-border);
         }
 
         .user-mini-profile { display: flex; align-items: center; gap: 12px; }
@@ -131,8 +148,8 @@
             flex-shrink: 0;
         }
         .user-info { flex: 1; min-width: 0; overflow: hidden; }
-        .user-info h4 { font-size: 0.9rem; color: white; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info h4 { font-size: 0.9rem; color: var(--text-sidebar-heading); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info p { font-size: 0.75rem; color: var(--text-sidebar); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .logout-btn {
             background: rgba(255, 107, 107, 0.15);
             color: var(--accent-red);

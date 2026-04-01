@@ -75,6 +75,40 @@ const shoppingSuggestionsRoutes = require('./routes/shoppingSuggestionsRoutes');
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
 
+// Middleware untuk mengecek status akun user dari database
+const checkUserStatus = async (req, res, next) => {
+    if (req.session && req.session.user && req.session.user.id !== 'default_admin') {
+        try {
+            const db = require('./config/database');
+            const [rows] = await db.execute(
+                'SELECT account_status, status FROM users WHERE id = ?',
+                [req.session.user.id]
+            );
+
+            if (rows.length > 0) {
+                const userStatus = rows[0];
+                const accountStatus = userStatus.account_status || userStatus.status || 'active';
+
+                // If account is disabled, destroy session and redirect
+                if (accountStatus === 'inactive' || accountStatus === 'suspended') {
+                    req.session.destroy((err) => {
+                        if (err) {
+                            console.error('Error destroying session for disabled user:', err);
+                        }
+                        res.clearCookie('connect.sid');
+                        return res.redirect('/auth?message=Akun+Anda+telah+dinonaktifkan.+Silakan+hubungi+administrator.');
+                    });
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error('Error checking user status:', error);
+            // Continue with request even if status check fails (fail-safe)
+        }
+    }
+    next();
+};
+
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -202,6 +236,21 @@ app.get('/register', isNotAuthenticated, (req, res) => {
 
 // Use auth routes
 app.use('/auth', authRoutes);
+
+// Apply user status check middleware for all authenticated routes
+// This ensures disabled users are logged out automatically
+app.use((req, res, next) => {
+    // Skip status check for auth routes and public routes
+    const publicPaths = ['/auth', '/register', '/api/auth'];
+    const isPublicPath = publicPaths.some(path => req.path.startsWith(path));
+    
+    if (!isPublicPath && req.session && req.session.user) {
+        // Apply checkUserStatus middleware
+        checkUserStatus(req, res, next);
+    } else {
+        next();
+    }
+});
 
 // Use notes routes (protected)
 app.use('/api/notes', notesRoutes);
