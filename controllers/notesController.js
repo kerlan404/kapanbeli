@@ -249,6 +249,57 @@ const notesController = {
                 message: 'Terjadi kesalahan saat mengambil catatan terbaru.'
             });
         }
+    },
+
+    // Fungsi untuk toggle status completed
+    async toggleStatus(req, res) {
+        try {
+            const userId = req.session.user?.id;
+            const noteId = req.params.id;
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Akses ditolak. Silakan login terlebih dahulu.'
+                });
+            }
+
+            if (!noteId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'ID catatan tidak valid.'
+                });
+            }
+
+            // Cek apakah catatan milik pengguna ini
+            const existingNote = await NotesModel.getByIdAndUserId(noteId, userId);
+            if (!existingNote) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Catatan tidak ditemukan atau Anda tidak memiliki izin.'
+                });
+            }
+
+            const updatedNote = await NotesModel.toggleStatus(noteId, userId);
+
+            // Log to activity_logs
+            const activityLogsService = require('../services/activityLogsService');
+            const statusText = updatedNote.is_completed ? 'menyelesaikan' : 'membuka kembali';
+            await activityLogsService.log(userId, 'UPDATE', `${statusText} catatan: "${existingNote.title}"`, req.ip || 'unknown', req.get('user-agent') || 'unknown');
+
+            res.status(200).json({
+                success: true,
+                message: updatedNote.is_completed ? 'Catatan ditandai sebagai selesai.' : 'Catatan ditandai sebagai belum selesai.',
+                note: updatedNote
+            });
+
+        } catch (error) {
+            console.error('Toggle note status error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat memperbarui status catatan.'
+            });
+        }
     }
 };
 

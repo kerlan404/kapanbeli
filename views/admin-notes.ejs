@@ -13,6 +13,9 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --primary-blue: #2E86DE;
@@ -429,39 +432,66 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
         }
 
         .modal.active { display: flex; }
 
         .modal-content {
             background: var(--bg-card);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 500px;
+            border-radius: 16px;
+            padding: 0;
+            max-width: 700px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1) translateY(0);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            padding: 24px;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .modal-title { font-size: 1.25rem; font-weight: 600; }
+        .modal-title { 
+            font-size: 1.4rem; 
+            font-weight: 700; 
+            color: var(--text-main);
+        }
+
         .modal-close {
-            background: none; border: none;
+            background: rgba(0,0,0,0.05); 
+            border: none;
             font-size: 1.5rem;
             color: var(--text-muted);
             cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover { 
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+            transform: rotate(90deg) scale(1.1);
         }
 
         .form-group { margin-bottom: 20px; }
@@ -707,32 +737,125 @@
     <!-- View/Edit Modal -->
     <div id="noteModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Detail Catatan</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            
+            <!-- View Mode -->
+            <div id="noteViewMode" style="display: none;">
+                <div class="modal-header" style="background: linear-gradient(135deg, rgba(255, 159, 67, 0.1) 0%, rgba(46, 134, 222, 0.1) 100%); padding: 24px; border-radius: 12px 12px 0 0; position: relative;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));"></div>
+                    <h3 class="modal-title" id="modalTitle" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-sticky-note" style="color: var(--primary-orange);"></i>
+                        <span>Detail Catatan</span>
+                    </h3>
+                </div>
+                
+                <div class="modal-body" style="padding: 24px;">
+                    <!-- User Info -->
+                    <div style="background: rgba(46, 134, 222, 0.05); padding: 16px; border-radius: 10px; margin-bottom: 20px; border-left: 3px solid var(--primary-blue);">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-user"></i> Informasi User
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-main); font-size: 1rem;" id="noteUserName">-</div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;" id="noteUserEmail">-</div>
+                    </div>
+
+                    <!-- Title -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 0.8rem; color: var(--primary-blue); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-heading"></i> Judul Catatan
+                        </div>
+                        <div id="noteViewTitle" style="font-size: 1.3rem; font-weight: 700; color: var(--text-main); padding: 14px 16px; background: var(--bg-body); border-radius: 10px; border: 2px solid rgba(0,0,0,0.05);"></div>
+                    </div>
+
+                    <!-- Content -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 0.8rem; color: var(--primary-blue); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-align-left"></i> Isi Catatan
+                        </div>
+                        <div id="noteViewContent" style="font-size: 0.95rem; color: var(--text-main); padding: 16px; background: var(--bg-body); border-radius: 10px; border: 2px solid rgba(0,0,0,0.05); line-height: 1.7; white-space: pre-wrap; max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+
+                    <!-- Meta Info -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                        <div style="background: rgba(29, 209, 161, 0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(29, 209, 161, 0.2);">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">
+                                <i class="fas fa-calendar"></i> Dibuat
+                            </div>
+                            <div id="noteViewCreated" style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);"></div>
+                        </div>
+                        <div style="background: rgba(255, 159, 67, 0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(255, 159, 67, 0.2);">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">
+                                <i class="fas fa-sync-alt"></i> Diperbarui
+                            </div>
+                            <div id="noteViewUpdated" style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, rgba(255, 159, 67, 0.05) 0%, rgba(46, 134, 222, 0.05) 100%); border-radius: 10px;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">
+                            <i class="fas fa-check-circle"></i> Status
+                        </div>
+                        <div id="noteViewStatus"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; padding: 16px 24px; border-top: 1px solid var(--border-color);">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">
+                        <i class="fas fa-times"></i> Tutup
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="editNoteFromView()" id="btnEditFromView">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
             </div>
-            <form id="noteForm">
-                <input type="hidden" id="noteId">
-                <div class="form-group">
-                    <label>Judul</label>
-                    <input type="text" id="noteTitle" class="form-control" required>
+
+            <!-- Edit Mode -->
+            <div id="noteEditMode" style="display: none;">
+                <div class="modal-header" style="background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); padding: 24px; border-radius: 12px 12px 0 0; position: relative;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));"></div>
+                    <h3 class="modal-title" id="modalTitleEdit" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-edit" style="color: var(--primary-blue);"></i>
+                        <span>Edit Catatan</span>
+                    </h3>
                 </div>
-                <div class="form-group">
-                    <label>Isi Catatan</label>
-                    <textarea id="noteContent" class="form-control" rows="5" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="noteStatus" class="form-control">
-                        <option value="pending">Belum Selesai</option>
-                        <option value="completed">Selesai</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal()">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
+                
+                <form id="noteForm" style="padding: 24px;">
+                    <input type="hidden" id="noteId">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-blue); font-size: 0.9rem;">
+                            <i class="fas fa-heading"></i> Judul
+                        </label>
+                        <input type="text" id="noteTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-blue); font-size: 0.9rem;">
+                            <i class="fas fa-align-left"></i> Isi Catatan
+                        </label>
+                        <textarea id="noteContent" class="form-control" rows="6" required></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-blue); font-size: 0.9rem;">
+                            <i class="fas fa-check-circle"></i> Status
+                        </label>
+                        <select id="noteStatus" class="form-control">
+                            <option value="pending">Belum Selesai</option>
+                            <option value="completed">Selesai</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; padding: 16px 0 0; border-top: 1px solid var(--border-color);">
+                        <button type="button" class="btn btn-outline" onclick="backToView()">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">
+                            <i class="fas fa-times"></i> Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -938,7 +1061,7 @@
             }
         }
 
-        // View Note
+        // View Note (Read-Only Mode) - Enhanced
         async function viewNote(id) {
             try {
                 const response = await fetch(`/api/admin/notes/${id}`, { credentials: 'same-origin' });
@@ -946,14 +1069,39 @@
 
                 if (result.success) {
                     const note = result.data;
-                    document.getElementById('modalTitle').textContent = 'Detail Catatan';
+                    
+                    // Populate view mode
+                    document.getElementById('noteViewTitle').textContent = note.title;
+                    document.getElementById('noteViewContent').textContent = note.content || 'Tidak ada isi catatan.';
+                    document.getElementById('noteUserName').textContent = note.user_name || '-';
+                    document.getElementById('noteUserEmail').textContent = note.user_email || '-';
+                    
+                    // Format dates
+                    const createdDate = new Date(note.created_at).toLocaleString('id-ID', {
+                        year: 'numeric', month: 'long', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    const updatedDate = new Date(note.updated_at).toLocaleString('id-ID', {
+                        year: 'numeric', month: 'long', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    document.getElementById('noteViewCreated').textContent = createdDate;
+                    document.getElementById('noteViewUpdated').textContent = updatedDate;
+                    
+                    // Status badge
+                    const statusHtml = note.is_completed 
+                        ? '<span class="badge badge-completed" style="font-size: 1rem; padding: 10px 24px;"><i class="fas fa-check-circle"></i> Selesai</span>'
+                        : '<span class="badge badge-pending" style="font-size: 1rem; padding: 10px 24px;"><i class="fas fa-clock"></i> Belum Selesai</span>';
+                    document.getElementById('noteViewStatus').innerHTML = statusHtml;
+                    
+                    // Store note data for edit
                     document.getElementById('noteId').value = note.id;
-                    document.getElementById('noteTitle').value = note.title;
-                    document.getElementById('noteContent').value = note.content;
-                    document.getElementById('noteStatus').value = note.is_completed ? 'completed' : 'pending';
-                    document.getElementById('noteTitle').disabled = false;
-                    document.getElementById('noteContent').disabled = false;
-                    document.getElementById('noteStatus').disabled = false;
+                    
+                    // Show view mode, hide edit mode
+                    document.getElementById('noteViewMode').style.display = 'block';
+                    document.getElementById('noteEditMode').style.display = 'none';
+                    
                     document.getElementById('noteModal').classList.add('active');
                 } else {
                     showToast(result.message || 'Gagal memuat detail catatan', 'error');
@@ -964,16 +1112,68 @@
             }
         }
 
-        // Edit Note
+        // Edit Note from View
+        function editNoteFromView() {
+            document.getElementById('noteViewMode').style.display = 'none';
+            document.getElementById('noteEditMode').style.display = 'block';
+            
+            // Populate form
+            const title = document.getElementById('noteViewTitle').textContent;
+            const content = document.getElementById('noteViewContent').textContent;
+            const status = document.getElementById('noteViewStatus').querySelector('.badge').classList.contains('badge-completed') ? 'completed' : 'pending';
+            
+            document.getElementById('noteTitle').value = title;
+            document.getElementById('noteContent').value = content === 'Tidak ada isi catatan.' ? '' : content;
+            document.getElementById('noteStatus').value = status;
+            
+            document.getElementById('modalTitleEdit').innerHTML = '<i class="fas fa-edit" style="color: var(--primary-blue);"></i> <span>Edit Catatan</span>';
+        }
+
+        // Back to View from Edit
+        function backToView() {
+            document.getElementById('noteViewMode').style.display = 'block';
+            document.getElementById('noteEditMode').style.display = 'none';
+        }
+
+        // Edit Note (Editable Mode)
         async function editNote(id) {
-            await viewNote(id);
-            document.getElementById('modalTitle').textContent = 'Edit Catatan';
+            try {
+                const response = await fetch(`/api/admin/notes/${id}`, { credentials: 'same-origin' });
+                const result = await response.json();
+
+                if (result.success) {
+                    const note = result.data;
+                    
+                    // Populate form
+                    document.getElementById('noteId').value = note.id;
+                    document.getElementById('noteTitle').value = note.title;
+                    document.getElementById('noteContent').value = note.content;
+                    document.getElementById('noteStatus').value = note.is_completed ? 'completed' : 'pending';
+                    
+                    document.getElementById('modalTitleEdit').innerHTML = '<i class="fas fa-edit" style="color: var(--primary-blue);"></i> <span>Edit Catatan</span>';
+                    
+                    // Show edit mode, hide view mode
+                    document.getElementById('noteViewMode').style.display = 'none';
+                    document.getElementById('noteEditMode').style.display = 'block';
+                    
+                    document.getElementById('noteModal').classList.add('active');
+                } else {
+                    showToast(result.message || 'Gagal memuat detail catatan', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading note:', error);
+                showToast('Terjadi kesalahan saat memuat detail', 'error');
+            }
         }
 
         // Close Modal
         function closeModal() {
             document.getElementById('noteModal').classList.remove('active');
             document.getElementById('noteForm').reset();
+            resetFormStyles();
+            // Reset to view mode
+            document.getElementById('noteViewMode').style.display = 'block';
+            document.getElementById('noteEditMode').style.display = 'none';
         }
 
         // Form Submit
@@ -1010,27 +1210,53 @@
             }
         });
 
-        // Delete Note
+        // Reset form styles on close
+        function resetFormStyles() {
+            document.getElementById('noteTitle').style.background = '';
+            document.getElementById('noteContent').style.background = '';
+            document.getElementById('noteTitle').readOnly = false;
+            document.getElementById('noteContent').readOnly = false;
+            document.getElementById('noteStatus').disabled = false;
+        }
+
+        // Delete Note with SweetAlert
         async function deleteNote(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus catatan ini?')) return;
+            const result = await Swal.fire({
+                title: 'Hapus Catatan?',
+                text: 'Apakah Anda yakin ingin menghapus catatan ini? Tindakan ini tidak dapat dibatalkan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            });
 
-            try {
-                const response = await fetch(`/api/admin/notes/${id}`, {
-                    method: 'DELETE',
-                    credentials: 'same-origin'
-                });
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/admin/notes/${id}`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin'
+                    });
 
-                const result = await response.json();
+                    const result = await response.json();
 
-                if (result.success) {
-                    showToast('Catatan berhasil dihapus', 'success');
-                    loadNotes();
-                } else {
-                    showToast(result.message || 'Gagal menghapus catatan', 'error');
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Catatan berhasil dihapus',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        loadNotes();
+                    } else {
+                        showToast(result.message || 'Gagal menghapus catatan', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting note:', error);
+                    showToast('Terjadi kesalahan saat menghapus', 'error');
                 }
-            } catch (error) {
-                console.error('Error deleting note:', error);
-                showToast('Terjadi kesalahan saat menghapus', 'error');
             }
         }
 

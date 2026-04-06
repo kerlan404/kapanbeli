@@ -316,6 +316,10 @@ app.use('/api/admin/activity-logs', adminActivityRoutes);
 // Alias for backward compatibility
 app.use('/api/admin/activity', adminActivityRoutes);
 
+// Use activity logs routes (protected) - For dashboard activity section
+const activityLogsRoutes = require('./routes/activityLogs');
+app.use('/api/activity-logs', activityLogsRoutes);
+
 // Use admin product routes (protected) - MUST be before /api/admin
 app.use('/api/admin/products', adminProductRoutes);
 
@@ -496,12 +500,12 @@ app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
 // Current user's profile page (MUST BE BEFORE /profile/:id)
 app.get('/user-profile', isAuthenticated, (req, res) => {
     console.log('User profile page accessed. Session user:', req.session.user);
-    res.render('user-profile-new', { currentPage: 'profile' });
+    res.render('user-profile', { currentPage: 'profile' });
 });
 
 // Public user profile page
 app.get('/profile/:id', async (req, res) => {
-    res.render('user-profile-new', { currentPage: 'profile' });
+    res.render('user-profile', { currentPage: 'profile' });
 });
 
 app.get('/admin/user/:id/products', isAuthenticated, (req, res) => {

@@ -100,4 +100,18 @@ router.delete('/:id', adminProductController.deleteProduct);
  */
 router.patch('/:id/toggle-status', adminProductController.toggleStatus);
 
+/**
+ * @route PATCH /api/admin/products/:id/deactivate
+ * @desc API endpoint untuk menonaktifkan produk oleh admin
+ * @access Private (Admin)
+ */
+router.patch('/:id/deactivate', adminProductController.deactivateProduct);
+
+/**
+ * @route PATCH /api/admin/products/:id/reactivate
+ * @desc API endpoint untuk mengaktifkan kembali produk oleh admin
+ * @access Private (Admin)
+ */
+router.patch('/:id/reactivate', adminProductController.reactivateProduct);
+
 module.exports = router;

@@ -269,42 +269,198 @@
 
         .profile-stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 20px;
             margin-top: 30px;
         }
 
         .profile-stat-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.8));
-            padding: 20px;
-            border-radius: 16px;
+            background: var(--bg-card);
+            padding: 24px 20px;
+            border-radius: 20px;
             text-align: center;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .profile-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-accent), var(--card-accent-light));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .profile-stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--card-glow) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .profile-stat-card:hover::after {
+            opacity: 0.15;
         }
 
         .profile-stat-card:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-            background: linear-gradient(135deg, rgba(46, 134, 222, 0.08), rgba(255, 159, 67, 0.08));
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            border-color: var(--card-accent);
+        }
+
+        /* Card Variants */
+        .profile-stat-card.products {
+            --card-accent: #2E86DE;
+            --card-accent-light: #54a0ff;
+            --card-glow: rgba(46, 134, 222, 0.3);
+        }
+
+        .profile-stat-card.suggestions {
+            --card-accent: #FF9F43;
+            --card-accent-light: #FFC278;
+            --card-glow: rgba(255, 159, 67, 0.3);
+        }
+
+        .profile-stat-card.notes {
+            --card-accent: #1DD1A1;
+            --card-accent-light: #55efc4;
+            --card-glow: rgba(29, 209, 161, 0.3);
+        }
+
+        .profile-stat-card.logins {
+            --card-accent: #FF6B6B;
+            --card-accent-light: #ff8787;
+            --card-glow: rgba(255, 107, 107, 0.3);
+        }
+
+        .profile-stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin: 0 auto 15px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px var(--card-glow);
+        }
+
+        .profile-stat-card:hover .profile-stat-icon {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 10px 30px var(--card-glow);
+        }
+
+        .profile-stat-card.products .profile-stat-icon {
+            background: linear-gradient(135deg, #2E86DE, #54a0ff);
+            color: white;
+        }
+
+        .profile-stat-card.suggestions .profile-stat-icon {
+            background: linear-gradient(135deg, #FF9F43, #FFC278);
+            color: white;
+        }
+
+        .profile-stat-card.notes .profile-stat-icon {
+            background: linear-gradient(135deg, #1DD1A1, #55efc4);
+            color: white;
+        }
+
+        .profile-stat-card.logins .profile-stat-icon {
+            background: linear-gradient(135deg, #FF6B6B, #ff8787);
+            color: white;
         }
 
         .profile-stat-value {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 900;
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            background: linear-gradient(135deg, var(--card-accent), var(--card-accent-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-stat-card:hover .profile-stat-value {
+            transform: scale(1.1);
         }
 
         .profile-stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stat Pulse Animation */
+        @keyframes statPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Stat Card Entrance Animation */
+        @keyframes statCardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .profile-stat-card {
+            animation: statCardEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+        }
+
+        .profile-stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .profile-stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .profile-stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .profile-stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Dark Mode Stats */
+        body.dark-mode-active .profile-stat-card {
+            background: var(--bg-card-dark);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode-active .profile-stat-card:hover {
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+        }
+
+        body.dark-mode-active .profile-stat-icon {
+            box-shadow: 0 6px 25px var(--card-glow);
+        }
+
+        body.dark-mode-active .profile-stat-card:hover .profile-stat-icon {
+            box-shadow: 0 10px 35px var(--card-glow);
         }
 
         /* Navbar */
@@ -1412,21 +1568,25 @@
                     </p>
                     <div id="profileBadges" class="profile-badges"></div>
                     <div class="profile-stats-grid">
-                        <div class="profile-stat-card">
+                        <div class="profile-stat-card products">
+                            <div class="profile-stat-icon"><i class="fas fa-box-open"></i></div>
                             <div class="profile-stat-value" id="statProducts">0</div>
-                            <div class="profile-stat-label"><i class="fas fa-box"></i> Produk</div>
+                            <div class="profile-stat-label">Produk</div>
                         </div>
-                        <div class="profile-stat-card">
+                        <div class="profile-stat-card suggestions">
+                            <div class="profile-stat-icon"><i class="fas fa-lightbulb"></i></div>
                             <div class="profile-stat-value" id="statSuggestions">0</div>
-                            <div class="profile-stat-label"><i class="fas fa-lightbulb"></i> Saran</div>
+                            <div class="profile-stat-label">Saran</div>
                         </div>
-                        <div class="profile-stat-card">
+                        <div class="profile-stat-card notes">
+                            <div class="profile-stat-icon"><i class="fas fa-sticky-note"></i></div>
                             <div class="profile-stat-value" id="statNotes">0</div>
-                            <div class="profile-stat-label"><i class="fas fa-sticky-note"></i> Catatan</div>
+                            <div class="profile-stat-label">Catatan</div>
                         </div>
-                        <div class="profile-stat-card">
+                        <div class="profile-stat-card logins">
+                            <div class="profile-stat-icon"><i class="fas fa-sign-in-alt"></i></div>
                             <div class="profile-stat-value" id="statLogins">0</div>
-                            <div class="profile-stat-label"><i class="fas fa-sign-in-alt"></i> Login</div>
+                            <div class="profile-stat-label">Login</div>
                         </div>
                     </div>
                 </div>
@@ -1632,6 +1792,11 @@
         function displayProfile(data) {
             const { user, products, suggestions, notes } = data;
 
+            console.log('[displayProfile] Data received:', data);
+            console.log('[displayProfile] Products:', products, 'Count:', products ? products.length : 0);
+            console.log('[displayProfile] Suggestions:', suggestions, 'Count:', suggestions ? suggestions.length : 0);
+            console.log('[displayProfile] Notes:', notes, 'Count:', notes ? notes.length : 0);
+
             // Profile Image
             const profileImg = document.getElementById('profileImage');
             const placeholder = document.getElementById('profileAvatarPlaceholder');
@@ -1667,19 +1832,35 @@
                 </span>
             `;
 
-            // Meta Info
-            document.getElementById('joinDate').textContent = new Date(user.created_at).toLocaleDateString('id-ID', {
-                year: 'numeric', month: 'long', day: 'numeric'
-            });
-            document.getElementById('lastLogin').textContent = user.last_login
-                ? new Date(user.last_login).toLocaleString('id-ID')
-                : 'Belum pernah';
+            // Meta Info - Only update if elements exist
+            const joinDateEl = document.getElementById('joinDate');
+            const lastLoginEl = document.getElementById('lastLogin');
 
-            // Stats
-            document.getElementById('statProducts').textContent = products ? products.length : 0;
-            document.getElementById('statSuggestions').textContent = suggestions ? suggestions.length : 0;
-            document.getElementById('statNotes').textContent = notes ? notes.length : 0;
-            document.getElementById('statLogins').textContent = user.total_logins || 0;
+            if (joinDateEl) {
+                joinDateEl.textContent = new Date(user.created_at).toLocaleDateString('id-ID', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+            }
+
+            if (lastLoginEl) {
+                lastLoginEl.textContent = user.last_login
+                    ? new Date(user.last_login).toLocaleString('id-ID')
+                    : 'Belum pernah';
+            }
+
+            // Stats - Update with animation
+            const productCount = products ? products.length : 0;
+            const suggestionCount = suggestions ? suggestions.length : 0;
+            const noteCount = notes ? notes.length : 0;
+            const loginCount = user.total_logins || 0;
+
+            console.log('[displayProfile] Setting stats - Products:', productCount, 'Suggestions:', suggestionCount, 'Notes:', noteCount, 'Logins:', loginCount);
+
+            // Animate stats with counting effect
+            animateValue('statProducts', 0, productCount, 1000);
+            animateValue('statSuggestions', 0, suggestionCount, 1000);
+            animateValue('statNotes', 0, noteCount, 1000);
+            animateValue('statLogins', 0, loginCount, 1000);
 
             // Load user activity
             loadUserActivity();
@@ -1687,6 +1868,43 @@
             // Show content
             document.getElementById('loading').style.display = 'none';
             document.getElementById('profileContent').style.display = 'block';
+
+            console.log('[displayProfile] Profile displayed successfully');
+        }
+
+        // Animate number counting with smooth effect
+        function animateValue(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                console.error(`[animateValue] Element ${elementId} not found!`);
+                return;
+            }
+
+            const range = end - start;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease out cubic for smooth deceleration
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + range * easeOut);
+
+                element.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = end;
+                    // Add pulse effect when value > 0
+                    if (end > 0) {
+                        element.style.animation = 'statPulse 0.6s ease-out';
+                    }
+                }
+            }
+
+            requestAnimationFrame(update);
         }
 
         // Load user activity logs

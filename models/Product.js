@@ -7,24 +7,29 @@ const Product = {
         console.log('Getting products for user ID:', userId); // Debug log
         try {
             const query = `
-                SELECT 
-                    p.id, 
-                    p.name, 
-                    p.description, 
-                    p.category_id, 
+                SELECT
+                    p.id,
+                    p.name,
+                    p.description,
+                    p.category_id,
                     c.name as category_name,
-                    p.stock_quantity, 
-                    p.min_stock_level, 
-                    p.image_url, 
-                    p.user_id, 
-                    p.created_at, 
-                    p.updated_at, 
-                    p.unit, 
-                    p.quantity, 
+                    p.stock_quantity,
+                    p.min_stock_level,
+                    p.image_url,
+                    p.user_id,
+                    p.created_at,
+                    p.updated_at,
+                    p.unit,
+                    p.quantity,
                     DATE_FORMAT(p.expiry_date, '%Y-%m-%d') as expiry_date,
-                    p.notes
+                    p.notes,
+                    p.is_deactivated_by_admin,
+                    p.deactivated_at,
+                    p.deactivated_reason,
+                    u.name as deactivated_by_name
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN users u ON p.deactivated_by = u.id
                 WHERE p.user_id = ?
                 ORDER BY p.created_at DESC
             `;
@@ -436,6 +441,56 @@ const Product = {
             console.error('Error getting low stock items:', error);
             throw error;
         }
+    },
+
+    // Fungsi untuk menonaktifkan produk oleh admin
+    deactivateByAdmin: async (productId, adminId, reason) => {
+        const query = `
+            UPDATE products
+            SET is_deactivated_by_admin = TRUE,
+                deactivated_at = NOW(),
+                deactivated_reason = ?,
+                deactivated_by = ?
+            WHERE id = ?
+        `;
+        const [result] = await db.execute(query, [reason, adminId, productId]);
+
+        if (result.affectedRows === 0) {
+            throw new Error('Product tidak ditemukan');
+        }
+
+        return {
+            id: productId,
+            is_deactivated_by_admin: true,
+            deactivated_at: new Date(),
+            deactivated_reason: reason,
+            deactivated_by: adminId
+        };
+    },
+
+    // Fungsi untuk mengaktifkan kembali produk oleh admin
+    reactivateByAdmin: async (productId, adminId) => {
+        const query = `
+            UPDATE products
+            SET is_deactivated_by_admin = FALSE,
+                deactivated_at = NULL,
+                deactivated_reason = NULL,
+                deactivated_by = NULL
+            WHERE id = ?
+        `;
+        const [result] = await db.execute(query, [productId]);
+
+        if (result.affectedRows === 0) {
+            throw new Error('Product tidak ditemukan');
+        }
+
+        return {
+            id: productId,
+            is_deactivated_by_admin: false,
+            deactivated_at: null,
+            deactivated_reason: null,
+            deactivated_by: null
+        };
     }
 };
 

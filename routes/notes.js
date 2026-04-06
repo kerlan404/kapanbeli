@@ -26,6 +26,9 @@ router.post('/', notesController.create);
 // Endpoint untuk memperbarui catatan
 router.put('/:id', notesController.update);
 
+// Endpoint untuk toggle status completed
+router.patch('/:id/toggle-status', notesController.toggleStatus);
+
 // Endpoint untuk menghapus catatan
 router.delete('/:id', notesController.delete);
 

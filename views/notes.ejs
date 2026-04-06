@@ -77,12 +77,34 @@
         nav {
             position: sticky;
             top: 0;
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             z-index: 100;
             padding: 15px 5%;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        nav::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255, 159, 67, 0.4) 0%, rgba(46, 134, 222, 0.4) 50%, rgba(255, 159, 67, 0.4) 100%);
+            opacity: 0.5;
+        }
+
+        body.dark-mode-active nav {
+            background: rgba(30, 39, 46, 0.98);
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode-active nav::after {
+            background: linear-gradient(90deg, rgba(255, 159, 67, 0.3) 0%, rgba(46, 134, 222, 0.3) 50%, rgba(255, 159, 67, 0.3) 100%);
+            opacity: 0.3;
         }
 
         .nav-container {
@@ -306,6 +328,24 @@
             z-index: 2; /* Di atas garis */
         }
 
+        /* Time at top */
+        .note-time {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-orange);
+        }
+
+        .note-time i {
+            margin-right: 5px;
+            color: var(--primary-orange);
+        }
+
         .note-meta {
             display: flex;
             justify-content: space-between;
@@ -350,17 +390,60 @@
         .card-footer {
             margin-top: 15px;
             padding-top: 15px;
+            border-top: 1px solid var(--line-color);
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
             gap: 12px;
             opacity: 0;
             transition: all 0.3s ease;
-            border-top: 1px solid var(--line-color);
         }
 
-        .note-card:hover .card-footer { 
+        .note-card:hover .card-footer {
             opacity: 1;
             transform: translateY(-2px);
+        }
+
+        /* Status Badge */
+        .note-status {
+            flex-shrink: 0;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge.completed {
+            background: linear-gradient(135deg, rgba(29, 209, 161, 0.15), rgba(29, 209, 161, 0.1));
+            color: var(--success);
+            border: 1px solid rgba(29, 209, 161, 0.3);
+        }
+
+        .status-badge.completed i {
+            font-size: 0.85rem;
+        }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, rgba(254, 202, 87, 0.15), rgba(254, 202, 87, 0.1));
+            color: #d35400;
+            border: 1px solid rgba(254, 202, 87, 0.3);
+        }
+
+        .status-badge.pending i {
+            font-size: 0.85rem;
+        }
+
+        /* Note Actions */
+        .note-actions {
+            display: flex;
+            gap: 8px;
         }
 
         /* Enhanced Icon Buttons for Notes */
@@ -460,6 +543,36 @@
             transform: scale(1.3) rotate(10deg);
         }
 
+        /* Toggle Status Button - Green/Yellow Accent */
+        .icon-btn.toggle-status {
+            background: linear-gradient(135deg, rgba(29, 209, 161, 0.1) 0%, rgba(29, 209, 161, 0.15) 100%);
+            border-color: rgba(29, 209, 161, 0.3);
+            color: var(--success);
+            box-shadow: 0 2px 8px rgba(29, 209, 161, 0.15);
+        }
+
+        .icon-btn.toggle-status:hover {
+            background: linear-gradient(135deg, var(--success) 0%, #10ac84 100%);
+            border-color: var(--success);
+            color: white;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(29, 209, 161, 0.4);
+        }
+
+        .icon-btn.toggle-status:active {
+            transform: translateY(-1px) scale(1.05);
+        }
+
+        .icon-btn.toggle-status i {
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .icon-btn.toggle-status:hover i {
+            transform: scale(1.3) rotate(-15deg);
+        }
+
         /* Hover state for card footer - show buttons */
         .note-card:hover .card-footer {
             opacity: 1;
@@ -485,8 +598,8 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             display: flex;
             align-items: center;
@@ -501,95 +614,182 @@
         .modal-box {
             background: var(--bg-card);
             width: 90%;
-            max-width: 600px;
-            border-radius: 2px; /* Seperti kertas */
-            padding: 40px 40px 40px 60px; /* Padding kiri lebar untuk margin */
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 650px;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
-            /* Garis di modal juga */
-            background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
-            background-size: 100% 2.5rem;
-            border-left: 4px solid var(--margin-color); /* Margin tebal di modal */
+            overflow: hidden;
         }
 
         .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
 
-        .modal-header { margin-bottom: 30px; border-bottom: 2px solid var(--primary-orange); padding-bottom: 10px; display: inline-block; width: 100%; }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Modal Header with Gradient */
+        .modal-header {
+            background: linear-gradient(135deg, rgba(255, 159, 67, 0.1) 0%, rgba(46, 134, 222, 0.1) 100%);
+            padding: 24px 30px;
+            border-bottom: 2px solid var(--primary-orange);
+            position: relative;
         }
 
-        .modal-subtitle { color: var(--text-muted); font-size: 0.9rem; font-style: italic; }
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-title i {
+            color: var(--primary-orange);
+            font-size: 1.4rem;
+        }
+
+        .modal-subtitle { 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            margin-top: 5px;
+            margin-left: 34px;
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 30px;
+        }
 
         .form-group { margin-bottom: 25px; position: relative; }
-        
+
         .form-label {
-            display: block;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--primary-blue);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label i {
+            font-size: 0.95rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 0;
-            border: none;
-            background: transparent;
+            padding: 14px 18px;
+            border: 2px solid rgba(0,0,0,0.08);
+            border-radius: 10px;
+            background: var(--bg-body);
             color: var(--text-main);
-            font-family: 'Poppins', sans-serif; /* Atau font tulisan tangan jika ada */
-            font-size: 1.1rem;
-            line-height: 2.5rem; /* Sesuai garis background */
-            resize: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
             outline: none;
+            transition: all 0.3s ease;
         }
 
-        .form-control::placeholder { color: rgba(0,0,0,0.2); font-style: italic; }
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+        }
+
+        .form-control::placeholder { color: rgba(0,0,0,0.3); font-style: italic; }
         body.dark-mode-active .form-control::placeholder { color: rgba(255,255,255,0.2); }
 
-        textarea.form-control { min-height: 150px; }
+        input.form-control {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
 
+        textarea.form-control { min-height: 180px; }
+
+        /* Modal Footer */
         .modal-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--text-muted);
+            gap: 12px;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, rgba(255, 159, 67, 0.05) 0%, rgba(46, 134, 222, 0.05) 100%);
+            border-top: 1px solid rgba(0,0,0,0.08);
         }
 
         .btn {
-            padding: 10px 25px;
-            border-radius: 30px;
+            padding: 12px 28px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             border: none;
             font-family: inherit;
-            transition: transform 0.2s;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
+
         .btn:active { transform: scale(0.95); }
 
-        .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); }
-        .btn-secondary:hover { color: var(--danger); border-color: var(--danger); }
+        .btn-secondary { 
+            background: transparent; 
+            color: var(--text-muted); 
+            border: 2px solid var(--border-color);
+        }
+        .btn-secondary:hover { 
+            background: rgba(0,0,0,0.05);
+            border-color: var(--text-muted);
+        }
 
-        .btn-primary { background: var(--primary-blue); color: white; box-shadow: 0 4px 10px rgba(46, 134, 222, 0.3); }
-        .btn-primary:hover { background: #2373c7; transform: translateY(-2px); }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary-blue), #54a0ff); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(46, 134, 222, 0.3);
+        }
+        .btn-primary:hover { 
+            background: linear-gradient(135deg, #1e6bb8, var(--primary-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 134, 222, 0.4);
+        }
 
         .close-modal-btn {
-            position: absolute; top: 15px; right: 20px;
-            background: none; border: none; font-size: 1.5rem; color: var(--text-muted);
-            cursor: pointer; transition: 0.2s; z-index: 10;
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05);
+            border: none; 
+            font-size: 1.3rem; 
+            color: var(--text-muted);
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .close-modal-btn:hover { color: var(--danger); transform: rotate(90deg); }
+        .close-modal-btn:hover { 
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--danger); 
+            transform: rotate(90deg) scale(1.1);
+        }
 
         /* Animations */
         @keyframes slideUp {
@@ -669,22 +869,26 @@
         <div class="modal-box">
             <button class="close-modal-btn" onclick="closeModal()">&times;</button>
             <div class="modal-header">
-                <h3 class="modal-title">Halaman Baru</h3>
+                <h3 class="modal-title"><i class="fas fa-pen-fancy"></i> Halaman Baru</h3>
                 <p class="modal-subtitle">Tulis apa yang ada di pikiranmu...</p>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">Judul</label>
-                <input type="text" id="noteTitle" class="form-control" placeholder="Masukkan judul catatan..." autocomplete="off">
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">Isi Catatan</label>
-                <textarea id="noteContent" class="form-control" placeholder="Tulis detail catatan di sini..."></textarea>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-heading"></i> Judul</label>
+                    <input type="text" id="noteTitle" class="form-control" placeholder="Masukkan judul catatan..." autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-align-left"></i> Isi Catatan</label>
+                    <textarea id="noteContent" class="form-control" placeholder="Tulis detail catatan di sini..."></textarea>
+                </div>
             </div>
 
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Batal
+                </button>
                 <button class="btn btn-primary" onclick="saveNote()">
                     <i class="fas fa-save"></i> Simpan
                 </button>
@@ -859,19 +1063,29 @@
                     <div class="tape"></div>
                     <div class="push-pin"></div>
                     <div class="card-body">
-                        <div class="note-meta">
-                            <span><i class="far fa-clock"></i> ${formattedDate}</span>
+                        <div class="note-time">
+                            <i class="far fa-clock"></i> ${formattedDate}
                         </div>
                         <h3 class="note-title" onclick="editNote(${note.id}, '${safeTitle}', '${safeContent}')">${note.title}</h3>
                         <p class="note-content">${note.content || 'Tidak ada isi catatan.'}</p>
-                        
+
                         <div class="card-footer">
-                            <button class="icon-btn edit" title="Edit" onclick="editNote(${note.id}, '${safeTitle}', '${safeContent}')">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button class="icon-btn delete" title="Hapus" onclick="deleteNote(${note.id}, '${safeTitle}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <div class="note-status">
+                                ${note.is_completed 
+                                    ? '<span class="status-badge completed"><i class="fas fa-check-circle"></i> Selesai</span>' 
+                                    : '<span class="status-badge pending"><i class="fas fa-clock"></i> Belum Selesai</span>'}
+                            </div>
+                            <div class="note-actions">
+                                <button class="icon-btn toggle-status" title="${note.is_completed ? 'Tandai Belum Selesai' : 'Tandai Selesai'}" onclick="toggleNoteStatus(${note.id}, '${safeTitle}', ${note.is_completed})">
+                                    <i class="fas ${note.is_completed ? 'fa-undo' : 'fa-check'}"></i>
+                                </button>
+                                <button class="icon-btn edit" title="Edit" onclick="editNote(${note.id}, '${safeTitle}', '${safeContent}')">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button class="icon-btn delete" title="Hapus" onclick="deleteNote(${note.id}, '${safeTitle}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -919,20 +1133,43 @@
             }
         }
 
-        // --- 5. EDIT LOGIC (SweetAlert - Style tetap standar agar fokus pada input) ---
+        // --- 5. EDIT LOGIC (Enhanced SweetAlert) ---
         async function editNote(id, title, content) {
+            const isDark = body.classList.contains('dark-mode-active');
+            
             const { value: formValues } = await Swal.fire({
-                title: 'Edit Catatan',
+                title: '<i class="fas fa-edit" style="color: #FF9F43;"></i> Edit Catatan',
                 html: `
-                    <input id="swal-input1" class="swal2-input" placeholder="Judul" value="${title}">
-                    <textarea id="swal-input2" class="swal2-textarea" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" rows="4" placeholder="Isi Catatan">${content}</textarea>
+                    <div style="text-align: left; padding: 10px 0;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: ${isDark ? '#2E86DE' : '#2E86DE'}; font-size: 0.9rem;">
+                            <i class="fas fa-heading"></i> Judul
+                        </label>
+                        <input id="swal-input1" class="swal2-input" placeholder="Judul catatan" value="${title}" 
+                            style="width: 100%; margin-bottom: 20px; padding: 12px 16px; border: 2px solid ${isDark ? '#3D5166' : '#E1E8ED'}; border-radius: 10px; background: ${isDark ? '#34495E' : '#F8F9FA'}; color: ${isDark ? '#DFE6E9' : '#2C3E50'}; font-size: 1.05rem; font-weight: 600;">
+                        
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: ${isDark ? '#2E86DE' : '#2E86DE'}; font-size: 0.9rem;">
+                            <i class="fas fa-align-left"></i> Isi Catatan
+                        </label>
+                        <textarea id="swal-input2" class="swal2-textarea" placeholder="Isi catatan..." 
+                            style="width: 100%; padding: 14px 16px; border: 2px solid ${isDark ? '#3D5166' : '#E1E8ED'}; border-radius: 10px; background: ${isDark ? '#34495E' : '#F8F9FA'}; color: ${isDark ? '#DFE6E9' : '#2C3E50'}; font-size: 1rem; min-height: 180px; resize: vertical; line-height: 1.6;">${content}</textarea>
+                    </div>
                 `,
                 focusConfirm: false,
                 preConfirm: () => [ document.getElementById('swal-input1').value, document.getElementById('swal-input2').value ],
-                showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal',
-                confirmButtonColor: 'var(--primary-blue)',
-                background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
-                color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
+                showCancelButton: true, 
+                confirmButtonText: '<i class="fas fa-save"></i> Simpan', 
+                cancelButtonText: '<i class="fas fa-times"></i> Batal',
+                confirmButtonColor: '#2E86DE',
+                cancelButtonColor: '#8395A7',
+                background: isDark ? '#2d3b45' : '#fff',
+                color: isDark ? '#fff' : '#2C3E50',
+                width: '650px',
+                padding: '30px',
+                backdrop: 'rgba(0,0,0,0.7)',
+                customClass: {
+                    popup: 'animated-popup',
+                    title: 'animated-title'
+                }
             });
 
             if (formValues) {
@@ -965,13 +1202,64 @@
                 try {
                     const response = await fetch(`/api/notes/${id}`, { method: 'DELETE' });
                     const data = await response.json();
-                    if (data.success) { Swal.fire('Terhapus!', 'Catatan Anda telah dihapus.', 'success'); loadNotes(); } 
+                    if (data.success) { Swal.fire('Terhapus!', 'Catatan Anda telah dihapus.', 'success'); loadNotes(); }
                     else { Swal.fire('Gagal', data.message, 'error'); }
                 } catch (error) { Swal.fire('Error', 'Gagal menghapus catatan.', 'error'); }
             }
         }
 
-        // --- 7. SEARCH LOGIC ---
+        // --- 7. TOGGLE STATUS LOGIC ---
+        async function toggleNoteStatus(id, title, currentStatus) {
+            const isCompleted = !currentStatus;
+            const confirmText = isCompleted 
+                ? `Yakin menandai "${title}" sebagai selesai?` 
+                : `Yakin menandai "${title}" sebagai belum selesai?`;
+            const successText = isCompleted 
+                ? 'Catatan ditandai sebagai selesai! ✅' 
+                : 'Catatan ditandai sebagai belum selesai! 🔄';
+
+            const result = await Swal.fire({
+                title: 'Ubah Status Catatan',
+                text: confirmText,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: isCompleted ? '#1DD1A1' : '#FECA57',
+                cancelButtonColor: '#8395A7',
+                confirmButtonText: isCompleted ? 'Ya, Selesai!' : 'Ya, Belum Selesai!',
+                cancelButtonText: 'Batal',
+                background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/notes/${id}/toggle-status`, { 
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: successText,
+                            timer: 2000,
+                            showConfirmButton: false,
+                            background: body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                            color: body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
+                        });
+                        loadNotes();
+                    } else {
+                        Swal.fire('Gagal', data.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Toggle note status error:', error);
+                    Swal.fire('Error', 'Gagal memperbarui status catatan.', 'error');
+                }
+            }
+        }
+
+        // --- 8. SEARCH LOGIC ---
         document.getElementById('searchInput').addEventListener('input', async (e) => {
             const query = e.target.value.toLowerCase();
             const cards = document.querySelectorAll('.note-card');

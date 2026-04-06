@@ -197,6 +197,57 @@ const adminProductController = {
         const result = await adminProductService.createProduct(createData);
 
         res.status(201).json(result);
+    }),
+
+    /**
+     * PATCH /api/admin/products/:id/deactivate
+     * API endpoint untuk menonaktifkan produk oleh admin
+     */
+    deactivateProduct: errorHandler.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const { reason } = req.body;
+        const adminId = req.session.user?.id;
+
+        if (!adminId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        const Product = require('../models/Product');
+        const result = await Product.deactivateByAdmin(id, adminId, reason || 'Tidak ada alasan');
+
+        res.json({
+            success: true,
+            message: 'Produk berhasil dinonaktifkan',
+            data: result
+        });
+    }),
+
+    /**
+     * PATCH /api/admin/products/:id/reactivate
+     * API endpoint untuk mengaktifkan kembali produk oleh admin
+     */
+    reactivateProduct: errorHandler.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const adminId = req.session.user?.id;
+
+        if (!adminId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        const Product = require('../models/Product');
+        const result = await Product.reactivateByAdmin(id, adminId);
+
+        res.json({
+            success: true,
+            message: 'Produk berhasil diaktifkan kembali',
+            data: result
+        });
     })
 };
 
