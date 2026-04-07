@@ -30,6 +30,16 @@
             <span>Semua Produk</span>
         </a>
 
+        <a href="/admin/expired-watch" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'expired-watch' ? 'active' : '' %>">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Monitoring Kadaluarsa</span>
+        </a>
+
+        <a href="/admin/categories" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'categories' ? 'active' : '' %>">
+            <i class="fas fa-tags"></i>
+            <span>Manajemen Kategori</span>
+        </a>
+
         <a href="/admin/shopping-suggestions" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'shopping-suggestions' ? 'active' : '' %>">
             <i class="fas fa-shopping-cart"></i>
             <span>Saran Pembelian</span>

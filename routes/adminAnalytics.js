@@ -30,4 +30,16 @@ router.get('/summary', adminAnalyticsController.getSummary.bind(adminAnalyticsCo
  */
 router.get('/', adminAnalyticsController.getAnalytics.bind(adminAnalyticsController));
 
+/**
+ * GET /api/admin/analytics/top-users
+ * Top 10 users with most products
+ */
+router.get('/top-users', adminAnalyticsController.getTopUsers.bind(adminAnalyticsController));
+
+/**
+ * GET /api/admin/analytics/category-distribution
+ * Product distribution by category
+ */
+router.get('/category-distribution', adminAnalyticsController.getCategoryDistribution.bind(adminAnalyticsController));
+
 module.exports = router;

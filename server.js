@@ -81,6 +81,10 @@ const adminProductRoutes = require('./routes/adminProductRoutes');
 const adminNotesRoutes = require('./routes/adminNotesRoutes');
 const adminActivityRoutes = require('./routes/adminActivityRoutes');
 const shoppingSuggestionsRoutes = require('./routes/shoppingSuggestionsRoutes');
+const expiredRoutes = require('./routes/expiredRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const broadcastRoutes = require('./routes/broadcastRoutes');
+const exportRoutes = require('./routes/exportRoutes');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
@@ -378,6 +382,12 @@ app.use('/api/profile', settingsRoutes);
 // Use settings API routes (protected)
 app.use('/api/settings', settingsApiRoutes);
 
+// New feature routes
+app.use('/admin', expiredRoutes);
+app.use('/admin', categoryRoutes);
+app.use('/api/admin', broadcastRoutes);
+app.use('/api/admin', exportRoutes);
+
 // Protected routes
 app.get('/notes', isAuthenticated, (req, res) => {
     res.render('notes', { currentPage: 'notes' });
@@ -460,6 +470,32 @@ app.get('/admin/activity-logs', isAuthenticated, (req, res) => {
             currentPage: 'activity-logs',
             user: req.session.user,
             title: 'Log Aktivitas User'
+        });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+// Expired Watch Page
+app.get('/admin/expired-watch', isAuthenticated, (req, res) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-expired-watch', {
+            currentPage: 'expired-watch',
+            user: req.session.user,
+            title: 'Monitoring Kadaluarsa'
+        });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
+// Category Management Page
+app.get('/admin/categories', isAuthenticated, (req, res) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-categories', {
+            currentPage: 'categories',
+            user: req.session.user,
+            title: 'Manajemen Kategori'
         });
     } else {
         res.status(403).send('Access denied. Admins only.');

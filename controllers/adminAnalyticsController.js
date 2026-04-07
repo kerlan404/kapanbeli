@@ -237,6 +237,62 @@ const analyticsController = {
     calcGrowth(prev, curr) {
         if (prev === 0) return curr > 0 ? 100 : 0;
         return parseFloat((((curr - prev) / prev) * 100).toFixed(2));
+    },
+
+    /**
+     * GET /api/admin/analytics/top-users
+     */
+    async getTopUsers(req, res) {
+        try {
+            if (!req.session?.user?.role || req.session.user.role !== 'admin') {
+                return res.status(403).json({ success: false, message: 'Akses ditolak.' });
+            }
+
+            const [users] = await db.execute(`
+                SELECT 
+                    u.id,
+                    u.name,
+                    u.email,
+                    COUNT(p.id) as total_products,
+                    COALESCE(SUM(p.stock_quantity), 0) as total_stock
+                FROM users u
+                LEFT JOIN products p ON u.id = p.user_id
+                GROUP BY u.id, u.name, u.email
+                ORDER BY total_products DESC
+                LIMIT 10
+            `);
+
+            res.json({ success: true, users });
+        } catch (error) {
+            console.error('Top users error:', error);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    /**
+     * GET /api/admin/analytics/category-distribution
+     */
+    async getCategoryDistribution(req, res) {
+        try {
+            if (!req.session?.user?.role || req.session.user.role !== 'admin') {
+                return res.status(403).json({ success: false, message: 'Akses ditolak.' });
+            }
+
+            const [categories] = await db.execute(`
+                SELECT 
+                    c.name,
+                    COUNT(p.id) as count
+                FROM categories c
+                LEFT JOIN products p ON c.id = p.category_id
+                GROUP BY c.id, c.name
+                ORDER BY count DESC
+            `);
+
+            res.json({ success: true, categories });
+        } catch (error) {
+            console.error('Category distribution error:', error);
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 

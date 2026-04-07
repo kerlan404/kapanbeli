@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Kategori - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-blue: #2E86DE; --primary-dark: #1B5FA5; --primary-orange: #FF9F43;
+            --accent-green: #1DD1A1; --accent-red: #FF6B6B;
+            --bg-sidebar: #1A1D23; --bg-sidebar-hover: rgba(255,255,255,0.05);
+            --bg-sidebar-active: rgba(46,134,222,0.15);
+            --text-sidebar: rgba(255,255,255,0.7); --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: #FFFFFF; --sidebar-border: rgba(255,255,255,0.1);
+            --bg-body: #F0F2F5; --bg-card: #FFFFFF;
+            --text-main: #1A1D21; --text-muted: #6C757D;
+            --border-color: #E5E7EB; --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1); --radius: 16px;
+            --sidebar-width: 260px;
+        }
+        body.dark-mode-active {
+            --bg-sidebar: #1A1D23; --bg-body: #0F1115; --bg-card: #1A1D23;
+            --text-main: #E5E7EB; --text-muted: #9CA3AF; --border-color: #2D3139;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: var(--sidebar-width); background: var(--bg-sidebar); color: var(--text-sidebar);
+            height: 100vh; position: fixed; top: 0; left: 0; display: flex;
+            flex-direction: column; z-index: 1000; border-right: 1px solid var(--sidebar-border);
+        }
+        .sidebar-header { height: 64px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--sidebar-border); }
+        .sidebar-header .logo { font-weight: 700; font-size: 1.15rem; color: var(--text-sidebar-heading); display: flex; align-items: center; gap: 10px; }
+        .sidebar-header .logo i { color: var(--primary-orange); font-size: 1.3rem; }
+        .sidebar-menu { flex: 1; padding: 16px 0; overflow-y: auto; }
+        .menu-label { padding: 0 20px 8px; font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.35); font-weight: 600; letter-spacing: 1px; margin-top: 16px; }
+        .nav-item { display: flex; align-items: center; padding: 10px 20px; color: var(--text-sidebar); transition: all 0.2s; border-left: 3px solid transparent; font-size: 0.9rem; }
+        .nav-item:hover { background: var(--bg-sidebar-hover); color: var(--text-sidebar-heading); }
+        .nav-item.active { background: var(--bg-sidebar-active); color: var(--text-sidebar-active); border-left-color: var(--primary-blue); }
+        .nav-item i { width: 22px; margin-right: 12px; text-align: center; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--sidebar-border); }
+        .user-mini-profile { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-orange); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 0.9rem; flex-shrink: 0; }
+        .user-info { flex: 1; min-width: 0; }
+        .user-info h4 { font-size: 0.85rem; color: var(--text-sidebar-heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info p { font-size: 0.7rem; color: var(--text-sidebar); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .logout-btn { background: rgba(255,107,107,0.12); color: var(--accent-red); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .logout-btn:hover { background: var(--accent-red); color: white; }
+
+        /* ========== MAIN ========== */
+        .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 32px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; gap: 20px; flex-wrap: wrap; }
+        .page-title { font-size: 1.6rem; font-weight: 700; }
+        .page-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+        .top-actions { display: flex; gap: 12px; align-items: center; }
+        .btn { padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--accent-green); color: white; }
+        .btn-danger { background: var(--accent-red); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .theme-toggle {
+            width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid var(--border-color);
+            background: var(--bg-card); color: var(--text-main); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 1rem;
+        }
+        .theme-toggle:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+
+        /* ========== PANEL & TABLE ========== */
+        .panel-card { background: var(--bg-card); border-radius: var(--radius); padding: 22px; border: 1px solid var(--border-color); margin-bottom: 24px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        .panel-title { font-size: 1.05rem; font-weight: 600; }
+        .table-wrapper { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 11px 14px; text-align: left; font-weight: 600; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); }
+        .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+        .data-table tbody tr:hover { background: rgba(46,134,222,0.04); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+        .badge-blue { background: rgba(46,134,222,0.12); color: var(--primary-blue); }
+        .loading-state { text-align: center; padding: 40px; }
+        .loading-state i { font-size: 2rem; color: var(--primary-blue); animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .main-content { margin-left: 0; padding: 20px; } }
+    </style>
+</head>
+<body>
+    <%- include('./partials/admin-sidebar', { currentPage: 'categories', user: typeof user !== 'undefined' ? user : null }) %>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title">🏷 Manajemen Kategori</h1>
+                <p class="page-subtitle">Kelola kategori produk untuk pengelompokan yang lebih rapi</p>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+                <button class="btn btn-primary" onclick="showAddModal()"><i class="fas fa-plus"></i> Tambah Kategori</button>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-header"><h3 class="panel-title">Daftar Kategori</h3></div>
+            <div id="loadingState" class="loading-state"><i class="fas fa-circle-notch"></i><p>Memuat...</p></div>
+            <div class="table-wrapper" id="tableWrapper" style="display:none;">
+                <table class="data-table">
+                    <thead><tr><th>ID</th><th>Nama Kategori</th><th>Deskripsi</th><th>Jumlah Produk</th><th style="width:160px;">Aksi</th></tr></thead>
+                    <tbody id="categoryTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let categories = [];
+
+        // Dark Mode
+        function initDarkMode() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) document.body.classList.add('dark-mode-active');
+            updateThemeIcon();
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode-active');
+            const isDark = document.body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+        function updateThemeIcon() {
+            const icon = document.querySelector('.theme-toggle i');
+            if (icon) icon.className = document.body.classList.contains('dark-mode-active') ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { initDarkMode(); loadCategories(); });
+
+        async function loadCategories() {
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('tableWrapper').style.display = 'none';
+            try {
+                const res = await fetch('/admin/api/categories', { credentials: 'same-origin' });
+                const result = await res.json();
+                if (!result.success) {
+                    console.error('API Error:', result);
+                    document.getElementById('loadingState').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--accent-red);"></i><p>Gagal memuat data</p>';
+                    return;
+                }
+                categories = result.data || [];
+                renderTable();
+            } catch (e) {
+                console.error('Fetch error:', e);
+                document.getElementById('loadingState').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--accent-red);"></i><p>Error koneksi server</p>';
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('categoryTableBody');
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('tableWrapper').style.display = 'block';
+
+            if (!categories.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada kategori</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = categories.map(c => `
+                <tr>
+                    <td><strong>#${c.id}</strong></td>
+                    <td>${esc(c.name)}</td>
+                    <td>${esc(c.description || '-')}</td>
+                    <td><span class="badge badge-blue">${c.product_count || 0} produk</span></td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editCategory(${c.id})" style="margin-right:6px;"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id}, '${esc(c.name).replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function showAddModal() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Tambah Kategori Baru',
+                html: `
+                    <input id="swal-name" class="swal2-input" placeholder="Nama Kategori">
+                    <input id="swal-desc" class="swal2-input" placeholder="Deskripsi (opsional)">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                preConfirm: () => ({
+                    name: document.getElementById('swal-name').value,
+                    description: document.getElementById('swal-desc').value
+                })
+            });
+
+            if (formValues?.name) {
+                try {
+                    const res = await fetch('/admin/api/categories', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues),
+                        credentials: 'same-origin'
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        Swal.fire('Berhasil!', result.message, 'success');
+                        loadCategories();
+                    } else Swal.fire('Gagal!', result.message, 'error');
+                } catch (e) { Swal.fire('Error!', 'Gagal menyimpan', 'error'); }
+            }
+        }
+
+        async function editCategory(id) {
+            const cat = categories.find(c => c.id === id);
+            if (!cat) return;
+
+            const { value: formValues } = await Swal.fire({
+                title: `Edit: ${cat.name}`,
+                html: `
+                    <input id="swal-name" class="swal2-input" value="${cat.name}" placeholder="Nama Kategori">
+                    <input id="swal-desc" class="swal2-input" value="${cat.description || ''}" placeholder="Deskripsi (opsional)">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Update',
+                cancelButtonText: 'Batal',
+                preConfirm: () => ({
+                    name: document.getElementById('swal-name').value,
+                    description: document.getElementById('swal-desc').value
+                })
+            });
+
+            if (formValues?.name) {
+                try {
+                    const res = await fetch(`/admin/api/categories/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues),
+                        credentials: 'same-origin'
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        Swal.fire('Berhasil!', result.message, 'success');
+                        loadCategories();
+                    } else Swal.fire('Gagal!', result.message, 'error');
+                } catch (e) { Swal.fire('Error!', 'Gagal update', 'error'); }
+            }
+        }
+
+        async function deleteCategory(id, name) {
+            const result = await Swal.fire({
+                title: `Hapus "${name}"?`,
+                text: 'Kategori yang memiliki produk tidak bisa dihapus!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FF6B6B',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/admin/api/categories/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+                    const data = await res.json();
+                    if (data.success) {
+                        Swal.fire('Berhasil!', data.message, 'success');
+                        loadCategories();
+                    } else Swal.fire('Gagal!', data.message, 'error');
+                } catch (e) { Swal.fire('Error!', 'Gagal menghapus', 'error'); }
+            }
+        }
+
+        function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    </script>
+</body>
+</html>
