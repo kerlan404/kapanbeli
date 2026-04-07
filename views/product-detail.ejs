@@ -62,6 +62,91 @@
 
         .desc-box { padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; line-height: 1.6; color: var(--text-muted); }
 
+        /* Deactivation Warning Overlay */
+        .deactivation-warning-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .deactivation-content {
+            text-align: center;
+            padding: 40px;
+            max-width: 500px;
+        }
+
+        .deactivation-content i:first-child {
+            font-size: 5rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .deactivation-content h2 {
+            color: var(--danger);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .deactivation-reason {
+            background: rgba(255, 107, 107, 0.15);
+            border-left: 4px solid var(--danger);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .deactivation-reason i {
+            color: var(--danger);
+            font-size: 1.2rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .deactivation-reason span {
+            color: #ff6b6b;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .waiting-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .waiting-text i {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } .data-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -123,6 +208,7 @@
     <script>
         // --- LOGIC (Server Connection Preserved) ---
         const id = window.location.pathname.split('/').pop();
+        let isDeactivated = false;
 
         async function loadDetail() {
             try {
@@ -130,6 +216,10 @@
                 const data = await res.json();
                 if(data.success) {
                     const p = data.product;
+                    
+                    // Check if product is deactivated
+                    isDeactivated = p.is_deactivated_by_admin === 1 || p.is_deactivated_by_admin === true;
+                    
                     document.getElementById('prodName').innerText = p.name;
                     document.getElementById('prodStock').innerText = `${parseFloat(p.stock_quantity).toString()} ${p.unit||''}`;
                     document.getElementById('prodUnit').innerText = p.unit || '-';
@@ -160,15 +250,79 @@
                     else if(p.stock_quantity <= p.min_stock_level) { stockEl.classList.add('st-low'); stockEl.innerText += ' (Rendah)'; }
                     else { stockEl.classList.add('st-ok'); stockEl.innerText += ' (Aman)'; }
 
+                    // Show deactivation warning
+                    if (isDeactivated) {
+                        showDeactivationWarning(p.deactivated_reason || 'Tidak ada alasan yang diberikan');
+                    }
+
                 } else {
                     alert('Produk tidak ditemukan'); window.location.href='/products';
                 }
             } catch(e) { console.error(e); alert('Gagal memuat data'); }
         }
 
-        function editProd() { window.location.href = `/products/edit/${id}`; }
+        function showDeactivationWarning(reason) {
+            // Add deactivation overlay
+            const grid = document.querySelector('.detail-grid');
+            if (grid) {
+                const overlay = document.createElement('div');
+                overlay.className = 'deactivation-warning-overlay';
+                overlay.innerHTML = `
+                    <div class="deactivation-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Produk Ini Sudah Dinonaktifkan oleh Admin</h2>
+                        <div class="deactivation-reason">
+                            <i class="fas fa-info-circle"></i>
+                            <span>${reason}</span>
+                        </div>
+                        <p class="waiting-text"><i class="fas fa-clock"></i> Menunggu konfirmasi admin untuk mengaktifkan kembali</p>
+                    </div>
+                `;
+                grid.style.position = 'relative';
+                grid.appendChild(overlay);
+
+                // Disable buttons
+                const editBtn = document.querySelector('.action-icons .icon-btn:first-child');
+                const deleteBtn = document.querySelector('.action-icons .icon-btn.delete');
+                if (editBtn) {
+                    editBtn.disabled = true;
+                    editBtn.style.opacity = '0.3';
+                    editBtn.style.cursor = 'not-allowed';
+                    editBtn.title = 'Tidak dapat mengedit - Menunggu konfirmasi admin';
+                }
+                if (deleteBtn) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.3';
+                    deleteBtn.style.cursor = 'not-allowed';
+                    deleteBtn.title = 'Tidak dapat menghapus - Menunggu konfirmasi admin';
+                }
+            }
+        }
+
+        function editProd() { 
+            if (isDeactivated) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Dapat Mengedit',
+                    text: 'Produk ini telah dinonaktifkan oleh admin. Menunggu konfirmasi admin.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            window.location.href = `/products/edit/${id}`; 
+        }
 
         async function delProd() {
+            if (isDeactivated) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Dapat Menghapus',
+                    text: 'Produk ini telah dinonaktifkan oleh admin. Menunggu konfirmasi admin.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             const result = await Swal.fire({
                 title: 'Hapus Produk?',
                 text: "Produk yang dihapus tidak dapat dikembalikan!",

@@ -232,6 +232,17 @@ const productsController = {
                 });
             }
 
+            // Cek apakah produk dinonaktifkan oleh admin
+            if (existingProduct.is_deactivated_by_admin === 1 || existingProduct.is_deactivated_by_admin === true) {
+                console.log(`[BLOCKED] User ${userId} tried to edit deactivated product ${productId}`);
+                return res.status(403).json({
+                    success: false,
+                    message: 'Produk ini telah dinonaktifkan oleh admin. Anda tidak dapat mengeditnya sampai admin mengkonfirmasi.',
+                    deactivated: true,
+                    reason: existingProduct.deactivated_reason || 'Tidak ada alasan'
+                });
+            }
+
             // VALIDASI KATEGORI: Jika tidak ada, default ke "Lainnya"
             let categoryToUse = category || category_id;
             if (!categoryToUse || categoryToUse === '' || categoryToUse === null) {
@@ -335,6 +346,17 @@ const productsController = {
                 return res.status(404).json({
                     success: false,
                     message: 'Produk tidak ditemukan atau Anda tidak memiliki izin untuk menghapusnya.'
+                });
+            }
+
+            // Cek apakah produk dinonaktifkan oleh admin
+            if (existingProduct.is_deactivated_by_admin === 1 || existingProduct.is_deactivated_by_admin === true) {
+                console.log(`[BLOCKED] User ${userId} tried to delete deactivated product ${productId}`);
+                return res.status(403).json({
+                    success: false,
+                    message: 'Produk ini telah dinonaktifkan oleh admin. Anda tidak dapat menghapusnya sampai admin mengkonfirmasi.',
+                    deactivated: true,
+                    reason: existingProduct.deactivated_reason || 'Tidak ada alasan'
                 });
             }
 

@@ -529,8 +529,62 @@ app.get('/products/detail/:id', isAuthenticated, (req, res) => {
     res.render('product-detail', { currentPage: 'products' });
 });
 
-app.get('/products/edit/:id', isAuthenticated, (req, res) => {
-    res.render('products-add', { currentPage: 'products' }); // Reuse the add page for editing
+app.get('/products/edit/:id', isAuthenticated, async (req, res) => {
+    try {
+        const ProductModel = require('./models/Product');
+        const product = await ProductModel.getByIdAndUserId(req.params.id, req.session.user.id);
+        
+        if (!product) {
+            return res.status(404).send(`
+                <html>
+                <head><title>Produk Tidak Ditemukan</title></head>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h1>Produk Tidak Ditemukan</h1>
+                    <p>Produk yang Anda cari tidak ada.</p>
+                    <a href="/products">Kembali ke Bahan Saya</a>
+                </body>
+                </html>
+            `);
+        }
+
+        // Check if product is deactivated by admin
+        if (product.is_deactivated_by_admin === 1 || product.is_deactivated_by_admin === true) {
+            return res.status(403).send(`
+                <html>
+                <head>
+                    <title>Produk Dinonaktifkan</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                </head>
+                <body style="font-family: 'Poppins', sans-serif; text-align: center; padding: 50px; background: #f5f5f5;">
+                    <div style="max-width: 500px; margin: 50px auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #FF6B6B; margin-bottom: 20px;"></i>
+                        <h1 style="color: #FF6B6B; margin-bottom: 10px;">Produk Dinonaktifkan oleh Admin</h1>
+                        <p style="color: #636E72; margin-bottom: 20px;">Produk <strong>"${product.name}"</strong> telah dinonaktifkan oleh admin.</p>
+                        ${product.deactivated_reason ? `
+                            <div style="background: rgba(255, 107, 107, 0.1); border-left: 3px solid #FF6B6B; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                                <strong style="color: #FF6B6B;">Alasan:</strong>
+                                <p style="color: #FF6B6B; margin: 5px 0 0 0;">${product.deactivated_reason}</p>
+                            </div>
+                        ` : ''}
+                        <p style="color: #636E72; font-size: 0.9rem; margin-bottom: 30px;">
+                            <i class="fas fa-clock"></i> Menunggu konfirmasi admin untuk mengaktifkan kembali
+                        </p>
+                        <a href="/products" style="background: #2E86DE; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-arrow-left"></i> Kembali ke Bahan Saya
+                        </a>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        res.render('products-add', { currentPage: 'products' }); // Reuse the add page for editing
+    } catch (error) {
+        console.error('Error checking product deactivation:', error);
+        res.status(500).send('Terjadi kesalahan server');
+    }
 });
 
 // Legacy route for adding products (can be removed later if using API route exclusively)

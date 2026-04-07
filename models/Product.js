@@ -69,9 +69,11 @@ const Product = {
         try {
             const query = `
                 SELECT p.id, p.name, p.description, p.category_id, c.name as category_name, p.stock_quantity, p.min_stock_level, p.image_url, p.user_id, p.created_at, p.updated_at, p.unit, p.quantity,
-                DATE_FORMAT(p.expiry_date, '%Y-%m-%d') as expiry_date, p.notes
+                DATE_FORMAT(p.expiry_date, '%Y-%m-%d') as expiry_date, p.notes,
+                p.is_deactivated_by_admin, p.deactivated_at, p.deactivated_reason, u.name as deactivated_by_name
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN users u ON p.deactivated_by = u.id
                 WHERE p.id = ? AND p.user_id = ?
             `;
             const [rows] = await db.execute(query, [productId, userId]);
@@ -104,7 +106,11 @@ const Product = {
                     unit: rows[0].unit || null,
                     quantity: rows[0].quantity || 1,
                     expiry_date: rows[0].expiry_date || null,
-                    notes: rows[0].notes || ''
+                    notes: rows[0].notes || '',
+                    is_deactivated_by_admin: false,
+                    deactivated_at: null,
+                    deactivated_reason: null,
+                    deactivated_by_name: null
                 };
             }
             throw error;
