@@ -459,76 +459,7 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-history"></i>
-                <span>Kapan Beli Admin</span>
-            </div>
-        </div>
-
-        <div class="sidebar-menu">
-            <div class="menu-label">MENU UTAMA</div>
-
-            <a href="/admin" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="/admin/users" class="nav-item">
-                <i class="fas fa-users"></i>
-                <span>Manajemen Pengguna</span>
-            </a>
-
-            <a href="/admin/products" class="nav-item">
-                <i class="fas fa-box"></i>
-                <span>Semua Produk</span>
-            </a>
-
-            <a href="/admin/shopping-suggestions" class="nav-item">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Saran Pembelian</span>
-            </a>
-
-            <div class="menu-label">KONTEN</div>
-
-            <a href="/admin/notes" class="nav-item">
-                <i class="fas fa-sticky-note"></i>
-                <span>Catatan User</span>
-            </a>
-
-            <a href="/admin/activity-logs" class="nav-item active">
-                <i class="fas fa-history"></i>
-                <span>Log Aktivitas</span>
-            </a>
-
-            <div class="menu-label">ANALITIK & SISTEM</div>
-
-            <a href="/admin/analytics" class="nav-item">
-                <i class="fas fa-chart-bar"></i>
-                <span>Analitik</span>
-            </a>
-
-            <a href="/admin/settings" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Pengaturan</span>
-            </a>
-        </div>
-
-        <div class="sidebar-footer">
-            <div class="user-mini-profile">
-                <div class="user-avatar">A</div>
-                <div class="user-info">
-                    <h4>Administrator</h4>
-                    <p>admin@kapanbeli.com</p>
-                </div>
-                <a href="/auth/logout" class="logout-btn" title="Keluar">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
-            </div>
-        </div>
-    </aside>
+    <%- include('./partials/admin-sidebar', { currentPage: 'activity-logs', user: typeof user !== 'undefined' ? user : null }) %>
 
     <!-- Main Content -->
     <main class="main-content">

@@ -85,6 +85,7 @@ const expiredRoutes = require('./routes/expiredRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const broadcastRoutes = require('./routes/broadcastRoutes');
 const exportRoutes = require('./routes/exportRoutes');
+const announcementsRoutes = require('./routes/announcements');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
@@ -382,15 +383,20 @@ app.use('/api/profile', settingsRoutes);
 // Use settings API routes (protected)
 app.use('/api/settings', settingsApiRoutes);
 
-// New feature routes
-app.use('/admin', expiredRoutes);
-app.use('/admin', categoryRoutes);
+// New feature routes (API only - page routes are defined above)
+app.use('/admin/api', expiredRoutes);
+app.use('/admin/api', categoryRoutes);
 app.use('/api/admin', broadcastRoutes);
 app.use('/api/admin', exportRoutes);
+app.use('/api/announcements', announcementsRoutes);
 
 // Protected routes
 app.get('/notes', isAuthenticated, (req, res) => {
     res.render('notes', { currentPage: 'notes' });
+});
+
+app.get('/inbox', isAuthenticated, (req, res) => {
+    res.render('inbox', { currentPage: 'inbox' });
 });
 
 // Profile route (replaces settings)
@@ -485,7 +491,8 @@ app.get('/admin/expired-watch', isAuthenticated, (req, res) => {
             title: 'Monitoring Kadaluarsa'
         });
     } else {
-        res.status(403).send('Access denied. Admins only.');
+        // Redirect to auth if not admin
+        req.session.destroy(() => res.redirect('/auth'));
     }
 });
 
@@ -498,7 +505,8 @@ app.get('/admin/categories', isAuthenticated, (req, res) => {
             title: 'Manajemen Kategori'
         });
     } else {
-        res.status(403).send('Access denied. Admins only.');
+        // Redirect to auth if not admin
+        req.session.destroy(() => res.redirect('/auth'));
     }
 });
 

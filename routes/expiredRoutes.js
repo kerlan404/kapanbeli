@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const expiredController = require('../controllers/expiredController');
 
-// Admin only middleware
+// Admin only middleware for API routes
 const isAdmin = (req, res, next) => {
     if (req.session.user && req.session.user.role === 'admin') {
         next();
@@ -13,12 +13,9 @@ const isAdmin = (req, res, next) => {
 
 router.use(isAdmin);
 
-// Page route
-router.get('/expired-watch', expiredController.showPage);
-
-// API routes
-router.get('/api/expired-items', expiredController.getExpiredItems);
-router.get('/api/wastage-stats', expiredController.getWastageStats);
-router.get('/api/expiring-soon', expiredController.getExpiringSoon);
+// API routes only (page routes are handled in server.js)
+router.get('/expired-items', expiredController.getExpiredItems);
+router.get('/wastage-stats', expiredController.getWastageStats);
+router.get('/expiring-soon', expiredController.getExpiringSoon);
 
 module.exports = router;

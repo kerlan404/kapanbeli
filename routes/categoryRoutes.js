@@ -13,13 +13,10 @@ const isAdmin = (req, res, next) => {
 
 router.use(isAdmin);
 
-// Page route
-router.get('/categories', categoryController.showPage);
-
-// API routes
-router.get('/api/categories', categoryController.getAll);
-router.post('/api/categories', categoryController.create);
-router.put('/api/categories/:id', categoryController.update);
-router.delete('/api/categories/:id', categoryController.delete);
+// API routes only (page routes are handled in server.js)
+router.get('/categories', categoryController.getAll);
+router.post('/categories', categoryController.create);
+router.put('/categories/:id', categoryController.update);
+router.delete('/categories/:id', categoryController.delete);
 
 module.exports = router;

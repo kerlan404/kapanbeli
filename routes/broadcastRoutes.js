@@ -14,7 +14,7 @@ const isAdmin = (req, res, next) => {
 router.use(isAdmin);
 
 // API routes
-router.post('/api/broadcast', broadcastController.sendAnnouncement);
-router.get('/api/broadcast/history', broadcastController.getHistory);
+router.post('/broadcast', broadcastController.sendAnnouncement);
+router.get('/broadcast/history', broadcastController.getHistory);
 
 module.exports = router;

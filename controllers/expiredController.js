@@ -20,11 +20,12 @@ const expiredController = {
      * GET /api/admin/expired-items
      */
     getExpiredItems: errorHandler.asyncHandler(async (req, res) => {
-        const { page, limit, search } = req.query;
+        const { page, limit, search, category } = req.query;
         const result = await expiredService.getExpiredItems({
             page: page || 1,
             limit: limit || 20,
-            search: search || ''
+            search: search || '',
+            category: category || ''
         });
         res.json(result);
     }),

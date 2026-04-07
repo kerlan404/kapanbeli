@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotak Surat - Kapan Beli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-blue: #2E86DE; --primary-orange: #FF9F43;
+            --bg-body: #F0F2F5; --bg-card: #FFFFFF; --bg-nav: rgba(255,255,255,0.95);
+            --text-main: #1A1D21; --text-muted: #6C757D;
+            --border-color: #E5E7EB; --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --danger: #FF6B6B; --success: #1DD1A1; --warning: #FECA57;
+        }
+        body.dark-mode-active {
+            --bg-body: #0F1115; --bg-card: #1A1D23; --bg-nav: rgba(26,29,35,0.98);
+            --text-main: #E5E7EB; --text-muted: #9CA3AF;
+            --border-color: #2D3139; --shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-body); color: var(--text-main); min-height: 100vh; }
+        
+        /* Navbar */
+        nav {
+            background: var(--bg-nav); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color); padding: 14px 5%;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .logo { font-weight: 700; font-size: 1.3rem; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary-orange); }
+        .nav-menu { display: flex; gap: 24px; }
+        .nav-link { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.9rem; }
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .unread-badge {
+            background: var(--danger); color: white; border-radius: 50%;
+            width: 18px; height: 18px; display: flex; align-items: center;
+            justify-content: center; font-size: 0.65rem; font-weight: 700;
+            position: absolute; top: -6px; right: -6px;
+        }
+        .inbox-icon { position: relative; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
+        .dark-toggle { background: none; border: none; font-size: 1.1rem; color: var(--text-main); cursor: pointer; padding: 6px; }
+
+        /* Container */
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        
+        /* Header */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .page-header h1 i { color: var(--primary-orange); }
+        .btn {
+            padding: 9px 16px; border-radius: 10px; border: none; cursor: pointer;
+            font-weight: 500; font-size: 0.85rem; display: inline-flex; align-items: center;
+            gap: 6px; transition: all 0.2s; font-family: 'Poppins', sans-serif;
+        }
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: #1B5FA5; }
+        .btn-outline { background: transparent; border: 1.5px solid var(--border-color); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+
+        /* Filters */
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .filter-tab {
+            padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border-color);
+            background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+            font-size: 0.82rem; font-weight: 500; transition: all 0.2s; font-family: 'Poppins', sans-serif;
+        }
+        .filter-tab:hover, .filter-tab.active { border-color: var(--primary-blue); color: var(--primary-blue); background: rgba(46,134,222,0.08); }
+
+        /* Messages */
+        .messages-list { display: flex; flex-direction: column; gap: 12px; }
+        .message-card {
+            background: var(--bg-card); border-radius: 14px; padding: 18px;
+            border: 1px solid var(--border-color); cursor: pointer;
+            transition: all 0.2s; position: relative;
+        }
+        .message-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+        .message-card.unread { border-left: 4px solid var(--primary-blue); }
+        .message-card.unread .msg-title { font-weight: 700; }
+        .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .msg-title { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        .msg-type {
+            font-size: 0.68rem; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+        }
+        .msg-type.info { background: rgba(46,134,222,0.12); color: var(--primary-blue); }
+        .msg-type.warning { background: rgba(255,159,67,0.12); color: var(--primary-orange); }
+        .msg-type.error { background: rgba(255,107,107,0.12); color: var(--danger); }
+        .msg-preview { color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; margin-bottom: 10px; }
+        .msg-footer { display: flex; justify-content: space-between; align-items: center; }
+        .msg-date { font-size: 0.72rem; color: var(--text-muted); }
+        .msg-actions { display: flex; gap: 8px; }
+        .msg-action { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; padding: 4px; transition: color 0.2s; }
+        .msg-action:hover { color: var(--primary-blue); }
+        .msg-action.delete:hover { color: var(--danger); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 3.5rem; color: var(--text-muted); opacity: 0.3; margin-bottom: 16px; }
+        .empty-state h3 { color: var(--text-muted); font-weight: 500; }
+        .empty-state p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: var(--bg-card); border-radius: 16px; padding: 28px;
+            max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 1.15rem; }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+        .modal-body .msg-full { line-height: 1.7; font-size: 0.9rem; }
+        .modal-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+
+        @media (max-width: 600px) { .nav-menu { display: none; } .container { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo"><i class="fas fa-book-open"></i> Kapan Beli</a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/notes" class="nav-link">Catatan</a>
+                <a href="/products" class="nav-link">Bahan Saya</a>
+                <a href="/suggestions" class="nav-link">Saran</a>
+                <a href="/inbox" class="nav-link active" style="position:relative;">Kotak Surat <span id="navBadge" style="background:var(--danger);color:white;border-radius:50%;width:16px;height:16px;display:none;align-items:center;justify-content:center;font-size:0.6rem;position:absolute;top:-4px;right:-12px;font-weight:700;"></span></a>
+            </div>
+            <div class="nav-right">
+                <a href="/inbox" class="inbox-icon" title="Kotak Surat">
+                    <i class="fas fa-envelope"></i>
+                    <span class="unread-badge" id="navUnreadBadge" style="display:none;">0</span>
+                </a>
+                <button class="dark-toggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+                <a href="/auth/logout" class="nav-link" style="font-size:0.85rem;">Keluar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-envelope"></i> Kotak Surat</h1>
+            <button class="btn btn-outline" onclick="markAllRead()"><i class="fas fa-check-double"></i> Tandai Semua Dibaca</button>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterMsg('all')">Semua</button>
+            <button class="filter-tab" onclick="filterMsg('unread')">Belum Dibaca</button>
+        </div>
+
+        <div id="messagesContainer" class="messages-list"></div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="msgModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:12px;"><span class="msg-type" id="modalType"></span></div>
+                <div class="msg-full" id="modalMsg"></div>
+                <div style="margin-top:12px;font-size:0.75rem;color:var(--text-muted);" id="modalDate"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messages = [], currentFilter = 'all';
+
+        // Dark Mode
+        function initDarkMode() {
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode-active');
+            }
+            updateThemeIcon();
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode-active');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode-active') ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+        function updateThemeIcon() {
+            const icon = document.querySelector('.dark-toggle i');
+            if (icon) icon.className = document.body.classList.contains('dark-mode-active') ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { initDarkMode(); loadMessages(); });
+
+        async function loadMessages() {
+            try {
+                const res = await fetch('/api/announcements', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (!data.success) return;
+                messages = data.data || [];
+                updateNavBadge(data.unreadCount);
+                renderMessages();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            const filtered = currentFilter === 'unread' ? messages.filter(m => !m.is_read) : messages;
+            
+            if (!filtered.length) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><h3>${currentFilter === 'unread' ? 'Semua pesan sudah dibaca' : 'Kotak surat kosong'}</h3><p>${currentFilter === 'unread' ? 'Tidak ada pesan belum dibaca' : 'Belum ada pengumuman dari admin'}</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(m => `
+                <div class="message-card ${m.is_read ? '' : 'unread'}" onclick="openMessage(${m.id})">
+                    <div class="msg-header">
+                        <div class="msg-title">${esc(m.title)} <span class="msg-type ${m.type}">${m.type_label || 'Info'}</span></div>
+                    </div>
+                    <div class="msg-preview">${esc(m.message).substring(0, 100)}${m.message.length > 100 ? '...' : ''}</div>
+                    <div class="msg-footer">
+                        <div class="msg-date">${formatDate(m.created_at)}</div>
+                        <div class="msg-actions">
+                            ${!m.is_read ? `<button class="msg-action" onclick="event.stopPropagation();markRead(${m.id})" title="Tandai dibaca"><i class="fas fa-check"></i></button>` : ''}
+                            <button class="msg-action delete" onclick="event.stopPropagation();deleteMsg(${m.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openMessage(id) {
+            const msg = messages.find(m => m.id === id);
+            if (!msg) return;
+            
+            // Mark as read
+            if (!msg.is_read) {
+                await fetch(`/api/announcements/${id}/read`, { method: 'PUT', credentials: 'same-origin' });
+                msg.is_read = 1;
+                loadMessages();
+            }
+
+            document.getElementById('modalTitle').textContent = msg.title;
+            document.getElementById('modalType').className = `msg-type ${msg.type}`;
+            document.getElementById('modalType').textContent = msg.type_label || 'Info';
+            document.getElementById('modalMsg').textContent = msg.message;
+            document.getElementById('modalDate').textContent = 'Dikirim: ' + formatDate(msg.created_at);
+            document.getElementById('msgModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('msgModal').style.display = 'none'; }
+
+        async function markRead(id) {
+            await fetch(`/api/announcements/${id}/read`, { method: 'PUT', credentials: 'same-origin' });
+            loadMessages();
+        }
+
+        async function markAllRead() {
+            await fetch('/api/announcements/read-all', { method: 'PUT', credentials: 'same-origin' });
+            loadMessages();
+        }
+
+        async function deleteMsg(id) {
+            const result = await Swal.fire({ title: 'Hapus pesan?', text: 'Pesan yang dihapus tidak bisa dikembalikan', icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF6B6B', confirmButtonText: 'Ya', cancelButtonText: 'Batal' });
+            if (result.isConfirmed) {
+                await fetch(`/api/announcements/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+                loadMessages();
+            }
+        }
+
+        function filterMsg(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMessages();
+        }
+
+        function updateNavBadge(count) {
+            // Update nav badge in navbar
+            const navBadge = document.getElementById('navBadge');
+            if (navBadge) {
+                if (count > 0) { navBadge.textContent = count > 9 ? '9+' : count; navBadge.style.display = 'inline-flex'; }
+                else navBadge.style.display = 'none';
+            }
+            // Update icon badge
+            const badge = document.getElementById('navUnreadBadge');
+            if (badge) {
+                if (count > 0) { badge.textContent = count > 9 ? '9+' : count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            }
+        }
+
+        function formatDate(d) {
+            const date = new Date(d);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 60000);
+            if (diff < 1) return 'Baru saja';
+            if (diff < 60) return `${diff} menit lalu`;
+            if (diff < 1440) return `${Math.floor(diff / 60)} jam lalu`;
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    </script>
+</body>
+</html>

@@ -29,65 +29,54 @@
         body { font-family: 'Poppins', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
         a { text-decoration: none; color: inherit; }
 
-        /* ========== SIDEBAR ========== */
-        .sidebar {
-            width: var(--sidebar-width); background: var(--bg-sidebar); color: var(--text-sidebar);
-            height: 100vh; position: fixed; top: 0; left: 0; display: flex;
-            flex-direction: column; z-index: 1000; border-right: 1px solid var(--sidebar-border);
-        }
-        .sidebar-header { height: 64px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--sidebar-border); }
-        .sidebar-header .logo { font-weight: 700; font-size: 1.15rem; color: var(--text-sidebar-heading); display: flex; align-items: center; gap: 10px; }
-        .sidebar-header .logo i { color: var(--primary-orange); font-size: 1.3rem; }
-        .sidebar-menu { flex: 1; padding: 16px 0; overflow-y: auto; }
-        .menu-label { padding: 0 20px 8px; font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.35); font-weight: 600; letter-spacing: 1px; margin-top: 16px; }
-        .nav-item { display: flex; align-items: center; padding: 10px 20px; color: var(--text-sidebar); transition: all 0.2s; border-left: 3px solid transparent; font-size: 0.9rem; }
-        .nav-item:hover { background: var(--bg-sidebar-hover); color: var(--text-sidebar-heading); }
-        .nav-item.active { background: var(--bg-sidebar-active); color: var(--text-sidebar-active); border-left-color: var(--primary-blue); }
-        .nav-item i { width: 22px; margin-right: 12px; text-align: center; }
-        .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--sidebar-border); }
-        .user-mini-profile { display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-orange); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 0.9rem; flex-shrink: 0; }
-        .user-info { flex: 1; min-width: 0; }
-        .user-info h4 { font-size: 0.85rem; color: var(--text-sidebar-heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-info p { font-size: 0.7rem; color: var(--text-sidebar); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .logout-btn { background: rgba(255,107,107,0.12); color: var(--accent-red); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .logout-btn:hover { background: var(--accent-red); color: white; }
-
         /* ========== MAIN ========== */
         .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 32px; }
-        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; gap: 20px; flex-wrap: wrap; }
-        .page-title { font-size: 1.6rem; font-weight: 700; }
-        .page-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
-        .top-actions { display: flex; gap: 12px; align-items: center; }
-        .btn { padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 20px; flex-wrap: wrap; }
+        .page-title { font-size: 1.5rem; font-weight: 700; }
+        .page-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+        .top-actions { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 9px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .btn-primary { background: var(--primary-blue); color: white; }
         .btn-primary:hover { background: var(--primary-dark); }
         .btn-success { background: var(--accent-green); color: white; }
         .btn-danger { background: var(--accent-red); color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
-        .theme-toggle {
-            width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid var(--border-color);
-            background: var(--bg-card); color: var(--text-main); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 1rem;
-        }
+        .btn-sm { padding: 6px 10px; font-size: 0.78rem; }
+        .theme-toggle { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 1rem; }
         .theme-toggle:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
 
+        /* ========== FILTERS ========== */
+        .filters-bar { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; background: var(--bg-card); padding: 14px 16px; border-radius: var(--radius); border: 1px solid var(--border-color); }
+        .form-control { padding: 9px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-main); font-size: 0.85rem; font-family: 'Poppins', sans-serif; outline: none; }
+        .form-control:focus { border-color: var(--primary-blue); }
+        .filter-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .filter-label i { color: var(--primary-blue); }
+
         /* ========== PANEL & TABLE ========== */
-        .panel-card { background: var(--bg-card); border-radius: var(--radius); padding: 22px; border: 1px solid var(--border-color); margin-bottom: 24px; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
-        .panel-title { font-size: 1.05rem; font-weight: 600; }
+        .panel-card { background: var(--bg-card); border-radius: var(--radius); padding: 20px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        .panel-title { font-size: 1rem; font-weight: 600; }
         .table-wrapper { overflow-x: auto; }
         .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th { padding: 11px 14px; text-align: left; font-weight: 600; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); }
-        .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+        .data-table th { padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); }
+        .data-table td { padding: 11px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; }
         .data-table tbody tr:hover { background: rgba(46,134,222,0.04); }
         .data-table tbody tr:last-child td { border-bottom: none; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
         .badge-blue { background: rgba(46,134,222,0.12); color: var(--primary-blue); }
+
+        /* ========== PAGINATION ========== */
+        .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        .pagination-info { font-size: 0.8rem; color: var(--text-muted); }
+        .pagination { display: flex; gap: 6px; align-items: center; }
+        .page-btn { min-width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+        .page-btn:hover:not(:disabled) { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
         .loading-state { text-align: center; padding: 40px; }
         .loading-state i { font-size: 2rem; color: var(--primary-blue); animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 768px) { .main-content { margin-left: 0; padding: 20px; } }
+        @media (max-width: 768px) { .main-content { margin-left: 0; padding: 20px; } .filters-bar { flex-direction: column; } .filters-bar .form-control { width: 100%; } }
     </style>
 </head>
 <body>
@@ -105,6 +94,14 @@
             </div>
         </div>
 
+        <!-- Filters -->
+        <div class="filters-bar">
+            <span class="filter-label"><i class="fas fa-filter"></i> Filter:</span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari kategori..." style="flex:1;max-width:300px;">
+            <button class="btn btn-primary" onclick="applyFilters()"><i class="fas fa-search"></i> Cari</button>
+            <button class="btn" style="background:var(--border-color);color:var(--text-muted);" onclick="resetFilters()"><i class="fas fa-undo"></i> Reset</button>
+        </div>
+
         <div class="panel-card">
             <div class="panel-header"><h3 class="panel-title">Daftar Kategori</h3></div>
             <div id="loadingState" class="loading-state"><i class="fas fa-circle-notch"></i><p>Memuat...</p></div>
@@ -113,12 +110,17 @@
                     <thead><tr><th>ID</th><th>Nama Kategori</th><th>Deskripsi</th><th>Jumlah Produk</th><th style="width:160px;">Aksi</th></tr></thead>
                     <tbody id="categoryTableBody"></tbody>
                 </table>
+                <div class="pagination-bar">
+                    <div class="pagination-info" id="paginationInfo">Menampilkan 0 dari 0 data</div>
+                    <div class="pagination" id="paginationBtns"></div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
-        let categories = [];
+        let allCategories = [], filtered = [], currentPage = 1;
+        const perPage = 20;
 
         // Dark Mode
         function initDarkMode() {
@@ -145,18 +147,31 @@
             document.getElementById('tableWrapper').style.display = 'none';
             try {
                 const res = await fetch('/admin/api/categories', { credentials: 'same-origin' });
-                const result = await res.json();
-                if (!result.success) {
-                    console.error('API Error:', result);
-                    document.getElementById('loadingState').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--accent-red);"></i><p>Gagal memuat data</p>';
+                
+                // Handle auth error - redirect to login
+                if (res.status === 401 || res.status === 403) {
+                    window.location.href = '/auth';
                     return;
                 }
-                categories = result.data || [];
-                renderTable();
-            } catch (e) {
-                console.error('Fetch error:', e);
-                document.getElementById('loadingState').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--accent-red);"></i><p>Error koneksi server</p>';
-            }
+                
+                const result = await res.json();
+                if (!result.success) { console.error('API Error:', result); return; }
+                allCategories = result.data || [];
+                applyFilters();
+            } catch (e) { console.error('Fetch error:', e); }
+        }
+
+        function applyFilters() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            filtered = q ? allCategories.filter(c => c.name.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)) : [...allCategories];
+            currentPage = 1;
+            renderTable();
+        }
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            filtered = [...allCategories];
+            currentPage = 1;
+            renderTable();
         }
 
         function renderTable() {
@@ -164,12 +179,20 @@
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('tableWrapper').style.display = 'block';
 
-            if (!categories.length) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada kategori</td></tr>';
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / perPage);
+            const start = (currentPage - 1) * perPage;
+            const pageItems = filtered.slice(start, start + perPage);
+
+            document.getElementById('paginationInfo').textContent = `Menampilkan ${totalItems > 0 ? start + 1 : 0}-${Math.min(start + perPage, totalItems)} dari ${totalItems} data`;
+
+            if (!pageItems.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Tidak ada kategori ditemukan</td></tr>';
+                document.getElementById('paginationBtns').innerHTML = '';
                 return;
             }
 
-            tbody.innerHTML = categories.map(c => `
+            tbody.innerHTML = pageItems.map(c => `
                 <tr>
                     <td><strong>#${c.id}</strong></td>
                     <td>${esc(c.name)}</td>
@@ -181,102 +204,71 @@
                     </td>
                 </tr>
             `).join('');
+
+            // Pagination
+            const pagContainer = document.getElementById('paginationBtns');
+            if (totalPages <= 1) { pagContainer.innerHTML = ''; return; }
+            let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+            const maxShow = 5;
+            let s = Math.max(1, currentPage - Math.floor(maxShow / 2));
+            let e = Math.min(totalPages, s + maxShow - 1);
+            if (e - s < maxShow - 1) s = Math.max(1, e - maxShow + 1);
+            for (let p = s; p <= e; p++) html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+            html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+            pagContainer.innerHTML = html;
         }
+
+        function goPage(p) { currentPage = p; renderTable(); }
 
         async function showAddModal() {
             const { value: formValues } = await Swal.fire({
                 title: 'Tambah Kategori Baru',
-                html: `
-                    <input id="swal-name" class="swal2-input" placeholder="Nama Kategori">
-                    <input id="swal-desc" class="swal2-input" placeholder="Deskripsi (opsional)">
-                `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-                preConfirm: () => ({
-                    name: document.getElementById('swal-name').value,
-                    description: document.getElementById('swal-desc').value
-                })
+                html: `<input id="swal-name" class="swal2-input" placeholder="Nama Kategori"><input id="swal-desc" class="swal2-input" placeholder="Deskripsi (opsional)">`,
+                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal',
+                preConfirm: () => ({ name: document.getElementById('swal-name').value, description: document.getElementById('swal-desc').value })
             });
-
             if (formValues?.name) {
                 try {
-                    const res = await fetch('/admin/api/categories', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formValues),
-                        credentials: 'same-origin'
-                    });
+                    const res = await fetch('/admin/api/categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formValues), credentials: 'same-origin' });
                     const result = await res.json();
-                    if (result.success) {
-                        Swal.fire('Berhasil!', result.message, 'success');
-                        loadCategories();
-                    } else Swal.fire('Gagal!', result.message, 'error');
+                    if (result.success) { Swal.fire('Berhasil!', result.message, 'success'); loadCategories(); }
+                    else Swal.fire('Gagal!', result.message, 'error');
                 } catch (e) { Swal.fire('Error!', 'Gagal menyimpan', 'error'); }
             }
         }
 
         async function editCategory(id) {
-            const cat = categories.find(c => c.id === id);
+            const cat = allCategories.find(c => c.id === id);
             if (!cat) return;
-
             const { value: formValues } = await Swal.fire({
                 title: `Edit: ${cat.name}`,
-                html: `
-                    <input id="swal-name" class="swal2-input" value="${cat.name}" placeholder="Nama Kategori">
-                    <input id="swal-desc" class="swal2-input" value="${cat.description || ''}" placeholder="Deskripsi (opsional)">
-                `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Update',
-                cancelButtonText: 'Batal',
-                preConfirm: () => ({
-                    name: document.getElementById('swal-name').value,
-                    description: document.getElementById('swal-desc').value
-                })
+                html: `<input id="swal-name" class="swal2-input" value="${cat.name}" placeholder="Nama Kategori"><input id="swal-desc" class="swal2-input" value="${cat.description || ''}" placeholder="Deskripsi (opsional)">`,
+                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Update', cancelButtonText: 'Batal',
+                preConfirm: () => ({ name: document.getElementById('swal-name').value, description: document.getElementById('swal-desc').value })
             });
-
             if (formValues?.name) {
                 try {
-                    const res = await fetch(`/admin/api/categories/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formValues),
-                        credentials: 'same-origin'
-                    });
+                    const res = await fetch(`/admin/api/categories/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formValues), credentials: 'same-origin' });
                     const result = await res.json();
-                    if (result.success) {
-                        Swal.fire('Berhasil!', result.message, 'success');
-                        loadCategories();
-                    } else Swal.fire('Gagal!', result.message, 'error');
+                    if (result.success) { Swal.fire('Berhasil!', result.message, 'success'); loadCategories(); }
+                    else Swal.fire('Gagal!', result.message, 'error');
                 } catch (e) { Swal.fire('Error!', 'Gagal update', 'error'); }
             }
         }
 
         async function deleteCategory(id, name) {
-            const result = await Swal.fire({
-                title: `Hapus "${name}"?`,
-                text: 'Kategori yang memiliki produk tidak bisa dihapus!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#FF6B6B',
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Batal'
-            });
-
+            const result = await Swal.fire({ title: `Hapus "${name}"?`, text: 'Kategori yang memiliki produk tidak bisa dihapus!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF6B6B', confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal' });
             if (result.isConfirmed) {
                 try {
                     const res = await fetch(`/admin/api/categories/${id}`, { method: 'DELETE', credentials: 'same-origin' });
                     const data = await res.json();
-                    if (data.success) {
-                        Swal.fire('Berhasil!', data.message, 'success');
-                        loadCategories();
-                    } else Swal.fire('Gagal!', data.message, 'error');
+                    if (data.success) { Swal.fire('Berhasil!', data.message, 'success'); loadCategories(); }
+                    else Swal.fire('Gagal!', data.message, 'error');
                 } catch (e) { Swal.fire('Error!', 'Gagal menghapus', 'error'); }
             }
         }
 
+        document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyFilters(); });
         function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
     </script>
 </body>

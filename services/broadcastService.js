@@ -11,8 +11,8 @@ const broadcastService = {
      */
     async sendAnnouncement(title, message, type = 'info', sendTo = 'all') {
         try {
-            // Validate type
-            const validTypes = ['info', 'warning', 'error', 'success'];
+            // Database only supports: info, warning, error
+            const validTypes = ['info', 'warning', 'error'];
             if (!validTypes.includes(type)) {
                 type = 'info';
             }
@@ -31,20 +31,23 @@ const broadcastService = {
                 return { success: true, sent_count: 0, message: 'Tidak ada user target' };
             }
 
-            // Insert notifications for each user
-            const notificationPromises = users.map(user =>
-                db.execute(
-                    'INSERT INTO notifications (user_id, title, message, type, is_read, created_at) VALUES (?, ?, ?, ?, FALSE, NOW())',
-                    [user.id, title, message, type]
-                )
-            );
-
-            await Promise.all(notificationPromises);
+            // Insert notifications in batches for better performance
+            const batchSize = 100;
+            for (let i = 0; i < users.length; i += batchSize) {
+                const batch = users.slice(i, i + batchSize);
+                const placeholders = batch.map(() => '(?, ?, ?, ?, FALSE, NOW())').join(', ');
+                const values = batch.flatMap(u => [u.id, title, message, type]);
+                
+                await db.execute(
+                    `INSERT INTO notifications (user_id, title, message, type, is_read, created_at) VALUES ${placeholders}`,
+                    values
+                );
+            }
 
             return {
                 success: true,
                 sent_count: users.length,
-                message: `Announcement terkirim ke ${users.length} user`
+                message: `Pengumuman terkirim ke ${users.length} user`
             };
         } catch (error) {
             console.error('[broadcastService.sendAnnouncement] Error:', error);

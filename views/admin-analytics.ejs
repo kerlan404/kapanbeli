@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -361,19 +362,64 @@
             document.getElementById('errorState').style.display = 'none';
             icon.classList.add('fa-spin');
             try {
-                const [u, p, t, c] = await Promise.all([
-                    fetch(`/api/admin/analytics?range=${range}`, {credentials:'same-origin'}).then(r=>r.json()),
-                    fetch('/api/admin/products/statistics', {credentials:'same-origin'}).then(r=>r.json()),
-                    fetch('/api/admin/analytics/top-users', {credentials:'same-origin'}).then(r=>r.json()),
-                    fetch('/api/admin/analytics/category-distribution', {credentials:'same-origin'}).then(r=>r.json())
+                const [analyticsRes, statsRes, topUsersRes, catRes] = await Promise.all([
+                    fetch(`/api/admin/analytics?range=${range}`, {credentials:'same-origin'}),
+                    fetch('/api/admin/products/statistics', {credentials:'same-origin'}),
+                    fetch('/api/admin/analytics/top-users', {credentials:'same-origin'}),
+                    fetch('/api/admin/analytics/category-distribution', {credentials:'same-origin'})
                 ]);
-                if (u.success) { updateUser(u); document.getElementById('loadingState').style.display='none'; document.getElementById('analyticsContent').style.display='block'; }
-                else showError(u.message||'Gagal');
-                if (p.success) updProduct(p);
-                if (t.success) updTopUsers(t);
-                if (c.success) updCategory(c);
-            } catch(e) { console.error(e); showError('Error memuat data'); }
-            finally { icon.classList.remove('fa-spin'); }
+
+                // Handle auth errors - redirect to login
+                if ([analyticsRes, statsRes, topUsersRes, catRes].some(r => r.status === 401 || r.status === 403)) {
+                    window.location.href = '/auth';
+                    return;
+                }
+
+                // Parse responses
+                const analytics = analyticsRes.ok ? await analyticsRes.json() : {success: false, error: 'Analytics API error'};
+                const stats = statsRes.ok ? await statsRes.json() : {success: false, error: 'Stats API error'};
+                const topUsers = topUsersRes.ok ? await topUsersRes.json() : {success: false, error: 'Top users API error'};
+                const cat = catRes.ok ? await catRes.json() : {success: false, error: 'Category API error'};
+
+                // Log errors for debugging
+                if (!analytics.success) console.error('Analytics error:', analytics);
+                if (!stats.success) console.warn('Stats error:', stats);
+                if (!topUsers.success) console.warn('Top users error:', topUsers);
+                if (!cat.success) console.warn('Category error:', cat);
+
+                // Show main content if analytics loaded
+                if (analytics.success) {
+                    updateUser(analytics);
+                    document.getElementById('loadingState').style.display='none';
+                    document.getElementById('analyticsContent').style.display='block';
+                } else {
+                    showError(analytics.message || analytics.error || 'Gagal memuat data analitik');
+                    return;
+                }
+
+                // Update product stats (optional - don't fail if this fails)
+                if (stats.success) updProduct(stats);
+                else {
+                    document.getElementById('totalProducts').textContent = '-';
+                    document.getElementById('activeProducts').textContent = '-';
+                    document.getElementById('lowStockProducts').textContent = '-';
+                    document.getElementById('outOfStockProducts').textContent = '-';
+                }
+
+                // Update top users (optional)
+                if (topUsers.success) updTopUsers(topUsers);
+                else document.getElementById('topUsersTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Gagal memuat data</td></tr>';
+
+                // Update category distribution (optional)
+                if (cat.success) updCategory(cat);
+                else document.getElementById('categoryTableBody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Gagal memuat data</td></tr>';
+
+            } catch(e) {
+                console.error('Load analytics error:', e);
+                showError('Error memuat data: ' + e.message);
+            } finally {
+                icon.classList.remove('fa-spin');
+            }
         }
 
         function updateUser(d) {
@@ -444,34 +490,64 @@
         // Broadcast Announcement
         async function showBroadcastModal() {
             const { value: form } = await Swal.fire({
-                title: '<i class="fas fa-bullhorn"></i> Kirim Pengumuman',
+                title: '<i class="fas fa-bullhorn" style="color:#2E86DE;"></i> Kirim Pengumuman',
+                width: 600,
                 html: `
-                    <input id="brd-title" class="swal2-input" placeholder="Judul Pengumuman">
-                    <textarea id="brd-msg" class="swal2-textarea" placeholder="Isi pesan..." rows="4"></textarea>
-                    <select id="brd-type" class="swal2-select" style="width:100%;padding:8px;border-radius:8px;">
-                        <option value="info">ℹ️ Info</option>
-                        <option value="warning">⚠️ Peringatan</option>
-                        <option value="success">✅ Sukses</option>
-                        <option value="error">❌ Error</option>
-                    </select>
-                    <select id="brd-target" class="swal2-select" style="width:100%;padding:8px;border-radius:8px;margin-top:8px;">
-                        <option value="all">Semua User</option>
-                        <option value="active">User Aktif Saja</option>
-                    </select>
+                    <div style="text-align:left;margin-bottom:20px;">
+                        <p style="color:#6C757D;font-size:0.85rem;margin-bottom:12px;">📢 Kirim pengumuman ke semua pengguna. Pengguna akan menerima notifikasi di Kotak Surat mereka.</p>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Judul Pengumuman</label>
+                        <input id="brd-title" class="swal2-input" placeholder="Contoh: Maintenance Server" style="margin:0;width:100%;">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Isi Pesan</label>
+                        <textarea id="brd-msg" class="swal2-textarea" placeholder="Tulis pesan pengumuman di sini..." rows="4" style="margin:0;width:100%;min-height:100px;"></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                        <div>
+                            <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Tipe Pesan</label>
+                            <select id="brd-type" class="swal2-select" style="width:100%;padding:8px;border-radius:8px;">
+                                <option value="info">ℹ️ Info Umum</option>
+                                <option value="warning">⚠️ Peringatan</option>
+                                <option value="error">🔴 Penting/Urgent</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Target Pengiriman</label>
+                            <select id="brd-target" class="swal2-select" style="width:100%;padding:8px;border-radius:8px;">
+                                <option value="all">👥 Semua User</option>
+                                <option value="active">✅ User Aktif</option>
+                            </select>
+                        </div>
+                    </div>
                 `,
                 focusConfirm: false,
                 showCancelButton: true,
-                confirmButtonText: 'Kirim',
+                confirmButtonText: '<i class="fas fa-paper-plane"></i> Kirim Pengumuman',
                 cancelButtonText: 'Batal',
-                preConfirm: () => ({
-                    title: document.getElementById('brd-title').value,
-                    message: document.getElementById('brd-msg').value,
-                    type: document.getElementById('brd-type').value,
-                    sendTo: document.getElementById('brd-target').value
-                })
+                confirmButtonColor: '#2E86DE',
+                preConfirm: () => {
+                    const title = document.getElementById('brd-title').value.trim();
+                    const message = document.getElementById('brd-msg').value.trim();
+                    if (!title || title.length < 3) { Swal.showValidationMessage('Judul minimal 3 karakter'); return false; }
+                    if (!message || message.length < 10) { Swal.showValidationMessage('Pesan minimal 10 karakter'); return false; }
+                    return {
+                        title, message,
+                        type: document.getElementById('brd-type').value,
+                        sendTo: document.getElementById('brd-target').value
+                    };
+                }
             });
 
-            if (form?.title && form?.message) {
+            if (form) {
+                Swal.fire({
+                    title: 'Mengirim...',
+                    text: 'Sedang mengirim pengumuman',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
                 try {
                     const res = await fetch('/api/admin/broadcast', {
                         method: 'POST',
@@ -479,11 +555,45 @@
                         body: JSON.stringify(form),
                         credentials: 'same-origin'
                     });
+                    
+                    // Handle auth error
+                    if (res.status === 401 || res.status === 403) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Sesi Berakhir',
+                            text: 'Silakan login kembali sebagai admin',
+                            confirmButtonColor: '#2E86DE'
+                        }).then(() => window.location.href = '/auth');
+                        return;
+                    }
+                    
                     const result = await res.json();
+                    
                     if (result.success) {
-                        Swal.fire('Terkirim! 📢', `Pengumuman terkirim ke ${result.sent_count} user`, 'success');
-                    } else Swal.fire('Gagal!', result.message, 'error');
-                } catch (e) { Swal.fire('Error!', 'Gagal mengirim', 'error'); }
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil Dikirim! 📢',
+                            html: `Pengumuman <strong>"${esc(form.title)}"</strong> terkirim ke <strong>${result.sent_count} user</strong>`,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#2E86DE'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Mengirim',
+                            text: result.message || 'Terjadi kesalahan saat mengirim pengumuman',
+                            confirmButtonColor: '#2E86DE'
+                        });
+                    }
+                } catch (e) {
+                    console.error('Broadcast error:', e);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Gagal mengirim pengumuman: ' + e.message,
+                        confirmButtonColor: '#2E86DE'
+                    });
+                }
             }
         }
 
@@ -493,21 +603,83 @@
                 title: '<i class="fas fa-download"></i> Export Data',
                 html: `
                     <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
-                        <button class="btn btn-primary" onclick="exportData('users')" style="justify-content:flex-start;"><i class="fas fa-users"></i> Export Pengguna (CSV)</button>
-                        <button class="btn btn-primary" onclick="exportData('products')" style="justify-content:flex-start;"><i class="fas fa-boxes"></i> Export Produk (CSV)</button>
-                        <button class="btn btn-primary" onclick="exportData('categories')" style="justify-content:flex-start;"><i class="fas fa-tags"></i> Export Kategori (CSV)</button>
+                        <button class="btn btn-primary" onclick="exportData('users')" style="justify-content:flex-start;width:100%;"><i class="fas fa-users"></i> Export Pengguna (CSV)</button>
+                        <button class="btn btn-primary" onclick="exportData('products')" style="justify-content:flex-start;width:100%;"><i class="fas fa-boxes"></i> Export Produk (CSV)</button>
+                        <button class="btn btn-primary" onclick="exportData('categories')" style="justify-content:flex-start;width:100%;"><i class="fas fa-tags"></i> Export Kategori (CSV)</button>
                     </div>
                 `,
                 showCancelButton: true,
                 cancelButtonText: 'Tutup',
-                showConfirmButton: false
+                showConfirmButton: false,
+                width: 500
             });
         }
 
         function exportData(type) {
-            window.location.href = `/api/admin/export/${type}`;
-            Swal.close();
-            setTimeout(() => Swal.fire('Downloading...', 'File sedang diunduh', 'success'), 500);
+            Swal.fire({
+                title: 'Mengunduh...',
+                text: `Sedang menyiapkan file ${type}`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            // Create a hidden form to submit the request with credentials
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = `/api/admin/export/${type}`;
+            form.style.display = 'none';
+            document.body.appendChild(form);
+
+            // Use fetch to handle the download with proper error handling
+            fetch(`/api/admin/export/${type}`, {
+                method: 'GET',
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('Sesi berakhir. Silakan login kembali.');
+                }
+                if (!response.ok) {
+                    throw new Error('Gagal mengunduh file.');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = type + '_' + new Date().toISOString().split('T')[0] + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                form.remove();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil! 📥',
+                    text: 'File CSV berhasil diunduh',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            })
+            .catch(error => {
+                form.remove();
+                if (error.message.includes('Sesi')) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sesi Berakhir',
+                        text: error.message,
+                        confirmButtonColor: '#2E86DE'
+                    }).then(() => window.location.href = '/auth');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Mengunduh',
+                        text: error.message,
+                        confirmButtonColor: '#2E86DE'
+                    });
+                }
+            });
         }
     </script>
 </body>
