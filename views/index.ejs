@@ -1706,57 +1706,22 @@
         });
 
         // --- LOGIC 4: AUTH CHECK ---
-        const authLink = document.getElementById('authLink');
+        // Auth logic is now handled by navbar partial
+        // Only keep the logout event listener
         const logoutLink = document.getElementById('logoutLink');
-        const welcomeText = document.getElementById('welcomeText');
-        const mainActionBtn = document.getElementById('mainActionBtn');
-        // Note: These elements may not exist in all pages, so we check for null
-
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status', { method: 'GET', credentials: 'same-origin' });
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.authenticated) {
-                        if(authLink) authLink.style.display = 'none';
-                        if(logoutLink) logoutLink.style.display = 'inline-block';
-                        if(welcomeText) {
-                            welcomeText.style.display = 'inline-block';
-                            welcomeText.textContent = `Halo, ${data.user.name}!`;
-                        }
-                        if(mainActionBtn) {
-                            mainActionBtn.innerHTML = '<i class="fas fa-book" style="font-size: 0.75rem; margin-top: 1px;"></i> <span>Buka Catatan</span>';
-                            mainActionBtn.href = '/products';
-                        }
-                        return true; // Authenticated
-                    }
+        if (logoutLink) {
+            logoutLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+                    // Redirect langsung ke home page setelah logout
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Logout error', error);
+                    window.location.href = '/';
                 }
-                // Default logged out state
-                if(authLink) authLink.style.display = 'inline-block';
-                if(logoutLink) logoutLink.style.display = 'none';
-                if(welcomeText) welcomeText.style.display = 'none';
-                if(mainActionBtn) {
-                    mainActionBtn.innerHTML = '<i class="fas fa-plus" style="font-size: 0.75rem; margin-top: 1px;"></i> <span>Mulai Catat</span>';
-                    mainActionBtn.href = '/auth';
-                }
-                return false;
-            } catch (error) {
-                console.error('Auth check failed', error);
-                return false;
-            }
+            });
         }
-
-        logoutLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
-                // Redirect langsung ke home page setelah logout
-                window.location.href = '/';
-            } catch (error) { 
-                console.error('Logout error', error);
-                window.location.href = '/';
-            }
-        });
 
         // --- LOGIC 5: MAIN DASHBOARD DATA (UPDATED) ---
 
@@ -2672,24 +2637,33 @@
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', async () => {
             updateGreeting();
-            const isAuth = await checkAuthStatus();
+            
+            // Auth is now handled by navbar partial
+            // Check if user is authenticated and load data accordingly
+            try {
+                const response = await fetch('/auth/status', { method: 'GET', credentials: 'same-origin' });
+                const data = await response.json();
+                const isAuth = data.authenticated;
 
-            if(isAuth) {
-                // Load data immediately without delay
-                loadDashboardData();
-                loadNotes();
-                // Load activities with slight delay to ensure DOM is ready
-                setTimeout(() => loadActivities(), 100);
-            }
-
-            // Refresh data tiap 30 detik
-            setInterval(() => {
                 if(isAuth) {
+                    // Load data immediately without delay
                     loadDashboardData();
                     loadNotes();
-                    loadActivities();
+                    // Load activities with slight delay to ensure DOM is ready
+                    setTimeout(() => loadActivities(), 100);
                 }
-            }, 30000);
+
+                // Refresh data tiap 30 detik
+                setInterval(() => {
+                    if(isAuth) {
+                        loadDashboardData();
+                        loadNotes();
+                        loadActivities();
+                    }
+                }, 30000);
+            } catch (error) {
+                console.error('Failed to check auth status:', error);
+            }
 
             setInterval(updateGreeting, 60000);
         });

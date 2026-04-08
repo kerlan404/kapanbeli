@@ -810,29 +810,7 @@
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <nav>
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <i class="fas fa-book-open"></i>
-                <span>Kapan Beli</span>
-            </a>
-            <div class="nav-menu">
-                <a href="/" class="nav-link">Beranda</a>
-                <a href="/notes" class="nav-link active">Catatan Saya</a>
-                <a href="/products" class="nav-link">Bahan Saya</a>
-                <a href="/suggestions" class="nav-link">Saran Pembelian</a>
-            </div>
-            <div class="nav-buttons">
-                <span id="userName" style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: none; margin-right: 10px;">User</span>
-                <a href="/user-profile" id="profilePhotoLink" style="display:none;">
-                    <img id="navProfilePhoto" src="" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-orange); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(255, 159, 67, 0.3);" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 20px rgba(255, 159, 67, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(255, 159, 67, 0.3)'" />
-                </a>
-                <a href="/user-profile" id="profileLink" class="nav-link" title="Profil" style="font-size: 0.95rem; display:none;"><i class="fas fa-user-circle" style="font-size: 1.8rem; color: var(--primary-orange);"></i></a>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-            </div>
-        </div>
-    </nav>
+    <%- include('./partials/navbar', { currentPage: 'notes' }) %>
 
     <!-- CONTAINER -->
     <div class="container">
@@ -911,26 +889,6 @@
                 if (!data.authenticated) {
                     window.location.href = '/auth';
                     return;
-                }
-
-                // Show profile photo if exists
-                const userName = document.getElementById('userName');
-                const profilePhotoLink = document.getElementById('profilePhotoLink');
-                const profileLink = document.getElementById('profileLink');
-                const navProfilePhoto = document.getElementById('navProfilePhoto');
-
-                // Show user name
-                userName.textContent = data.user.name;
-                userName.style.display = 'inline-block';
-
-                if (data.user.profile_photo) {
-                    navProfilePhoto.src = data.user.profile_photo;
-                    navProfilePhoto.style.display = 'inline-block';
-                    profilePhotoLink.style.display = 'inline-block';
-                    profileLink.style.display = 'none';
-                } else {
-                    profilePhotoLink.style.display = 'none';
-                    profileLink.style.display = 'inline-block';
                 }
             } catch(e) {
                 window.location.href = '/auth';

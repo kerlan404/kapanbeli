@@ -15,8 +15,13 @@
         </div>
 
         <div class="nav-actions">
+            <a href="/inbox" class="inbox-link" title="Kotak Surat" style="position: relative; color: var(--text-muted); font-size: 1.3rem; padding: 8px; border-radius: 10px; transition: all 0.3s; text-decoration: none;">
+                <i class="fas fa-bell"></i>
+                <span id="inboxBadge" style="position: absolute; top: 2px; right: 2px; background: var(--accent-red); color: white; border-radius: 50%; min-width: 18px; height: 18px; display: none; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; padding: 0 4px;"></span>
+            </a>
             <div id="authContainer">
-                <div id="unauthButtons" style="display: none;">
+                <!-- Default: show login/register buttons, hide if authenticated -->
+                <div id="unauthButtons">
                     <a href="/auth" class="btn-text">Masuk</a>
                     <a href="/register" class="btn-primary">Daftar</a>
                 </div>
@@ -49,6 +54,8 @@
             });
             const data = await response.json();
 
+            console.log('Auth status:', data);
+
             const unauthButtons = document.getElementById('unauthButtons');
             const logoutLink = document.getElementById('logoutLink');
             const profileLink = document.getElementById('profileLink');
@@ -58,23 +65,30 @@
             if (data.authenticated) {
                 // Hide login/register buttons
                 unauthButtons.style.display = 'none';
-                // Show logout and profile
+
+                // Show logout
                 logoutLink.style.display = 'flex';
 
-                if (data.user && data.user.profile_photo) {
+                // Show profile icon
+                if (data.user && data.user.profile_photo && data.user.profile_photo.trim() !== '') {
+                    // User has profile photo
+                    console.log('Setting profile photo:', data.user.profile_photo);
                     navProfilePhoto.src = data.user.profile_photo;
                     navProfilePhoto.style.display = 'block';
-                    profilePhotoLink.style.display = 'block';
+                    profilePhotoLink.style.display = 'flex';
+                    profilePhotoLink.style.alignItems = 'center';
                     profileLink.style.display = 'none';
                 } else {
+                    // No profile photo, show default icon
+                    console.log('No profile photo, showing default icon');
                     navProfilePhoto.style.display = 'none';
-                    profilePhotoLink.style.display = 'block';
+                    profilePhotoLink.style.display = 'none';
                     profileLink.style.display = 'flex';
+                    profileLink.style.alignItems = 'center';
                 }
             } else {
-                // Show login/register buttons
+                // Not authenticated - show login/register
                 unauthButtons.style.display = 'flex';
-                // Hide logout and profile
                 logoutLink.style.display = 'none';
                 profileLink.style.display = 'none';
                 profilePhotoLink.style.display = 'none';
@@ -82,13 +96,38 @@
             }
         } catch (error) {
             console.error('Auth check error:', error);
+            // On error, show login buttons as fallback
+            const unauthButtons = document.getElementById('unauthButtons');
+            if (unauthButtons) unauthButtons.style.display = 'flex';
         }
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', checkAuthStatus);
+        document.addEventListener('DOMContentLoaded', () => { checkAuthStatus(); loadInboxBadge(); });
     } else {
         checkAuthStatus();
+        loadInboxBadge();
+    }
+
+    async function loadInboxBadge() {
+        try {
+            const response = await fetch('/api/announcements', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.unreadCount > 0) {
+                const badge = document.getElementById('inboxBadge');
+                if (badge) {
+                    badge.textContent = data.unreadCount > 9 ? '9+' : data.unreadCount;
+                    badge.style.display = 'flex';
+                }
+            }
+        } catch (error) {
+            console.error('Inbox badge error:', error);
+        }
     }
 
     function checkAuth(event) {
@@ -231,6 +270,11 @@
         display: flex;
         align-items: center;
         gap: 12px;
+    }
+
+    .inbox-link:hover {
+        color: var(--primary-blue);
+        background: rgba(46, 134, 222, 0.08);
     }
 
     #authContainer {

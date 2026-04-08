@@ -206,13 +206,19 @@ const adminProductController = {
     deactivateProduct: errorHandler.asyncHandler(async (req, res) => {
         const { id } = req.params;
         const { reason } = req.body;
-        const adminId = req.session.user?.id;
+        let adminId = req.session.user?.id;
 
         if (!adminId) {
             return res.status(401).json({
                 success: false,
                 message: 'Unauthorized'
             });
+        }
+
+        // Handle default admin - set deactivated_by to NULL
+        // because 'default_admin' is not a real user ID in database
+        if (adminId === 'default_admin') {
+            adminId = null;
         }
 
         const Product = require('../models/Product');
@@ -231,13 +237,18 @@ const adminProductController = {
      */
     reactivateProduct: errorHandler.asyncHandler(async (req, res) => {
         const { id } = req.params;
-        const adminId = req.session.user?.id;
+        let adminId = req.session.user?.id;
 
         if (!adminId) {
             return res.status(401).json({
                 success: false,
                 message: 'Unauthorized'
             });
+        }
+
+        // Handle default admin - set adminId to NULL
+        if (adminId === 'default_admin') {
+            adminId = null;
         }
 
         const Product = require('../models/Product');

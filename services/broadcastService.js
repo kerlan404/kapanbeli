@@ -20,9 +20,11 @@ const broadcastService = {
             // Get target users
             let users;
             if (sendTo === 'all') {
-                [users] = await db.execute('SELECT id FROM users WHERE role = "user"');
+                // Send to ALL users (including admins)
+                [users] = await db.execute('SELECT id FROM users');
             } else if (sendTo === 'active') {
-                [users] = await db.execute('SELECT id FROM users WHERE role = "user" AND account_status = "active"');
+                // Send to all active users (including admins)
+                [users] = await db.execute('SELECT id FROM users WHERE account_status = "active"');
             } else {
                 throw new Error('Invalid target audience');
             }

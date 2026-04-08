@@ -82,7 +82,6 @@ const adminNotesRoutes = require('./routes/adminNotesRoutes');
 const adminActivityRoutes = require('./routes/adminActivityRoutes');
 const shoppingSuggestionsRoutes = require('./routes/shoppingSuggestionsRoutes');
 const expiredRoutes = require('./routes/expiredRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
 const broadcastRoutes = require('./routes/broadcastRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 const announcementsRoutes = require('./routes/announcements');
@@ -355,6 +354,19 @@ app.get('/admin/products', isAuthenticated, (req, res) => {
     }
 });
 
+// Admin broadcast route
+app.get('/admin/broadcast', isAuthenticated, (req, res) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        res.render('admin-broadcast', {
+            currentPage: 'broadcast',
+            pageTitle: 'Broadcast Pengumuman',
+            user: req.session.user
+        });
+    } else {
+        res.status(403).send('Access denied. Admins only.');
+    }
+});
+
 // Shopping suggestions routes
 app.get('/admin/shopping-suggestions', isAuthenticated, (req, res) => {
     if (req.session.user && req.session.user.role === 'admin') {
@@ -385,7 +397,6 @@ app.use('/api/settings', settingsApiRoutes);
 
 // New feature routes (API only - page routes are defined above)
 app.use('/admin/api', expiredRoutes);
-app.use('/admin/api', categoryRoutes);
 app.use('/api/admin', broadcastRoutes);
 app.use('/api/admin', exportRoutes);
 app.use('/api/announcements', announcementsRoutes);
@@ -489,20 +500,6 @@ app.get('/admin/expired-watch', isAuthenticated, (req, res) => {
             currentPage: 'expired-watch',
             user: req.session.user,
             title: 'Monitoring Kadaluarsa'
-        });
-    } else {
-        // Redirect to auth if not admin
-        req.session.destroy(() => res.redirect('/auth'));
-    }
-});
-
-// Category Management Page
-app.get('/admin/categories', isAuthenticated, (req, res) => {
-    if (req.session.user && req.session.user.role === 'admin') {
-        res.render('admin-categories', {
-            currentPage: 'categories',
-            user: req.session.user,
-            title: 'Manajemen Kategori'
         });
     } else {
         // Redirect to auth if not admin

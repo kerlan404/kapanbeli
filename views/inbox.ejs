@@ -72,30 +72,54 @@
         .filter-tab:hover, .filter-tab.active { border-color: var(--primary-blue); color: var(--primary-blue); background: rgba(46,134,222,0.08); }
 
         /* Messages */
-        .messages-list { display: flex; flex-direction: column; gap: 12px; }
+        .messages-list { display: flex; flex-direction: column; gap: 14px; }
         .message-card {
-            background: var(--bg-card); border-radius: 14px; padding: 18px;
+            background: var(--bg-card); border-radius: 16px; padding: 0;
             border: 1px solid var(--border-color); cursor: pointer;
-            transition: all 0.2s; position: relative;
+            transition: all 0.25s ease; position: relative; overflow: hidden;
         }
-        .message-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-        .message-card.unread { border-left: 4px solid var(--primary-blue); }
+        .message-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: transparent;
+            transition: background 0.25s ease;
+        }
+        .message-card.unread::before { background: var(--primary-blue); }
+        .message-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-2px); border-color: rgba(46,134,222,0.3); }
+        .message-card.unread { background: linear-gradient(135deg, rgba(46,134,222,0.03) 0%, var(--bg-card) 100%); }
         .message-card.unread .msg-title { font-weight: 700; }
-        .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        .msg-title { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
-        .msg-type {
-            font-size: 0.68rem; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+        .msg-inner { padding: 18px 20px 18px 24px; }
+        .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .msg-title { font-size: 1rem; display: flex; align-items: center; gap: 10px; }
+        .msg-title .unread-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary-blue); display: inline-block;
+            animation: pulse 2s infinite;
         }
-        .msg-type.info { background: rgba(46,134,222,0.12); color: var(--primary-blue); }
-        .msg-type.warning { background: rgba(255,159,67,0.12); color: var(--primary-orange); }
-        .msg-type.error { background: rgba(255,107,107,0.12); color: var(--danger); }
-        .msg-preview { color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; margin-bottom: 10px; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .msg-type {
+            font-size: 0.68rem; padding: 3px 10px; border-radius: 12px; font-weight: 600;
+        }
+        .msg-type.info { background: rgba(46,134,222,0.1); color: var(--primary-blue); }
+        .msg-type.warning { background: rgba(255,159,67,0.1); color: var(--primary-orange); }
+        .msg-type.error { background: rgba(255,107,107,0.1); color: var(--danger); }
+        .msg-preview { color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 12px; }
         .msg-footer { display: flex; justify-content: space-between; align-items: center; }
-        .msg-date { font-size: 0.72rem; color: var(--text-muted); }
-        .msg-actions { display: flex; gap: 8px; }
-        .msg-action { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; padding: 4px; transition: color 0.2s; }
-        .msg-action:hover { color: var(--primary-blue); }
-        .msg-action.delete:hover { color: var(--danger); }
+        .msg-date { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .msg-date i { font-size: 0.7rem; }
+        .msg-actions { display: flex; gap: 6px; }
+        .msg-action {
+            width: 32px; height: 32px; border-radius: 8px; background: var(--bg-body);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            cursor: pointer; font-size: 0.8rem; display: flex; align-items: center;
+            justify-content: center; transition: all 0.2s;
+        }
+        .msg-action:hover { background: rgba(46,134,222,0.1); color: var(--primary-blue); border-color: var(--primary-blue); }
+        .msg-action.delete:hover { background: rgba(255,107,107,0.1); color: var(--danger); border-color: var(--danger); }
 
         /* Empty State */
         .empty-state { text-align: center; padding: 60px 20px; }
@@ -220,15 +244,20 @@
 
             container.innerHTML = filtered.map(m => `
                 <div class="message-card ${m.is_read ? '' : 'unread'}" onclick="openMessage(${m.id})">
-                    <div class="msg-header">
-                        <div class="msg-title">${esc(m.title)} <span class="msg-type ${m.type}">${m.type_label || 'Info'}</span></div>
-                    </div>
-                    <div class="msg-preview">${esc(m.message).substring(0, 100)}${m.message.length > 100 ? '...' : ''}</div>
-                    <div class="msg-footer">
-                        <div class="msg-date">${formatDate(m.created_at)}</div>
-                        <div class="msg-actions">
-                            ${!m.is_read ? `<button class="msg-action" onclick="event.stopPropagation();markRead(${m.id})" title="Tandai dibaca"><i class="fas fa-check"></i></button>` : ''}
-                            <button class="msg-action delete" onclick="event.stopPropagation();deleteMsg(${m.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+                    <div class="msg-inner">
+                        <div class="msg-header">
+                            <div class="msg-title">
+                                ${!m.is_read ? '<span class="unread-dot"></span>' : ''}
+                                ${esc(m.title)} <span class="msg-type ${m.type}">${m.type_label || 'Info'}</span>
+                            </div>
+                        </div>
+                        <div class="msg-preview">${esc(m.message).substring(0, 100)}${m.message.length > 100 ? '...' : ''}</div>
+                        <div class="msg-footer">
+                            <div class="msg-date"><i class="far fa-clock"></i> ${formatDate(m.created_at)}</div>
+                            <div class="msg-actions">
+                                ${!m.is_read ? `<button class="msg-action" onclick="event.stopPropagation();markRead(${m.id})" title="Tandai dibaca"><i class="fas fa-check"></i></button>` : ''}
+                                <button class="msg-action delete" onclick="event.stopPropagation();deleteMsg(${m.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>

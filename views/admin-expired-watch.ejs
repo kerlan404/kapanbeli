@@ -85,7 +85,42 @@
 
         .loading-state, .empty-state { text-align: center; padding: 50px 20px; }
         .loading-state i { font-size: 2rem; color: var(--primary-blue); margin-bottom: 12px; animation: spin 1s linear infinite; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .empty-state i { font-size: 3rem; color: var(--accent-green); margin-bottom: 16px; }
+        .empty-state h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-main); }
+        .empty-state p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            border-left: 4px solid var(--accent-green);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error { border-left-color: var(--accent-red); }
+        .toast.warning { border-left-color: var(--primary-orange); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         @media (max-width: 768px) { .main-content { margin-left: 0; padding: 20px; } .filters-bar { flex-direction: column; } .filters-bar .form-control { width: 100%; } }
     </style>
 </head>
@@ -99,8 +134,10 @@
                 <p class="page-subtitle">Pantau bahan makanan yang sudah expired dari seluruh user</p>
             </div>
             <div class="top-actions">
-                <button class="theme-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-                <button class="btn btn-primary" onclick="loadExpired()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+                <button class="btn btn-primary" onclick="loadExpired(1, true)"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
 
@@ -114,9 +151,17 @@
         <div class="filters-bar">
             <span class="filter-label"><i class="fas fa-filter"></i> Filter:</span>
             <input type="text" id="searchInput" class="form-control" placeholder="Cari bahan/user...">
-            <select id="categoryFilter" class="form-control"><option value="">Semua Kategori</option></select>
+            <select id="categoryFilter" class="form-control">
+                <option value="">Semua Kategori</option>
+                <option value="Bumbu Dapur">Bumbu Dapur</option>
+                <option value="Sayuran">Sayuran</option>
+                <option value="Buah-buahan">Buah-buahan</option>
+                <option value="Protein">Protein</option>
+                <option value="Bahan Kering">Bahan Kering</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
             <button class="btn btn-primary" onclick="applyFilters()" style="margin-left:auto;"><i class="fas fa-search"></i> Filter</button>
-            <button class="btn" style="background:var(--border-color);color:var(--text-muted);" onclick="resetFilters()"><i class="fas fa-undo"></i> Reset</button>
+            <button class="btn" style="background:var(--border-color);color:var(--text-muted);" onclick="resetFilters()"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
 
         <!-- Table -->
@@ -134,13 +179,32 @@
                     <div class="pagination" id="paginationBtns"></div>
                 </div>
             </div>
-            <div id="emptyState" class="empty-state" style="display:none;"><i class="fas fa-check-circle" style="font-size:3rem;color:var(--accent-green);"></i><h3>Semua Bahan Aman!</h3><p style="color:var(--text-muted);">Tidak ada item yang expired</p></div>
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <i class="fas fa-check-circle"></i>
+                <h3>Semua Bahan Aman!</h3>
+                <p>Tidak ada item yang expired</p>
+            </div>
         </div>
     </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         let allData = [], currentPage = 1, totalPages = 1, totalItems = 0;
         let filterSearch = '', filterCategory = '';
+
+        // Toast notification function - consistent with other pages
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${esc(message)}</span>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
 
         // Dark Mode
         function initDarkMode() {
@@ -149,20 +213,24 @@
             if (saved === 'dark' || (!saved && prefersDark)) document.body.classList.add('dark-mode-active');
             updateThemeIcon();
         }
-        function toggleDarkMode() {
+        function toggleTheme() {
             document.body.classList.toggle('dark-mode-active');
             const isDark = document.body.classList.contains('dark-mode-active');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeIcon();
         }
         function updateThemeIcon() {
-            const icon = document.querySelector('.theme-toggle i');
-            if (icon) icon.className = document.body.classList.contains('dark-mode-active') ? 'fas fa-sun' : 'fas fa-moon';
+            const isDark = document.body.classList.contains('dark-mode-active');
+            const btn = document.querySelector('.top-actions .btn-outline');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => { initDarkMode(); loadExpired(); });
 
-        async function loadExpired(page = 1) {
+        async function loadExpired(page = 1, showNotification = false) {
             currentPage = page;
             document.getElementById('loadingState').style.display = 'flex';
             document.getElementById('tableWrapper').style.display = 'none';
@@ -170,13 +238,13 @@
             try {
                 const q = new URLSearchParams({ page, limit: 20, search: filterSearch, category: filterCategory });
                 const res = await fetch(`/admin/api/expired-items?${q}`, { credentials: 'same-origin' });
-                
+
                 // Handle auth error - redirect to login
                 if (res.status === 401 || res.status === 403) {
                     window.location.href = '/auth';
                     return;
                 }
-                
+
                 const result = await res.json();
                 if (!result.success) { console.error('API Error:', result); return; }
 
@@ -193,15 +261,12 @@
                     document.getElementById('avgShelfLife').textContent = Math.round(avg) + ' hari';
                 }
 
-                // Update category filter options
-                const catSelect = document.getElementById('categoryFilter');
-                const currentVal = catSelect.value;
-                if (result.categories?.length) {
-                    catSelect.innerHTML = '<option value="">Semua Kategori</option>' + result.categories.map(c => `<option value="${esc(c)}" ${c === filterCategory ? 'selected' : ''}>${esc(c)}</option>`).join('');
-                }
-
                 renderTable();
                 renderPagination();
+                
+                if (showNotification) {
+                    showToast('Data berhasil disegarkan', 'success');
+                }
             } catch (e) { console.error('Fetch error:', e); }
         }
 
@@ -252,13 +317,14 @@
         function applyFilters() {
             filterSearch = document.getElementById('searchInput').value.trim();
             filterCategory = document.getElementById('categoryFilter').value;
-            loadExpired(1);
+            loadExpired(1, false);
         }
         function resetFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('categoryFilter').value = '';
             filterSearch = ''; filterCategory = '';
-            loadExpired(1);
+            loadExpired(1, true);
+            showToast('Filter berhasil direset', 'success');
         }
 
         // Enter key for search

@@ -470,10 +470,10 @@
                 <p class="page-subtitle">Pantau aktivitas login dan logout pengguna</p>
             </div>
             <div class="top-actions">
-                <button class="theme-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
-                    <i class="fas fa-moon"></i>
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
                 </button>
-                <button class="btn btn-outline" onclick="loadActivityLogs()">
+                <button class="btn btn-outline" onclick="loadActivityLogs(true)">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
                 </button>
@@ -535,11 +535,11 @@
                             </select>
                         </div>
                         <div class="filter-actions">
-                            <button class="btn btn-outline btn-reset" onclick="resetFilters()" title="Reset Filter">
-                                <i class="fas fa-redo"></i>
-                                <span>Reset</span>
+                            <button class="btn btn-outline btn-reset" onclick="resetFilters()" title="Refresh Filter">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Refresh</span>
                             </button>
-                            <button class="btn btn-primary" onclick="loadActivityLogs()" title="Refresh">
+                            <button class="btn btn-primary" onclick="loadActivityLogs(true)" title="Refresh">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
@@ -595,26 +595,29 @@
 
         // Initialize Dark Mode
         function initDarkMode() {
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (isDarkMode) {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) {
                 document.body.classList.add('dark-mode-active');
-                updateThemeIcon(true);
             }
+            updateThemeIcon();
         }
 
         // Toggle Dark Mode
-        function toggleDarkMode() {
+        function toggleTheme() {
             document.body.classList.toggle('dark-mode-active');
-            const isDarkMode = document.body.classList.contains('dark-mode-active');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateThemeIcon(isDarkMode);
+            const isDark = document.body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
         }
 
         // Update Theme Icon
-        function updateThemeIcon(isDarkMode) {
-            const icon = document.querySelector('.theme-toggle i');
-            if (icon) {
-                icon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        function updateThemeIcon() {
+            const isDark = document.body.classList.contains('dark-mode-active');
+            const btn = document.querySelector('.top-actions .btn-outline:first-child');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
             }
         }
 
@@ -627,7 +630,7 @@
             currentActivityType = '';
             currentUserStatus = '';
             currentPage = 1;
-            loadActivityLogs();
+            loadActivityLogs(true);
         }
 
         // Initialize
@@ -647,7 +650,7 @@
         }
 
         // Load Activity Logs
-        async function loadActivityLogs() {
+        async function loadActivityLogs(showNotification = false) {
             const loadingState = document.getElementById('loadingState');
             const activityTable = document.getElementById('activityTable');
             const emptyState = document.getElementById('emptyState');
@@ -661,9 +664,9 @@
             try {
                 currentActivityType = document.getElementById('activityTypeFilter').value;
                 currentUserStatus = document.getElementById('userStatusFilter').value;
-                
+
                 let url = `/api/admin/activity-logs?page=${currentPage}&limit=20`;
-                
+
                 if (currentSearch) {
                     url += `&search=${encodeURIComponent(currentSearch)}`;
                 }
@@ -680,13 +683,17 @@
                 if (result.success) {
                     loadActivityStatistics();
                     renderActivityLogs(result.data);
-                    
+
                     if (result.data.length > 0) {
                         activityTable.style.display = 'table';
                         renderPagination(result.pagination);
                         pagination.style.display = 'flex';
                     } else {
                         emptyState.style.display = 'block';
+                    }
+                    
+                    if (showNotification) {
+                        showToast('Data berhasil disegarkan', 'success');
                     }
                 } else {
                     showToast(result.message || 'Gagal memuat data', 'error');

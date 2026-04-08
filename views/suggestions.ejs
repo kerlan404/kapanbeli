@@ -640,33 +640,7 @@
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <nav>
-        <div class="nav-container">
-            <a href="/" class="nav-brand">
-                <i class="fas fa-book-open"></i>
-                <span>Kapan Beli</span>
-            </a>
-            <div class="nav-menu">
-                <a href="/" class="nav-link">Beranda</a>
-                <a href="/notes" class="nav-link">Catatan</a>
-                <a href="/products" class="nav-link">Bahan Saya</a>
-                <a href="/suggestions" class="nav-link active">Saran Pembelian</a>
-            </div>
-            <div class="nav-actions">
-                <span id="userName" style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: none; margin-right: 10px;">User</span>
-                <a href="/user-profile" id="profilePhotoLink" style="display:none;">
-                    <img id="navProfilePhoto" src="" alt="Profile" class="profile-photo" />
-                </a>
-                <a href="/user-profile" id="profileLink" class="nav-link" title="Profil" style="font-size: 0.95rem; display:none;">
-                    <i class="fas fa-user-circle" style="font-size: 1.8rem; color: var(--primary-orange);"></i>
-                </a>
-                <button class="dark-mode-toggle" title="Toggle Dark Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
+    <%- include('./partials/navbar', { currentPage: 'suggestions' }) %>
 
     <div class="container">
         <!-- Header -->
@@ -743,26 +717,6 @@
                     return;
                 }
 
-                // Show profile photo if exists
-                const userName = document.getElementById('userName');
-                const profilePhotoLink = document.getElementById('profilePhotoLink');
-                const profileLink = document.getElementById('profileLink');
-                const navProfilePhoto = document.getElementById('navProfilePhoto');
-
-                // Show user name
-                userName.textContent = data.user.name;
-                userName.style.display = 'inline-block';
-
-                if (data.user.profile_photo) {
-                    navProfilePhoto.src = data.user.profile_photo;
-                    navProfilePhoto.style.display = 'inline-block';
-                    profilePhotoLink.style.display = 'inline-block';
-                    profileLink.style.display = 'none';
-                } else {
-                    profilePhotoLink.style.display = 'none';
-                    profileLink.style.display = 'inline-block';
-                }
-                
                 // Store user info for later use
                 window.currentUser = data.user;
             } catch(e) {

@@ -16,8 +16,8 @@ const broadcastController = {
             return res.status(400).json({ success: false, message: 'Judul minimal 3 karakter' });
         }
 
-        if (!message || message.trim().length < 10) {
-            return res.status(400).json({ success: false, message: 'Pesan minimal 10 karakter' });
+        if (!message || message.trim().length === 0) {
+            return res.status(400).json({ success: false, message: 'Pesan tidak boleh kosong' });
         }
 
         const result = await broadcastService.sendAnnouncement(

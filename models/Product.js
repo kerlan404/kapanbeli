@@ -459,6 +459,7 @@ const Product = {
                 deactivated_by = ?
             WHERE id = ?
         `;
+        // adminId can be NULL for default admin
         const [result] = await db.execute(query, [reason, adminId, productId]);
 
         if (result.affectedRows === 0) {

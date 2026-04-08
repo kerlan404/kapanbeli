@@ -62,84 +62,149 @@
 
         .desc-box { padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; line-height: 1.6; color: var(--text-muted); }
 
-        /* Deactivation Warning Overlay */
+        /* Deactivation Warning Overlay - REDESIGNED */
         .deactivation-warning-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.90);
             border-radius: var(--radius);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+            padding: 20px;
         }
 
         .deactivation-content {
-            text-align: center;
+            background: var(--bg-card);
+            border: 3px solid var(--danger);
+            border-radius: 20px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 550px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(255, 107, 107, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .deactivation-content i:first-child {
-            font-size: 5rem;
+        .deactivation-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--danger) 0%, #ff5252 50%, var(--danger) 100%);
+        }
+
+        .deactivation-icon-wrapper {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border: 3px solid var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .deactivation-icon-wrapper i {
+            font-size: 3rem;
             color: var(--danger);
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
         }
 
         .deactivation-content h2 {
             color: var(--danger);
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            line-height: 1.3;
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            font-weight: 700;
         }
 
         .deactivation-reason {
-            background: rgba(255, 107, 107, 0.15);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
             border-left: 4px solid var(--danger);
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 15px;
             text-align: left;
         }
 
-        .deactivation-reason i {
-            color: var(--danger);
-            font-size: 1.2rem;
-            margin-top: 2px;
+        .deactivation-reason-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
         }
 
-        .deactivation-reason span {
-            color: #ff6b6b;
+        .deactivation-reason-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .deactivation-reason-text {
+            flex: 1;
+        }
+
+        .deactivation-reason-text strong {
+            display: block;
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .deactivation-reason-text p {
+            color: var(--text-main);
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            margin: 0;
+            font-weight: 500;
         }
 
         .waiting-text {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 20px;
+            font-size: 0.95rem;
+            margin-top: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            font-weight: 500;
         }
 
         .waiting-text i {
             animation: spin 2s linear infinite;
+            color: var(--text-muted);
+            font-size: 1.2rem;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.1); }
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scale(1.05);
+                box-shadow: 0 0 0 15px rgba(255, 107, 107, 0);
+            }
         }
 
         @keyframes spin {
@@ -147,7 +212,23 @@
             to { transform: rotate(360deg); }
         }
 
-        @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } .data-grid { grid-template-columns: 1fr; } }
+        @media(max-width: 768px) { 
+            .detail-grid { grid-template-columns: 1fr; } 
+            .data-grid { grid-template-columns: 1fr; } 
+            .deactivation-content { 
+                padding: 30px 20px; 
+            }
+            .deactivation-content h2 {
+                font-size: 1.3rem;
+            }
+            .deactivation-icon-wrapper {
+                width: 80px;
+                height: 80px;
+            }
+            .deactivation-icon-wrapper i {
+                font-size: 2.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -269,13 +350,23 @@
                 overlay.className = 'deactivation-warning-overlay';
                 overlay.innerHTML = `
                     <div class="deactivation-content">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="deactivation-icon-wrapper">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
                         <h2>Produk Ini Sudah Dinonaktifkan oleh Admin</h2>
                         <div class="deactivation-reason">
-                            <i class="fas fa-info-circle"></i>
-                            <span>${reason}</span>
+                            <div class="deactivation-reason-icon">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            <div class="deactivation-reason-text">
+                                <strong>Alasan Nonaktifkan:</strong>
+                                <p>${reason}</p>
+                            </div>
                         </div>
-                        <p class="waiting-text"><i class="fas fa-clock"></i> Menunggu konfirmasi admin untuk mengaktifkan kembali</p>
+                        <p class="waiting-text">
+                            <i class="fas fa-clock"></i> 
+                            <span>Menunggu konfirmasi admin untuk mengaktifkan kembali</span>
+                        </p>
                     </div>
                 `;
                 grid.style.position = 'relative';

@@ -34,14 +34,16 @@
             <span>Monitoring Kadaluarsa</span>
         </a>
 
-        <a href="/admin/categories" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'categories' ? 'active' : '' %>">
-            <i class="fas fa-tags"></i>
-            <span>Manajemen Kategori</span>
-        </a>
-
         <a href="/admin/shopping-suggestions" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'shopping-suggestions' ? 'active' : '' %>">
             <i class="fas fa-shopping-cart"></i>
             <span>Saran Pembelian</span>
+        </a>
+
+        <div class="menu-label">Communication</div>
+
+        <a href="/admin/broadcast" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'broadcast' ? 'active' : '' %>">
+            <i class="fas fa-bullhorn"></i>
+            <span>Broadcast Pengumuman</span>
         </a>
 
         <div class="menu-label">Content</div>

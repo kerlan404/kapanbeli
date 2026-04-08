@@ -220,15 +220,17 @@
                 <p class="page-subtitle">Data pengguna, produk, dan aktivitas sistem</p>
             </div>
             <div class="top-actions">
-                <button class="theme-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-                <select id="rangeFilter" class="form-control" onchange="loadAnalytics()">
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+                <select id="rangeFilter" class="form-control" onchange="loadAnalytics(false)">
                     <option value="today">Hari Ini</option>
                     <option value="7days" selected>7 Hari Terakhir</option>
                     <option value="month">Bulan Ini</option>
                 </select>
                 <button class="btn btn-primary" onclick="showBroadcastModal()" title="Kirim Pengumuman"><i class="fas fa-bullhorn"></i> Broadcast</button>
                 <button class="btn btn-primary" onclick="showExportModal()" title="Export Data"><i class="fas fa-download"></i> Export</button>
-                <button class="btn btn-primary" onclick="loadAnalytics()" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn btn-primary" onclick="loadAnalytics(true)" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
 
@@ -338,7 +340,7 @@
             }
             updateThemeIcon();
         }
-        function toggleDarkMode() {
+        function toggleTheme() {
             document.body.classList.toggle('dark-mode-active');
             const isDark = document.body.classList.contains('dark-mode-active');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
@@ -348,13 +350,16 @@
         }
         function updateThemeIcon() {
             const isDark = document.body.classList.contains('dark-mode-active');
-            const icon = document.querySelector('.theme-toggle i');
-            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            const btn = document.querySelector('.top-actions .btn-outline');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => { initDarkMode(); loadAnalytics(); });
 
-        async function loadAnalytics() {
+        async function loadAnalytics(showNotification = false) {
             const range = document.getElementById('rangeFilter').value;
             const icon = document.getElementById('refreshBtn').querySelector('i');
             document.getElementById('loadingState').style.display = 'flex';
@@ -413,6 +418,11 @@
                 // Update category distribution (optional)
                 if (cat.success) updCategory(cat);
                 else document.getElementById('categoryTableBody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Gagal memuat data</td></tr>';
+
+                // Show success toast notification only when requested
+                if (showNotification) {
+                    showToast('Data berhasil disegarkan', 'success');
+                }
 
             } catch(e) {
                 console.error('Load analytics error:', e);
@@ -487,131 +497,287 @@
         function showError(m) { document.getElementById('loadingState').style.display='none'; document.getElementById('analyticsContent').style.display='none'; document.getElementById('errorState').style.display='flex'; document.getElementById('errorMessage').textContent=m; }
         function esc(t){if(!t)return'';const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 
-        // Broadcast Announcement
+        // Broadcast Announcement - Professional UI
         async function showBroadcastModal() {
-            const { value: form } = await Swal.fire({
-                title: '<i class="fas fa-bullhorn" style="color:#2E86DE;"></i> Kirim Pengumuman',
-                width: 600,
+            Swal.fire({
+                title: '',
+                width: 580,
+                padding: 0,
+                showCloseButton: false,
+                showConfirmButton: false,
+                showCancelButton: false,
+                background: 'transparent',
+                backdrop: 'rgba(0,0,0,0.6)',
                 html: `
-                    <div style="text-align:left;margin-bottom:20px;">
-                        <p style="color:#6C757D;font-size:0.85rem;margin-bottom:12px;">📢 Kirim pengumuman ke semua pengguna. Pengguna akan menerima notifikasi di Kotak Surat mereka.</p>
-                    </div>
-                    <div style="margin-bottom:12px;">
-                        <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Judul Pengumuman</label>
-                        <input id="brd-title" class="swal2-input" placeholder="Contoh: Maintenance Server" style="margin:0;width:100%;">
-                    </div>
-                    <div style="margin-bottom:12px;">
-                        <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Isi Pesan</label>
-                        <textarea id="brd-msg" class="swal2-textarea" placeholder="Tulis pesan pengumuman di sini..." rows="4" style="margin:0;width:100%;min-height:100px;"></textarea>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                        <div>
-                            <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Tipe Pesan</label>
-                            <select id="brd-type" class="swal2-select" style="width:100%;padding:8px;border-radius:8px;">
-                                <option value="info">ℹ️ Info Umum</option>
-                                <option value="warning">⚠️ Peringatan</option>
-                                <option value="error">🔴 Penting/Urgent</option>
-                            </select>
+                    <div style="text-align: left; background: var(--bg-card); border-radius: 20px; overflow: hidden;">
+                        <!-- Header -->
+                        <div style="background: linear-gradient(135deg, #2E86DE 0%, #1B5FA5 100%); padding: 24px 28px 20px; color: white; position: relative;">
+                            <button onclick="Swal.close()" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                                <div style="width: 42px; height: 42px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-bullhorn" style="font-size: 1.2rem;"></i>
+                                </div>
+                                <div>
+                                    <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Kirim Pengumuman</h2>
+                                    <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Broadcast ke semua pengguna</p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label style="display:block;font-weight:500;font-size:0.85rem;margin-bottom:4px;">Target Pengiriman</label>
-                            <select id="brd-target" class="swal2-select" style="width:100%;padding:8px;border-radius:8px;">
-                                <option value="all">👥 Semua User</option>
-                                <option value="active">✅ User Aktif</option>
-                            </select>
+
+                        <!-- Body -->
+                        <div style="padding: 24px 28px;">
+                            <!-- Title -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; color: var(--text-main);">
+                                    Judul Pengumuman <span style="color: var(--accent-red);">*</span>
+                                </label>
+                                <input id="brd-title" class="swal2-input" placeholder="Contoh: Maintenance Server" style="margin: 0; width: 100%; border: 2px solid var(--border-color); border-radius: 10px; padding: 11px 14px; font-size: 0.88rem; transition: border-color 0.2s;">
+                            </div>
+
+                            <!-- Message -->
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; color: var(--text-main);">
+                                    Isi Pesan <span style="color: var(--accent-red);">*</span>
+                                </label>
+                                <textarea id="brd-msg" class="swal2-textarea" placeholder="Tulis detail pengumuman..." rows="3" style="margin: 0; width: 100%; min-height: 80px; border: 2px solid var(--border-color); border-radius: 10px; padding: 11px 14px; font-size: 0.88rem; resize: vertical; font-family: inherit;"></textarea>
+                            </div>
+
+                            <!-- Options -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; font-size: 0.78rem; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Tipe</label>
+                                    <select id="brd-type" style="width: 100%; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 0.85rem; background: var(--bg-card); color: var(--text-main); cursor: pointer;">
+                                        <option value="info">ℹ️ Info</option>
+                                        <option value="warning">⚠️ Peringatan</option>
+                                        <option value="error">🔴 Urgent</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; font-size: 0.78rem; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Target</label>
+                                    <select id="brd-target" style="width: 100%; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 0.85rem; background: var(--bg-card); color: var(--text-main); cursor: pointer;">
+                                        <option value="all">👥 Semua User</option>
+                                        <option value="active">✅ User Aktif</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Preview -->
+                            <div style="background: var(--bg-body); border-radius: 12px; padding: 14px 16px; border: 1px solid var(--border-color);">
+                                <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+                                    <i class="fas fa-eye" style="margin-right: 4px;"></i>Preview
+                                </div>
+                                <div id="broadcast-preview" style="background: var(--bg-card); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #2E86DE;">
+                                    <div style="font-weight: 600; color: var(--text-main); margin-bottom: 4px; font-size: 0.88rem;">Judul pengumuman</div>
+                                    <div style="color: var(--text-muted); font-size: 0.82rem; line-height: 1.4;">Isi pesan akan muncul di sini...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div style="padding: 16px 28px 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--border-color); background: var(--bg-body);">
+                            <button class="btn-cancel" style="padding: 10px 20px; border-radius: 10px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); font-weight: 500; font-size: 0.85rem; cursor: pointer; font-family: inherit;">Batal</button>
+                            <button class="btn-send" style="padding: 10px 24px; border-radius: 10px; border: none; background: #2E86DE; color: white; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit;">
+                                <i class="fas fa-paper-plane" style="margin-right: 6px;"></i>Kirim
+                            </button>
                         </div>
                     </div>
                 `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fas fa-paper-plane"></i> Kirim Pengumuman',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#2E86DE',
-                preConfirm: () => {
-                    const title = document.getElementById('brd-title').value.trim();
-                    const message = document.getElementById('brd-msg').value.trim();
-                    if (!title || title.length < 3) { Swal.showValidationMessage('Judul minimal 3 karakter'); return false; }
-                    if (!message || message.length < 10) { Swal.showValidationMessage('Pesan minimal 10 karakter'); return false; }
-                    return {
-                        title, message,
-                        type: document.getElementById('brd-type').value,
-                        sendTo: document.getElementById('brd-target').value
+                didOpen: () => {
+                    const titleInput = document.getElementById('brd-title');
+                    const msgInput = document.getElementById('brd-msg');
+                    const typeSelect = document.getElementById('brd-type');
+                    const targetSelect = document.getElementById('brd-target');
+                    const preview = document.getElementById('broadcast-preview');
+                    const btnCancel = document.querySelector('.btn-cancel');
+                    const btnSend = document.querySelector('.btn-send');
+
+                    const updatePreview = () => {
+                        const title = titleInput.value || 'Judul pengumuman';
+                        const msg = msgInput.value || 'Isi pesan akan muncul di sini...';
+                        const type = typeSelect.value;
+                        const colors = { info: '#2E86DE', warning: '#FF9F43', error: '#FF6B6B' };
+                        preview.style.borderLeftColor = colors[type] || '#2E86DE';
+                        preview.querySelector('div:first-child').textContent = title;
+                        preview.querySelector('div:nth-child(2)').textContent = msg;
                     };
+
+                    titleInput.addEventListener('input', updatePreview);
+                    msgInput.addEventListener('input', updatePreview);
+                    typeSelect.addEventListener('change', updatePreview);
+
+                    // Cancel button
+                    btnCancel.addEventListener('click', () => Swal.close());
+
+                    // Send button - Direct submission
+                    btnSend.addEventListener('click', async () => {
+                        const title = titleInput.value.trim();
+                        const message = msgInput.value.trim();
+                        const type = typeSelect.value;
+                        const sendTo = targetSelect.value;
+
+                        // Validation
+                        if (!title || title.length < 3) {
+                            Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            }).fire({ icon: 'error', title: 'Judul minimal 3 karakter' });
+                            titleInput.focus();
+                            return;
+                        }
+                        if (!message) {
+                            Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            }).fire({ icon: 'error', title: 'Pesan tidak boleh kosong' });
+                            msgInput.focus();
+                            return;
+                        }
+
+                        // Show loading
+                        Swal.fire({
+                            title: 'Mengirim...',
+                            text: 'Sedang mengirim pengumuman',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        try {
+                            const res = await fetch('/api/admin/broadcast', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ title, message, type, sendTo }),
+                                credentials: 'same-origin'
+                            });
+
+                            // Handle auth error
+                            if (res.status === 401 || res.status === 403) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Sesi Berakhir',
+                                    text: 'Silakan login kembali sebagai admin',
+                                    confirmButtonColor: '#2E86DE'
+                                }).then(() => window.location.href = '/auth');
+                                return;
+                            }
+
+                            const result = await res.json();
+
+                            if (result.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil Dikirim! 📢',
+                                    html: `Pengumuman <strong>"${esc(title)}"</strong> terkirim ke <strong>${result.sent_count} user</strong>`,
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#2E86DE'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal Mengirim',
+                                    text: result.message || 'Terjadi kesalahan saat mengirim pengumuman',
+                                    confirmButtonColor: '#2E86DE'
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Broadcast error:', e);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Gagal mengirim pengumuman: ' + e.message,
+                                confirmButtonColor: '#2E86DE'
+                            });
+                        }
+                    });
+
+                    setTimeout(() => titleInput.focus(), 300);
                 }
             });
-
-            if (form) {
-                Swal.fire({
-                    title: 'Mengirim...',
-                    text: 'Sedang mengirim pengumuman',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                try {
-                    const res = await fetch('/api/admin/broadcast', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(form),
-                        credentials: 'same-origin'
-                    });
-                    
-                    // Handle auth error
-                    if (res.status === 401 || res.status === 403) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Sesi Berakhir',
-                            text: 'Silakan login kembali sebagai admin',
-                            confirmButtonColor: '#2E86DE'
-                        }).then(() => window.location.href = '/auth');
-                        return;
-                    }
-                    
-                    const result = await res.json();
-                    
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil Dikirim! 📢',
-                            html: `Pengumuman <strong>"${esc(form.title)}"</strong> terkirim ke <strong>${result.sent_count} user</strong>`,
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#2E86DE'
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal Mengirim',
-                            text: result.message || 'Terjadi kesalahan saat mengirim pengumuman',
-                            confirmButtonColor: '#2E86DE'
-                        });
-                    }
-                } catch (e) {
-                    console.error('Broadcast error:', e);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Gagal mengirim pengumuman: ' + e.message,
-                        confirmButtonColor: '#2E86DE'
-                    });
-                }
-            }
         }
 
-        // Export Data
+        // Export Data - Professional UI
         function showExportModal() {
             Swal.fire({
-                title: '<i class="fas fa-download"></i> Export Data',
-                html: `
-                    <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
-                        <button class="btn btn-primary" onclick="exportData('users')" style="justify-content:flex-start;width:100%;"><i class="fas fa-users"></i> Export Pengguna (CSV)</button>
-                        <button class="btn btn-primary" onclick="exportData('products')" style="justify-content:flex-start;width:100%;"><i class="fas fa-boxes"></i> Export Produk (CSV)</button>
-                        <button class="btn btn-primary" onclick="exportData('categories')" style="justify-content:flex-start;width:100%;"><i class="fas fa-tags"></i> Export Kategori (CSV)</button>
-                    </div>
-                `,
-                showCancelButton: true,
-                cancelButtonText: 'Tutup',
+                title: '',
+                width: 520,
+                padding: 0,
+                showCloseButton: false,
                 showConfirmButton: false,
-                width: 500
+                showCancelButton: false,
+                background: 'transparent',
+                backdrop: 'rgba(0,0,0,0.6)',
+                html: `
+                    <div style="text-align: left; background: var(--bg-card); border-radius: 20px; overflow: hidden;">
+                        <!-- Header -->
+                        <div style="background: linear-gradient(135deg, #2E86DE 0%, #1B5FA5 100%); padding: 24px 28px 20px; color: white; position: relative;">
+                            <button onclick="Swal.close()" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                                <div style="width: 42px; height: 42px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-download" style="font-size: 1.2rem;"></i>
+                                </div>
+                                <div>
+                                    <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Export Data</h2>
+                                    <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Unduh data dalam format CSV</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div style="padding: 24px 28px;">
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Users Export -->
+                                <button onclick="exportData('users')" style="display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--bg-body); border: 1.5px solid var(--border-color); border-radius: 14px; cursor: pointer; transition: all 0.2s; text-align: left; font-family: inherit;" onmouseover="this.style.borderColor='var(--primary-blue)';this.style.background='rgba(46,134,222,0.05)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.background='var(--bg-body)'">
+                                    <div style="width: 44px; height: 44px; background: rgba(46,134,222,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fas fa-users" style="color: var(--primary-blue); font-size: 1.1rem;"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: var(--text-main); font-size: 0.95rem;">Export Pengguna</div>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Semua data pengguna terdaftar</div>
+                                    </div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                                </button>
+
+                                <!-- Products Export -->
+                                <button onclick="exportData('products')" style="display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--bg-body); border: 1.5px solid var(--border-color); border-radius: 14px; cursor: pointer; transition: all 0.2s; text-align: left; font-family: inherit;" onmouseover="this.style.borderColor='var(--accent-green)';this.style.background='rgba(29,209,161,0.05)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.background='var(--bg-body)'">
+                                    <div style="width: 44px; height: 44px; background: rgba(29,209,161,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fas fa-boxes" style="color: var(--accent-green); font-size: 1.1rem;"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: var(--text-main); font-size: 0.95rem;">Export Produk</div>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Semua data produk dan stok</div>
+                                    </div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                                </button>
+
+                                <!-- Categories Export -->
+                                <button onclick="exportData('categories')" style="display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--bg-body); border: 1.5px solid var(--border-color); border-radius: 14px; cursor: pointer; transition: all 0.2s; text-align: left; font-family: inherit;" onmouseover="this.style.borderColor='var(--primary-orange)';this.style.background='rgba(255,159,67,0.05)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.background='var(--bg-body)'">
+                                    <div style="width: 44px; height: 44px; background: rgba(255,159,67,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fas fa-tags" style="color: var(--primary-orange); font-size: 1.1rem;"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: var(--text-main); font-size: 0.95rem;">Export Kategori</div>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Daftar semua kategori produk</div>
+                                    </div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div style="padding: 16px 28px 20px; border-top: 1px solid var(--border-color); background: var(--bg-body);">
+                            <button onclick="Swal.close()" style="width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); font-weight: 500; font-size: 0.88rem; cursor: pointer; font-family: inherit; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--text-muted)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                `
             });
         }
 
@@ -680,6 +846,18 @@
                     });
                 }
             });
+        }
+
+        // Toast notification function - consistent with other pages
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${esc(message)}</span>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
     </script>
 </body>

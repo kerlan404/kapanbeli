@@ -12,7 +12,7 @@ const exportController = {
     exportUsers: errorHandler.asyncHandler(async (req, res) => {
         const { filename, content } = await exportService.exportUsers();
 
-        res.setHeader('Content-Type', 'text/csv;charset=utf-8;');
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.send(content);
     }),
@@ -23,7 +23,7 @@ const exportController = {
     exportProducts: errorHandler.asyncHandler(async (req, res) => {
         const { filename, content } = await exportService.exportProducts();
 
-        res.setHeader('Content-Type', 'text/csv;charset=utf-8;');
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.send(content);
     }),
@@ -34,7 +34,7 @@ const exportController = {
     exportCategories: errorHandler.asyncHandler(async (req, res) => {
         const { filename, content } = await exportService.exportCategories();
 
-        res.setHeader('Content-Type', 'text/csv;charset=utf-8;');
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.send(content);
     })

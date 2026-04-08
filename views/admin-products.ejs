@@ -322,6 +322,21 @@
         .badge-low { background: rgba(254, 202, 87, 0.15); color: var(--primary-orange); }
         .badge-out { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
 
+        /* Deactivated Row Styling */
+        .deactivated-row {
+            background: rgba(255, 107, 107, 0.05);
+            border-left: 4px solid var(--accent-red);
+        }
+        .deactivated-row:hover {
+            background: rgba(255, 107, 107, 0.08);
+        }
+        .deactivated-row td {
+            opacity: 0.85;
+        }
+        .deactivated-row td:first-child {
+            border-left: 4px solid var(--accent-red);
+        }
+
         /* Profile Image */
         .profile-img-sm {
             width: 40px;
@@ -490,6 +505,9 @@
             .menu-toggle { display: block; }
         }
     </style>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -725,6 +743,44 @@
         </div>
     </div>
 
+    <!-- Deactivate Product Modal -->
+    <div class="modal" id="deactivateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nonaktifkan Produk</h3>
+                <button class="modal-close" onclick="closeDeactivateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Anda akan menonaktifkan produk:</p>
+                <p style="font-weight: 600; font-size: 1.1rem; margin: 10px 0; color: var(--primary-blue);">
+                    <i class="fas fa-box"></i> <span id="deactivateProductName"></span>
+                </p>
+                <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid var(--accent-red); padding: 12px; border-radius: 6px; margin: 15px 0;">
+                    <p style="color: var(--accent-red); font-weight: 500; margin: 0;">
+                        <i class="fas fa-exclamation-triangle"></i> Perhatian:
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 5px 0 0 0;">
+                        Produk yang dinonaktifkan tidak dapat diedit atau dihapus oleh user sampai diaktifkan kembali.
+                    </p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 8px;">
+                        <i class="fas fa-comment"></i> Alasan Nonaktifkan:
+                    </label>
+                    <textarea id="deactivateReason" rows="4" 
+                        placeholder="Jelaskan alasan menonaktifkan produk ini..."
+                        style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.95rem; resize: vertical; background: var(--bg-card); color: var(--text-main);"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDeactivateModal()">Batal</button>
+                <button class="btn btn-danger" onclick="confirmDeactivate()">
+                    <i class="fas fa-ban"></i> Nonaktifkan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
@@ -740,6 +796,7 @@
         let currentPage = 1;
         let currentLimit = 20;
         let deleteProductTargetId = null;
+        let deactivateProductTargetId = null;
         let searchTimer = null;
 
         // ============================================
@@ -876,12 +933,19 @@
                 const activeBadge = product.is_active
                     ? '<span class="badge badge-success">Aktif</span>'
                     : '<span class="badge badge-secondary">Non-Aktif</span>';
+                
+                // Deactivated badge
+                const isDeactivated = product.is_deactivated_by_admin === 1 || product.is_deactivated_by_admin === true;
+                const deactivatedBadge = isDeactivated
+                    ? '<span class="badge badge-danger" title="Dinonaktifkan oleh admin"><i class="fas fa-ban"></i> Deactivated</span>'
+                    : '';
+                
                 const expiry = product.expiry_date ? new Date(product.expiry_date).toLocaleDateString('id-ID') : '-';
                 const stockDisplay = formatStock(product.stock_quantity);
                 const minStockDisplay = formatStock(product.min_stock_level);
 
                 return `
-                    <tr>
+                    <tr class="${isDeactivated ? 'deactivated-row' : ''}">
                         <td>
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="${profileImg}" alt="${product.name}" class="profile-img-sm">
@@ -901,19 +965,29 @@
                             <div style="display: flex; flex-direction: column; gap: 5px;">
                                 ${activeBadge}
                                 ${stockBadge}
+                                ${deactivatedBadge}
                             </div>
                         </td>
                         <td>
                             <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                                <button class="btn btn-sm btn-primary" onclick="openEditModal(${product.id})" title="Edit">
+                                <button class="btn btn-sm btn-primary" onclick="openEditModal(${product.id})" title="Edit" ${isDeactivated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                ${isDeactivated ? `
+                                <button class="btn btn-sm btn-success" onclick="reactivateProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')" title="Aktifkan Kembali">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                                ` : `
+                                <button class="btn btn-sm btn-danger" onclick="openDeactivateModal(${product.id}, '${product.name.replace(/'/g, "\\'")}')" title="Nonaktifkan">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                `}
                                 <button class="btn btn-sm ${product.is_active ? 'btn-warning' : 'btn-success'}"
                                     onclick="toggleProductStatus(${product.id})"
                                     title="${product.is_active ? 'Nonaktifkan' : 'Aktifkan'}">
                                     <i class="fas fa-${product.is_active ? 'pause' : 'play'}"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteProduct(${product.id})" title="Hapus">
+                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteProduct(${product.id})" title="Hapus" ${isDeactivated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1166,6 +1240,136 @@
             .catch(error => {
                 console.error('Error toggling status:', error);
                 showToast('Terjadi kesalahan', 'error');
+            });
+        }
+
+        // ============================================
+        // DEACTIVATE PRODUCT FUNCTIONS
+        // ============================================
+        function openDeactivateModal(productId, productName) {
+            deactivateProductTargetId = productId;
+            document.getElementById('deactivateProductName').textContent = productName;
+            document.getElementById('deactivateReason').value = '';
+            document.getElementById('deactivateModal').classList.add('active');
+        }
+
+        function closeDeactivateModal() {
+            document.getElementById('deactivateModal').classList.remove('active');
+            deactivateProductTargetId = null;
+        }
+
+        function confirmDeactivate() {
+            if (!deactivateProductTargetId) return;
+
+            const reason = document.getElementById('deactivateReason').value.trim();
+            
+            if (!reason) {
+                showToast('Harap isi alasan nonaktifkan produk', 'error');
+                return;
+            }
+
+            // Show loading state
+            const confirmBtn = event.target.closest('button');
+            const originalHTML = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            confirmBtn.disabled = true;
+
+            fetch(`/api/admin/products/${deactivateProductTargetId}/deactivate`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showToast('Produk berhasil dinonaktifkan', 'success');
+                    closeDeactivateModal();
+                    loadProducts();
+                    loadProductStatistics();
+                } else {
+                    showToast('Gagal: ' + result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deactivating product:', error);
+                showToast('Terjadi kesalahan saat menonaktifkan produk', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                confirmBtn.innerHTML = originalHTML;
+                confirmBtn.disabled = false;
+            });
+        }
+
+        // ============================================
+        // REACTIVATE PRODUCT FUNCTION
+        // ============================================
+        function reactivateProduct(productId, productName) {
+            Swal.fire({
+                title: 'Aktifkan Kembali Produk?',
+                html: `
+                    <p>Anda akan mengaktifkan kembali produk:</p>
+                    <p style="font-weight: 600; font-size: 1.1rem; margin: 10px 0; color: #2E86DE;">
+                        <i class="fas fa-box"></i> ${productName}
+                    </p>
+                    <p style="color: #636E72; font-size: 0.9rem;">
+                        User akan dapat mengedit dan menghapus produk ini kembali.
+                    </p>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1DD1A1',
+                cancelButtonColor: '#636E72',
+                confirmButtonText: '<i class="fas fa-check"></i> Ya, Aktifkan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Memproses...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch(`/api/admin/products/${productId}/reactivate`, {
+                        method: 'PATCH',
+                        credentials: 'same-origin'
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Produk berhasil diaktifkan kembali',
+                                confirmButtonColor: '#1DD1A1'
+                            });
+                            loadProducts();
+                            loadProductStatistics();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: result.message || 'Gagal mengaktifkan produk',
+                                confirmButtonColor: '#FF6B6B'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error reactivating product:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat mengaktifkan produk',
+                            confirmButtonColor: '#FF6B6B'
+                        });
+                    });
+                }
             });
         }
 
