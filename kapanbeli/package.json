@@ -1,0 +1,39 @@
+{
+  "name": "kapan-beli",
+  "version": "1.0.0",
+  "description": "Kapan Beli - Shopping List Manager",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./kapanbeli/server.js",
+    "dev": "nodemon ./kapanbeli/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.5",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.18.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "mysql2": "^3.9.8",
+    "nodemailer": "^8.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kerlan404/kapanbeli.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kerlan404/kapanbeli/issues"
+  },
+  "homepage": "https://github.com/kerlan404/kapanbeli#readme"
+}

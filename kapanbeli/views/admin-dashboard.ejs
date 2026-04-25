@@ -1,0 +1,2735 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<% if (user && user.theme === 'dark') { var bodyClass = 'dark-mode-active'; } else { var bodyClass = ''; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Kapan Beli</title>
+
+    <!-- Google Fonts: Poppins & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js untuk Grafik Data Nyata -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --primary-blue: #2E86DE;
+            --primary-dark: #205A9E;
+            --primary-orange: #FF9F43;
+            --accent-green: #1DD1A1;
+            --accent-red: #FF6B6B;
+            --bg-sidebar: #ffffff;
+            --bg-sidebar-hover: rgba(46, 134, 222, 0.08);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.12);
+            --text-sidebar: #546E7A;
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: #2C3E50;
+            --sidebar-border: #e9ecef;
+            --bg-body: #F4F6F9;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --text-light: #ecf0f1;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
+            --sidebar-width: 240px;
+            --header-height: 64px;
+            --content-padding: 24px;
+        }
+
+        body.dark-mode-active {
+            --bg-sidebar: #1a1d23;
+            --bg-sidebar-hover: rgba(255,255,255,0.05);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.15);
+            --text-sidebar: rgba(255,255,255,0.7);
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: white;
+            --sidebar-border: rgba(255,255,255,0.1);
+            --bg-body: #121418;
+            --bg-card: #1e2128;
+            --text-main: #ecf0f1;
+            --text-muted: #bdc3c7;
+            --border-color: #2c3e50;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-sidebar-heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-orange); }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .menu-label {
+            padding: 0 24px 10px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-sidebar);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-sidebar-hover);
+            color: var(--text-sidebar-heading);
+        }
+
+        .nav-item.active {
+            background-color: var(--bg-sidebar-active);
+            color: var(--text-sidebar-active);
+            border-left-color: var(--primary-blue);
+        }
+
+        .nav-item i { width: 24px; margin-right: 12px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--sidebar-border);
+        }
+
+        .user-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .user-info h4 {
+            font-size: 0.9rem;
+            color: var(--text-sidebar-heading);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-sidebar);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            width: 32px; 
+            height: 32px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: var(--content-padding);
+            transition: all 0.3s ease;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .top-actions { display: flex; gap: 15px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .btn-danger { background: rgba(255, 107, 107, 0.1); color: var(--accent-red); }
+        .btn-danger:hover { background: var(--accent-red); color: white; }
+
+        /* --- CARDS & STATS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-info h3 { font-size: 2rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .stat-info p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+        .bg-blue-light { background: rgba(46, 134, 222, 0.1); color: var(--primary-blue); }
+        .bg-green-light { background: rgba(29, 209, 161, 0.1); color: var(--accent-green); }
+        .bg-orange-light { background: rgba(255, 159, 67, 0.1); color: var(--primary-orange); }
+        .bg-red-light { background: rgba(255, 107, 107, 0.1); color: var(--accent-red); }
+
+        /* --- CONTENT PANELS --- */
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .content-panel.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .panel-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .panel-title { font-size: 1.25rem; font-weight: 600; }
+
+        /* --- TABLES --- */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid var(--border-color); }
+        td { padding: 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.95rem; }
+        tr:hover td { background-color: rgba(0,0,0,0.01); }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
+        .badge-warning { background: rgba(255, 159, 67, 0.15); color: var(--primary-orange); }
+        .badge-danger { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+
+        /* --- FORMS (SETTINGS) --- */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; background: var(--bg-body); color: var(--text-main);
+            font-size: 0.95rem; outline: none;
+        }
+        .form-control:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1); }
+        
+        /* --- DETAIL VIEW --- */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        .profile-card { text-align: center; }
+        .profile-large-img {
+            width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
+            margin-bottom: 15px; border: 4px solid var(--bg-body); box-shadow: var(--shadow-md);
+        }
+        .data-list { list-style: none; }
+        .data-list li {
+            padding: 10px 0; border-bottom: 1px dashed var(--border-color);
+            display: flex; justify-content: space-between;
+        }
+        .data-list li:last-child { border: none; }
+        .data-label { color: var(--text-muted); }
+        .data-value { font-weight: 600; color: var(--text-main); }
+
+        /* --- RESPONSIVE --- */
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .detail-grid { grid-template-columns: 1fr; }
+        }
+
+        /* --- ANALYTICS STYLES --- */
+        .analytics-section {
+            margin-top: 30px;
+        }
+
+        .analytics-filter {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .analytics-filter select {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(0,0,0,0.1);
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .analytics-filter select:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .analytics-filter select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+
+        .analytics-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .analytics-stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .analytics-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .analytics-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-blue);
+        }
+
+        .analytics-stat-card.success::before { background: var(--accent-green); }
+        .analytics-stat-card.warning::before { background: var(--primary-orange); }
+        .analytics-stat-card.danger::before { background: var(--accent-red); }
+        .analytics-stat-card.info::before { background: var(--primary-blue); }
+
+        .analytics-stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .analytics-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .analytics-stat-icon.blue { background: rgba(46, 134, 222, 0.12); color: var(--primary-blue); }
+        .analytics-stat-icon.green { background: rgba(29, 209, 161, 0.12); color: var(--accent-green); }
+        .analytics-stat-icon.orange { background: rgba(255, 159, 67, 0.12); color: var(--primary-orange); }
+        .analytics-stat-icon.red { background: rgba(255, 107, 107, 0.12); color: var(--accent-red); }
+        .analytics-stat-icon.cyan { background: rgba(46, 134, 222, 0.12); color: var(--primary-blue); }
+
+        .analytics-stat-badge {
+            background: rgba(0,0,0,0.05);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .analytics-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .analytics-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .analytics-stat-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .analytics-stat-growth {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .analytics-stat-growth.up { color: var(--accent-green); }
+        .analytics-stat-growth.down { color: var(--accent-red); }
+        .analytics-stat-growth.neutral { color: var(--text-muted); }
+
+        .analytics-stat-growth-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+        }
+
+        .analytics-stat-growth.up .analytics-stat-growth-icon { background: rgba(29, 209, 161, 0.15); }
+        .analytics-stat-growth.down .analytics-stat-growth-icon { background: rgba(255, 107, 107, 0.15); }
+
+        .analytics-stat-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .analytics-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .analytics-chart-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .analytics-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .analytics-chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analytics-chart-title i {
+            color: var(--primary-blue);
+        }
+
+        .analytics-chart-legend {
+            display: flex;
+            gap: 12px;
+        }
+
+        .analytics-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .analytics-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .analytics-chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        .analytics-refresh-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Category Table Styles */
+        .category-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .category-table th { text-align: left; padding: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .category-table td { padding: 10px 8px; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); }
+        .progress-bar-mini { width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+        .progress-fill-mini { height: 100%; border-radius: 3px; background: var(--primary-blue); }
+
+        .analytics-loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .analytics-loading i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: var(--primary-blue);
+        }
+
+        .analytics-last-updated {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        /* Activity Logs Badges - Enhanced */
+        .activity-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .activity-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .activity-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .activity-badge-login { background: linear-gradient(135deg, rgba(29, 209, 161, 0.2) 0%, rgba(29, 209, 161, 0.1) 100%); color: var(--accent-green); }
+        .activity-badge-logout { background: linear-gradient(135deg, rgba(149, 165, 166, 0.2) 0%, rgba(149, 165, 166, 0.1) 100%); color: #95A5A6; }
+        .activity-badge-create { background: linear-gradient(135deg, rgba(254, 202, 87, 0.2) 0%, rgba(254, 202, 87, 0.1) 100%); color: var(--primary-orange); }
+        .activity-badge-update { background: linear-gradient(135deg, rgba(46, 134, 222, 0.2) 0%, rgba(46, 134, 222, 0.1) 100%); color: var(--primary-blue); }
+        .activity-badge-delete { background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 107, 107, 0.1) 100%); color: var(--accent-red); }
+        .activity-badge-view { background: linear-gradient(135deg, rgba(84, 160, 255, 0.2) 0%, rgba(84, 160, 255, 0.1) 100%); color: #54A0FF; }
+        .activity-badge-export { background: linear-gradient(135deg, rgba(162, 155, 254, 0.2) 0%, rgba(162, 155, 254, 0.1) 100%); color: #A29BFE; }
+        .activity-badge-import { background: linear-gradient(135deg, rgba(253, 121, 168, 0.2) 0%, rgba(253, 121, 168, 0.1) 100%); color: #FD79A8; }
+        .activity-badge-ban { background: linear-gradient(135deg, rgba(255, 107, 107, 0.25) 0%, rgba(255, 107, 107, 0.15) 100%); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .activity-badge-unban { background: linear-gradient(135deg, rgba(29, 209, 161, 0.25) 0%, rgba(29, 209, 161, 0.15) 100%); color: var(--accent-green); border: 1px solid var(--accent-green); }
+
+        /* Pulse Animation for Live Indicator */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(29, 209, 161, 0.7);
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                box-shadow: 0 0 0 10px rgba(29, 209, 161, 0);
+                transform: scale(1);
+            }
+        }
+
+        /* Enhanced Filter Controls */
+        .panel-card select.form-control,
+        .panel-card input.form-control {
+            border-radius: 12px;
+            border: 2px solid rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .panel-card select.form-control:focus,
+        .panel-card input.form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .panel-card select.form-control:hover,
+        .panel-card input.form-control:hover {
+            border-color: var(--primary-blue);
+        }
+
+        /* Activity Stats Summary - Enhanced */
+        #activityStatsSummary {
+            background: linear-gradient(135deg, rgba(46, 134, 222, 0.05) 0%, rgba(255, 159, 67, 0.05) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        #activityStatsSummary > div > div {
+            gap: 20px !important;
+        }
+
+        #activityStatsSummary > div > div > div {
+            background: var(--bg-card);
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            min-width: 100px;
+            transition: all 0.3s ease;
+        }
+
+        #activityStatsSummary > div > div > div:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        /* Activity Table Row Styling */
+        #activityLogsTableBody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        #activityLogsTableBody tr:hover {
+            background: linear-gradient(135deg, rgba(46, 134, 222, 0.05) 0%, rgba(255, 159, 67, 0.05) 100%);
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        #activityLogsTableBody td {
+            padding: 16px 15px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+
+        /* Empty State - Enhanced */
+        #activityEmptyState {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, rgba(46, 134, 222, 0.05) 0%, rgba(255, 159, 67, 0.05) 100%);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        #activityEmptyState i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideInRow {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .analytics-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="<%= bodyClass %>">
+
+    <!-- SIDEBAR -->
+    <%- include('./partials/admin-sidebar', { currentPage: 'dashboard', user: typeof user !== 'undefined' ? user : null }) %>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h2 class="page-title" id="pageTitle">Dashboard Overview</h2>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. DASHBOARD VIEW -->
+        <div id="dashboard-view" class="content-panel active">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-users">0</h3>
+                        <p>Total Pengguna</p>
+                    </div>
+                    <div class="stat-icon bg-blue-light"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-active">0</h3>
+                        <p>Pengguna Aktif</p>
+                    </div>
+                    <div class="stat-icon bg-green-light"><i class="fas fa-user-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-products">0</h3>
+                        <p>Total Produk</p>
+                    </div>
+                    <div class="stat-icon bg-orange-light"><i class="fas fa-boxes"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="stat-issues">0</h3>
+                        <p>Stok Menipis</p>
+                    </div>
+                    <div class="stat-icon bg-red-light"><i class="fas fa-exclamation-triangle"></i></div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div class="analytics-section">
+                <div class="panel-header" style="margin-bottom: 20px;">
+                    <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-chart-line" style="color: var(--primary-blue);"></i>
+                        Analitik Pertumbuhan
+                    </h3>
+                    <div class="analytics-filter">
+                        <select id="rangeFilter" onchange="loadAnalytics()">
+                            <option value="today">Hari Ini</option>
+                            <option value="7days" selected>7 Hari Terakhir</option>
+                            <option value="month">Bulan Ini</option>
+                        </select>
+                        <button class="analytics-refresh-btn" onclick="loadAnalytics()" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Refresh</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="analyticsLoading" class="analytics-loading" style="display: none;">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <p>Memuat data analitik...</p>
+                </div>
+
+                <!-- Analytics Content -->
+                <div id="analyticsContent">
+                    <!-- Stats Cards -->
+                    <div class="analytics-stats-grid">
+                        <!-- Total Users -->
+                        <div class="analytics-stat-card info">
+                            <div class="analytics-stat-header">
+                                <div class="analytics-stat-icon cyan">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span class="analytics-stat-badge">Semua Waktu</span>
+                            </div>
+                            <div class="analytics-stat-label">Total Pengguna</div>
+                            <div class="analytics-stat-value" id="totalUsers">0</div>
+                            <div class="analytics-stat-footer">
+                                <div class="analytics-stat-growth" id="usersGrowth">
+                                    <span class="analytics-stat-growth-icon">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </span>
+                                    <span>0%</span>
+                                </div>
+                                <span class="analytics-stat-subtitle">vs periode sebelumnya</span>
+                            </div>
+                        </div>
+
+                        <!-- New Users -->
+                        <div class="analytics-stat-card success">
+                            <div class="analytics-stat-header">
+                                <div class="analytics-stat-icon green">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <span class="analytics-stat-badge" id="newUsersBadge">Periode Ini</span>
+                            </div>
+                            <div class="analytics-stat-label">Pengguna Baru</div>
+                            <div class="analytics-stat-value" id="newUsers">0</div>
+                            <div class="analytics-stat-footer">
+                                <div class="analytics-stat-growth up" id="newUsersGrowth">
+                                    <span class="analytics-stat-growth-icon">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </span>
+                                    <span>0%</span>
+                                </div>
+                                <span class="analytics-stat-subtitle">vs periode sebelumnya</span>
+                            </div>
+                        </div>
+
+                        <!-- Total Products Growth -->
+                        <div class="analytics-stat-card warning">
+                            <div class="analytics-stat-header">
+                                <div class="analytics-stat-icon orange">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <span class="analytics-stat-badge" id="productsBadge">Periode Ini</span>
+                            </div>
+                            <div class="analytics-stat-label">Produk Baru</div>
+                            <div class="analytics-stat-value" id="newProducts">0</div>
+                            <div class="analytics-stat-footer">
+                                <div class="analytics-stat-growth" id="productsGrowth">
+                                    <span class="analytics-stat-growth-icon">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </span>
+                                    <span>0%</span>
+                                </div>
+                                <span class="analytics-stat-subtitle">vs periode sebelumnya</span>
+                            </div>
+                        </div>
+
+                        <!-- Daily Active Users -->
+                        <div class="analytics-stat-card danger">
+                            <div class="analytics-stat-header">
+                                <div class="analytics-stat-icon red">
+                                    <i class="fas fa-user-clock"></i>
+                                </div>
+                                <span class="analytics-stat-badge">Unik</span>
+                            </div>
+                            <div class="analytics-stat-label">Daily Active Users</div>
+                            <div class="analytics-stat-value" id="dau">0</div>
+                            <div class="analytics-stat-footer">
+                                <div class="analytics-stat-growth neutral">
+                                    <span class="analytics-stat-growth-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                    <span>User unik yang login</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combined Chart -->
+                    <div class="panel-card" style="margin-bottom: 20px;">
+                        <div class="analytics-chart-header">
+                            <h3 class="analytics-chart-title">
+                                <i class="fas fa-chart-mixed"></i>
+                                Overview Pertumbuhan & Aktivitas
+                            </h3>
+                            <div class="analytics-chart-legend">
+                                <div class="analytics-legend-item">
+                                    <div class="analytics-legend-dot" style="background: #2E86DE;"></div>
+                                    <span>Pengguna Baru</span>
+                                </div>
+                                <div class="analytics-legend-item">
+                                    <div class="analytics-legend-dot" style="background: #FF9F43;"></div>
+                                    <span>Produk Baru</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="analytics-chart-container">
+                            <canvas id="combinedChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Individual Charts -->
+                    <div class="analytics-charts-grid">
+                        <!-- Users Chart -->
+                        <div class="analytics-chart-card">
+                            <div class="analytics-chart-header">
+                                <h3 class="analytics-chart-title">
+                                    <i class="fas fa-user-plus"></i>
+                                    Pertumbuhan Pengguna Baru
+                                </h3>
+                            </div>
+                            <div class="analytics-chart-container">
+                                <canvas id="usersChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Products Chart -->
+                        <div class="analytics-chart-card">
+                            <div class="analytics-chart-header">
+                                <h3 class="analytics-chart-title">
+                                    <i class="fas fa-box"></i>
+                                    Pertumbuhan Produk Baru
+                                </h3>
+                            </div>
+                            <div class="analytics-chart-container">
+                                <canvas id="productsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Category Distribution Chart -->
+                        <div class="analytics-chart-card">
+                            <div class="analytics-chart-header">
+                                <h3 class="analytics-chart-title">
+                                    <i class="fas fa-layer-group"></i>
+                                    Distribusi per Kategori
+                                </h3>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; align-items: center;">
+                                <div class="analytics-chart-container" style="height: 220px;">
+                                    <canvas id="categoryChart"></canvas>
+                                </div>
+                                <div class="table-responsive" style="max-height: 220px; overflow-y: auto;">
+                                    <table class="category-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Kategori</th>
+                                                <th>Produk</th>
+                                                <th>%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="categoryTableBody">
+                                            <tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Memuat...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Last Updated -->
+                    <div class="analytics-last-updated">
+                        <i class="far fa-clock"></i>
+                        Terakhir diperbarui: <span id="lastUpdated">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIEW SECTIONS - PRODUCTS, SUGGESTIONS, NOTES -->
+            <div style="margin-top: 40px;">
+                <!-- Products Preview -->
+                <div class="analytics-section" style="margin-bottom: 40px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-box-open" style="color: var(--primary-blue);"></i>
+                            Produk Terbaru
+                        </h3>
+                        <a href="/admin/products" class="btn btn-outline" style="border-radius: 8px; padding: 8px 16px;">
+                            Lihat Semua <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                    <div class="panel-card" style="padding: 0;">
+                        <div id="productsPreviewLoading" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                            <p style="margin-top: 10px; color: var(--text-muted);">Memuat data...</p>
+                        </div>
+                        <div id="productsPreviewContent" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Shopping Suggestions Preview -->
+                <div class="analytics-section" style="margin-bottom: 40px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-shopping-cart" style="color: var(--primary-orange);"></i>
+                            Saran Pembelian
+                        </h3>
+                        <a href="/admin/shopping-suggestions" class="btn btn-outline" style="border-radius: 8px; padding: 8px 16px;">
+                            Lihat Semua <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                    <div class="panel-card" style="padding: 0;">
+                        <div id="suggestionsPreviewLoading" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-orange);"></i>
+                            <p style="margin-top: 10px; color: var(--text-muted);">Memuat data...</p>
+                        </div>
+                        <div id="suggestionsPreviewContent" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Notes Preview -->
+                <div class="analytics-section" style="margin-bottom: 40px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-sticky-note" style="color: var(--accent-green);"></i>
+                            Catatan Pengguna
+                        </h3>
+                        <a href="/admin/notes" class="btn btn-outline" style="border-radius: 8px; padding: 8px 16px;">
+                            Lihat Semua <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                    <div class="panel-card" style="padding: 0;">
+                        <div id="notesPreviewLoading" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--accent-green);"></i>
+                            <p style="margin-top: 10px; color: var(--text-muted);">Memuat data...</p>
+                        </div>
+                        <div id="notesPreviewContent" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOG AKTIVITAS USER SECTION - ENHANCED -->
+            <div class="analytics-section" style="margin-top: 40px;">
+                <div class="panel-header" style="margin-bottom: 25px; position: relative; overflow: hidden; border-radius: 12px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.05) 0%, rgba(255, 159, 67, 0.05) 100%); padding: 25px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                        <h3 class="panel-title" style="display: flex; align-items: center; gap: 12px; font-size: 1.4rem;">
+                            <i class="fas fa-clipboard-list" style="color: var(--primary-blue); font-size: 1.5rem;"></i>
+                            <span>Aktivitas Terkini</span>
+                        </h3>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="live-indicator" style="display: flex; align-items: center; gap: 8px; background: rgba(29, 209, 161, 0.1); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: var(--accent-green);">
+                                <span class="pulse-dot" style="width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite;"></span>
+                                Live
+                            </span>
+                            <button class="btn btn-primary" onclick="loadActivityLogs()" id="refreshActivityBtn" style="border-radius: 25px; padding: 10px 20px; transition: all 0.3s;">
+                                <i class="fas fa-sync-alt"></i> <span style="margin-left: 5px;">Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-muted); margin-top: 10px; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle" style="color: var(--primary-blue);"></i> 
+                        Pantau aktivitas user secara real-time
+                    </p>
+                </div>
+
+                <!-- Filters - Enhanced -->
+                <div class="panel-card" style="margin-bottom: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05);">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                        <!-- Range Filter -->
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); font-size: 0.9rem;">
+                                <i class="far fa-calendar-alt"></i> Periode
+                            </label>
+                            <select id="activityRangeFilter" class="form-control" onchange="loadActivityLogs()">
+                                <option value="today">Hari Ini</option>
+                                <option value="7days" selected>7 Hari Terakhir</option>
+                                <option value="month">Bulan Ini</option>
+                            </select>
+                        </div>
+
+                        <!-- Activity Type Filter -->
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); font-size: 0.9rem;">
+                                <i class="fas fa-tag"></i> Tipe Aktivitas
+                            </label>
+                            <select id="activityTypeFilter" class="form-control" onchange="loadActivityLogs()">
+                                <option value="">Semua Tipe</option>
+                                <option value="LOGIN">Login</option>
+                                <option value="LOGOUT">Logout</option>
+                                <option value="CREATE">Create</option>
+                                <option value="UPDATE">Update</option>
+                                <option value="DELETE">Delete</option>
+                                <option value="VIEW">View</option>
+                                <option value="EXPORT">Export</option>
+                                <option value="BAN">Ban</option>
+                                <option value="UNBAN">Unban</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Input -->
+                        <div style="flex: 2; min-width: 200px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); font-size: 0.9rem;">
+                                <i class="fas fa-search"></i> Cari User
+                            </label>
+                            <input 
+                                type="text" 
+                                id="activitySearchInput" 
+                                class="form-control" 
+                                placeholder="Cari berdasarkan nama atau email user..."
+                                onkeyup="debounceSearch()"
+                            >
+                        </div>
+
+                        <!-- Refresh Button -->
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); font-size: 0.9rem; visibility: hidden;">
+                                Action
+                            </label>
+                            <button class="btn btn-primary" onclick="loadActivityLogs()" id="refreshActivityBtn">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State - Enhanced -->
+                <div id="activityLogsLoading" class="analytics-loading" style="display: none; padding: 60px 20px; background: var(--bg-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <div style="position: relative; display: inline-block;">
+                        <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary-blue);"></i>
+                        <i class="fas fa-clipboard-list" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <p style="margin-top: 20px; color: var(--text-muted); font-weight: 600; font-size: 1rem;">Memuat aktivitas user...</p>
+                </div>
+
+                <!-- Activity Logs Table - Enhanced -->
+                <div class="panel-card" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.08); overflow: hidden;">
+                    <!-- Statistics Summary - Enhanced -->
+                    <div id="activityStatsSummary" style="margin: 0; padding: 25px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.08) 0%, rgba(255, 159, 67, 0.08) 100%); border-radius: 0;">
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: stretch;">
+                            <div style="text-align: center; background: var(--bg-card); padding: 20px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 120px; transition: all 0.3s ease; border-bottom: 4px solid var(--primary-blue);">
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; text-shadow: 0 2px 4px rgba(46, 134, 222, 0.2);" id="totalActivities">0</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total</div>
+                            </div>
+                            <div style="text-align: center; background: var(--bg-card); padding: 20px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 120px; transition: all 0.3s ease; border-bottom: 4px solid var(--accent-green);">
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green); margin-bottom: 8px; text-shadow: 0 2px 4px rgba(29, 209, 161, 0.2);" id="loginCount">0</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Login</div>
+                            </div>
+                            <div style="text-align: center; background: var(--bg-card); padding: 20px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 120px; transition: all 0.3s ease; border-bottom: 4px solid var(--primary-orange);">
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--primary-orange); margin-bottom: 8px; text-shadow: 0 2px 4px rgba(255, 159, 67, 0.2);" id="createCount">0</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Create</div>
+                            </div>
+                            <div style="text-align: center; background: var(--bg-card); padding: 20px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 120px; transition: all 0.3s ease; border-bottom: 4px solid var(--primary-dark);">
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; text-shadow: 0 2px 4px rgba(46, 134, 222, 0.2);" id="updateCount">0</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Update</div>
+                            </div>
+                            <div style="text-align: center; background: var(--bg-card); padding: 20px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 120px; transition: all 0.3s ease; border-bottom: 4px solid var(--accent-red);">
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--accent-red); margin-bottom: 8px; text-shadow: 0 2px 4px rgba(255, 107, 107, 0.2);" id="deleteCount">0</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Delete</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; padding: 18px 15px; border-bottom: 2px solid var(--primary-blue);">ID</th>
+                                    <th style="width: 180px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; padding: 18px 15px; border-bottom: 2px solid var(--primary-blue);">User</th>
+                                    <th style="width: 100px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; padding: 18px 15px; border-bottom: 2px solid var(--primary-blue);">Tipe</th>
+                                    <th style="background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; padding: 18px 15px; border-bottom: 2px solid var(--primary-blue);">Deskripsi</th>
+                                    <th style="width: 120px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; padding: 18px 15px; border-bottom: 2px solid var(--primary-blue);">IP Address</th>
+                                    <th style="width: 160px; background: linear-gradient(135deg, rgba(46, 134, 222, 0.1) 0%, rgba(255, 159, 67, 0.1) 100%); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; padding: 18px 15px; border-bottom: 2px solid var(--primary-blue);">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activityLogsTableBody" style="font-size: 0.9rem;">
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination - Enhanced -->
+                    <div id="activityPagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 25px; border-top: 2px solid rgba(0,0,0,0.08);">
+                        <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
+                            Menampilkan <span id="activityShowingFrom" style="font-weight: 700; color: var(--primary-blue);">0</span> - <span id="activityShowingTo" style="font-weight: 700; color: var(--primary-blue);">0</span> dari <span id="activityTotalItems" style="font-weight: 700; color: var(--primary-blue);">0</span> data
+                        </div>
+                        <div style="display: flex; gap: 8px;" id="activityPaginationButtons">
+                            <!-- Pagination buttons will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="activityEmptyState" style="display: none; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+                        <p style="color: var(--text-muted);">Belum ada aktivitas user</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. USERS VIEW -->
+        <div id="users-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Daftar Pengguna</h3>
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Tambah User</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Bergabung</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. USER DETAIL VIEW -->
+        <div id="user-detail-view" class="content-panel">
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="showPage('users')">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                </button>
+            </div>
+
+            <div class="detail-grid">
+                <!-- Profile Card -->
+                <div class="panel-card profile-card">
+                    <img src="https://picsum.photos/seed/admin/200/200" alt="User" class="profile-large-img">
+                    <h3 id="detail-name" style="margin-bottom: 5px;">-</h3>
+                    <p id="detail-email" style="color: var(--text-muted); margin-bottom: 20px;">-</p>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center;">Edit Profil</button>
+                        <button class="btn btn-danger" style="width: 100%; justify-content: center;">Nonaktifkan</button>
+                    </div>
+                </div>
+
+                <!-- Data & Products -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Data & Stok User</h3>
+                        <button class="btn btn-outline" onclick="alert('Data disalin!')"><i class="fas fa-copy"></i> Ekspor Data</button>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: var(--primary-blue);">Informasi Akun</h4>
+                    <ul class="data-list" style="margin-bottom: 30px;">
+                        <li><span class="data-label">ID Pengguna</span> <span class="data-value" id="detail-id">-</span></li>
+                        <li><span class="data-label">Role</span> <span class="data-value">Member</span></li>
+                        <li><span class="data-label">Terakhir Login</span> <span class="data-value" id="detail-last-login">-</span></li>
+                        <li><span class="data-label">Status Akun</span> <span class="badge badge-success">Aktif</span></li>
+                    </ul>
+
+                    <div class="user-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin-bottom: 5px;" id="userProductCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Produk</div>
+                        </div>
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-red); margin-bottom: 5px;" id="userLowStockCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Stok Rendah</div>
+                        </div>
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-green); margin-bottom: 5px;" id="userNotesCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Catatan</div>
+                        </div>
+                        <div class="stat-card-small" style="background: var(--bg-body); padding: 15px; border-radius: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-orange); margin-bottom: 5px;" id="userSuggestionsCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Saran</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: var(--primary-blue);">Produk Milik User</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Stok</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userProductsTable">
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SETTINGS VIEW -->
+        <div id="settings-view" class="content-panel">
+            <div class="panel-card" style="max-width: 800px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Pengaturan Sistem</h3>
+                </div>
+                <form onsubmit="event.preventDefault(); alert('Pengaturan disimpan!');">
+                    <div class="form-group">
+                        <label class="form-label">Nama Aplikasi</label>
+                        <input type="text" class="form-control" value="Kapan Beli">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Email Support</label>
+                            <input type="email" class="form-control" value="support@kapanbeli.id">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nomor Kontak</label>
+                            <input type="text" class="form-control" value="+62 812 3456 7890">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mode Maintenance</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="maintenanceMode" style="width: 20px; height: 20px;">
+                            <label for="maintenanceMode" style="margin: 0; cursor: pointer;">Aktifkan Mode Maintenance (Situs tidak dapat diakses publik)</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notifikasi Email</label>
+                        <select class="form-control">
+                            <option>Aktif (Stok Rendah & Kadaluarsa)</option>
+                            <option>Hanya Stok Rendah</option>
+                            <option>Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; text-align: right;">
+                        <button type="button" class="btn btn-outline" style="margin-right: 10px;">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Placeholder for Products View -->
+        <div id="products-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Semua Produk di Database</h3>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); padding: 50px;">Menampilkan seluruh produk dari seluruh pengguna...</p>
+            </div>
+        </div>
+
+        <!-- SUGGESTIONS VIEW -->
+        <div id="suggestions-view" class="content-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">Saran Pembelian Semua Pengguna</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="stat-pill" style="background: rgba(255, 107, 107, 0.1); color: var(--accent-red); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="adminLowStockCount">0</span> Stok Rendah
+                        </div>
+                        <div class="stat-pill" style="background: rgba(254, 202, 87, 0.1); color: var(--primary-orange); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem;">
+                            <i class="fas fa-clock"></i>
+                            <span id="adminExpiringCount">0</span> Kadaluarsa
+                        </div>
+                    </div>
+                </div>
+                <div id="suggestionsContainer" style="min-height: 400px;">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let growthChartInstance = null;
+        let combinedChartInstance = null;
+        let usersChartInstance = null;
+        let productsChartInstance = null;
+        let categoryChartInstance = null;
+
+        // Activity Logs Variables
+        let activityLogsData = [];
+        let activityLogsPagination = { page: 1, limit: 20, total: 0, totalPages: 0 };
+        let activityLogsSearchTimer = null;
+
+        // Activity type badge mapping
+        const activityBadgeClasses = {
+            'LOGIN': 'activity-badge-login',
+            'LOGOUT': 'activity-badge-logout',
+            'CREATE': 'activity-badge-create',
+            'UPDATE': 'activity-badge-update',
+            'DELETE': 'activity-badge-delete',
+            'VIEW': 'activity-badge-view',
+            'EXPORT': 'activity-badge-export',
+            'IMPORT': 'activity-badge-import',
+            'BAN': 'activity-badge-ban',
+            'UNBAN': 'activity-badge-unban'
+        };
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            
+            // Check if we should show a specific panel based on currentPage
+            const currentPage = '<%= typeof currentPage !== "undefined" ? currentPage : "dashboard" %>';
+            
+            if (currentPage === 'settings') {
+                showPage('settings', document.querySelector('.nav-item[href="/admin/settings"]'));
+            } else if (currentPage === 'analytics') {
+                showPage('analytics', document.querySelector('.nav-item[href="/admin/analytics"]'));
+            } else if (currentPage === 'activity-logs') {
+                showPage('activity-log', document.querySelector('.nav-item[href="/admin/activity-logs"]'));
+            } else if (currentPage === 'notes') {
+                showPage('activity-log', document.querySelector('.nav-item[href="/admin/notes"]'));
+            } else if (currentPage === 'products') {
+                showPage('products', document.querySelector('.nav-item[href="/admin/products"]'));
+            } else if (currentPage === 'users') {
+                showPage('users', document.querySelector('.nav-item[href="/admin/users"]'));
+            } else {
+                // Default to dashboard - load all data including previews
+                loadDashboardData();
+                loadAnalytics();
+                loadActivityLogs();
+                
+                // Load preview sections
+                loadProductsPreview();
+                loadSuggestionsPreview();
+                loadNotesPreview();
+            }
+        });
+
+        // --- THEME LOGIC ---
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' ||
+               (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode-active');
+                if (typeof Chart !== 'undefined') {
+                    Chart.defaults.color = '#bdc3c7';
+                    Chart.defaults.borderColor = '#2c3e50';
+                }
+            } else {
+                if (typeof Chart !== 'undefined') {
+                    Chart.defaults.color = '#2C3E50';
+                    Chart.defaults.borderColor = '#e9ecef';
+                }
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-active');
+            const isDark = document.body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            if (typeof Chart !== 'undefined') {
+                Chart.defaults.color = isDark ? '#bdc3c7' : '#2C3E50';
+                Chart.defaults.borderColor = isDark ? '#2c3e50' : '#e9ecef';
+            }
+
+            // Update chart colors if chart exists
+            if(typeof growthChartInstance !== 'undefined' && growthChartInstance) {
+                growthChartInstance.update();
+            }
+        }
+
+        // --- ANALYTICS FUNCTIONS ---
+        // Load analytics data
+        async function loadAnalytics() {
+            const range = document.getElementById('rangeFilter').value;
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            // Show loading state
+            if (refreshBtn) refreshBtn.classList.add('spinning');
+            
+            const loadingEl = document.getElementById('analyticsLoading');
+            const contentEl = document.getElementById('analyticsContent');
+            
+            if (loadingEl) loadingEl.style.display = 'block';
+            if (contentEl) contentEl.style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/admin/analytics?range=${range}`);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Response:', response.status, errorText);
+                    
+                    // Show error with details
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+                }
+
+                const data = await response.json();
+                console.log('Analytics data received:', data);
+
+                if (data.success) {
+                    updateStatsCards(data.summary, data.period);
+                    updateCharts(data.chart);
+                    loadCategoryDistribution();
+                    updateLastUpdated();
+
+                    if (loadingEl) loadingEl.style.display = 'none';
+                    if (contentEl) contentEl.style.display = 'block';
+                } else {
+                    console.error('API returned success: false:', data.message);
+                    throw new Error(data.message || 'API returned success: false');
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                
+                // Show error message in the analytics section
+                const loadingEl = document.getElementById('analyticsLoading');
+                const contentEl = document.getElementById('analyticsContent');
+                
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (contentEl) {
+                    contentEl.style.display = 'block';
+                    // Don't replace innerHTML, just show a notification or keep old data
+                    console.error('Showing error notification instead of replacing DOM');
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Memuat Analitik',
+                            text: error.message,
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                }
+            } finally {
+                if (refreshBtn) refreshBtn.classList.remove('spinning');
+            }
+        }
+
+        // Update stats cards
+        function updateStatsCards(summary, period) {
+            if (!summary) {
+                console.error('No summary data provided');
+                return;
+            }
+
+            // Update badge labels
+            if (document.getElementById('newUsersBadge')) document.getElementById('newUsersBadge').textContent = period || 'Periode Ini';
+            if (document.getElementById('productsBadge')) document.getElementById('productsBadge').textContent = period || 'Periode Ini';
+
+            // Update values with animation
+            animateValue('totalUsers', summary.totalUsers || 0);
+            animateValue('newUsers', summary.newUsers || 0);
+            animateValue('newProducts', summary.newProducts || 0);
+            animateValue('dau', summary.dailyActiveUsers || 0);
+
+            // Update growth indicators
+            if (summary.growth && summary.growth.users) {
+                updateGrowthIndicator('usersGrowth', summary.growth.users.percentage || 0, summary.growth.users.trend || 'neutral');
+                updateGrowthIndicator('newUsersGrowth', summary.growth.users.percentage || 0, summary.growth.users.trend || 'neutral');
+            }
+            if (summary.growth && summary.growth.products) {
+                updateGrowthIndicator('productsGrowth', summary.growth.products.percentage || 0, summary.growth.products.trend || 'neutral');
+            }
+        }
+
+        // Animate number values
+        function animateValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const duration = 500;
+            const start = 0;
+            const end = value;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Easing function
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = Math.floor(start + (end - start) * easeOutQuart);
+
+                element.textContent = current.toLocaleString('id-ID');
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Update growth indicator
+        function updateGrowthIndicator(elementId, percentage, trend) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const icon = element.querySelector('.analytics-stat-growth-icon i');
+            const text = element.querySelector('span:last-child');
+            
+            if (!icon || !text) return;
+
+            // Remove all trend classes
+            element.classList.remove('up', 'down', 'neutral');
+
+            // Set trend
+            if (trend === 'up') {
+                element.classList.add('up');
+                icon.className = 'fas fa-arrow-up';
+            } else if (trend === 'down') {
+                element.classList.add('down');
+                icon.className = 'fas fa-arrow-down';
+            } else {
+                element.classList.add('neutral');
+                icon.className = 'fas fa-minus';
+            }
+
+            // Format percentage
+            const sign = percentage >= 0 ? '+' : '';
+            text.textContent = `${sign}${percentage}%`;
+        }
+
+        // Update charts
+        function updateCharts(chartData) {
+            if (!chartData || !chartData.labels) {
+                console.error('Invalid chart data:', chartData);
+                return;
+            }
+
+            // Destroy existing charts
+            if (combinedChartInstance) combinedChartInstance.destroy();
+            if (usersChartInstance) usersChartInstance.destroy();
+            if (productsChartInstance) productsChartInstance.destroy();
+
+            const ctxCombined = document.getElementById('combinedChart').getContext('2d');
+            combinedChartInstance = new Chart(ctxCombined, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Pengguna Baru',
+                            data: chartData.users,
+                            borderColor: '#2E86DE',
+                            backgroundColor: 'rgba(46, 134, 222, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#2E86DE',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Produk Baru',
+                            data: chartData.products,
+                            type: 'bar',
+                            backgroundColor: 'rgba(255, 159, 67, 0.8)',
+                            borderColor: '#FF9F43',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                        y: {
+                            type: 'linear', display: true, position: 'left', beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { precision: 0, font: { size: 11 } },
+                            title: { display: true, text: 'Pengguna Baru', font: { size: 12 } }
+                        },
+                        y1: {
+                            type: 'linear', display: true, position: 'right', beginAtZero: true,
+                            grid: { display: false },
+                            ticks: { precision: 0, font: { size: 11 } },
+                            title: { display: true, text: 'Produk', font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+
+            // Users Chart (Line)
+            const ctxUsers = document.getElementById('usersChart').getContext('2d');
+            usersChartInstance = new Chart(ctxUsers, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Pengguna Baru',
+                        data: chartData.users,
+                        borderColor: '#2E86DE',
+                        backgroundColor: 'rgba(46, 134, 222, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#2E86DE',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { precision: 0 } }
+                    }
+                }
+            });
+
+            // Products Chart (Line)
+            const ctxProducts = document.getElementById('productsChart').getContext('2d');
+            productsChartInstance = new Chart(ctxProducts, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Produk Baru',
+                        data: chartData.products,
+                        borderColor: '#FF9F43',
+                        backgroundColor: 'rgba(255, 159, 67, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#FF9F43',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+
+        // --- CATEGORY DISTRIBUTION LOGIC ---
+        async function loadCategoryDistribution() {
+            try {
+                const res = await fetch('/api/admin/analytics/category-distribution', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.success) {
+                    updCategory(data.categories);
+                }
+            } catch (error) {
+                console.error('Error loading category distribution:', error);
+            }
+        }
+
+        function updCategory(cats) {
+            const tbody = document.getElementById('categoryTableBody');
+            const totalProducts = cats.reduce((sum, c) => sum + c.count, 0);
+            
+            if (!cats || cats.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada kategori</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = cats.map(c => {
+                const pct = totalProducts > 0 ? ((c.count / totalProducts) * 100).toFixed(1) : 0;
+                return `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.count}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar-mini" style="flex: 1;">
+                                    <div class="progress-fill-mini" style="width: ${pct}%"></div>
+                                </div>
+                                <span style="font-size: 0.75rem; min-width: 35px;">${pct}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderCategoryChart(cats);
+        }
+
+        function renderCategoryChart(cats) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+            }
+
+            const colors = ['#2E86DE', '#1DD1A1', '#FF9F43', '#FF6B6B', '#54A0FF', '#00D2D3', '#FECA57', '#FF9FF3', '#48DBFB', '#A29BFE'];
+
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: cats.map(c => c.name),
+                    datasets: [{
+                        data: cats.map(c => c.count),
+                        backgroundColor: colors.slice(0, cats.length),
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const timeStr = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastUpdated').textContent = `${dateStr}, ${timeStr}`;
+        }
+
+        // ============================================
+        // === ACTIVITY LOGS FUNCTIONS ===
+        // ============================================
+        // PREVIEW SECTIONS - LOAD FUNCTIONS
+        // ============================================
+        
+        // Load Products Preview
+        async function loadProductsPreview() {
+            try {
+                const response = await fetch('/api/admin/products?limit=5', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                document.getElementById('productsPreviewLoading').style.display = 'none';
+                const contentEl = document.getElementById('productsPreviewContent');
+
+                if (result.success && result.data && result.data.length > 0) {
+                    contentEl.innerHTML = `
+                        <div class="table-responsive">
+                            <table style="width: 100%;">
+                                <thead style="background: rgba(0,0,0,0.02); border-bottom: 2px solid var(--border-color);">
+                                    <tr>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Produk</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Pemilik</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Stok</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.data.map(p => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 15px 20px;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img src="${p.image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.name) + '&background=2E86DE&color=fff'}" 
+                                                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                                    <div>
+                                                        <div style="font-weight: 600; color: var(--text-main);">${p.name}</div>
+                                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${p.category_name || 'Lainnya'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">${p.user_name || 'Unknown'}</td>
+                                            <td style="padding: 15px 20px; color: var(--text-main); font-weight: 500;">${p.stock_quantity} ${p.unit || ''}</td>
+                                            <td style="padding: 15px 20px;">
+                                                <span class="badge ${p.stock_status === 'good' ? 'badge-success' : p.stock_status === 'low' ? 'badge-warning' : 'badge-danger'}" 
+                                                      style="padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                                    ${p.stock_status === 'good' ? 'Aman' : p.stock_status === 'low' ? 'Rendah' : 'Habis'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                } else {
+                    contentEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>Belum ada produk</p>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading products preview:', error);
+                document.getElementById('productsPreviewLoading').style.display = 'none';
+                document.getElementById('productsPreviewContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--accent-red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Gagal memuat data</p>
+                    </div>
+                `;
+                document.getElementById('productsPreviewContent').style.display = 'block';
+            }
+        }
+
+        // Load Shopping Suggestions Preview
+        async function loadSuggestionsPreview() {
+            try {
+                const response = await fetch('/api/admin/shopping-suggestions?limit=5', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                document.getElementById('suggestionsPreviewLoading').style.display = 'none';
+                const contentEl = document.getElementById('suggestionsPreviewContent');
+
+                if (result.success && result.data && result.data.length > 0) {
+                    contentEl.innerHTML = `
+                        <div class="table-responsive">
+                            <table style="width: 100%;">
+                                <thead style="background: rgba(0,0,0,0.02); border-bottom: 2px solid var(--border-color);">
+                                    <tr>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Produk</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Pemilik</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Stok</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Prioritas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.data.map(p => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 15px 20px;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <img src="${p.image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.name) + '&background=FF9F43&color=fff'}" 
+                                                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                                    <div>
+                                                        <div style="font-weight: 600; color: var(--text-main);">${p.name}</div>
+                                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${p.category_name || 'Lainnya'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">${p.user_name || 'Unknown'}</td>
+                                            <td style="padding: 15px 20px; color: var(--text-main); font-weight: 500;">${p.stock_quantity} ${p.unit || ''}</td>
+                                            <td style="padding: 15px 20px;">
+                                                <span class="badge ${p.priority === 1 ? 'badge-danger' : p.priority === 2 ? 'badge-warning' : 'badge-primary'}" 
+                                                      style="padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                                    ${p.priority === 1 ? 'Habis' : p.priority === 2 ? 'Rendah' : 'Kadaluarsa'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                } else {
+                    contentEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>Tidak ada saran pembelian saat ini</p>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading suggestions preview:', error);
+                document.getElementById('suggestionsPreviewLoading').style.display = 'none';
+                document.getElementById('suggestionsPreviewContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--accent-red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Gagal memuat data</p>
+                    </div>
+                `;
+                document.getElementById('suggestionsPreviewContent').style.display = 'block';
+            }
+        }
+
+        // Load Notes Preview
+        async function loadNotesPreview() {
+            try {
+                const response = await fetch('/api/admin/notes?limit=5', {
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+
+                document.getElementById('notesPreviewLoading').style.display = 'none';
+                const contentEl = document.getElementById('notesPreviewContent');
+
+                if (result.success && result.data && result.data.length > 0) {
+                    contentEl.innerHTML = `
+                        <div class="table-responsive">
+                            <table style="width: 100%;">
+                                <thead style="background: rgba(0,0,0,0.02); border-bottom: 2px solid var(--border-color);">
+                                    <tr>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Judul</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Pemilik</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Status</th>
+                                        <th style="padding: 12px 20px; text-align: left; font-size: 0.85rem; color: var(--text-muted);">Tanggal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.data.map(n => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 15px 20px;">
+                                                <div style="font-weight: 600; color: var(--text-main);">${n.title}</div>
+                                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">${(n.content || '').substring(0, 50)}...</div>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">${n.user_name || 'Unknown'}</td>
+                                            <td style="padding: 15px 20px;">
+                                                <span class="badge ${n.is_completed ? 'badge-success' : 'badge-warning'}" 
+                                                      style="padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                                    ${n.is_completed ? 'Selesai' : 'Belum Selesai'}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.85rem;">
+                                                ${new Date(n.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                } else {
+                    contentEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-sticky-note" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>Belum ada catatan</p>
+                        </div>
+                    `;
+                    contentEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading notes preview:', error);
+                document.getElementById('notesPreviewLoading').style.display = 'none';
+                document.getElementById('notesPreviewContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--accent-red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Gagal memuat data</p>
+                    </div>
+                `;
+                document.getElementById('notesPreviewContent').style.display = 'block';
+            }
+        }
+
+        // ============================================
+        // ACTIVITY LOGS FUNCTIONS
+        // ============================================
+
+        // Load activity logs from API
+        async function loadActivityLogs() {
+            const range = document.getElementById('activityRangeFilter').value;
+            const activityType = document.getElementById('activityTypeFilter').value;
+            const search = document.getElementById('activitySearchInput').value;
+            const page = activityLogsPagination.page;
+            const limit = activityLogsPagination.limit;
+
+            const loadingEl = document.getElementById('activityLogsLoading');
+            const refreshBtn = document.getElementById('refreshActivityBtn');
+
+            // Show loading
+            if (loadingEl) loadingEl.style.display = 'block';
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+                const icon = refreshBtn.querySelector('i');
+                if (icon) icon.classList.add('fa-spin');
+            }
+
+            try {
+                const params = new URLSearchParams({
+                    range,
+                    page,
+                    limit,
+                    ...(activityType && { activityType }),
+                    ...(search && { search })
+                });
+
+                const response = await fetch(`/api/activity-logs?${params}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    activityLogsData = result.data;
+                    activityLogsPagination = result.pagination;
+
+                    renderActivityLogsTable(result.data);
+                    updateActivityPagination(result.pagination);
+                    updateActivityStats(result.data);
+                } else {
+                    throw new Error(result.message || 'Failed to load activity logs');
+                }
+            } catch (error) {
+                console.error('Error loading activity logs:', error);
+                document.getElementById('activityLogsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--accent-red);">
+                            <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            Gagal memuat log aktivitas: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            } finally {
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (refreshBtn) {
+                    refreshBtn.disabled = false;
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) icon.classList.remove('fa-spin');
+                }
+            }
+        }
+
+        // Render activity logs table - Enhanced with animations
+        function renderActivityLogsTable(data) {
+            const tbody = document.getElementById('activityLogsTableBody');
+            const emptyState = document.getElementById('activityEmptyState');
+            const pagination = document.getElementById('activityPagination');
+
+            if (!data || data.length === 0) {
+                if (tbody) tbody.innerHTML = '';
+                if (emptyState) emptyState.style.display = 'block';
+                if (pagination) pagination.style.display = 'none';
+                return;
+            }
+
+            if (emptyState) emptyState.style.display = 'none';
+            if (pagination) pagination.style.display = 'flex';
+
+            // Activity type icons
+            const activityIcons = {
+                'LOGIN': 'fa-sign-in-alt',
+                'LOGOUT': 'fa-sign-out-alt',
+                'CREATE': 'fa-plus-circle',
+                'UPDATE': 'fa-edit',
+                'DELETE': 'fa-trash-alt',
+                'VIEW': 'fa-eye',
+                'EXPORT': 'fa-file-export',
+                'IMPORT': 'fa-file-import',
+                'BAN': 'fa-ban',
+                'UNBAN': 'fa-check-circle'
+            };
+
+            tbody.innerHTML = data.map((log, index) => {
+                const badgeClass = activityBadgeClasses[log.activity_type] || '';
+                const icon = activityIcons[log.activity_type] || 'fa-circle';
+                const timestamp = new Date(log.created_at).toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const animationDelay = index * 0.05;
+
+                return `
+                    <tr style="animation: slideInRow 0.4s ease forwards; animation-delay: ${animationDelay}s; opacity: 0;">
+                        <td style="font-weight: 700; color: var(--primary-blue);">#${log.id}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.9rem;">
+                                    ${(log.user_name || 'U').charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-main);">${log.user_name || 'Unknown'}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${log.user_email || ''}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="activity-badge ${badgeClass}">
+                                <i class="fas ${icon}"></i> ${log.activity_type}
+                            </span>
+                        </td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-main);" title="${log.description}">
+                            <i class="fas fa-tag" style="color: var(--primary-blue); margin-right: 6px; font-size: 0.8rem;"></i>
+                            ${log.description || '-'}
+                        </td>
+                        <td style="font-family: monospace; font-size: 0.85rem; color: var(--text-muted); background: rgba(0,0,0,0.02); padding: 16px 15px; border-radius: 8px;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--primary-orange); margin-right: 6px; font-size: 0.75rem;"></i>
+                            ${log.ip_address || '-'}
+                        </td>
+                        <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+                            <i class="far fa-clock" style="color: var(--primary-blue); margin-right: 6px; font-size: 0.8rem;"></i>
+                            ${timestamp}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update pagination buttons
+        function updateActivityPagination(pagination) {
+            const { page, totalPages, total, limit } = pagination;
+            const container = document.getElementById('activityPaginationButtons');
+            const showingFrom = document.getElementById('activityShowingFrom');
+            const showingTo = document.getElementById('activityShowingTo');
+            const totalItems = document.getElementById('activityTotalItems');
+
+            if (!container) return;
+
+            // Update showing info
+            if (showingFrom) showingFrom.textContent = total > 0 ? (page - 1) * limit + 1 : 0;
+            if (showingTo) showingTo.textContent = Math.min(page * limit, total);
+            if (totalItems) totalItems.textContent = total;
+
+            // Generate pagination buttons
+            let buttons = '';
+
+            // Previous button
+            buttons += `
+                <button class="btn btn-outline" ${page <= 1 ? 'disabled' : ''} onclick="goToActivityPage(${page - 1})" 
+                    style="padding: 8px 12px; ${page <= 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            // Page numbers
+            const maxVisible = 5;
+            let startPage = Math.max(1, page - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            if (startPage > 1) {
+                buttons += `<button class="btn btn-outline" onclick="goToActivityPage(1)" style="padding: 8px 12px;">1</button>`;
+                if (startPage > 2) {
+                    buttons += `<span style="padding: 8px; color: var(--text-muted);">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                buttons += `
+                    <button class="btn ${i === page ? 'btn-primary' : 'btn-outline'}" 
+                        onclick="goToActivityPage(${i})" 
+                        style="padding: 8px 12px; min-width: 40px;">
+                        ${i}
+                    </button>
+                `;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    buttons += `<span style="padding: 8px; color: var(--text-muted);">...</span>`;
+                }
+                buttons += `<button class="btn btn-outline" onclick="goToActivityPage(${totalPages})" style="padding: 8px 12px;">${totalPages}</button>`;
+            }
+
+            // Next button
+            buttons += `
+                <button class="btn btn-outline" ${page >= totalPages ? 'disabled' : ''} onclick="goToActivityPage(${page + 1})" 
+                    style="padding: 8px 12px; ${page >= totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            container.innerHTML = buttons;
+        }
+
+        // Go to specific page
+        function goToActivityPage(page) {
+            if (page < 1 || page > activityLogsPagination.totalPages) return;
+            activityLogsPagination.page = page;
+            loadActivityLogs();
+        }
+
+        // Update activity statistics
+        function updateActivityStats(data) {
+            const stats = {
+                total: data.length,
+                LOGIN: 0,
+                CREATE: 0,
+                UPDATE: 0,
+                DELETE: 0
+            };
+
+            data.forEach(log => {
+                if (stats[log.activity_type] !== undefined) {
+                    stats[log.activity_type]++;
+                }
+            });
+
+            // Update DOM
+            const totalEl = document.getElementById('totalActivities');
+            const loginEl = document.getElementById('loginCount');
+            const createEl = document.getElementById('createCount');
+            const updateEl = document.getElementById('updateCount');
+            const deleteEl = document.getElementById('deleteCount');
+
+            if (totalEl) totalEl.textContent = stats.total;
+            if (loginEl) loginEl.textContent = stats.LOGIN;
+            if (createEl) createEl.textContent = stats.CREATE;
+            if (updateEl) updateEl.textContent = stats.UPDATE;
+            if (deleteEl) deleteEl.textContent = stats.DELETE;
+        }
+
+        // Debounce search
+        function debounceSearch() {
+            if (activityLogsSearchTimer) clearTimeout(activityLogsSearchTimer);
+
+            activityLogsSearchTimer = setTimeout(() => {
+                activityLogsPagination.page = 1;
+                loadActivityLogs();
+            }, 500);
+        }
+
+        // ============================================
+        // === END ACTIVITY LOGS FUNCTIONS ===
+        // ============================================
+
+        // --- NAVIGATION ---
+        function showPage(pageId, element) {
+            document.querySelectorAll('.content-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(pageId + '-view').classList.add('active');
+
+            if(element) {
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'users': 'Manajemen Pengguna',
+                'user-detail': 'Detail Pengguna',
+                'settings': 'Pengaturan Sistem',
+                'products': 'Database Produk',
+                'suggestions': 'Saran Pembelian',
+                'activity-log': 'Log Aktivitas'
+            };
+            document.getElementById('pageTitle').textContent = titles[pageId] || 'Admin';
+
+            if(window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // --- DATA LOADING (NO DUMMY DATA) ---
+        async function loadDashboardData() {
+            try {
+                // 1. Load Stats
+                const statsRes = await fetch('/api/admin/stats', { credentials: 'same-origin' });
+                const statsData = await statsRes.json();
+                
+                if (statsData.success) {
+                    document.getElementById('stat-users').textContent = statsData.stats.totalUsers || 0;
+                    document.getElementById('stat-active').textContent = statsData.stats.activeUsers || 0;
+                    document.getElementById('stat-products').textContent = statsData.stats.totalProducts || 0;
+                    document.getElementById('stat-issues').textContent = statsData.stats.lowStockItems || 0;
+                } else {
+                    console.error('Stats Error:', statsData.message);
+                }
+
+                // 2. Load Users
+                const usersRes = await fetch('/api/admin/users', { credentials: 'same-origin' });
+                const usersData = await usersRes.json();
+                if (usersData.success) {
+                    renderUsersTable(usersData.users);
+                } else {
+                    renderUsersTable([]); // Render empty
+                }
+
+                // 3. Load Suggestions Stats
+                loadSuggestionsData();
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                // Handle Error State
+                document.getElementById('stat-users').textContent = 'Err';
+                document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Gagal memuat data</td></tr>';
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                            <p>Belum ada data pengguna</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>#${user.id}</td>
+                    <td style="font-weight: 600;">${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.created_at ? new Date(user.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A'}</td>
+                    <td>
+                        <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${user.is_active ? 'Aktif' : 'Non-Aktif'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;" onclick="viewUserDetail(${user.id})">
+                            <i class="fas fa-eye"></i> Detail
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- USER DETAIL LOGIC ---
+        async function viewUserDetail(userId) {
+            try {
+                // 1. Fetch User Info
+                const userRes = await fetch(`/api/admin/user/${userId}`, { credentials: 'same-origin' });
+                const userData = await userRes.json();
+
+                if (userData.success) {
+                    const u = userData.user;
+                    document.getElementById('detail-name').textContent = u.name;
+                    document.getElementById('detail-email').textContent = u.email;
+                    document.getElementById('detail-id').textContent = `#${u.id}`;
+                    document.getElementById('detail-last-login').textContent = u.last_login ? new Date(u.last_login).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+                    // Update mini stats (Assuming API returns these or we calculate them)
+                    document.getElementById('userProductCount').textContent = u.product_count || 0;
+                    document.getElementById('userLowStockCount').textContent = u.low_stock_count || 0;
+                    document.getElementById('userNotesCount').textContent = u.note_count || 0;
+                    document.getElementById('userSuggestionsCount').textContent = u.suggestion_count || 0;
+                } else {
+                    alert('User tidak ditemukan');
+                    return;
+                }
+
+                // 2. Fetch User Products
+                const prodRes = await fetch(`/api/admin/user/${userId}/products`, { credentials: 'same-origin' });
+                const prodData = await prodRes.json();
+                const prodTable = document.getElementById('userProductsTable');
+
+                if (prodData.success && prodData.products && prodData.products.length > 0) {
+                    prodTable.innerHTML = prodData.products.map(p => {
+                        const stock = parseFloat(p.stock_quantity);
+                        const min = parseFloat(p.min_stock_level || 0);
+                        let badge = 'badge-success';
+                        let status = 'Aman';
+
+                        if (stock <= 0) { badge = 'badge-danger'; status = 'Habis'; }
+                        else if (stock <= min) { badge = 'badge-warning'; status = 'Rendah'; }
+
+                        return `
+                            <tr>
+                                <td><b>${p.name}</b></td>
+                                <td>${stock} ${p.unit || ''}</td>
+                                <td><span class="badge ${badge}">${status}</span></td>
+                                <td><button class="btn btn-outline" style="padding: 4px 8px;"><i class="fas fa-eye"></i></button></td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    prodTable.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada produk</td></tr>`;
+                }
+
+                showPage('user-detail');
+
+            } catch (error) {
+                console.error('Error loading user detail:', error);
+                alert('Gagal memuat data pengguna.');
+            }
+        }
+
+        // --- SUGGESTIONS DATA LOADING ---
+        async function loadSuggestionsData() {
+            try {
+                const res = await fetch('/api/suggestions/admin/all', { credentials: 'same-origin' });
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('adminLowStockCount').textContent = data.suggestions.filter(s => s.type === 'low-stock').length;
+                    document.getElementById('adminExpiringCount').textContent = data.suggestions.filter(s => s.type === 'expiring').length;
+                    renderSuggestionsTable(data.suggestions);
+                } else {
+                    renderSuggestionsTable([]);
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+                document.getElementById('suggestionsContainer').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <p>Gagal memuat data saran pembelian</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSuggestionsTable(suggestions) {
+            const container = document.getElementById('suggestionsContainer');
+
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-green);"></i>
+                        <p>Tidak ada saran pembelian saat ini</p>
+                        <p style="font-size: 0.9rem;">Stok semua pengguna dalam kondisi aman</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by type
+            const lowStock = suggestions.filter(s => s.type === 'low-stock');
+            const expiring = suggestions.filter(s => s.type === 'expiring');
+
+            let html = '';
+
+            if (lowStock.length > 0) {
+                html += `
+                    <h4 style="margin: 20px 0 15px 0; color: var(--accent-red); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i> Stok Rendah (${lowStock.length})
+                    </h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pengguna</th>
+                                    <th>Produk</th>
+                                    <th>Stok Saat Ini</th>
+                                    <th>Min. Stok</th>
+                                    <th>Kadaluarsa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${lowStock.map(s => `
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 600;">${s.user_name}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">${s.user_email}</div>
+                                        </td>
+                                        <td><strong>${s.name}</strong></td>
+                                        <td><span class="badge badge-warning">${s.stock_quantity} ${s.unit || ''}</span></td>
+                                        <td>${s.min_stock_level || 0} ${s.unit || ''}</td>
+                                        <td>${s.expiry_date ? new Date(s.expiry_date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (expiring.length > 0) {
+                html += `
+                    <h4 style="margin: 30px 0 15px 0; color: var(--primary-orange); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-clock"></i> Hampir Kadaluarsa (${expiring.length})
+                    </h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pengguna</th>
+                                    <th>Produk</th>
+                                    <th>Stok</th>
+                                    <th>Sisa Hari</th>
+                                    <th>Kadaluarsa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${expiring.map(s => {
+                                    const diffDays = Math.ceil((new Date(s.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                                    return `
+                                        <tr>
+                                            <td>
+                                                <div style="font-weight: 600;">${s.user_name}</div>
+                                                <div style="font-size: 0.8rem; color: var(--text-muted);">${s.user_email}</div>
+                                            </td>
+                                            <td><strong>${s.name}</strong></td>
+                                            <td>${s.stock_quantity} ${s.unit || ''}</td>
+                                            <td><span class="badge ${diffDays <= 3 ? 'badge-danger' : 'badge-warning'}">${diffDays} hari</span></td>
+                                            <td>${s.expiry_date ? new Date(s.expiry_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-'}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Handle logout function
+        async function handleLogout() {
+            try {
+                const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = data.redirect || '/';
+                }
+            } catch (error) {
+                console.error('Logout error', error);
+            }
+        }
+    </script>
+</body>
+</html>

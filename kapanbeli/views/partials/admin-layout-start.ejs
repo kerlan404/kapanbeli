@@ -1,0 +1,29 @@
+<!-- 
+  Admin Layout - Main layout wrapper for all admin pages
+  Usage: Wrap your page content with this layout
+  
+  Parameters:
+  - currentPage: String - Current page identifier for sidebar active state
+  - pageTitle: String - Page title for topbar
+  - user: Object - Current user object from session
+  - content: String - The page-specific content (when using as template)
+-->
+
+<%# This is the layout start - includes sidebar and topbar %>
+<%
+const title = typeof pageTitle !== 'undefined' ? pageTitle : 'Admin Panel';
+const currentUser = typeof user !== 'undefined' ? user : null;
+%>
+
+<!-- Sidebar -->
+<%- include('../partials/admin-sidebar', { currentPage: currentPage, user: currentUser }) %>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Topbar -->
+    <%- include('../partials/admin-topbar', { 
+        title: title,
+        breadcrumbs: typeof breadcrumbs !== 'undefined' ? breadcrumbs : []
+    }) %>
+    
+    <!-- Page Content Placeholder -->

@@ -1,0 +1,1422 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Akun - Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-blue: #2E86DE;
+            --primary-blue-dark: #1B5F9E;
+            --primary-blue-light: #5FA8F0;
+            --primary-orange: #FF9F43;
+            --primary-orange-dark: #E67E22;
+            --primary-orange-light: #FFC278;
+            --accent-green: #1DD1A1;
+            --accent-green-dark: #10B981;
+            --accent-red: #FF6B6B;
+            --accent-red-dark: #EE5A5A;
+            --bg-body: #F0F4F8;
+            --bg-body-dark: #0F172A;
+            --bg-card: #FFFFFF;
+            --bg-card-dark: #1E293B;
+            --bg-input: #F8FAFC;
+            --bg-input-dark: #334155;
+            --text-main: #1E293B;
+            --text-main-dark: #F8FAFC;
+            --text-muted: #64748B;
+            --text-muted-dark: #94A3B8;
+            --border-color: rgba(46, 134, 222, 0.15);
+            --border-color-dark: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.12);
+            --radius-xl: 24px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode-active {
+            --bg-body: var(--bg-body-dark);
+            --bg-card: var(--bg-card-dark);
+            --bg-input: var(--bg-input-dark);
+            --text-main: var(--text-main-dark);
+            --text-muted: var(--text-muted-dark);
+            --border-color: var(--border-color-dark);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(46, 134, 222, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 159, 67, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Profile Header Overhaul */
+        .profile-header-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .profile-cover {
+            height: 180px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #667eea 50%, var(--primary-orange) 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 10s ease infinite;
+            position: relative;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .profile-avatar-section {
+            padding: 0 40px;
+            margin-top: -75px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            display: inline-block;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 50%;
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-avatar, .profile-avatar-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: var(--primary-blue);
+        }
+
+        .profile-avatar-edit-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 42px;
+            height: 42px;
+            background: var(--primary-orange);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--bg-card);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(255, 159, 67, 0.4);
+        }
+
+        .profile-avatar-edit-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .profile-main-info {
+            padding: 25px 40px 40px;
+        }
+
+        .profile-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-email {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-email i { color: var(--primary-blue); }
+
+        .profile-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-admin { background: rgba(147, 51, 234, 0.1); color: #9333EA; border: 1px solid rgba(147, 51, 234, 0.2); }
+        .badge-user { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-active { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+        /* Stats Section */
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+        }
+
+        .profile-stat-card {
+            background: var(--bg-input);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .profile-stat-card:hover {
+            background: var(--bg-card);
+            border-color: var(--primary-blue);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-stat-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .profile-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Sections Styling */
+        .profile-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+        }
+
+        .section-title i {
+            width: 42px;
+            height: 42px;
+            background: var(--bg-input);
+            color: var(--primary-blue);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        /* Activity Toggle Styles */
+        .activity-toggle-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .activity-toggle-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .activity-toggle-btn i {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .activity-toggle-btn.collapsed i {
+            transform: rotate(-180deg);
+        }
+
+        .activity-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+
+        .activity-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: var(--bg-card);
+            border-color: var(--primary-blue);
+            transform: scale(1.01);
+        }
+
+        .activity-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+
+        .activity-icon.login { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+        .activity-icon.logout { background: rgba(100, 116, 139, 0.1); color: #64748B; }
+        .activity-icon.create { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .activity-icon.update { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+        .activity-icon.delete { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--bg-input);
+            background: var(--bg-input);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: inherit;
+        }
+
+        /* Language Selector Styled */
+        .language-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .language-select-wrapper select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+            appearance: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .language-select-wrapper select:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+        }
+
+        .language-select-wrapper::after {
+            content: '\f078';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .profile-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .profile-actions .btn {
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse-animation 0.5s ease-out;
+        }
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-blue-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(46, 134, 222, 0.3); }
+        
+        .btn-warning { background: var(--primary-orange); color: white; }
+        .btn-warning:hover { background: var(--primary-orange-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3); }
+
+        .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-input); transform: translateY(-2px); }
+
+
+        @media (max-width: 768px) {
+            .profile-avatar-section { justify-content: center; text-align: center; margin-top: -60px; }
+            .profile-main-info { text-align: center; }
+            .profile-badges { justify-content: center; }
+            .profile-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .page-title i {
+            color: var(--primary-orange);
+            filter: drop-shadow(0 2px 4px rgba(255, 159, 67, 0.3));
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Premium Utility Styles */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 40px;
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: var(--accent-green); }
+        .toast.error { background: var(--accent-red); }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Activity Styling Fixes */
+        .activity-empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .activity-empty i {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .activity-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .activity-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .activity-meta i {
+            color: var(--primary-blue);
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-description {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .activity-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .activity-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .activity-meta i {
+            font-size: 0.75rem;
+            color: var(--primary-blue);
+        }
+
+        .activity-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .activity-empty i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            opacity: 0.4;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Additional Layout Tweaks */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-main);
+        }
+
+        .page-title i {
+            color: var(--primary-blue);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .profile-avatar-section {
+                justify-content: center;
+                margin-top: -60px;
+            }
+
+            .profile-main-info {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .profile-badges {
+                justify-content: center;
+            }
+
+            .profile-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<%- include('./partials/theme-guard') %>
+<body class="<%= (typeof user !== 'undefined' && user && user.theme === 'dark') ? 'dark-mode-active' : '' %>">
+    <%- include('./partials/navbar') %>
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2 class="page-title">
+                <i class="fas fa-user-gear"></i>
+                <%= __('profile_settings') %>
+            </h2>
+            <button class="btn btn-outline" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> <%= __('btn_back') %>
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <p style="margin-top: 20px; color: var(--text-muted); font-weight: 500;">Memuat data profil...</p>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="error-state" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Oops! Data tidak ditemukan</h3>
+            <p>Profil user yang Anda cari tidak tersedia.</p>
+            <button class="btn btn-primary" onclick="window.history.back()" style="display: inline-flex;">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+        </div>
+
+        <!-- Profile Content -->
+        <div id="profileContent" style="display: none;">
+            <!-- Profile Header Card -->
+            <div class="profile-header-card">
+                <div class="profile-cover"></div>
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-wrapper">
+                        <img id="profileImage" src="" alt="Profile" class="profile-avatar" style="display: none;">
+                        <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder" style="display: none;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-avatar-edit-btn" onclick="document.getElementById('profilePhotoInput').click()">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="uploadProfilePhoto(event)">
+                    </div>
+                </div>
+                <div class="profile-main-info">
+                    <h2 id="profileName" class="profile-name">-</h2>
+                    <p id="profileEmail" class="profile-email">
+                        <i class="fas fa-envelope"></i>
+                        <span>-</span>
+                    </p>
+                    <div id="profileBadges" class="profile-badges"></div>
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-card">
+                            <span class="stat-value" id="statProducts">0</span>
+                            <span class="stat-label"><%= __('profile_products') %></span>
+                        </div>
+                        <div class="profile-stat-card">
+                            <span class="stat-value" id="statSuggestions">0</span>
+                            <span class="stat-label"><%= __('profile_suggestions') %></span>
+                        </div>
+                        <div class="profile-stat-card">
+                            <span class="stat-value" id="statNotes">0</span>
+                            <span class="stat-label"><%= __('profile_notes') %></span>
+                        </div>
+                        <div class="profile-stat-card">
+                            <span class="stat-value" id="statLogins">0</span>
+                            <span class="stat-label"><%= __('profile_logins') %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Section -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-history"></i>
+                        <%= __('profile_activity') %>
+                    </h3>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="activity-toggle-btn" onclick="toggleActivitySection()" id="activityToggleBtn" title="<%= __('close') %>/<%= __('detail') %>">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button class="btn btn-outline" style="padding: 8px 16px; font-size: 0.85rem;" onclick="loadUserActivity()" id="refreshActivityBtn">
+                            <i class="fas fa-sync-alt"></i> <span><%= __('profile_refresh') %></span>
+                        </button>
+                    </div>
+                </div>
+                <div id="activityListContainer" class="activity-content">
+                    <div class="activity-list" id="activityList">
+                        <!-- Items loaded via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Profile Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user-edit"></i>
+                    <%= __('profile_edit') %>
+                </h3>
+                <div class="form-grid" style="margin-top: 25px;">
+                    <div class="form-group">
+                        <label><%= __('profile_username') %></label>
+                        <input type="text" id="editName" placeholder="<%= __('profile_username') %>">
+                    </div>
+                    <div class="form-group">
+                        <label><%= __('profile_email') %></label>
+                        <input type="email" id="editEmail" placeholder="<%= __('profile_email') %>">
+                    </div>
+                    <!-- Language selection removed as per user request -->
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-primary" onclick="updateProfile()">
+                        <i class="fas fa-save"></i> <%= __('profile_save') %>
+                    </button>
+                    <button class="btn btn-ghost" onclick="cancelEdit()" style="background: transparent; color: var(--text-muted); border: 1px solid var(--border-color);">
+                        <%= __('profile_cancel') %>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Change Password Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <i class="fas fa-key"></i>
+                    <%= __('profile_change_password') %>
+                </h3>
+                <div class="form-grid" style="margin-top: 25px;">
+                    <div class="form-group">
+                        <label><%= __('profile_new_password') %></label>
+                        <input type="password" id="newPassword" placeholder="Minimal 6 karakter">
+                    </div>
+                    <div class="form-group">
+                        <label><%= __('profile_confirm_password') %></label>
+                        <input type="password" id="confirmPassword" placeholder="Ulangi password">
+                    </div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-warning" onclick="changePassword()">
+                        <i class="fas fa-shield-alt"></i> <%= __('profile_update_password') %>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentUser = null;
+
+        // Show modern toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load profile data
+        async function loadProfile() {
+            try {
+                const authResponse = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const authData = await authResponse.json();
+
+                if (!authData.authenticated) {
+                    window.location.href = '/auth?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
+
+                const userId = authData.user.id;
+
+                const response = await fetch('/api/profile/data', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+
+                if (!result.success || !result.data.user) {
+                    showError();
+                    return;
+                }
+
+                currentUser = result.data.user;
+                displayProfile(result.data);
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showError();
+            }
+        }
+
+        // Display profile
+        function displayProfile(data) {
+            const { user, products, suggestions, notes } = data;
+
+            console.log('[displayProfile] Data received:', data);
+            console.log('[displayProfile] Products:', products, 'Count:', products ? products.length : 0);
+            console.log('[displayProfile] Suggestions:', suggestions, 'Count:', suggestions ? suggestions.length : 0);
+            console.log('[displayProfile] Notes:', notes, 'Count:', notes ? notes.length : 0);
+
+            // Profile Image
+            const profileImg = document.getElementById('profileImage');
+            const placeholder = document.getElementById('profileAvatarPlaceholder');
+
+            if (user.profile_photo) {
+                let photoPath = user.profile_photo;
+                if (!photoPath.startsWith('http') && !photoPath.startsWith('/')) {
+                    photoPath = '/' + photoPath;
+                }
+                profileImg.src = photoPath;
+                profileImg.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                profileImg.style.display = 'none';
+                placeholder.style.display = 'flex';
+                placeholder.innerHTML = `<i class="fas fa-user"></i>`;
+            }
+
+            // Profile Info
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').querySelector('span').textContent = user.email;
+
+            document.getElementById('editName').value = user.name;
+            document.getElementById('editEmail').value = user.email;
+            
+            // Modern language selector update
+            // Language selector removed as per user request
+
+            // Badges
+            const badgesContainer = document.getElementById('profileBadges');
+            const roleText = user.role === 'admin' ? '<%= __("role_admin") %>' : '<%= __("role_user") %>';
+            const statusText = user.account_status === 'active' ? '<%= __("status_active") %>' : '<%= __("nonaktif") %>';
+            
+            badgesContainer.innerHTML = `
+                <span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}">
+                    <i class="fas fa-${user.role === 'admin' ? 'crown' : 'user'}"></i>
+                    ${roleText}
+                </span>
+                <span class="badge ${user.account_status === 'active' ? 'badge-active' : 'badge-inactive'}">
+                    <i class="fas fa-${user.account_status === 'active' ? 'check-circle' : 'times-circle'}"></i>
+                    ${statusText}
+                </span>
+            `;
+
+            // Meta Info - Only update if elements exist
+            const joinDateEl = document.getElementById('joinDate');
+            const lastLoginEl = document.getElementById('lastLogin');
+
+            if (joinDateEl) {
+                joinDateEl.textContent = new Date(user.created_at).toLocaleDateString('id-ID', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+
+            if (lastLoginEl) {
+                lastLoginEl.textContent = user.last_login
+                    ? new Date(user.last_login).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '<%= __("never") || "Belum pernah" %>';
+            }
+
+            // Stats - Update with animation
+            const productCount = products ? products.length : 0;
+            const suggestionCount = suggestions ? suggestions.length : 0;
+            const noteCount = notes ? notes.length : 0;
+            const loginCount = user.total_logins || 0;
+
+            console.log('[displayProfile] Setting stats - Products:', productCount, 'Suggestions:', suggestionCount, 'Notes:', noteCount, 'Logins:', loginCount);
+
+            // Animate stats with counting effect
+            animateValue('statProducts', 0, productCount, 1000);
+            animateValue('statSuggestions', 0, suggestionCount, 1000);
+            animateValue('statNotes', 0, noteCount, 1000);
+            animateValue('statLogins', 0, loginCount, 1000);
+
+            // Load user activity
+            loadUserActivity();
+
+            // Show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+
+            console.log('[displayProfile] Profile displayed successfully');
+        }
+
+        // Animate number counting with smooth effect
+        function animateValue(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                console.error(`[animateValue] Element ${elementId} not found!`);
+                return;
+            }
+
+            const range = end - start;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease out cubic for smooth deceleration
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + range * easeOut);
+
+                element.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = end;
+                    // Add pulse effect when value > 0
+                    if (end > 0) {
+                        element.style.animation = 'statPulse 0.6s ease-out';
+                    }
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Load user activity logs
+        async function loadUserActivity() {
+            const btn = document.getElementById('refreshActivityBtn');
+            const icon = btn?.querySelector('i');
+
+            if (btn) {
+                btn.classList.add('spinning');
+                btn.disabled = true;
+            }
+
+            try {
+                const userId = currentUser?.id;
+                console.log('Loading activity for user ID:', userId);
+
+                // Try activity-logs API first
+                const url = userId
+                    ? `/api/activity-logs?limit=10&range=7days&userId=${userId}`
+                    : '/api/activity-logs?limit=10&range=7days';
+
+                const response = await fetch(url, {
+                    credentials: 'same-origin'
+                });
+
+                console.log('Activity response status:', response.status);
+
+                if (response.status === 403) {
+                    console.warn('Activity logs access denied, falling back to login logs...');
+                    // Fallback to login logs
+                    const loginUrl = `/api/activity-logs/login-history?userId=${userId}`;
+                    const loginResponse = await fetch(loginUrl, {
+                        credentials: 'same-origin'
+                    });
+                    const loginResult = await loginResponse.json();
+                    console.log('Login history result:', loginResult);
+
+                    if (loginResult.success && loginResult.data) {
+                        renderUserActivity(loginResult.data);
+                    } else {
+                        renderUserActivity([]);
+                    }
+                } else {
+                    const result = await response.json();
+                    console.log('Activity result:', result);
+
+                    if (result.success && result.data) {
+                        renderUserActivity(result.data);
+                    } else {
+                        renderUserActivity([]);
+                    }
+                }
+            } catch (error) {
+                console.error('Activity load error:', error);
+                renderUserActivity([]);
+            } finally {
+                if (btn) {
+                    btn.classList.remove('spinning');
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Toggle activity section visibility
+        function toggleActivitySection() {
+            const content = document.getElementById('activityListContainer');
+            const toggleBtn = document.getElementById('activityToggleBtn');
+            const icon = toggleBtn.querySelector('i');
+            
+            content.classList.toggle('collapsed');
+            toggleBtn.classList.toggle('collapsed');
+            
+            if (content.classList.contains('collapsed')) {
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                icon.className = 'fas fa-chevron-up';
+            }
+        }
+
+        // Render user activity
+        function renderUserActivity(activities) {
+            const container = document.getElementById('activityList');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = `
+                    <div class="activity-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>Belum ada aktivitas</p>
+                        <p style="font-size: 0.85rem; margin-top: 10px;">Aktivitas Anda akan muncul di sini</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Activity icons mapping
+            const activityIcons = {
+                'LOGIN': 'fa-sign-in-alt',
+                'LOGOUT': 'fa-sign-out-alt',
+                'CREATE': 'fa-plus-circle',
+                'UPDATE': 'fa-edit',
+                'DELETE': 'fa-trash-alt',
+                'VIEW': 'fa-eye'
+            };
+
+            // Activity type labels
+            const activityLabels = {
+                'LOGIN': 'Login',
+                'LOGOUT': 'Logout',
+                'CREATE': 'Membuat',
+                'UPDATE': 'Memperbarui',
+                'DELETE': 'Menghapus',
+                'VIEW': 'Melihat'
+            };
+
+            container.innerHTML = activities.map((log, index) => {
+                const icon = activityIcons[log.activity_type] || 'fa-circle';
+                const label = activityLabels[log.activity_type] || log.activity_type;
+                const timestamp = new Date(log.created_at).toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="activity-item" style="animation-delay: ${index * 0.1}s">
+                        <div class="activity-icon ${log.activity_type.toLowerCase()}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-description">
+                                ${label}: ${log.description || 'Aktivitas user'}
+                            </div>
+                            <div class="activity-meta">
+                                <span>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    ${log.ip_address || 'IP tidak diketahui'}
+                                </span>
+                                <span>
+                                    <i class="far fa-clock"></i>
+                                    ${timestamp}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show error
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Upload profile photo
+        async function uploadProfilePhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Ukuran file maksimal 5MB', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('profile_photo', file);
+
+            try {
+                const response = await fetch('/api/profile/photo', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire(window.i18n.berhasil, window.i18n.msg_photo_updated, 'success');
+                    loadProfile();
+                } else {
+                    Swal.fire(window.i18n.gagal, result.message || window.i18n.msg_error_photo, 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_photo, 'error');
+            }
+        }
+
+        // Update profile
+        async function updateProfile() {
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            // Language selection removed
+
+            if (!name || name.length < 3) {
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_username_min, 'error');
+                return;
+            }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_email_invalid, 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire(window.i18n.berhasil, window.i18n.msg_profile_updated, 'success');
+                    loadProfile();
+                } else {
+                    Swal.fire(window.i18n.gagal, result.message || window.i18n.msg_error_update, 'error');
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_update, 'error');
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            if (currentUser) {
+                document.getElementById('editName').value = currentUser.name;
+                document.getElementById('editEmail').value = currentUser.email;
+            }
+        }
+
+        // Change password
+        async function changePassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!newPassword || newPassword.length < 6) {
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_password_min, 'error');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_password_match, 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile/password', {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword, confirmPassword })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire(window.i18n.berhasil, window.i18n.msg_password_changed, 'success');
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    Swal.fire(window.i18n.gagal, result.message || window.i18n.msg_error_password, 'error');
+                }
+            } catch (error) {
+                console.error('Change password error:', error);
+                Swal.fire(window.i18n.gagal, window.i18n.msg_error_password, 'error');
+            }
+        }
+
+
+
+        // Toggle activity section
+        function toggleActivitySection() {
+            const container = document.getElementById('activityListContainer');
+            const btn = document.getElementById('activityToggleBtn');
+            const isCollapsed = container.classList.toggle('collapsed');
+            btn.classList.toggle('collapsed', isCollapsed);
+            
+            // Save preference
+            localStorage.setItem('activitySectionCollapsed', isCollapsed);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const isCollapsed = localStorage.getItem('activitySectionCollapsed') === 'true';
+            if (isCollapsed) {
+                const container = document.getElementById('activityListContainer');
+                const btn = document.getElementById('activityToggleBtn');
+                if (container) container.classList.add('collapsed');
+                if (btn) btn.classList.add('collapsed');
+            }
+        });
+
+        // Load profile data
+        loadProfile();
+    </script>
+
+    <!-- Footer -->
+    <%- include('./partials/footer') %>
+</body>
+</html>

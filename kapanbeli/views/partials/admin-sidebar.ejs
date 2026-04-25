@@ -1,0 +1,211 @@
+<!--
+  Admin Sidebar Component
+  Theme-aware sidebar - follows selected theme
+-->
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Kapan Beli Admin</span>
+        </div>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="menu-label">Main Menu</div>
+        <a href="/admin" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/admin/users" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'users' ? 'active' : '' %>">
+            <i class="fas fa-users"></i>
+            <span>Manajemen Pengguna</span>
+        </a>
+        <a href="/admin/products" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>">
+            <i class="fas fa-box"></i>
+            <span>Semua Produk</span>
+        </a>
+        <a href="/admin/expired-watch" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'expired-watch' ? 'active' : '' %>">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Monitoring Kadaluarsa</span>
+        </a>
+        <a href="/admin/shopping-suggestions" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'shopping-suggestions' ? 'active' : '' %>">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Saran Pembelian</span>
+        </a>
+
+        <div class="menu-label">Communication</div>
+        <a href="/admin/broadcast" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'broadcast' ? 'active' : '' %>">
+            <i class="fas fa-bullhorn"></i>
+            <span>Broadcast Pengumuman</span>
+        </a>
+
+        <div class="menu-label">Content</div>
+        <a href="/admin/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
+            <i class="fas fa-sticky-note"></i>
+            <span>Catatan User</span>
+        </a>
+        <a href="/admin/activity-logs" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'activity-logs' ? 'active' : '' %>">
+            <i class="fas fa-history"></i>
+            <span>Log Aktivitas</span>
+        </a>
+
+        <div class="menu-label">System Settings</div>
+        <a href="/admin/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
+            <i class="fas fa-cog"></i>
+            <span>Pengaturan</span>
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-mini-profile">
+            <div class="user-avatar">
+                <% if (typeof user !== 'undefined' && user && (user.profile_image || user.profile_photo)) { %>
+                    <img src="<%= user.profile_image || user.profile_photo %>" alt="<%= user.name %>" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                <% } else { %>
+                    <%= typeof user !== 'undefined' && user && user.name ? user.name[0].toUpperCase() : 'A' %>
+                <% } %>
+            </div>
+            <div class="user-info" style="flex: 1; min-width: 0;">
+                <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= typeof user !== 'undefined' && user && user.name ? user.name : 'Admin' %></h4>
+                <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= typeof user !== 'undefined' && user && user.email ? user.email : 'admin@kapanbeli.com' %></p>
+            </div>
+            <form action="/auth/logout" method="POST" style="display: inline;">
+                <button type="submit" class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sidebar theme handler - Sync with global body class
+    (function() {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        function applyTheme() {
+            const isDark = document.body.classList.contains('dark-mode-active') || 
+                          localStorage.getItem('theme') === 'dark';
+            
+            if (isDark) {
+                sidebar.classList.remove('light-theme');
+            } else {
+                sidebar.classList.add('light-theme');
+            }
+        }
+
+        // Apply immediately
+        applyTheme();
+        
+        // Watch for body class changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') applyTheme();
+            });
+        });
+        observer.observe(document.body, { attributes: true });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'theme') applyTheme();
+        });
+    })();
+</script>
+
+<style>
+    /* ========== BASE SIDEBAR STYLES ========== */
+    .sidebar {
+        width: var(--sidebar-width, 260px);
+        background: var(--bg-sidebar, #1A1D23);
+        color: var(--text-sidebar, rgba(255,255,255,0.7));
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        border-right: 1px solid var(--sidebar-border, rgba(255,255,255,0.1));
+        overflow: hidden;
+    }
+    .sidebar-header {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--sidebar-border, rgba(255,255,255,0.1));
+        flex-shrink: 0;
+    }
+    .sidebar-header .logo {
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--text-sidebar-heading, #FFFFFF);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sidebar-header .logo i { color: var(--primary-orange, #FF9F43); font-size: 1.3rem; }
+    .sidebar-menu { flex: 1; padding: 16px 0; overflow-y: auto; }
+    .sidebar-menu::-webkit-scrollbar { width: 4px; }
+    .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .menu-label {
+        padding: 0 20px 8px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-top: 16px;
+    }
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        color: var(--text-sidebar, rgba(255,255,255,0.7));
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    .nav-item:hover { background: var(--bg-sidebar-hover, rgba(255,255,255,0.05)); color: var(--text-sidebar-heading, #FFFFFF); }
+    .nav-item.active {
+        background: var(--bg-sidebar-active, rgba(46,134,222,0.15));
+        color: var(--text-sidebar-active, #2E86DE);
+        border-left-color: var(--primary-blue, #2E86DE);
+    }
+    .nav-item i { width: 22px; margin-right: 12px; text-align: center; }
+    .sidebar-footer {
+        padding: 16px 20px;
+        border-top: 1px solid var(--sidebar-border, rgba(255,255,255,0.1));
+        flex-shrink: 0;
+    }
+    .user-mini-profile { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--primary-orange, #FF9F43);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; color: white; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-info h4 { font-size: 0.85rem; color: var(--text-sidebar-heading, #FFFFFF); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-info p { font-size: 0.7rem; color: var(--text-sidebar, rgba(255,255,255,0.7)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logout-btn {
+        background: rgba(255,107,107,0.12); color: var(--accent-red, #FF6B6B); border: none;
+        border-radius: 8px; width: 32px; height: 32px; display: flex;
+        align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+    }
+    .logout-btn:hover { background: var(--accent-red, #FF6B6B); color: white; }
+
+    /* Light theme overrides */
+    .sidebar.light-theme { background-color: #ffffff !important; border-right: 1px solid rgba(0,0,0,0.1); }
+    .sidebar.light-theme .sidebar-header { border-bottom-color: rgba(0,0,0,0.1) !important; }
+    .sidebar.light-theme .nav-item { color: rgba(44, 62, 80, 0.7) !important; }
+    .sidebar.light-theme .nav-item:hover { background-color: rgba(46, 134, 222, 0.08) !important; color: #2C3E50 !important; }
+    .sidebar.light-theme .nav-item.active { background-color: rgba(46, 134, 222, 0.12) !important; color: #2E86DE !important; border-left-color: #2E86DE !important; }
+    .sidebar.light-theme .menu-label { color: rgba(44, 62, 80, 0.5) !important; }
+    .sidebar.light-theme .user-info h4 { color: #2C3E50 !important; }
+    .sidebar.light-theme .user-info p { color: rgba(44, 62, 80, 0.6) !important; }
+    .sidebar.light-theme .logout-btn { background: rgba(255, 107, 107, 0.1) !important; border-color: rgba(255, 107, 107, 0.2) !important; }
+    .sidebar.light-theme .logout-btn:hover { background: #FF6B6B !important; color: white !important; }
+</style>

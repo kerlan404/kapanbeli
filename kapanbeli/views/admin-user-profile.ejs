@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> - Admin Panel</title>
+
+    <!-- Boutique CSS -->
+    <!-- Elite Boutique Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #2E86DE;
+            --primary-glow: rgba(46, 134, 222, 0.3);
+            --accent-gold: #FF9F43;
+            --accent-emerald: #1DD1A1;
+            --accent-crimson: #FF6B6B;
+            --zinc-50: #fafafa;
+            --zinc-100: #f4f4f5;
+            --zinc-200: #e4e4e7;
+            --zinc-800: #27272a;
+            --zinc-900: #18181b;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.3);
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode-active {
+            --bg-glass: rgba(24, 24, 27, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.05);
+            --text-main: #fafafa;
+            --text-muted: #a1a1aa;
+            --zinc-100: #18181b;
+            --zinc-50: #09090b;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
+
+        body {
+            background-color: var(--zinc-50);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(46, 134, 222, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 159, 67, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(29, 209, 161, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(162, 155, 254, 0.05) 0px, transparent 50%);
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Header */
+        header {
+            backdrop-filter: blur(20px);
+            background: var(--bg-glass);
+            border-bottom: 1px solid var(--border-glass);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-title { display: flex; align-items: center; gap: 20px; }
+        
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 16px var(--primary-glow);
+        }
+
+        .back-btn:hover { 
+            transform: translateX(-5px) scale(1.05); 
+            box-shadow: 0 12px 24px var(--primary-glow);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-outline {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover { 
+            border-color: var(--primary); 
+            color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        /* Profile Container */
+        .profile-container {
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
+            overflow: hidden;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+        }
+
+        .profile-cover {
+            height: 220px;
+            background: linear-gradient(135deg, #2E86DE 0%, #FF9F43 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-cover::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.15;
+            mix-blend-mode: soft-light;
+        }
+
+        .profile-content {
+            padding: 40px;
+            padding-top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-photo-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .profile-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 40px;
+            border: 8px solid var(--border-glass);
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            background: var(--zinc-100);
+            transition: transform 0.5s ease;
+        }
+
+        .profile-photo:hover { transform: scale(1.02) rotate(2deg); }
+
+        .role-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-size: 1.5rem;
+            border: 4px solid var(--bg-glass);
+        }
+
+        .profile-info { text-align: center; }
+        .profile-name { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.02em; }
+        .profile-email { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 24px; font-weight: 500; }
+
+        .badges-wrapper {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .badge-admin { background: rgba(108, 92, 231, 0.1); color: #6C5CE7; border: 1px solid rgba(108, 92, 231, 0.2); }
+        .badge-user { background: rgba(46, 134, 222, 0.1); color: var(--primary); border: 1px solid rgba(46, 134, 222, 0.2); }
+        .badge-active { background: rgba(29, 209, 161, 0.1); color: #10B981; border: 1px solid rgba(29, 209, 161, 0.2); }
+        .badge-inactive { background: rgba(255, 107, 107, 0.1); color: var(--accent-crimson); border: 1px solid rgba(255, 107, 107, 0.2); }
+
+        .profile-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px dashed var(--border-glass);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 16px;
+            border: 1px solid var(--border-glass);
+        }
+
+        .meta-item i { color: var(--primary); font-size: 1.1rem; }
+        .meta-item strong { color: var(--text-muted); font-weight: 500; font-size: 0.85rem; text-transform: uppercase; margin-right: 4px; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
+            border: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stat-card:hover { 
+            transform: translateY(-10px) scale(1.02); 
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-info p { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+        .stat-info h3 { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 700; color: var(--text-main); line-height: 1; }
+
+        .stat-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-blue { background: linear-gradient(135deg, #3B82F6, #1E40AF); }
+        .stat-orange { background: linear-gradient(135deg, #F59E0B, #B45309); }
+        .stat-green { background: linear-gradient(135deg, #10B981, #065F46); }
+        .stat-purple { background: linear-gradient(135deg, #8B5CF6, #4C1D95); }
+
+        /* Sections */
+        .section-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
+            border: 1px solid var(--border-glass);
+            margin-bottom: 40px;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+        }
+
+        .section-header {
+            padding: 24px 40px;
+            background: rgba(0,0,0,0.02);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 14px; }
+        .section-title i { padding: 10px; background: var(--primary-glow); border-radius: 12px; font-size: 1.2rem; }
+
+        /* Table Design */
+        .table-responsive { overflow-x: auto; padding: 20px 40px 40px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+        th { 
+            text-align: left; 
+            padding: 16px 24px; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        td { 
+            padding: 20px 24px; 
+            background: rgba(0,0,0,0.02);
+            font-size: 1rem;
+            color: var(--text-main);
+            border-top: 1px solid var(--border-glass);
+            border-bottom: 1px solid var(--border-glass);
+        }
+        td:first-child { border-left: 1px solid var(--border-glass); border-radius: 16px 0 0 16px; }
+        td:last-child { border-right: 1px solid var(--border-glass); border-radius: 0 16px 16px 0; }
+        
+        tr:hover td { background: var(--primary-glow); border-color: var(--primary); }
+
+        /* Tab System Enhance */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            padding: 10px 40px;
+            border-bottom: 1px solid var(--border-glass);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover { background: var(--bg-glass); color: var(--text-main); }
+        .tab-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 8px 20px var(--primary-glow);
+        }
+
+        @media (max-width: 992px) {
+            .profile-container { padding: 0 20px; }
+            header { padding: 16px 20px; }
+            .profile-name { font-size: 2.2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
+    <script>
+        // Maintain dark mode from localStorage
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark-mode-active');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark-mode-active');
+            }
+        })();
+    </script>
+    <% if (!user) { %>
+        <!-- User Not Found -->
+        <div style="min-height: calc(100vh - 100px); display: flex; align-items: center; justify-content: center; padding: 20px;" class="animate-fade-in">
+            <div style="text-align: center;">
+                <div style="width: 100px; height: 100px; background: rgba(255, 107, 107, 0.1); color: var(--accent-crimson); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 3rem; transform: rotate(-10deg);">
+                    <i class="fas fa-user-times"></i>
+                </div>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">User Tidak Ditemukan</h1>
+                <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 1.1rem;">Data user yang Anda cari tidak tersedia atau telah dihapus.</p>
+                <a href="/admin/users" class="btn btn-primary" style="display: inline-flex; justify-content: center; margin: 0 auto;">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar User
+                </a>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- Header -->
+        <header>
+            <div class="header-title">
+                <a href="/admin/users" class="back-btn" title="Kembali">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text-main);"><%= pageTitle %></h1>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Pantau dan kelola profil pengguna secara mendalam</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="window.location.reload()" class="btn btn-outline">
+                    <i class="fas fa-sync-alt"></i> Segarkan Data
+                </button>
+            </div>
+        </header>
+
+        <main class="profile-container">
+            <!-- Profile Card -->
+            <div class="glass-card animate-fade-in">
+                <div class="profile-cover"></div>
+                <div class="profile-content">
+                    <div class="profile-photo-wrapper">
+                        <%
+                            var profileImage = user.profile_photo || user.profile_photo_url || user.profile_image;
+                            if (!profileImage || profileImage === 'null' || profileImage === '') {
+                                profileImage = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=2E86DE&color=fff&size=200';
+                            } else if (!profileImage.startsWith('http') && !profileImage.startsWith('/')) {
+                                profileImage = '/uploads/' + profileImage.replace('uploads/', '');
+                            }
+                        %>
+                        <img src="<%= profileImage %>" alt="<%= user.name %>" class="profile-photo" onerror="this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.name) %>&background=2E86DE&color=fff&size=200'">
+                        <div class="role-icon" title="<%= user.role === 'admin' ? 'Administrator' : 'User' %>">
+                            <i class="fas fa-<%= user.role === 'admin' ? 'crown' : 'user-shield' %>"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <h2 class="profile-name"><%= user.name %></h2>
+                        <p class="profile-email"><%= user.email %></p>
+                        
+                        <div class="badges-wrapper">
+                            <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-user' %>">
+                                <i class="fas fa-<%= user.role === 'admin' ? 'crown' : 'user' %>"></i>
+                                <%= user.role === 'admin' ? 'Administrator' : 'Pengguna' %>
+                            </span>
+                            <span class="badge <%= (user.account_status || 'active') === 'active' ? 'badge-active' : 'badge-inactive' %>">
+                                <i class="fas fa-<%= (user.account_status || 'active') === 'active' ? 'check-circle' : 'times-circle' %>"></i>
+                                <%= (user.account_status || 'active') === 'active' ? 'Aktif' : 'Non-Aktif' %>
+                            </span>
+                        </div>
+
+                        <!-- Password View Section -->
+                        <div style="display: inline-flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.03); padding: 12px 20px; border-radius: 16px; font-size: 1rem; border: 1px solid var(--border-glass);">
+                            <i class="fas fa-key" style="color: var(--primary); opacity: 0.8;"></i>
+                            <span id="passwordDisplay" style="font-family: 'Outfit', monospace; font-weight: 600; letter-spacing: 0.1em; color: var(--text-main);">••••••••</span>
+                            <button onclick="togglePasswordView()" style="background: var(--bg-glass); border: 1px solid var(--border-glass); cursor: pointer; color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s;" title="Tampilkan/Sembunyikan Password">
+                                <i id="passwordToggleIcon" class="fas fa-eye"></i>
+                            </button>
+                            <input type="hidden" id="userPasswordHash" value="<%= user.password || '' %>">
+                        </div>
+
+                        <div class="profile-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span><strong>Bergabung Sejak</strong> <%= new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-history"></i>
+                                <span><strong>Terakhir Aktif</strong> <%= user.last_login ? new Date(user.last_login).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Baru Bergabung' %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Total Login</p>
+                        <h3><%= user.total_logins || 0 %></h3>
+                    </div>
+                    <div class="stat-icon stat-blue shadow-lg"><i class="fas fa-fingerprint"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Koleksi Bahan</p>
+                        <h3><%= user.total_products || 0 %></h3>
+                    </div>
+                    <div class="stat-icon stat-orange shadow-lg"><i class="fas fa-utensils"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Catatan Simpan</p>
+                        <h3><%= user.total_notes || 0 %></h3>
+                    </div>
+                    <div class="stat-icon stat-green shadow-lg"><i class="fas fa-bookmark"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Saran Belanja</p>
+                        <h3><%= user.total_suggestions || 0 %></h3>
+                    </div>
+                    <div class="stat-icon stat-purple shadow-lg"><i class="fas fa-shopping-basket"></i></div>
+                </div>
+            </div>
+
+            <!-- Activity Logs Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-wave-square"></i> Timeline Aktivitas</h3>
+                    <div style="background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 12px; padding: 4px 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-filter" style="font-size: 0.8rem; color: var(--text-muted);"></i>
+                        <select id="activityFilter" style="border: none; background: transparent; color: var(--text-main); font-weight: 600; padding: 6px; outline: none; cursor: pointer;">
+                            <option value="all">Semua Aktivitas</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="create">Tambah</option>
+                            <option value="update">Ubah</option>
+                            <option value="delete">Hapus</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="activityTable">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Event</th>
+                                <th>Deskripsi Aktivitas</th>
+                                <th>Alamat IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityLogsBody">
+                            <% if (activityLogs && activityLogs.length > 0) { %>
+                                <% activityLogs.slice(0, 10).forEach(log => { %>
+                                    <tr>
+                                        <td style="font-weight: 600;"><%= new Date(log.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></td>
+                                        <td>
+                                            <span class="badge <%= (log.activity_type || '').toLowerCase() === 'login' ? 'badge-active' : 'badge-user' %>" style="border-radius: 8px;">
+                                                <%= log.activity_type %>
+                                            </span>
+                                        </td>
+                                        <td style="max-width: 400px; color: var(--text-main); line-height: 1.5;"><%= log.description %></td>
+                                        <td style="font-family: 'Outfit', monospace; color: var(--primary); font-size: 0.85rem;"><%= log.ip_address || '-' %></td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr><td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px; opacity: 0.5;"></i> Belum ada rekaman aktivitas</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Data Tabs Section -->
+            <div class="section-card">
+                <div class="tab-nav">
+                    <button onclick="switchTab('products')" id="tab-products" class="tab-btn active">
+                        <i class="fas fa-folder"></i> Bahan User
+                    </button>
+                    <button onclick="switchTab('notes')" id="tab-notes" class="tab-btn">
+                        <i class="fas fa-sticky-note"></i> Catatan
+                    </button>
+                    <button onclick="switchTab('suggestions')" id="tab-suggestions" class="tab-btn">
+                        <i class="fas fa-lightbulb"></i> Saran Belanja
+                    </button>
+                </div>
+
+                <!-- Products Tab Content -->
+                <div id="content-products" class="tab-content">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Bahan</th>
+                                    <th>Stok</th>
+                                    <th>Kadaluarsa</th>
+                                    <th>Dibuat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (products && products.length > 0) { %>
+                                    <% products.forEach(p => { %>
+                                        <tr>
+                                            <td style="font-weight: 600;"><%= p.name %></td>
+                                            <td><%= p.stock_quantity %> <%= p.unit || '' %></td>
+                                            <td><%= p.expiry_date ? new Date(p.expiry_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-' %></td>
+                                            <td><%= new Date(p.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">Belum ada bahan</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Notes Tab Content (Hidden by default) -->
+                <div id="content-notes" class="tab-content" style="display: none;">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Judul</th>
+                                    <th>Isi</th>
+                                    <th>Dibuat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (notes && notes.length > 0) { %>
+                                    <% notes.forEach(n => { %>
+                                        <tr>
+                                            <td style="font-weight: 600;"><%= n.title || 'Tanpa Judul' %></td>
+                                            <td style="max-width: 400px; color: var(--text-muted);"><%= n.content ? n.content.substring(0, 100) + '...' : '-' %></td>
+                                            <td><%= new Date(n.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted);">Belum ada catatan</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Suggestions Tab Content (Hidden by default) -->
+                <div id="content-suggestions" class="tab-content" style="display: none;">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Saran</th>
+                                    <th>Jenis</th>
+                                    <th>Status</th>
+                                    <th>Dibuat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (suggestions && suggestions.length > 0) { %>
+                                    <% suggestions.forEach(s => { %>
+                                        <tr>
+                                            <td style="font-weight: 600;"><%= s.name %></td>
+                                            <td><%= s.type %></td>
+                                            <td><span class="badge badge-user"><%= s.status || 'pending' %></span></td>
+                                            <td><%= new Date(s.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">Belum ada saran</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            // Tab system
+            function switchTab(tabName) {
+                // Hide all contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Remove active from all tabs
+                document.querySelectorAll('[id^="tab-"]').forEach(button => {
+                    button.style.background = 'transparent';
+                    button.style.borderBottom = 'none';
+                });
+                
+                // Show target content
+                document.getElementById('content-' + tabName).style.display = 'block';
+                
+                // Mark active button
+                const activeBtn = document.getElementById('tab-' + tabName);
+                if (activeBtn) {
+                   activeBtn.style.background = 'var(--bg-card)';
+                   activeBtn.style.borderBottom = '3px solid var(--primary-blue)';
+                }
+            }
+
+            // Toggle password view
+            function togglePasswordView() {
+                const passwordDisplay = document.getElementById('passwordDisplay');
+                const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+                const passwordHash = document.getElementById('userPasswordHash').value;
+                
+                if (passwordDisplay.textContent === '••••••••') {
+                    passwordDisplay.textContent = passwordHash.substring(0, 15) + '...';
+                    passwordToggleIcon.classList.remove('fa-eye');
+                    passwordToggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordDisplay.textContent = '••••••••';
+                    passwordToggleIcon.classList.remove('fa-eye-slash');
+                    passwordToggleIcon.classList.add('fa-eye');
+                }
+            }
+
+            // Filter activity logs
+            document.getElementById('activityFilter')?.addEventListener('change', function() {
+                const filterValue = this.value;
+                const rows = document.querySelectorAll('#activityLogsBody tr');
+                
+                rows.forEach(row => {
+                    const activityCell = row.querySelector('td:nth-child(2)');
+                    if (activityCell) {
+                        const activityType = activityCell.textContent.trim().toLowerCase();
+                        if (filterValue === 'all' || activityType === filterValue) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        </script>
+    <% } %>
+
+</body>
+</html>

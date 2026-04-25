@@ -1,0 +1,43 @@
+<!--
+  Status Badge Component - UNIFIED
+  Usage: <%- include('../partials/status-badge', { status: status }) %>
+  
+  Parameters:
+  - status: String - User status ('active', 'inactive', 'suspended', 'banned')
+  
+  Status values (database standard):
+  - active → Aktif (hijau)
+  - inactive → Non-Aktif (merah)
+  - suspended/banned → Ditangguhkan (abu-abu)
+  
+  All status values are lowercase in database.
+  Display labels are in Indonesian.
+-->
+
+<%
+const statusValue = (typeof status !== 'undefined' && status) ? status.toLowerCase() : 'inactive';
+
+let badgeClass = 'badge-secondary';
+let badgeText = 'Tidak Diketahui';
+
+switch(statusValue) {
+    case 'active':
+        badgeClass = 'badge-success';
+        badgeText = 'Aktif';
+        break;
+    case 'inactive':
+        badgeClass = 'badge-danger';
+        badgeText = 'Non-Aktif';
+        break;
+    case 'suspended':
+    case 'banned':
+        badgeClass = 'badge-warning';
+        badgeText = 'Ditangguhkan';
+        break;
+    default:
+        badgeClass = 'badge-secondary';
+        badgeText = 'Tidak Diketahui';
+}
+%>
+
+<span class="badge <%= badgeClass %>"><%= badgeText %></span>

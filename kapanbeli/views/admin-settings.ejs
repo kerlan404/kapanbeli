@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - Admin Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #2E86DE;
+            --primary-dark: #205A9E;
+            --primary-orange: #FF9F43;
+            --accent-green: #1DD1A1;
+            --accent-red: #FF6B6B;
+            --bg-sidebar: #ffffff;
+            --bg-sidebar-hover: rgba(46, 134, 222, 0.08);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.12);
+            --text-sidebar: #546E7A;
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: #2C3E50;
+            --sidebar-border: #e9ecef;
+            --bg-body: #F4F6F9;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --text-light: #ecf0f1;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
+            --sidebar-width: 240px;
+            --header-height: 64px;
+            --content-padding: 24px;
+        }
+
+        body.dark-mode-active {
+            --bg-sidebar: #1a1d23;
+            --bg-sidebar-hover: rgba(255,255,255,0.05);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.15);
+            --text-sidebar: rgba(255,255,255,0.7);
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: white;
+            --sidebar-border: rgba(255,255,255,0.1);
+            --bg-body: #121418;
+            --bg-card: #1e2128;
+            --text-main: #ecf0f1;
+            --text-muted: #bdc3c7;
+            --border-color: #2c3e50;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-sidebar-heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-orange); }
+
+        .sidebar-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
+
+        .menu-label {
+            padding: 0 24px 10px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-sidebar);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-sidebar-hover);
+            color: var(--text-sidebar-heading);
+        }
+        .nav-item.active {
+            background-color: var(--bg-sidebar-active);
+            color: var(--text-sidebar-active);
+            border-left-color: var(--primary-blue);
+        }
+        .nav-item i { width: 24px; margin-right: 12px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--sidebar-border);
+        }
+
+        .user-mini-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--primary-orange);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; min-width: 0; overflow: hidden; }
+        .user-info h4 { font-size: 0.9rem; color: var(--text-sidebar-heading); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info p { font-size: 0.75rem; color: var(--text-sidebar); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: var(--content-padding);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .page-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
+        .top-actions { display: flex; gap: 15px; align-items: center; }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        /* Panel Card */
+        .panel-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: rgba(46, 134, 222, 0.1);
+            color: var(--primary-blue);
+        }
+
+        .panel-title { font-size: 1.25rem; font-weight: 600; }
+
+        /* Form */
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+
+        .form-control::placeholder { color: var(--text-muted); }
+
+        /* Checkbox */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-wrapper:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .checkbox-description {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+
+        /* Loading State */
+        .btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn.loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            border-left: 4px solid var(--accent-green);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error { border-left-color: var(--accent-red); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/admin-sidebar', { currentPage: 'settings', user: typeof user !== 'undefined' ? user : null }) %>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title">Pengaturan Sistem</h1>
+                <p class="page-subtitle">Kelola konfigurasi dan pengaturan aplikasi</p>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+            </div>
+        </div>
+        <div class="settings-grid">
+            <!-- General Settings -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3 class="panel-title">Konfigurasi Umum</h3>
+                </div>
+
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Nama Aplikasi</label>
+                        <input type="text" name="app_name" class="form-control" value="Kapan Beli" placeholder="Masukkan nama aplikasi">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email Support</label>
+                        <input type="email" name="support_email" class="form-control" value="support@kapanbeli.id" placeholder="email@domain.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Nomor Kontak</label>
+                        <input type="tel" name="contact_number" class="form-control" value="+62 812 3456 7890" placeholder="+62 xxx xxxx xxxx">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="maintenance_mode" id="maintenanceMode">
+                            <span class="checkbox-label">
+                                <div>Mode Maintenance</div>
+                                <div class="checkbox-description">Aktifkan untuk membuat situs tidak dapat diakses publik</div>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-bell"></i> Notifikasi Email</label>
+                        <select name="email_notifications" class="form-control">
+                            <option value="all">Aktif (Stok Rendah & Kadaluarsa)</option>
+                            <option value="low_stock">Hanya Stok Rendah</option>
+                            <option value="none">Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="loadSettings()">
+                            <i class="fas fa-undo"></i>
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                            <i class="fas fa-save"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- System Information -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3 class="panel-title">Informasi Sistem</h3>
+                </div>
+
+                <div style="padding: 15px 0;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted);">Versi Aplikasi</span>
+                        <span style="font-weight: 600;">1.0.0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted);">Environment</span>
+                        <span style="font-weight: 600;">Production</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted);">Database</span>
+                        <span style="font-weight: 600;">MySQL</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted);">Timezone</span>
+                        <span style="font-weight: 600;">Asia/Jakarta</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span style="color: var(--text-muted);">Last Backup</span>
+                        <span style="font-weight: 600;">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Initialize Dark Mode
+        function initDarkMode() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) {
+                document.body.classList.add('dark-mode-active');
+            }
+            updateThemeIcon();
+        }
+
+        // Toggle Dark Mode
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-active');
+            const isDark = document.body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+
+        // Update Theme Icon
+        function updateThemeIcon() {
+            const isDark = document.body.classList.contains('dark-mode-active');
+            const btn = document.querySelector('.top-actions .btn-outline');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initDarkMode();
+            loadSettings();
+        });
+
+        // Load Settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/settings', {
+                    credentials: 'same-origin'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const settings = result.data;
+                    document.querySelector('input[name="app_name"]').value = settings.app_name || 'Kapan Beli';
+                    document.querySelector('input[name="support_email"]').value = settings.support_email || 'support@kapanbeli.id';
+                    document.querySelector('input[name="contact_number"]').value = settings.contact_number || '+62 812 3456 7890';
+                    document.querySelector('input[name="maintenance_mode"]').checked = settings.maintenance_mode || false;
+                    document.querySelector('select[name="email_notifications"]').value = settings.email_notifications || 'all';
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // Form Submit Handler
+        document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.innerHTML;
+            
+            saveBtn.disabled = true;
+            saveBtn.classList.add('loading');
+            saveBtn.innerHTML = '<i class="fas fa-spinner"></i> Menyimpan...';
+
+            const formData = {
+                app_name: document.querySelector('input[name="app_name"]').value,
+                support_email: document.querySelector('input[name="support_email"]').value,
+                contact_number: document.querySelector('input[name="contact_number"]').value,
+                maintenance_mode: document.querySelector('input[name="maintenance_mode"]').checked,
+                email_notifications: document.querySelector('select[name="email_notifications"]').value
+            };
+
+            try {
+                const response = await fetch('/api/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Pengaturan berhasil disimpan!', 'success');
+                } else {
+                    showToast('Gagal menyimpan: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showToast('Terjadi kesalahan saat menyimpan', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('loading');
+                saveBtn.innerHTML = originalText;
+            }
+        });
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,731 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= __('title_notes') %> - Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" type="image/x-icon">
+
+    <style>
+        :root {
+            --primary-orange: #FF9D42;
+            --primary-black: #0F172A;
+            --accent-blue: #3B82F6;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            
+            --notebook-paper: #FFFFFF;
+            --line-color: rgba(59, 130, 246, 0.1);
+            --margin-color: #FECACA;
+            --line-height: 2.2rem;
+            
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            
+            --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode-active {
+            --bg-light: #020617;
+            --white: #0F172A;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --notebook-paper: #1E293B;
+            --line-color: rgba(255, 255, 255, 0.05);
+            --margin-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: radial-gradient(var(--line-color) 2px, transparent 2px);
+            background-size: 40px 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* --- HEADER SECTION --- */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            background: var(--white);
+            padding: 24px 32px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(15, 23, 42, 0.04);
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-black);
+        }
+
+        body.dark-mode-active .page-title { color: white; }
+
+        .page-title i {
+            color: var(--primary-orange);
+            font-size: 1.8rem;
+        }
+
+        .btn-add {
+            background: var(--primary-orange);
+            color: var(--primary-black);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(255, 157, 66, 0.2);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 157, 66, 0.3);
+        }
+
+        /* --- SEARCH SECTION --- */
+        .search-area {
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px 16px 56px;
+            border-radius: 100px;
+            border: 2px solid transparent;
+            background: var(--white);
+            box-shadow: var(--card-shadow);
+            font-size: 1rem;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-area i {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-orange);
+            font-size: 1.2rem;
+        }
+
+        /* --- NOTES GRID (NOTEBOOK STYLE) --- */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 32px;
+        }
+
+        .note-card {
+            background: var(--notebook-paper);
+            border-radius: 8px;
+            min-height: 380px;
+            position: relative;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(15, 23, 42, 0.05);
+            /* Notebook Lines */
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+            background-size: 100% var(--line-height);
+            background-position: 0 0;
+        }
+
+        .note-card:hover {
+            transform: translateY(-8px) rotate(0.5deg);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        /* Margin Line */
+        .note-card::before {
+            content: '';
+            position: absolute;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--margin-color);
+            z-index: 1;
+        }
+
+        .card-header {
+            padding: 24px 24px 8px 70px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .note-date {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .note-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-black);
+            line-height: var(--line-height);
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        body.dark-mode-active .note-title { color: white; }
+
+        .card-body {
+            padding: 0 24px 24px 70px;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .note-content {
+            font-size: 1rem;
+            line-height: var(--line-height);
+            color: var(--text-main);
+            white-space: pre-wrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 8;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            padding: 16px 24px 24px 70px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge.selesai { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-badge.pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-badge.belum { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-muted);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-edit:hover { background: var(--accent-blue); color: white; }
+        .btn-delete:hover { background: var(--danger); color: white; }
+        .btn-status:hover { background: var(--primary-orange); color: var(--primary-black); }
+
+        /* Premium Status Options */
+        .status-options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .status-opt {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 2px solid var(--line-color);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            background: var(--bg-light);
+        }
+        .status-opt:hover {
+            transform: translateX(8px);
+            border-color: var(--primary-orange);
+            background: rgba(255, 157, 66, 0.05);
+        }
+        .status-opt.active {
+            border-color: var(--primary-orange);
+            background: rgba(255, 157, 66, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 157, 66, 0.1);
+        }
+        .opt-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .opt-info { flex: 1; }
+        .opt-title { font-weight: 800; font-size: 1rem; color: var(--text-main); display: block; }
+        .opt-desc { font-size: 0.75rem; color: var(--text-muted); }
+        .opt-check { color: var(--primary-orange); font-size: 1.2rem; opacity: 0; transition: opacity 0.2s; }
+        .status-opt.active .opt-check { opacity: 1; }
+
+        .opt-belum .opt-icon { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+        .opt-pending .opt-icon { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .opt-selesai .opt-icon { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+
+        /* --- MODAL --- */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--white);
+            width: 100%;
+            max-width: 650px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 32px;
+            background: var(--primary-black);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode-active .modal-header { background: var(--primary-orange); color: var(--primary-black); }
+
+        .modal-header h2 { font-weight: 800; font-size: 1.4rem; }
+
+        .modal-body { padding: 32px; }
+
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+        .form-input {
+            width: 100%; padding: 14px 20px; border-radius: 12px; border: 2px solid #E2E8F0;
+            background: var(--bg-light); color: var(--text-main); font-size: 1rem; outline: none; transition: var(--transition);
+        }
+        body.dark-mode-active .form-input { border-color: rgba(255,255,255,0.05); }
+        .form-input:focus { border-color: var(--primary-orange); }
+
+        .modal-footer {
+            padding: 24px 32px;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+        }
+
+        /* --- EMPTY STATE --- */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 100px 24px;
+        }
+
+        .empty-state i { font-size: 4rem; color: var(--primary-orange); opacity: 0.2; margin-bottom: 24px; }
+        .empty-state h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-muted); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .header-section { flex-direction: column; text-align: center; gap: 20px; }
+            .notes-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<%- include('./partials/theme-guard') %>
+<body class="<%= (typeof user !== 'undefined' && user && user.theme === 'dark') ? 'dark-mode-active' : '' %>">
+
+    <%- include('./partials/navbar', { currentPage: 'notes' }) %>
+
+    <div class="container">
+        <div class="header-section">
+            <div class="page-title">
+                <i class="fas fa-receipt"></i>
+                <%= __('title_notes') %>
+            </div>
+            <button class="btn-add" id="openModalBtn">
+                <i class="fas fa-plus"></i>
+                <span><%= __('notes_add') %></span>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="search-area">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="<%= __('notes_search') %>">
+        </div>
+
+        <!-- Notes Grid -->
+        <div id="notesGrid" class="notes-grid">
+            <!-- Loading -->
+            <div class="empty-state" id="loadingState">
+                <i class="fas fa-circle-notch fa-spin" style="opacity: 1"></i>
+                <p>Membuka buku...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"><%= __('notes_add') %></h2>
+                <i class="fas fa-times" style="cursor: pointer" onclick="closeModal()"></i>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="noteId">
+                <div class="form-group">
+                    <label><%= __('profile_username') || 'Judul' %></label>
+                    <input type="text" id="noteTitleInput" class="form-input" placeholder="...">
+                </div>
+                <div class="form-group">
+                    <label><%= __('notes_content') || 'Isi Catatan' %></label>
+                    <textarea id="noteContentInput" class="form-input" style="min-height: 200px" placeholder="..."></textarea>
+                </div>
+                <div class="form-group" id="statusGroup" style="display: none">
+                    <label>Status</label>
+                    <select id="noteStatusInput" class="form-input">
+                        <option value="Belum Selesai">Belum Selesai</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-add" style="background: transparent; color: var(--text-muted); box-shadow: none" onclick="closeModal()">Batal</button>
+                <button class="btn-add" id="saveNoteBtn" onclick="saveNote()">Simpan Catatan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allNotes = [];
+        const grid = document.getElementById('notesGrid');
+        const modal = document.getElementById('noteModal');
+        const searchInput = document.getElementById('searchInput');
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', loadNotes);
+
+        async function loadNotes() {
+            try {
+                const res = await fetch('/api/notes');
+                const data = await res.json();
+                if (data.success) {
+                    allNotes = data.notes;
+                    renderNotes(allNotes);
+                }
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div class="empty-state"><h3>Gagal Memuat</h3><p>Cek koneksi internetmu.</p></div>';
+            }
+        }
+
+        function renderNotes(notes) {
+            grid.innerHTML = '';
+            if (notes.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><i class="fas fa-sticky-note"></i><h3>${window.i18n.belum_ada_catatan}</h3><p>${window.i18n.notes_empty || "Start writing something!"}</p></div>`;
+                return;
+            }
+
+            notes.forEach(note => {
+                const div = document.createElement('div');
+                div.className = 'note-card';
+                div.innerHTML = `
+                    <div class="card-header">
+                        <span class="note-date">${(() => {
+                            const d = new Date(note.created_at);
+                            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                        })()}</span>
+                        <h3 class="note-title" onclick="editNote(${note.id})">${note.title}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="note-content">${note.content}</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="status-badge ${note.status === 'Selesai' ? 'selesai' : (note.status === 'Pending' ? 'pending' : 'belum')}">
+                            ${note.status === 'Selesai' ? '<i class="fas fa-check-circle"></i>' : (note.status === 'Pending' ? '<i class="fas fa-hourglass-half"></i>' : '<i class="fas fa-circle"></i>')}
+                            ${note.status}
+                        </span>
+                        <div class="actions">
+                            <button class="action-btn btn-status" title="Ubah Status" onclick="showStatusOptions(${note.id})"><i class="fas fa-list-check"></i></button>
+                            <button class="action-btn btn-edit" onclick="editNote(${note.id})"><i class="fas fa-pen"></i></button>
+                            <button class="action-btn btn-delete" onclick="deleteNote(${note.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Search
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = allNotes.filter(n => n.title.toLowerCase().includes(val) || n.content.toLowerCase().includes(val));
+            renderNotes(filtered);
+        });
+
+        // Modal Logic
+        document.getElementById('openModalBtn').onclick = () => {
+            document.getElementById('modalTitle').innerText = window.i18n.tambah_catatan;
+            document.getElementById('noteId').value = '';
+            document.getElementById('noteTitleInput').value = '';
+            document.getElementById('noteContentInput').value = '';
+            document.getElementById('statusGroup').style.display = 'none';
+            modal.classList.add('active');
+        };
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Save
+        async function saveNote() {
+            const id = document.getElementById('noteId').value;
+            const title = document.getElementById('noteTitleInput').value;
+            const content = document.getElementById('noteContentInput').value;
+            const status = document.getElementById('noteStatusInput').value;
+
+            if (!title) return Swal.fire(window.i18n.gagal, window.i18n.judul_wajib, 'error');
+
+            const url = id ? `/api/notes/${id}` : '/api/notes';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content, status })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    Swal.fire(window.i18n.berhasil, data.message, 'success');
+                    closeModal();
+                    loadNotes();
+                }
+            } catch (err) {
+                Swal.fire('Gagal', 'Sesuatu yang salah terjadi', 'error');
+            }
+        }
+
+        // Edit
+        function editNote(id) {
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            document.getElementById('modalTitle').innerText = 'Edit Catatan';
+            document.getElementById('noteId').value = note.id;
+            document.getElementById('noteTitleInput').value = note.title;
+            document.getElementById('noteContentInput').value = note.content;
+            document.getElementById('noteStatusInput').value = note.status;
+            document.getElementById('statusGroup').style.display = 'block';
+            modal.classList.add('active');
+        }
+
+        // Status Selection Dialog (Premium UI)
+        async function showStatusOptions(id) {
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            const { value: status } = await Swal.fire({
+                title: 'Ubah Status Catatan',
+                html: `
+                    <div class="status-options-container">
+                        <div class="status-opt opt-belum ${note.status === 'Belum Selesai' ? 'active' : ''}" data-value="Belum Selesai">
+                            <div class="opt-icon"><i class="fas fa-circle"></i></div>
+                            <div class="opt-info">
+                                <span class="opt-title">Belum Selesai</span>
+                                <span class="opt-desc">Kebutuhan belanja masih menunggu.</span>
+                            </div>
+                            <div class="opt-check"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                        <div class="status-opt opt-pending ${note.status === 'Pending' ? 'active' : ''}" data-value="Pending">
+                            <div class="opt-icon"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="opt-info">
+                                <span class="opt-title">Pending</span>
+                                <span class="opt-desc">Sedang dalam proses atau ditunda.</span>
+                            </div>
+                            <div class="opt-check"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                        <div class="status-opt opt-selesai ${note.status === 'Selesai' ? 'active' : ''}" data-value="Selesai">
+                            <div class="opt-icon"><i class="fas fa-check-circle"></i></div>
+                            <div class="opt-info">
+                                <span class="opt-title">Selesai</span>
+                                <span class="opt-desc">Belanja sudah terpenuhi dengan baik.</span>
+                            </div>
+                            <div class="opt-check"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                showConfirmButton: false,
+                cancelButtonText: 'Tutup',
+                background: document.body.classList.contains('dark-mode-active') ? '#0F172A' : '#FFFFFF',
+                color: document.body.classList.contains('dark-mode-active') ? '#F8FAFC' : '#1E293B',
+                didOpen: () => {
+                    const opts = Swal.getHtmlContainer().querySelectorAll('.status-opt');
+                    opts.forEach(opt => {
+                        opt.addEventListener('click', () => {
+                            Swal.clickConfirm();
+                            updateStatus(id, opt.getAttribute('data-value'));
+                        });
+                    });
+                }
+            });
+        }
+
+        async function updateStatus(id, status) {
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            try {
+                const res = await fetch(`/api/notes/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        title: note.title, 
+                        content: note.content, 
+                        status: status 
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    loadNotes();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: `Status: ${status}`,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error', 'Gagal update status', 'error');
+            }
+        }
+
+        // Delete
+        async function deleteNote(id) {
+            const result = await Swal.fire({
+                title: 'Hapus Catatan?',
+                text: "Tindakan ini tidak bisa dibatalkan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Ya, Hapus!'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/notes/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if (data.success) {
+                        Swal.fire('Terhapus!', 'Catatanmu telah hilang.', 'success');
+                        loadNotes();
+                    }
+                } catch (err) {
+                    Swal.fire('Error', 'Gagal menghapus', 'error');
+                }
+            }
+        }
+    </script>
+
+    <%- include('./partials/footer') %>
+</body>
+</html>

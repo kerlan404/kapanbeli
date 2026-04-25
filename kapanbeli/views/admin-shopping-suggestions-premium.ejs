@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saran Pembelian - Kapan Beli Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Premium Dark Theme */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #1a1a1a;
+            --bg-hover: #262626;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+            
+            --accent-orange: #f97316;
+            --accent-orange-light: #fb923c;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            
+            --border-color: #262626;
+            --border-light: #404040;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+            --shadow-glow-orange: 0 0 20px rgba(249, 115, 22, 0.3);
+            --shadow-glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+            --shadow-glow-amber: 0 0 20px rgba(245, 158, 11, 0.3);
+            
+            --sidebar-width: 280px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-light));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: var(--shadow-glow-orange);
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .menu-label {
+            padding: 0 24px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--accent-orange);
+            border-left-color: var(--accent-orange);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .sidebar-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .logout-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Status Chips */
+        .status-chips {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-chip.all {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .status-chip.all:hover,
+        .status-chip.all.active {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .status-chip.expired {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            box-shadow: var(--shadow-glow-red);
+        }
+
+        .status-chip.expired:hover,
+        .status-chip.expired.active {
+            background: rgba(239, 68, 68, 0.25);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .status-chip.out-of-stock {
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            box-shadow: var(--shadow-glow-orange);
+        }
+
+        .status-chip.out-of-stock:hover,
+        .status-chip.out-of-stock.active {
+            background: rgba(249, 115, 22, 0.25);
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
+        }
+
+        .status-chip.low-stock {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            box-shadow: var(--shadow-glow-amber);
+        }
+
+        .status-chip.low-stock:hover,
+        .status-chip.low-stock.active {
+            background: rgba(245, 158, 11, 0.25);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+        }
+
+        .status-chip i {
+            font-size: 1rem;
+        }
+
+        /* Products List */
+        .products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .product-owner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .product-owner i {
+            color: var(--accent-orange);
+        }
+
+        .product-stock {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .product-stock i {
+            color: var(--accent-amber);
+        }
+
+        .stock-value {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .product-priority {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .priority-badge {
+            padding: 6px 16px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .priority-badge.high {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .priority-badge.medium {
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .priority-badge.low {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-buy {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-light));
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-glow-orange);
+            flex-shrink: 0;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-buy i {
+            font-size: 1.1rem;
+        }
+
+        /* Filters Toolbar */
+        .filters-toolbar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            padding: 14px 20px 14px 48px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .filter-select {
+            padding: 14px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+        }
+
+        .filter-select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .btn-reset {
+            padding: 14px 24px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+            transform: translateY(-2px);
+        }
+
+        .btn-refresh {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-light));
+            border: none;
+            border-radius: var(--radius-full);
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-glow-orange);
+        }
+
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .product-meta {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .product-priority {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-buy {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filters-toolbar {
+                flex-direction: column;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <span class="logo-text">Kapan Beli Admin</span>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-label">MENU UTAMA</div>
+            
+            <a href="/admin" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/admin/users" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Manajemen Pengguna</span>
+            </a>
+
+            <a href="/admin/products" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Semua Produk</span>
+            </a>
+
+            <a href="/admin/shopping-suggestions" class="nav-item active">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Saran Pembelian</span>
+            </a>
+
+            <div class="menu-label">KONTEN</div>
+
+            <a href="/admin/notes" class="nav-item">
+                <i class="fas fa-sticky-note"></i>
+                <span>Catatan User</span>
+            </a>
+
+            <a href="/admin/activity-logs" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Log Aktivitas</span>
+            </a>
+
+            <div class="menu-label">ANALITIK & SISTEM</div>
+
+            <a href="/admin/analytics" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analitik</span>
+            </a>
+
+            <a href="/admin/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Pengaturan</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-avatar">A</div>
+            <div class="user-info">
+                <div class="user-name">Administrator</div>
+                <div class="user-email">admin@kapanbeli.com</div>
+            </div>
+            <a href="/auth/logout" class="logout-btn" title="Keluar">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Saran Pembelian</h1>
+            <p class="page-subtitle">Produk yang perlu dibeli berdasarkan stok dan kadaluarsa</p>
+        </div>
+
+        <!-- Status Chips -->
+        <div class="status-chips">
+            <button class="status-chip all active">
+                <i class="fas fa-th-large"></i>
+                <span>Semua</span>
+            </button>
+            <button class="status-chip expired">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Kadaluarsa</span>
+            </button>
+            <button class="status-chip out-of-stock">
+                <i class="fas fa-times-circle"></i>
+                <span>Habis Stok</span>
+            </button>
+            <button class="status-chip low-stock">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Stok Rendah</span>
+            </button>
+        </div>
+
+        <!-- Filters Toolbar -->
+        <div class="filters-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Cari produk...">
+            </div>
+            <select class="filter-select">
+                <option value="">Semua Kategori</option>
+                <option value="bumbu">Bumbu Dapur</option>
+                <option value="sayur">Sayuran</option>
+                <option value="protein">Protein</option>
+                <option value="buah">Buah-buahan</option>
+            </select>
+            <button class="btn-reset">
+                <i class="fas fa-redo"></i>
+                <span>Reset</span>
+            </button>
+            <button class="btn-refresh">
+                <i class="fas fa-sync-alt"></i>
+                <span>Refresh</span>
+            </button>
+        </div>
+
+        <!-- Products List -->
+        <div class="products-list">
+            <!-- Product Card 1 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=200&h=200&fit=crop" alt="Bawang Merah" class="product-image">
+                <div class="product-details">
+                    <h3 class="product-name">Bawang Merah</h3>
+                    <div class="product-meta">
+                        <div class="product-owner">
+                            <i class="fas fa-user"></i>
+                            <span>jaop</span>
+                        </div>
+                        <div class="product-stock">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span class="stock-value">0.33 gram</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-priority">
+                    <span class="priority-badge high">Urgent</span>
+                    <button class="btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Beli</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1615485925763-867862f80a3a?w=200&h=200&fit=crop" alt="Susu UHT" class="product-image">
+                <div class="product-details">
+                    <h3 class="product-name">Susu UHT</h3>
+                    <div class="product-meta">
+                        <div class="product-owner">
+                            <i class="fas fa-user"></i>
+                            <span>jhon ffoie</span>
+                        </div>
+                        <div class="product-stock">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span class="stock-value">0.5 liter</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-priority">
+                    <span class="priority-badge high">Urgent</span>
+                    <button class="btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Beli</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 3 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1563514227147-6d243466551d?w=200&h=200&fit=crop" alt="Telur Ayam" class="product-image">
+                <div class="product-details">
+                    <h3 class="product-name">Telur Ayam</h3>
+                    <div class="product-meta">
+                        <div class="product-owner">
+                            <i class="fas fa-user"></i>
+                            <span>haloue</span>
+                        </div>
+                        <div class="product-stock">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span class="stock-value">2 pcs</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-priority">
+                    <span class="priority-badge medium">Medium</span>
+                    <button class="btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Beli</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 4 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=200&h=200&fit=crop" alt="Gula Pasir" class="product-image">
+                <div class="product-details">
+                    <h3 class="product-name">Gula Pasir</h3>
+                    <div class="product-meta">
+                        <div class="product-owner">
+                            <i class="fas fa-user"></i>
+                            <span>rezy</span>
+                        </div>
+                        <div class="product-stock">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span class="stock-value">0.75 kg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-priority">
+                    <span class="priority-badge low">Low</span>
+                    <button class="btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Beli</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 5 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=200&h=200&fit=crop" alt="Minyak Goreng" class="product-image">
+                <div class="product-details">
+                    <h3 class="product-name">Minyak Goreng</h3>
+                    <div class="product-meta">
+                        <div class="product-owner">
+                            <i class="fas fa-user"></i>
+                            <span>halo</span>
+                        </div>
+                        <div class="product-stock">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span class="stock-value">0.2 liter</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-priority">
+                    <span class="priority-badge high">Urgent</span>
+                    <button class="btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Beli</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Status chip selection
+        document.querySelectorAll('.status-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.product-card').forEach(card => {
+                const productName = card.querySelector('.product-name').textContent.toLowerCase();
+                if (productName.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Buy button functionality
+        document.querySelectorAll('.btn-buy').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                const productName = productCard.querySelector('.product-name').textContent;
+                
+                // Visual feedback
+                this.innerHTML = '<i class="fas fa-check"></i><span>Dibeli</span>';
+                this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                setTimeout(() => {
+                    productCard.style.opacity = '0.5';
+                    productCard.style.pointerEvents = 'none';
+                }, 500);
+            });
+        });
+
+        // Reset filters
+        document.querySelector('.btn-reset').addEventListener('click', function() {
+            searchInput.value = '';
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.style.display = 'flex';
+            });
+            document.querySelectorAll('.status-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            document.querySelector('.status-chip.all').classList.add('active');
+        });
+
+        // Refresh
+        document.querySelector('.btn-refresh').addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            icon.classList.add('fa-spin');
+            
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

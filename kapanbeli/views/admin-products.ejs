@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Produk - Admin Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        :root {
+            --primary-blue: #2E86DE;
+            --primary-dark: #205A9E;
+            --primary-orange: #FF9F43;
+            --accent-green: #1DD1A1;
+            --accent-red: #FF6B6B;
+            --bg-sidebar: #ffffff;
+            --bg-sidebar-hover: rgba(46, 134, 222, 0.08);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.12);
+            --text-sidebar: #546E7A;
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: #2C3E50;
+            --sidebar-border: #e9ecef;
+            --bg-body: #F4F6F9;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #8395A7;
+            --text-light: #ecf0f1;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
+            --sidebar-width: 240px;
+            --header-height: 64px;
+            --content-padding: 24px;
+        }
+
+        body.dark-mode-active {
+            --bg-sidebar: #1a1d23;
+            --bg-sidebar-hover: rgba(255,255,255,0.05);
+            --bg-sidebar-active: rgba(46, 134, 222, 0.15);
+            --text-sidebar: rgba(255,255,255,0.7);
+            --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: white;
+            --sidebar-border: rgba(255,255,255,0.1);
+            --bg-body: #121418;
+            --bg-card: #1e2128;
+            --text-main: #ecf0f1;
+            --text-muted: #bdc3c7;
+            --border-color: #2c3e50;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-sidebar-heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-orange); }
+
+        .sidebar-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
+
+        .menu-label {
+            padding: 0 24px 10px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-sidebar);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background-color: var(--bg-sidebar-hover); color: var(--text-sidebar-heading); }
+        .nav-item.active {
+            background-color: var(--bg-sidebar-active);
+            color: var(--text-sidebar-active);
+            border-left-color: var(--primary-blue);
+        }
+        .nav-item i { width: 24px; margin-right: 12px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--sidebar-border);
+        }
+
+        .user-mini-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--primary-orange);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; min-width: 0; overflow: hidden; }
+        .user-info h4 { font-size: 0.9rem; color: var(--text-sidebar-heading); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info p { font-size: 0.75rem; color: var(--text-sidebar); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: var(--content-padding);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .top-actions { display: flex; gap: 15px; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .btn-success { background: var(--accent-green); color: white; }
+        .btn-danger { background: var(--accent-red); color: white; }
+        .btn-warning { background: var(--primary-orange); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-info h3 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .stat-info p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Panel Card */
+        .panel-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .panel-title { font-size: 1.25rem; font-weight: 600; }
+
+        /* Filters */
+        .filters-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group { flex: 1; min-width: 150px; }
+        .filter-group.filter-buttons { flex: 0 0 auto; }
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+
+        /* Table */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        tr:hover td { background-color: rgba(0,0,0,0.02); }
+
+        /* Badges */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-success { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
+        .badge-danger { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+        .badge-warning { background: rgba(254, 202, 87, 0.15); color: var(--primary-orange); }
+        .badge-primary { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
+        .badge-secondary { background: rgba(149, 165, 166, 0.15); color: var(--text-muted); }
+        .badge-good { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
+        .badge-low { background: rgba(254, 202, 87, 0.15); color: var(--primary-orange); }
+        .badge-out { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+
+        /* Deactivated Row Styling */
+        .deactivated-row {
+            background: rgba(255, 107, 107, 0.05);
+            border-left: 4px solid var(--accent-red);
+        }
+        .deactivated-row:hover {
+            background: rgba(255, 107, 107, 0.08);
+        }
+        .deactivated-row td {
+            opacity: 0.85;
+        }
+        .deactivated-row td:first-child {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        /* Profile Image */
+        .profile-img-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info { color: var(--text-muted); font-size: 0.9rem; }
+
+        .pagination { display: flex; gap: 5px; list-style: none; }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-main);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        .pagination button.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Premium Modal Design */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(9, 9, 11, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal.active { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal.active .modal-content { transform: translateY(0) scale(1); }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .modal-title { 
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem; 
+            font-weight: 700; 
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .modal-close {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover { background: var(--accent-red); color: white; border-color: var(--accent-red); }
+
+        .modal-body { 
+            padding: 30px; 
+            overflow-y: auto;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.01));
+        }
+
+        .modal-footer {
+            padding: 24px 30px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            background: rgba(0,0,0,0.02);
+        }
+
+        /* Improved Form Styling */
+        .form-group { margin-bottom: 24px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group label i { color: var(--primary-blue); font-size: 0.8rem; }
+        
+        .form-group input, 
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        .form-group input:focus, 
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+            background: var(--bg-card);
+        }
+
+        /* Custom Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .checkbox-group:hover { background: rgba(46, 134, 222, 0.05); }
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast.success { border-left: 4px solid var(--accent-green); }
+        .toast.error { border-left: 4px solid var(--accent-red); }
+        .toast.warning { border-left: 4px solid var(--primary-orange); }
+
+        /* Responsive */
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+        }
+    </style>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <%- include('./partials/admin-sidebar', { currentPage: 'products', user: typeof user !== 'undefined' ? user : null }) %>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h2 class="page-title">Manajemen Produk</h2>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="fas fa-plus"></i> Tambah Produk
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="productStatsGrid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statTotalProducts">0</h3>
+                    <p>Total Produk</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statActiveProducts">0</h3>
+                    <p>Produk Aktif</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statLowStock">0</h3>
+                    <p>Stok Rendah</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statOutOfStock">0</h3>
+                    <p>Habis Stok</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3 class="panel-title">Daftar Produk</h3>
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-search"></i> Cari
+                        </label>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control"
+                            placeholder="Nama produk atau kategori..."
+                            onkeyup="debounceSearch()"
+                        >
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-tags"></i> Kategori
+                        </label>
+                        <select id="categoryFilter" class="form-control" onchange="loadProducts()">
+                            <option value="">Semua Kategori</option>
+                            <option value="Bumbu Dapur">Bumbu Dapur</option>
+                            <option value="Sayuran">Sayuran</option>
+                            <option value="Buah-buahan">Buah-buahan</option>
+                            <option value="Protein">Protein</option>
+                            <option value="Bahan Kering">Bahan Kering</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-filter"></i> Status Stok
+                        </label>
+                        <select id="stockStatusFilter" class="form-control" onchange="loadProducts()">
+                            <option value="">Semua Status</option>
+                            <option value="good">Aman</option>
+                            <option value="low">Rendah</option>
+                            <option value="out">Habis</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-buttons">
+                        <label class="filter-label" style="visibility: hidden;">Action</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" onclick="resetFilters()" style="min-width: 120px;">
+                                <i class="fas fa-redo"></i> Reset Filter
+                            </button>
+                            <button class="btn btn-primary" onclick="refreshData()" style="min-width: 120px;">
+                                <i class="fas fa-sync-alt"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="tableLoading" style="text-align: center; padding: 40px; display: none;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                <p style="margin-top: 15px; color: var(--text-muted);">Memuat data...</p>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Kategori</th>
+                            <th>Stok</th>
+                            <th>Kadaluarsa</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" id="paginationContainer" style="display: none;">
+                <div class="pagination-info">
+                    Menampilkan <span id="showingFrom">0</span> - <span id="showingTo">0</span> dari <span id="totalItems">0</span> data
+                </div>
+                <ul class="pagination" id="paginationButtons">
+                    <!-- Pagination buttons will be inserted here -->
+                </ul>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" style="text-align: center; padding: 60px 20px; display: none;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <p style="color: var(--text-muted);">Belum ada data produk</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Product Edit/Add Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content animate-fade-in">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-box-open" style="color: var(--primary-blue);"></i>
+                    <span>Tambah Produk Baru</span>
+                </h3>
+                <button class="modal-close" onclick="closeModal()" title="Tutup">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="editProductId">
+
+                    <div class="form-group">
+                        <label for="productName"><i class="fas fa-heading"></i> Nama Produk *</label>
+                        <input type="text" id="productName" required minlength="3" placeholder="Contoh: Bawang Merah Super">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="productCategory"><i class="fas fa-tags"></i> Kategori</label>
+                            <select id="productCategory">
+                                <option value="Bumbu Dapur">Bumbu Dapur</option>
+                                <option value="Sayuran">Sayuran</option>
+                                <option value="Buah-buahan">Buah-buahan</option>
+                                <option value="Protein">Protein</option>
+                                <option value="Bahan Kering">Bahan Kering</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productUnit"><i class="fas fa-balance-scale"></i> Satuan</label>
+                            <select id="productUnit">
+                                <option value="kg">Kilogram (kg)</option>
+                                <option value="gram">Gram (gr)</option>
+                                <option value="pcs">Buah/Pcs</option>
+                                <option value="liter">Liter</option>
+                                <option value="bungkus">Bungkus</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="productStock"><i class="fas fa-cubes"></i> Stok Saat Ini *</label>
+                            <input type="number" id="productStock" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="productMinStock"><i class="fas fa-exclamation-circle"></i> Stok Minimal *</label>
+                            <input type="number" id="productMinStock" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productExpiryDate"><i class="fas fa-calendar-times"></i> Tanggal Kadaluarsa (dd/mm/yyyy)</label>
+                        <div style="position: relative;">
+                            <input type="text" id="productExpiryDate" placeholder="Pilih tanggal..." style="cursor: pointer; background: var(--bg-card);">
+                            <i class="fas fa-calendar" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-group">
+                            <input type="checkbox" id="productIsActive" checked>
+                            <span style="font-weight: 500;">Aktifkan Produk (Dapat dilihat oleh pengguna)</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+                <button class="btn btn-primary" onclick="handleFormSubmit()" id="btnSubmit">
+                    <i class="fas fa-save"></i> Simpan Produk
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Konfirmasi Hapus</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus produk ini?</p>
+                <p style="color: var(--accent-red); margin-top: 10px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Tindakan ini tidak dapat dibatalkan.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deactivate Product Modal -->
+    <div class="modal" id="deactivateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nonaktifkan Produk</h3>
+                <button class="modal-close" onclick="closeDeactivateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Anda akan menonaktifkan produk:</p>
+                <p style="font-weight: 600; font-size: 1.1rem; margin: 10px 0; color: var(--primary-blue);">
+                    <i class="fas fa-box"></i> <span id="deactivateProductName"></span>
+                </p>
+                <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid var(--accent-red); padding: 12px; border-radius: 6px; margin: 15px 0;">
+                    <p style="color: var(--accent-red); font-weight: 500; margin: 0;">
+                        <i class="fas fa-exclamation-triangle"></i> Perhatian:
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 5px 0 0 0;">
+                        Produk yang dinonaktifkan tidak dapat diedit atau dihapus oleh user sampai diaktifkan kembali.
+                    </p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 8px;">
+                        <i class="fas fa-comment"></i> Alasan Nonaktifkan:
+                    </label>
+                    <textarea id="deactivateReason" rows="4" 
+                        placeholder="Jelaskan alasan menonaktifkan produk ini..."
+                        style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.95rem; resize: vertical; background: var(--bg-card); color: var(--text-main);"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDeactivateModal()">Batal</button>
+                <button class="btn btn-danger" onclick="confirmDeactivate()">
+                    <i class="fas fa-ban"></i> Nonaktifkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // ============================================
+        // GLOBAL VARIABLES
+        // ============================================
+        let currentPage = 1;
+        let currentLimit = 20;
+        let deleteProductTargetId = null;
+        let deactivateProductTargetId = null;
+        let searchTimer = null;
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadProducts();
+            loadProductStatistics();
+
+            // Initialize Flatpickr for premium date picking
+            flatpickr("#productExpiryDate", {
+                dateFormat: "d/m/Y",
+                allowInput: true,
+                minDate: "today",
+                theme: "material_blue",
+                altInput: true,
+                altFormat: "d/m/Y",
+                "locale": {
+                    "firstDayOfWeek": 1
+                },
+                // Ensure manual input is parsed correctly
+                onReady: function(selectedDates, dateStr, instance) {
+                    if (instance.altInput) {
+                        instance.altInput.addEventListener('blur', function() {
+                            const val = instance.altInput.value;
+                            if (val) instance.setDate(val, true, "d/m/Y");
+                        });
+                    }
+                }
+            });
+        });
+
+        // ============================================
+        // THEME
+        // ============================================
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' ||
+               (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode-active');
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-active');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode-active') ? 'dark' : 'light');
+            
+            // Update button icon
+            const btn = document.querySelector('.top-actions .btn-outline');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.className = document.body.classList.contains('dark-mode-active') 
+                        ? 'fas fa-sun' 
+                        : 'fas fa-moon';
+                }
+            }
+        }
+
+        // ============================================
+        // SIDEBAR
+        // ============================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // ============================================
+        // RESET FILTERS
+        // ============================================
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('stockStatusFilter').value = '';
+            currentPage = 1;
+            loadProducts();
+            showToast('Filter berhasil direset', 'success');
+        }
+
+        // ============================================
+        // REFRESH DATA
+        // ============================================
+        function refreshData() {
+            currentPage = 1;
+            loadProducts();
+            loadProductStatistics();
+            showToast('Data berhasil disegarkan', 'success');
+        }
+
+        // ============================================
+        // LOAD PRODUCTS
+        // ============================================
+        async function loadProducts() {
+            const search = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const stockStatus = document.getElementById('stockStatusFilter').value;
+
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: currentLimit,
+                ...(search && { search }),
+                ...(category && { category }),
+                ...(stockStatus && { stockStatus })
+            });
+
+            console.log('Loading products with params:', Object.fromEntries(params));
+            showTableLoading(true);
+
+            try {
+                const response = await fetch(`/api/admin/products?${params}`, {
+                    credentials: 'same-origin'
+                });
+
+                if (response.status === 401) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Authentication required');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    renderProductsTable(result.data);
+                    renderPagination(result.pagination);
+                    updatePaginationInfo(result.pagination);
+                } else {
+                    showToast('Gagal memuat data: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showToast('Terjadi kesalahan saat memuat data: ' + error.message, 'error');
+            } finally {
+                showTableLoading(false);
+            }
+        }
+
+        // ============================================
+        // RENDER PRODUCTS TABLE
+        // ============================================
+        function renderProductsTable(products) {
+            const tbody = document.getElementById('productsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const paginationContainer = document.getElementById('paginationContainer');
+
+            if (!products || products.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                paginationContainer.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            paginationContainer.style.display = 'flex';
+
+            tbody.innerHTML = products.map(product => {
+                const profileImg = product.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=2E86DE&color=fff`;
+                const stockBadge = getStockBadge(product.stock_status);
+                const activeBadge = product.is_active
+                    ? '<span class="badge badge-success">Aktif</span>'
+                    : '<span class="badge badge-secondary">Non-Aktif</span>';
+                
+                // Deactivated badge
+                const isDeactivated = product.is_deactivated_by_admin === 1 || product.is_deactivated_by_admin === true;
+                const deactivatedBadge = isDeactivated
+                    ? '<span class="badge badge-danger" title="Dinonaktifkan oleh admin"><i class="fas fa-ban"></i> Deactivated</span>'
+                    : '';
+                
+                const expiry = product.expiry_date 
+                    ? formatDateToDMY(product.expiry_date)
+                    : '<span style="color: var(--text-muted); font-size: 0.8rem;">-</span>';
+                const stockDisplay = formatStock(product.stock_quantity);
+                const minStockDisplay = formatStock(product.min_stock_level);
+
+                return `
+                    <tr class="${isDeactivated ? 'deactivated-row' : ''}">
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${profileImg}" alt="${product.name}" class="profile-img-sm">
+                                <div>
+                                    <div style="font-weight: 600;">${product.name}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${product.unit || 'pcs'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${product.category_name || product.category ? `<span class="badge badge-primary">${product.category_name || product.category}</span>` : '<span class="text-muted">Lainnya</span>'}</td>
+                        <td>
+                            <div style="font-weight: 500;">${stockDisplay} ${product.unit || ''}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Min: ${minStockDisplay}</div>
+                        </td>
+                        <td>${expiry}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                ${activeBadge}
+                                ${stockBadge}
+                                ${deactivatedBadge}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <button class="btn btn-sm btn-primary" onclick="openEditModal(${product.id})" title="Edit" ${isDeactivated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                ${isDeactivated ? `
+                                <button class="btn btn-sm btn-success" onclick="reactivateProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')" title="Aktifkan Kembali">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                                ` : `
+                                <button class="btn btn-sm btn-danger" onclick="openDeactivateModal(${product.id}, '${product.name.replace(/'/g, "\\'")}')" title="Nonaktifkan">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                `}
+                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteProduct(${product.id})" title="Hapus" ${isDeactivated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStockBadge(status) {
+            const badges = {
+                'good': '<span class="badge badge-good">Aman</span>',
+                'low': '<span class="badge badge-low">Rendah</span>',
+                'out': '<span class="badge badge-out">Habis</span>'
+            };
+            return badges[status] || badges['good'];
+        }
+
+        function formatStock(quantity) {
+            if (quantity === null || quantity === undefined) return '-';
+            const num = parseFloat(quantity);
+            if (Number.isInteger(num)) return num.toString();
+            return parseFloat(num.toFixed(1)).toString();
+        }
+
+        // ============================================
+        // PAGINATION
+        // ============================================
+        function renderPagination(pagination) {
+            const { page, totalPages, hasNext, hasPrev } = pagination;
+            const container = document.getElementById('paginationButtons');
+
+            let buttons = '';
+
+            // Previous
+            buttons += `<button ${!hasPrev ? 'disabled' : ''} onclick="goToPage(${page - 1})">
+                <i class="fas fa-chevron-left"></i>
+            </button>`;
+
+            // Page numbers
+            const maxVisible = 5;
+            let startPage = Math.max(1, page - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                buttons += `<button class="${i === page ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+
+            // Next
+            buttons += `<button ${!hasNext ? 'disabled' : ''} onclick="goToPage(${page + 1})">
+                <i class="fas fa-chevron-right"></i>
+            </button>`;
+
+            container.innerHTML = buttons;
+        }
+
+        function updatePaginationInfo(pagination) {
+            const { page, limit, total } = pagination;
+            const from = (page - 1) * limit + 1;
+            const to = Math.min(page * limit, total);
+
+            document.getElementById('showingFrom').textContent = total > 0 ? from : 0;
+            document.getElementById('showingTo').textContent = to;
+            document.getElementById('totalItems').textContent = total;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadProducts();
+        }
+
+        // ============================================
+        // SEARCH
+        // ============================================
+        function debounceSearch() {
+            if (searchTimer) clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentPage = 1;
+                loadProducts();
+            }, 500);
+        }
+
+        // ============================================
+        // STATISTICS
+        // ============================================
+        async function loadProductStatistics() {
+            try {
+                const response = await fetch('/api/admin/products/statistics', {
+                    credentials: 'same-origin'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const stats = result.data;
+                    document.getElementById('statTotalProducts').textContent = stats.total_products || 0;
+                    document.getElementById('statActiveProducts').textContent = stats.active_products || 0;
+                    document.getElementById('statLowStock').textContent = stats.low_stock || 0;
+                    document.getElementById('statOutOfStock').textContent = stats.out_of_stock || 0;
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Helper to format date to DD/MM/YYYY
+        function formatDateToDMY(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return '-';
+            
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        // Helper to parse DD/MM/YYYY or DD-MM-YYYY to YYYY-MM-DD
+        function parseDMYToYMD(dmyString) {
+            if (!dmyString) return null;
+            
+            // Handle both / and - as separators
+            const parts = dmyString.includes('/') ? dmyString.split('/') : dmyString.split('-');
+            
+            if (parts.length !== 3) return null;
+            
+            let [d, m, y] = parts;
+            
+            // Basic validation and normalization
+            d = d.padStart(2, '0');
+            m = m.padStart(2, '0');
+            if (y.length === 2) y = '20' + y; // Assume 20xx for 2-digit years
+            
+            return `${y}-${m}-${d}`;
+        }
+
+        // TABLE LOADING
+        function showTableLoading(show) {
+            document.getElementById('tableLoading').style.display = show ? 'block' : 'none';
+        }
+
+        let modalMode = 'edit';
+
+        function openAddModal() {
+            modalMode = 'add';
+            document.getElementById('modalTitle').textContent = 'Tambah Produk Baru';
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productForm').reset();
+            
+            // Set defaults
+            document.getElementById('productCategory').value = 'Lainnya';
+            document.getElementById('productUnit').value = 'pcs';
+            document.getElementById('productIsActive').checked = true;
+            
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function openEditModal(productId) {
+            modalMode = 'edit';
+            document.getElementById('modalTitle').textContent = 'Edit Produk';
+            // Fetch product data and populate modal
+            fetch(`/api/admin/products/${productId}`, {
+                credentials: 'same-origin'
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    const product = result.data;
+                    console.log('Product data for edit:', product);
+                    
+                    document.getElementById('editProductId').value = product.id;
+                    document.getElementById('productName').value = product.name;
+                    
+                    // Set category - use product's category or default to 'Lainnya' only if not in list
+                    const validCategories = ['Bumbu Dapur', 'Sayuran', 'Buah-buahan', 'Protein', 'Bahan Kering', 'Lainnya'];
+                    const productCategory = product.category_name || product.category;
+                    console.log('Product category:', productCategory, '| category_name:', product.category_name, '| category:', product.category);
+                    
+                    document.getElementById('productCategory').value = validCategories.includes(productCategory) ? productCategory : 'Lainnya';
+                    
+                    // Format stock values to remove unnecessary decimals (1 instead of 1.0)
+                    const stockQty = parseFloat(product.stock_quantity);
+                    const minStock = parseFloat(product.min_stock_level);
+                    
+                    document.getElementById('productStock').value = Number.isInteger(stockQty) ? stockQty : parseFloat(stockQty.toFixed(1));
+                    document.getElementById('productMinStock').value = Number.isInteger(minStock) ? minStock : parseFloat(minStock.toFixed(1));
+                    
+                    document.getElementById('productUnit').value = product.unit || 'pcs';
+                    
+                    // Format for Flatpickr (DD/MM/YYYY)
+                    const dateInput = document.getElementById('productExpiryDate');
+                    if (product.expiry_date) {
+                        const dmy = formatDateToDMY(product.expiry_date);
+                        dateInput._flatpickr.setDate(dmy, true, "d/m/Y");
+                    } else {
+                        dateInput._flatpickr.clear();
+                    }
+                    
+                    document.getElementById('productIsActive').checked = product.is_active;
+
+                    document.getElementById('productModal').classList.add('active');
+                } else {
+                    showToast('Gagal memuat data produk', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading product:', error);
+                showToast('Terjadi kesalahan', 'error');
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        function handleFormSubmit() {
+            const productId = document.getElementById('editProductId').value;
+            const data = {
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                stock_quantity: parseFloat(document.getElementById('productStock').value),
+                min_stock_level: parseFloat(document.getElementById('productMinStock').value),
+                unit: document.getElementById('productUnit').value,
+                expiry_date: parseDMYToYMD(document.getElementById('productExpiryDate').value),
+                is_active: document.getElementById('productIsActive').checked
+            };
+
+            const url = modalMode === 'add' ? '/api/admin/products' : `/api/admin/products/${productId}`;
+            const method = modalMode === 'add' ? 'POST' : 'PUT';
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showToast(modalMode === 'add' ? 'Produk berhasil ditambahkan' : 'Produk berhasil diupdate', 'success');
+                    closeModal();
+                    loadProducts();
+                    loadProductStatistics();
+                } else {
+                    showToast('Gagal: ' + result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error(`Error ${modalMode} product:`, error);
+                showToast('Terjadi kesalahan', 'error');
+            });
+        }
+
+        function confirmDeleteProduct(productId) {
+            deleteProductTargetId = productId;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteProductTargetId = null;
+        }
+
+        function confirmDelete() {
+            if (!deleteProductTargetId) return;
+
+            fetch(`/api/admin/products/${deleteProductTargetId}`, {
+                method: 'DELETE',
+                credentials: 'same-origin'
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showToast('Produk berhasil dihapus', 'success');
+                    closeDeleteModal();
+                    loadProducts();
+                    loadProductStatistics();
+                } else {
+                    showToast('Gagal: ' + result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+                showToast('Terjadi kesalahan', 'error');
+            });
+        }
+
+        function toggleProductStatus(productId) {
+            fetch(`/api/admin/products/${productId}/toggle-status`, {
+                method: 'PATCH',
+                credentials: 'same-origin'
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    loadProducts();
+                } else {
+                    showToast('Gagal: ' + result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling status:', error);
+                showToast('Terjadi kesalahan', 'error');
+            });
+        }
+
+        // ============================================
+        // DEACTIVATE PRODUCT FUNCTIONS
+        // ============================================
+        function openDeactivateModal(productId, productName) {
+            deactivateProductTargetId = productId;
+            document.getElementById('deactivateProductName').textContent = productName;
+            document.getElementById('deactivateReason').value = '';
+            document.getElementById('deactivateModal').classList.add('active');
+        }
+
+        function closeDeactivateModal() {
+            document.getElementById('deactivateModal').classList.remove('active');
+            deactivateProductTargetId = null;
+        }
+
+        function confirmDeactivate() {
+            if (!deactivateProductTargetId) return;
+
+            const reason = document.getElementById('deactivateReason').value.trim();
+            
+            if (!reason) {
+                showToast('Harap isi alasan nonaktifkan produk', 'error');
+                return;
+            }
+
+            // Show loading state
+            const confirmBtn = event.target.closest('button');
+            const originalHTML = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            confirmBtn.disabled = true;
+
+            fetch(`/api/admin/products/${deactivateProductTargetId}/deactivate`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showToast('Produk berhasil dinonaktifkan', 'success');
+                    closeDeactivateModal();
+                    loadProducts();
+                    loadProductStatistics();
+                } else {
+                    showToast('Gagal: ' + result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deactivating product:', error);
+                showToast('Terjadi kesalahan saat menonaktifkan produk', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                confirmBtn.innerHTML = originalHTML;
+                confirmBtn.disabled = false;
+            });
+        }
+
+        // ============================================
+        // REACTIVATE PRODUCT FUNCTION
+        // ============================================
+        function reactivateProduct(productId, productName) {
+            Swal.fire({
+                title: 'Aktifkan Kembali Produk?',
+                html: `
+                    <p>Anda akan mengaktifkan kembali produk:</p>
+                    <p style="font-weight: 600; font-size: 1.1rem; margin: 10px 0; color: #2E86DE;">
+                        <i class="fas fa-box"></i> ${productName}
+                    </p>
+                    <p style="color: #636E72; font-size: 0.9rem;">
+                        User akan dapat mengedit dan menghapus produk ini kembali.
+                    </p>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1DD1A1',
+                cancelButtonColor: '#636E72',
+                confirmButtonText: '<i class="fas fa-check"></i> Ya, Aktifkan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Memproses...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch(`/api/admin/products/${productId}/reactivate`, {
+                        method: 'PATCH',
+                        credentials: 'same-origin'
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Produk berhasil diaktifkan kembali',
+                                confirmButtonColor: '#1DD1A1'
+                            });
+                            loadProducts();
+                            loadProductStatistics();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: result.message || 'Gagal mengaktifkan produk',
+                                confirmButtonColor: '#FF6B6B'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error reactivating product:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat mengaktifkan produk',
+                            confirmButtonColor: '#FF6B6B'
+                        });
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' :
+                        type === 'error' ? 'fa-exclamation-circle' :
+                        'fa-info-circle';
+            
+            toast.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

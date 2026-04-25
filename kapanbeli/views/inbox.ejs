@@ -1,0 +1,718 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= __('nav_inbox') %> - Kapan Beli</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-orange: #FF9D42;
+            --primary-orange-dark: #FF8008;
+            --bg-light: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --accent-red: #EF4444;
+            --accent-green: #10B981;
+            --accent-yellow: #F59E0B;
+            --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+            --card-shadow-hover: 0 10px 30px rgba(15, 23, 42, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode-active {
+            --bg-light: #020617;
+            --bg-card: #0F172A;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: #1E293B;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.3s, border-color 0.3s; }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        /* --- HEADER --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-title .icon-box {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 16px rgba(255, 157, 66, 0.2);
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* --- FILTERS --- */
+        .inbox-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            background: var(--bg-card);
+            padding: 5px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-tab.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-action {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 11px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            transform: translateY(-2px);
+        }
+
+        /* --- MESSAGE LIST --- */
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: 56px 1fr auto;
+            align-items: center;
+            gap: 18px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .message-card:hover {
+            transform: translateY(-4px) scale(1.005);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--primary-blue);
+        }
+
+        .message-card.unread {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.05), var(--bg-card));
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .avatar-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--primary-blue);
+            border: 1px solid var(--border-color);
+        }
+
+        .message-card.unread .avatar-box {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-blue);
+        }
+
+        .msg-content {
+            overflow: hidden;
+        }
+
+        .msg-sender {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sender-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-main);
+        }
+
+        .msg-badge {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-system { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+
+        .msg-preview {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 500px;
+        }
+
+        .message-card.unread .msg-preview {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .msg-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .msg-time {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .msg-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .message-card:hover .msg-actions {
+            opacity: 1;
+        }
+
+        .action-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-circle:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .action-circle.delete:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* --- EMPTY STATE --- */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 2px dashed var(--border-color);
+        }
+
+        .empty-state .icon-circle {
+            width: 90px;
+            height: 90px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin: 0 auto 24px;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-muted); }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: modalSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 { font-size: 1.25rem; font-weight: 800; font-family: 'Outfit', sans-serif; }
+        
+        .modal-close {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--bg-light); border: none; cursor: pointer;
+            color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover { background: var(--accent-red); color: white; transform: rotate(90deg); }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-msg-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .modal-msg-header .info-meta { flex: 1; }
+        .modal-msg-header .info-meta h4 { font-weight: 700; margin-bottom: 2px; }
+        .modal-msg-header .info-meta span { font-size: 0.8rem; color: var(--text-muted); }
+
+        .modal-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-main);
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .message-card { grid-template-columns: 48px 1fr; }
+            .msg-meta { grid-column: 1 / span 2; flex-direction: row; justify-content: space-between; width: 100%; }
+            .msg-preview { max-width: 250px; }
+            .btn-action span { display: none; }
+        }
+    </style>
+</head>
+<%- include('./partials/theme-guard') %>
+<body class="<%= (typeof user !== 'undefined' && user && user.theme === 'dark') ? 'dark-mode-active' : '' %>">
+    
+    <%- include('./partials/navbar', { currentPage: 'inbox' }) %>
+
+    <div class="container animate-on-scroll">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-title">
+                <div class="icon-box">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <div>
+                    <h1><%= __('nav_inbox') %></h1>
+                    <p style="color:var(--text-muted); font-size: 0.9rem; font-weight: 500;"><%= __('inbox_subtitle') || 'Monitor latest information from system' %></p>
+                </div>
+            </div>
+            <button class="btn-action" onclick="markAllRead()" id="btnMarkAll">
+                <i class="fas fa-check-double"></i>
+                <span><%= __('mark_all_read') || 'Mark All Read' %></span>
+            </button>
+        </div>
+
+        <!-- Controls -->
+        <div class="inbox-controls">
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterMsg('all', this)"><%= __('all') || 'All' %></button>
+                <button class="filter-tab" onclick="filterMsg('unread', this)"><%= __('pesan_baru') || 'New' %></button>
+            </div>
+            <div id="statusBadge" style="display: none;">
+                <span class="msg-badge badge-system" style="padding: 6px 14px; border-radius: 100px;">
+                    <i class="fas fa-circle" style="font-size: 0.4rem; margin-right: 6px; vertical-align: middle;"></i>
+                    <span id="unreadCountText">0</span> ${window.i18n.pesan_baru || 'Pesan Baru'}
+                </span>
+            </div>
+        </div>
+
+        <!-- List -->
+        <div id="messagesContainer" class="messages-list">
+            <div style="text-align: center; padding: 100px;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--primary-blue); opacity: 0.5;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="msgModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><%= __('detail') %></h2>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-msg-header">
+                    <div class="avatar-box">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="info-meta">
+                        <h4 id="modalTitle">Judul Pesan</h4>
+                        <span id="modalDate">8 Apr 2026, 14:20</span>
+                    </div>
+                    <div id="modalTypeBadge"></div>
+                </div>
+                <div class="modal-text" id="modalMsg">Isi pesan akan tampil di sini...</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action" style="background: var(--primary-blue); color: white; border: none;" onclick="closeModal()"><%= __('close') || 'Close' %></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messages = [], currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => { loadMessages(); });
+
+        async function loadMessages() {
+            const container = document.getElementById('messagesContainer');
+            try {
+                const res = await fetch('/api/announcements', { credentials: 'same-origin' });
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
+                const data = await res.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Gagal memuat data dari server');
+                }
+                
+                messages = data.data || [];
+                
+                // Update Unread Counter UI
+                const statusBadge = document.getElementById('statusBadge');
+                const unreadCountText = document.getElementById('unreadCountText');
+                if (data.unreadCount > 0) {
+                    statusBadge.style.display = 'block';
+                    unreadCountText.textContent = data.unreadCount;
+                    
+                    // Logic: Auto-mark as read when viewing the inbox
+                    // This satisfies "sudah di baca otomatis sudah terbaca dan ga perlu refresh"
+                    setTimeout(() => {
+                        markAllRead(true); // Call with 'silent' flag to avoid extra reloads/toasts
+                    }, 2000);
+                } else {
+                    statusBadge.style.display = 'none';
+                }
+
+                renderMessages();
+            } catch (e) {
+                console.error('Gagal memuat pesan:', e);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon-circle" style="color: var(--accent-red); background: rgba(239, 68, 68, 0.1);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>${window.i18n.oops_gagal}</h3>
+                        <p>${e.message || (currentLang === 'id' ? 'Coba lagi nanti atau hubungi admin.' : 'Try again later or contact admin.')}</p>
+                        <button class="btn-action" style="margin-top: 20px;" onclick="loadMessages()">
+                            <i class="fas fa-sync"></i> ${window.i18n.coba_lagi}
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            const filtered = currentFilter === 'unread' ? messages.filter(m => !m.is_read) : messages;
+            
+            if (!filtered.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon-circle">
+                            <i class="${currentFilter === 'unread' ? 'fas fa-check-circle' : 'fas fa-inbox'}"></i>
+                        </div>
+                        <h3>${currentFilter === 'unread' ? (window.i18n.sudah_terbaca || 'Sudah Terbaca Semua') : (window.i18n.inbox_kosong || 'Kotak Surat Kosong')}</h3>
+                        <p>${currentFilter === 'unread' ? (window.i18n.semua_terbaca_desc || 'Semua pesan telah Anda baca. Kerja bagus!') : (window.i18n.inbox_kosong_desc || 'Belum ada pesan resmi dari sistem untuk Anda saat ini.')}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(m => {
+                const typeInfo = getMessageTypeInfo(m.type);
+                return `
+                    <div class="message-card ${m.is_read ? '' : 'unread'}" onclick="openMessage(${m.id})">
+                        <div class="avatar-box">
+                            <i class="${typeInfo.icon}"></i>
+                        </div>
+                        <div class="msg-content">
+                            <div class="msg-sender">
+                                <span class="sender-name">${esc(m.title)}</span>
+                                <span class="msg-badge ${typeInfo.className}">${m.type_label || window.i18n.pesan}</span>
+                            </div>
+                            <div class="msg-preview">${esc(m.message)}</div>
+                        </div>
+                        <div class="msg-meta">
+                            <span class="msg-time">${formatDate(m.created_at)}</span>
+                            <div class="msg-actions">
+                                ${!m.is_read ? `
+                                    <div class="action-circle" onclick="event.stopPropagation();markRead(${m.id})" title="${window.i18n.tandai_dibaca}">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                ` : ''}
+                                <div class="action-circle delete" onclick="event.stopPropagation();deleteMsg(${m.id})" title="${window.i18n.hapus}">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getMessageTypeInfo(type) {
+            switch(type) {
+                case 'warning': return { icon: 'fas fa-exclamation-circle', className: 'badge-warning' };
+                case 'error': return { icon: 'fas fa-times-circle', className: 'badge-danger' };
+                default: return { icon: 'fas fa-robot', className: 'badge-system' };
+            }
+        }
+
+        async function openMessage(id) {
+            const msg = messages.find(m => m.id === id);
+            if (!msg) return;
+            
+            // Mark as read
+            if (!msg.is_read) {
+                await fetch(`/api/announcements/${id}/read`, { method: 'PUT', credentials: 'same-origin' });
+                msg.is_read = 1;
+                loadMessages(); // Reload for counters
+            }
+
+            const typeInfo = getMessageTypeInfo(msg.type);
+            document.getElementById('modalTitle').textContent = msg.title;
+            document.getElementById('modalTypeBadge').innerHTML = `<span class="msg-badge ${typeInfo.className}">${msg.type_label || 'Pesan'}</span>`;
+            document.getElementById('modalMsg').textContent = msg.message;
+            document.getElementById('modalDate').textContent = formatDate(msg.created_at, true);
+            document.getElementById('msgModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('msgModal').style.display = 'none'; }
+
+        async function markRead(id) {
+            await fetch(`/api/announcements/${id}/read`, { method: 'PUT', credentials: 'same-origin' });
+            loadMessages();
+            if (window.refreshNotifications) window.refreshNotifications();
+        }
+
+        async function markAllRead(silent = false) {
+            const btn = document.getElementById('btnMarkAll');
+            if (!silent) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span>Tunggu...</span>';
+            }
+            
+            try {
+                await fetch('/api/announcements/read-all', { method: 'PUT', credentials: 'same-origin' });
+                
+                if (silent) {
+                    // Just update badge silently
+                    const statusBadge = document.getElementById('statusBadge');
+                    if (statusBadge) statusBadge.style.display = 'none';
+                    if (window.refreshNotifications) window.refreshNotifications();
+                    return;
+                }
+
+                await loadMessages();
+                if (window.refreshNotifications) window.refreshNotifications();
+            } catch (err) {
+                console.error('Mark all read error:', err);
+            } finally {
+                if (!silent) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-double"></i> <span>Tandai Semua Dibaca</span>';
+                }
+            }
+        }
+
+        async function deleteMsg(id) {
+            const result = await Swal.fire({
+                title: 'Hapus pesan?',
+                text: 'Pesan ini akan dihapus dari kotak surat Anda selamanya.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                background: document.body.classList.contains('dark-mode-active') ? '#0F172A' : '#FFFFFF',
+                color: document.body.classList.contains('dark-mode-active') ? '#F8FAFC' : '#1E293B'
+            });
+            
+            if (result.isConfirmed) {
+                await fetch(`/api/announcements/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+                loadMessages();
+                if (window.refreshNotifications) window.refreshNotifications();
+            }
+        }
+
+        function filterMsg(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderMessages();
+        }
+
+        function formatDate(d, isFull = false) {
+            const date = new Date(d);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 60000);
+            
+            if (!isFull) {
+                if (diff < 1) return 'Baru saja';
+                if (diff < 60) return `${diff}m lalu`;
+                if (diff < 1440) return `${Math.floor(diff / 60)}j lalu`;
+            }
+            
+            // Fix: Use toLocaleString for combined date and time
+            if (isFull) {
+                return date.toLocaleString('id-ID', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            return date.toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric'
+            });
+        }
+
+        function esc(t) { 
+            if (!t) return ''; 
+            const d = document.createElement('div'); 
+            d.textContent = t; 
+            return d.innerHTML; 
+        }
+    </script>
+</body>
+</html>

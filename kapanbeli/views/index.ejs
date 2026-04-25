@@ -1,0 +1,793 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kapan Beli - <%= __('site_tagline') %></title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- PREMIUM DESIGN SYSTEM --- */
+        :root {
+            --primary: #3B82F6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #FF9F43;
+            --accent-glow: rgba(255, 159, 67, 0.4);
+            --bg-light: #F8FAFC;
+            --bg-dark: #020617;
+            --card-glass: rgba(255, 255, 255, 0.7);
+            --card-glass-dark: rgba(15, 23, 42, 0.75);
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-glass: rgba(255, 255, 255, 0.3);
+            --border-glass-dark: rgba(255, 255, 255, 0.1);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.12);
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode-active {
+            --bg-light: var(--bg-dark);
+            --card-glass: var(--card-glass-dark);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-glass: var(--border-glass-dark);
+            --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        /* --- GLOBAL & BACKGROUND --- */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* Mesh Gradient Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: var(--bg-light);
+            overflow: hidden;
+        }
+
+        .mesh-bg::before, .mesh-bg::after {
+            content: '';
+            position: absolute;
+            width: 800px; height: 800px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: -1;
+            animation: meshMove 20s infinite alternate;
+        }
+
+        .mesh-bg::before {
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            top: -20%; left: -10%;
+        }
+
+        .mesh-bg::after {
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            bottom: -20%; right: -10%;
+            animation-delay: -10s;
+        }
+
+        @keyframes meshMove {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            padding: 20px 0;
+            background: rgba(var(--bg-light), 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 120px 0 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            flex: 1.2;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 10px 24px;
+            border-radius: 100px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            letter-spacing: -2.5px;
+            color: var(--text-main);
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            max-width: 580px;
+            line-height: 1.7;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 36px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary, #2563EB));
+            color: white;
+            box-shadow: 0 15px 30px -10px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px -10px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-light);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        /* --- HERO VISUAL --- */
+        .hero-visual {
+            flex: 0.8;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .visual-blob {
+            width: 450px; height: 450px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            display: flex;
+            align-items: center; justify-content: center;
+            animation: blobFloat 8s infinite ease-in-out;
+            position: relative;
+            box-shadow: 0 30px 60px -20px var(--accent-glow);
+        }
+
+        .visual-blob i {
+            font-size: 10rem;
+            color: white;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        }
+
+        @keyframes blobFloat {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translateY(0) rotate(0); }
+            50% { border-radius: 50% 50% 30% 70% / 50% 50% 70% 30%; transform: translateY(-30px) rotate(5deg); }
+        }
+
+        /* --- BENTO STATS GRID --- */
+        .bento-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 24px;
+            margin: 40px 0 100px;
+        }
+
+        .bento-item {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-item:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .bento-item.large { grid-column: span 2; grid-row: span 2; }
+
+        .bento-icon {
+            width: 60px; height: 60px;
+            background: var(--bg-light);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .bento-item:hover .bento-icon {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .bento-item h3 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -2px;
+        }
+
+        .bento-item p {
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* --- SECTION HEADERS --- */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 48px;
+            padding: 0 10px;
+        }
+
+        .header-title h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 8px;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* --- PRODUCT CARDS --- */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .card-img {
+            height: 220px;
+            background: #E2E8F0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .glass-card:hover .card-img img {
+            transform: scale(1.1);
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-glass);
+        }
+
+        .card-body {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        .card-body h4 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .stock-progress {
+            height: 8px;
+            background: rgba(var(--primary-glow), 0.1);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-bar.low { background: linear-gradient(90deg, #F87171, #EF4444); }
+
+        /* --- NOTES SECTION --- */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+        }
+
+        .note-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            transition: var(--transition);
+            border-left: 8px solid var(--primary);
+        }
+
+        .note-card:hover {
+            transform: translateX(10px);
+            box-shadow: var(--shadow-lg);
+            background: var(--bg-light);
+        }
+
+        .note-status {
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .status-done { background: rgba(34, 197, 94, 0.1); color: #22C55E; }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .status-urgent { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+        /* --- ACTIVITY SECTION --- */
+        .activity-container {
+            background: var(--bg-dark);
+            color: white;
+            border-radius: 40px;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .activity-container::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            z-index: 0;
+        }
+
+        .activity-content { position: relative; z-index: 1; }
+
+        .activity-row {
+            display: flex; align-items: center; gap: 30px;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .activity-row:hover {
+            transform: translateX(20px);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .row-icon {
+            width: 50px; height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        /* --- FOOTER FEATURES --- */
+        .footer-features {
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        .feature-grid-3 {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+            margin-top: 80px;
+        }
+
+        .feat-card {
+            background: var(--card-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 40px;
+            padding: 60px 40px;
+            transition: var(--transition);
+        }
+
+        .feat-card:hover {
+            transform: translateY(-20px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feat-card i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 40px;
+            display: block;
+            filter: drop-shadow(0 15px 15px var(--primary-glow));
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .hero { flex-direction: column; text-align: center; gap: 60px; }
+            .hero p { margin: 0 auto 48px; }
+            .hero-btns { justify-content: center; }
+            .bento-stats { grid-template-columns: repeat(2, 1fr); }
+            .notes-grid { grid-template-columns: 1fr; }
+            .visual-blob { width: 350px; height: 350px; }
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 3.2rem; }
+            .bento-stats { grid-template-columns: 1fr; }
+            .bento-item.large { grid-column: span 1; grid-row: span 1; }
+            .feature-grid-3 { grid-template-columns: 1fr; }
+            .header-title h2 { font-size: 2.2rem; }
+            .activity-container { padding: 40px 24px; }
+        }
+    </style>
+</head>
+<%- include('./partials/theme-guard') %>
+<body class="<%= (typeof user !== 'undefined' && user && user.theme === 'dark') ? 'dark-mode-active' : '' %>">
+
+    <%- include('./partials/navbar') %>
+
+    <!-- MESH BACKGROUND -->
+    <div class="mesh-bg"></div>
+
+    <div class="container">
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-sparkles"></i>
+                    <span><%= __('hero_badge') || 'Smart Kitchen Ecosystem' %></span>
+                </div>
+                <h1><%= __('hero_title_1') || 'Architecture of Your' %> <br><span><%= __('hero_title_2') || 'Perfect Kitchen.' %></span></h1>
+                <p><%= __('home_hero_subtitle') %></p>
+                <div class="hero-btns">
+                    <a href="/products" class="btn btn-primary">
+                        <%= __('nav_products') %> <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="/notes" class="btn btn-outline">
+                        <%= __('nav_notes') %>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="visual-blob">
+                    <i class="fas fa-kitchen-set"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- BENTO STATS -->
+        <div class="bento-stats">
+            <div class="bento-item large">
+                <div class="bento-icon"><i class="fas fa-box-open"></i></div>
+                <h3><%= stats.totalBahan %></h3>
+                <p><%= __('footer_stock_mgmt') %></p>
+                <div style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">
+                    <%= __('footer_desc') %>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-icon" style="color: #EF4444;"><i class="fas fa-bolt"></i></div>
+                <h3 style="font-size: 2.5rem;"><%= stats.stokMenipis %></h3>
+                <p><%= __('index_low_stock') %></p>
+            </div>
+            <div class="bento-item">
+                <div class="bento-icon" style="color: var(--accent);"><i class="fas fa-clock"></i></div>
+                <h3 style="font-size: 2.5rem;"><%= stats.kadaluarsa %></h3>
+                <p><%= __('index_expired') %></p>
+            </div>
+            <div class="bento-item" style="grid-column: span 2;">
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    <div class="bento-icon" style="margin-bottom: 0;"><i class="fas fa-file-invoice"></i></div>
+                    <div>
+                        <h3 style="font-size: 2.5rem; margin-bottom: 0;"><%= stats.totalNotes %></h3>
+                        <p><%= __('index_active_notes') %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUCTS SECTION -->
+        <section style="margin-bottom: 100px;">
+            <div class="section-header">
+                <div class="header-title">
+                    <h2><%= __('index_live_inv') %></h2>
+                    <p><%= __('index_live_inv_desc') %></p>
+                </div>
+                <a href="/products" class="btn btn-outline" style="padding: 10px 24px; font-size: 0.9rem;"><%= __('index_view_all_assets') %></a>
+            </div>
+            
+            <div class="products-grid">
+                <% if (recentProducts && recentProducts.length > 0) { %>
+                    <% recentProducts.forEach(prod => { %>
+                        <% const isDeactivated = prod.is_deactivated_by_admin === 1 || prod.is_deactivated_by_admin === true; %>
+                        <div class="glass-card">
+                            <div class="card-img">
+                                <% if(prod.image_url) { %>
+                                    <img src="<%= prod.image_url %>" alt="<%= prod.name %>">
+                                <% } else { %>
+                                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #CBD5E1;">
+                                        <i class="fas fa-image" style="font-size: 3rem; color: #94A3B8;"></i>
+                                    </div>
+                                <% } %>
+                                <% if(prod.category_name) { %>
+                                    <span class="category-badge"><%= prod.category_name %></span>
+                                <% } %>
+                                <% if(isDeactivated) { %>
+                                    <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px;">
+                                        <div style="background: #EF4444; padding: 4px 12px; border-radius: 100px; font-weight: 800; font-size: 0.7rem; margin-bottom: 10px;"><%= __('status_deactivated') %></div>
+                                        <p style="font-size: 0.75rem; opacity: 0.8;"><%= __('deactivated_by_admin') %></p>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="card-body">
+                                <h4><%= prod.name %></h4>
+                                <div class="card-stats">
+                                    <span><%= prod.stock_quantity %> <%= prod.unit %></span>
+                                    <span style="<%= isDeactivated ? 'color: #EF4444;' : 'color: var(--primary);' %>">
+                                        <%= isDeactivated ? __('restricted') : __('available') %>
+                                    </span>
+                                </div>
+                                <div class="stock-progress">
+                                    <div class="progress-bar <%= prod.stock_quantity <= 5 ? 'low' : '' %>" style="width: <%= Math.min(100, (prod.stock_quantity / 20) * 100) %>%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="glass-card" style="grid-column: 1/-1; padding: 60px; text-align: center;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 20px; display: block;"></i>
+                        <p style="font-weight: 700; color: var(--text-muted);"><%= __('index_empty_inv') %></p>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+
+        <section style="margin-bottom: 100px;">
+            <div class="section-header">
+                <div class="header-title">
+                    <h2><%= __('index_intel') %></h2>
+                    <p><%= __('index_intel_desc') %></p>
+                </div>
+                <a href="/notes" class="btn btn-primary" style="padding: 10px 24px; font-size: 0.9rem;"><%= __('index_commander') %></a>
+            </div>
+
+            <div class="notes-grid">
+                <% if (recentNotes && recentNotes.length > 0) { %>
+                    <% recentNotes.forEach(note => { %>
+                        <div class="note-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                                <div class="note-status <%= note.status === 'Selesai' ? 'status-done' : (note.status === 'Pending' ? 'status-pending' : 'status-urgent') %>">
+                                    <%= note.status %>
+                                </div>
+                                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);"><%= new Date(note.created_at).toLocaleDateString() %></span>
+                            </div>
+                            <h4 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 15px;"><%= note.title %></h4>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><%= note.content %></p>
+                            <a href="/notes" style="color: var(--primary); font-weight: 800; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;">
+                                <%= __('index_open_spec') %> <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="note-card" style="grid-column: 1/-1; text-align: center; border-left: none;">
+                        <p style="font-weight: 700; color: var(--text-muted);"><%= __('index_empty_notes') %></p>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+
+        <section style="margin-bottom: 120px;">
+            <div class="activity-container">
+                <div class="activity-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                        <div>
+                            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;"><%= __('index_log') %></h2>
+                            <p style="opacity: 0.5; font-weight: 600;"><%= __('index_log_desc') %></p>
+                        </div>
+                        <i class="fas fa-shield-halved" style="font-size: 3rem; color: var(--primary); opacity: 0.2;"></i>
+                    </div>
+
+                    <div class="activity-stream">
+                        <% if (activities && activities.length > 0) { %>
+                            <% activities.forEach(act => { %>
+                                <div class="activity-row">
+                                    <div class="row-icon">
+                                        <% if(act.activity_type === 'CREATE') { %>
+                                            <i class="fas fa-plus-circle"></i>
+                                        <% } else if(act.activity_type === 'UPDATE') { %>
+                                            <i class="fas fa-sync"></i>
+                                        <% } else if(act.activity_type === 'DELETE') { %>
+                                            <i class="fas fa-minus-circle"></i>
+                                        <% } else { %>
+                                            <i class="fas fa-info-circle"></i>
+                                        <% } %>
+                                    </div>
+                                    <div style="flex-grow: 1;">
+                                        <h5 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;"><%= act.description %></h5>
+                                        <p style="font-size: 0.85rem; opacity: 0.5;"><%= new Date(act.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) %></p>
+                                    </div>
+                                    <div style="font-size: 0.7rem; font-weight: 800; color: var(--primary); background: rgba(59, 130, 246, 0.1); padding: 4px 10px; border-radius: 6px;">
+                                        <%= act.activity_type %>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div style="text-align: center; padding: 60px; opacity: 0.3;">
+                                <i class="fas fa-terminal" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                                <p>Tidak ada log operasional terekam.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FEATURES EXPLANATION -->
+    <section class="footer-features">
+        <div class="container">
+            <div class="hero-badge">
+                <i class="fas fa-microchip"></i>
+                <span>Kapabilitas Inti</span>
+            </div>
+            <h2 style="font-size: 3.5rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 20px;">Dirancang untuk Keunggulan</h2>
+            <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto; font-size: 1.2rem;">Platform kami mengintegrasikan logika inventaris canggih dengan pengalaman pengguna intuitif untuk mengeliminasi inefisiensi dapur.</p>
+
+            <div class="feature-grid-3">
+                <div class="feat-card">
+                    <i class="fas fa-satellite-dish"></i>
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Telemetri Real-time</h3>
+                    <p style="color: var(--text-muted); line-height: 1.8;">Sinkronisasi instan status inventaris di seluruh perangkat terautentikasi Anda.</p>
+                </div>
+                <div class="feat-card">
+                    <i class="fas fa-brain"></i>
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Daftar Prediktif</h3>
+                    <p style="color: var(--text-muted); line-height: 1.8;">Saran pengadaan otomatis berdasarkan pola konsumsi historis.</p>
+                </div>
+                <div class="feat-card">
+                    <i class="fas fa-earth-asia"></i>
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Prioritas Keberlanjutan</h3>
+                    <p style="color: var(--text-muted); line-height: 1.8;">Pemantauan kedaluwarsa canggih yang dirancang untuk mengurangi limbah dapur.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <%- include('./partials/footer') %>
+</body>
+</html>

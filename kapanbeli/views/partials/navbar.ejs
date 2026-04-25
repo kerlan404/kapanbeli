@@ -1,0 +1,423 @@
+<!-- NAVBAR -->
+<%- include('./theme-guard') %>
+
+<style>
+    /* 1. Base Navbar Style */
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #FFFFFF !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 70px;
+    }
+
+    /* 2. Dark Mode Overrides */
+    body.dark-mode-active .navbar {
+        background: #0F172A !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .navbar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #3B82F6;
+        opacity: 0.6;
+    }
+
+    .navbar.scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 3. Container & Layout */
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+    }
+
+    /* 4. Brand (Kapan Beli) */
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 900 !important;
+        font-size: 1.8rem !important;
+        color: #000000 !important;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode-active .nav-brand {
+        color: #FFFFFF !important;
+    }
+
+    .nav-brand i {
+        color: #FF9D42 !important; /* Primary Orange */
+        font-size: 2.2rem !important;
+        filter: drop-shadow(0 2px 4px rgba(255, 157, 66, 0.3));
+    }
+
+    /* 5. Navigation Menu */
+    .nav-menu {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.04);
+        padding: 6px;
+        border-radius: 16px;
+    }
+
+    body.dark-mode-active .nav-menu {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: #1E293B !important; /* text-main */
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        padding: 10px 18px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    
+    body.dark-mode-active .nav-link {
+        color: #F8FAFC !important;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        color: #FF9D42 !important;
+        background: rgba(255, 157, 66, 0.1);
+    }
+
+    .nav-link.active {
+        font-weight: 800 !important;
+    }
+
+    /* 6. Actions (Inbox, Profile, Toggle) */
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .inbox-link {
+        color: #64748B;
+        padding: 8px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .inbox-link:hover {
+        color: #3B82F6;
+        background: rgba(59, 130, 246, 0.08);
+    }
+
+    .btn-text {
+        color: #1E293B !important;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 10px 16px;
+        border-radius: 10px;
+    }
+    
+    body.dark-mode-active .btn-text { color: #F8FAFC !important; }
+
+    .btn-primary {
+        background: #FF9D42;
+        color: #FFFFFF !important;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 0.95rem;
+        padding: 10px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(255, 157, 66, 0.2);
+    }
+
+    .nav-profile-photo {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        border: 2px solid #FF9D42;
+    }
+
+    .dark-mode-toggle {
+        background: rgba(59, 130, 246, 0.1);
+        border: none;
+        color: #3B82F6;
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+        transition: all 0.3s;
+    }
+
+    body.dark-mode-active .dark-mode-toggle {
+        color: #FF9D42;
+        background: rgba(255, 157, 66, 0.15);
+    }
+
+    .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0 !important;
+    }
+
+    .logout-link {
+        color: #EF4444 !important;
+    }
+
+    .logout-link:hover {
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #EF4444 !important;
+    }
+
+    .pulse-animation {
+        animation: badgePulse 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes badgePulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    /* 7. Mobile Responsive */
+    @media (max-width: 992px) {
+        .nav-menu { display: none; }
+        .nav-brand span { display: none; }
+    }
+</style>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-brand">
+            <i class="fas fa-book-open"></i>
+            <span>Kapan Beli</span>
+        </a>
+
+        <div class="nav-menu">
+            <a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>"><%= __('nav_home') %></a>
+            <a href="/notes" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>" onclick="checkAuth(event)"><%= __('nav_notes') %></a>
+            <a href="/products" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>" onclick="checkAuth(event)"><%= __('nav_products') %></a>
+            <a href="/suggestions" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'suggestions' ? 'active' : '' %>" onclick="checkAuth(event)"><%= __('nav_suggestions') %></a>
+            <% if (typeof currentPage === 'undefined' || currentPage !== 'inbox') { %>
+                <a href="/about" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'about' ? 'active' : '' %>"><%= __('nav_about') %></a>
+            <% } %>
+        </div>
+
+        <div class="nav-actions">
+            <a href="/inbox" class="inbox-link" title="<%= __('nav_inbox') || 'Inbox' %>" style="position: relative;">
+                <i class="fas fa-bell"></i>
+                <span id="inboxBadge" style="position: absolute; top: 2px; right: 2px; background: #EF4444; color: white; border-radius: 50%; min-width: 18px; height: 18px; display: none; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;"></span>
+            </a>
+            
+            <div id="authContainer" style="display: flex; align-items: center; gap: 8px;">
+                <div id="unauthButtons" style="display: flex; gap: 10px;">
+                    <a href="/auth" class="btn-text"><%= __('nav_login') %></a>
+                    <a href="/register" class="btn-primary"><%= __('nav_register') %></a>
+                </div>
+                <a href="/user-profile" id="profilePhotoLink" style="display:none;" class="nav-profile-link">
+                    <img id="navProfilePhoto" src="" alt="Profile" class="nav-profile-photo" />
+                </a>
+                <a href="/user-profile" id="profileLink" style="display:none;" class="nav-link icon-btn" title="<%= __('nav_profile') %>">
+                    <i class="fas fa-user-gear"></i>
+                </a>
+                <a href="/auth/logout" id="logoutLink" style="display:none;" class="nav-link icon-btn logout-link" title="<%= __('nav_logout') %>">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+
+            <button class="dark-mode-toggle" id="darkModeToggle" title="Ganti Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Global localization for JS
+    window.i18n = {
+        'habis': '<%= __("habis") || "Habis" %>',
+        'stok_rendah': '<%= __("stok_rendah") || "Stok Rendah" %>',
+        'kadaluarsa': '<%= __("kadaluarsa") || "Kadaluarsa" %>',
+        'hampir_kadaluarsa': '<%= __("hampir_kadaluarsa") || "Hampir Kadaluarsa" %>',
+        'isi_stok': '<%= __("isi_stok") || "Isi Stok" %>',
+        'tandai': '<%= __("tandai") || "Tandai" %>',
+        'detail': '<%= __("detail") || "Detail" %>',
+        'stok': '<%= __("stok") || "Stok" %>',
+        'kadaluarsa_label': '<%= __("kadaluarsa_label") || "Kadaluarsa" %>',
+        'semua_aman': '<%= __("semua_aman") || "Semua Bahan Dalam Kondisi Baik" %>',
+        'tidak_ada_saran': '<%= __("tidak_ada_saran") || "Tidak ada saran pembelian saat ini. Stok dapur Anda aman dan terjaga!" %>',
+        'kotak_surat': '<%= __("nav_inbox") || "Kotak Surat" %>',
+        'pesan_baru': '<%= __("pesan_baru") || "Pesan Baru" %>',
+        'sudah_terbaca': '<%= __("sudah_terbaca") || "Sudah Terbaca Semua" %>',
+        'semua_terbaca_desc': '<%= __("semua_terbaca_desc") || "Semua pesan telah Anda baca. Kerja bagus!" %>',
+        'inbox_kosong': '<%= __("inbox_kosong") || "Kotak Surat Kosong" %>',
+        'inbox_kosong_desc': '<%= __("inbox_kosong_desc") || "Belum ada pesan resmi dari sistem untuk Anda saat ini." %>',
+        'berhasil': '<%= __("success") || "Berhasil" %>',
+        'gagal': '<%= __("error") || "Gagal" %>',
+        'hapus': '<%= __("notes_delete") || "Hapus" %>',
+        'simpan': '<%= __("notes_save") || "Simpan" %>',
+        'edit': '<%= __("notes_edit") || "Edit" %>',
+        'tambah_catatan': '<%= __("notes_add") || "Tambah Catatan" %>',
+        'cari_catatan': '<%= __("notes_search") || "Cari catatan..." %>',
+        'belum_ada_catatan': '<%= __("notes_empty") || "Belum ada catatan" %>',
+        'judul_wajib': '<%= __("judul_wajib") || "Judul harus diisi" %>',
+        'nonaktif': '<%= __("status_deactivated") || "Nonaktif" %>',
+        'alasan': '<%= __("alasan") || "Alasan" %>',
+        'msg_profile_updated': '<%= __("msg_profile_updated") %>',
+        'msg_password_changed': '<%= __("msg_password_changed") %>',
+        'msg_photo_updated': '<%= __("msg_photo_updated") %>',
+        'msg_error_update': '<%= __("msg_error_update") %>',
+        'msg_error_password': '<%= __("msg_error_password") %>',
+        'msg_error_photo': '<%= __("msg_error_photo") %>',
+        'msg_error_username_min': '<%= __("msg_error_username_min") %>',
+        'msg_error_email_invalid': '<%= __("msg_error_email_invalid") %>',
+        'msg_error_password_min': '<%= __("msg_error_password_min") %>',
+        'msg_error_password_match': '<%= __("msg_error_password_match") %>',
+        'sudah_terbaca': '<%= __("sudah_terbaca") %>',
+        'inbox_kosong': '<%= __("inbox_kosong") %>',
+        'semua_terbaca_desc': '<%= __("semua_terbaca_desc") %>',
+        'inbox_kosong_desc': '<%= __("inbox_kosong_desc") %>',
+        'oops_gagal': '<%= __("oops_gagal") %>',
+        'coba_lagi': '<%= __("coba_lagi") %>',
+        'hapus': '<%= __("hapus") %>',
+        'tandai_dibaca': '<%= __("tandai_dibaca") %>',
+        'pesan': '<%= __("pesan") %>',
+        'berhasil': '<%= __("berhasil") %>',
+        'gagal': '<%= __("gagal") %>'
+    };
+
+    // Real-time notification refresh function
+    window.refreshNotifications = async function() {
+        try {
+            const response = await fetch('/api/announcements', { method: 'GET', credentials: 'same-origin' });
+            const data = await response.json();
+            const badge = document.getElementById('inboxBadge');
+            
+            if (badge && data.success) {
+                if (data.unreadCount > 0) {
+                    badge.textContent = data.unreadCount > 9 ? '9+' : data.unreadCount;
+                    badge.style.display = 'flex';
+                    
+                    // Add pulse animation if new
+                    if (badge.textContent !== badge.dataset.lastCount) {
+                        badge.classList.add('pulse-animation');
+                        setTimeout(() => badge.classList.remove('pulse-animation'), 1000);
+                    }
+                    badge.dataset.lastCount = badge.textContent;
+                } else {
+                    badge.style.display = 'none';
+                }
+                
+                // If on inbox page, update the list too
+                if (typeof window.loadMessages === 'function' && window.location.pathname === '/inbox') {
+                    // window.loadMessages(); // Optional: might be too intrusive
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to poll notifications');
+        }
+    };
+
+    async function checkAuthStatus() {
+        try {
+            const response = await fetch('/auth/status', { method: 'GET', credentials: 'same-origin' });
+            const data = await response.json();
+            const unauthButtons = document.getElementById('unauthButtons');
+            const logoutLink = document.getElementById('logoutLink');
+            const profileLink = document.getElementById('profileLink');
+            const profilePhotoLink = document.getElementById('profilePhotoLink');
+            const navProfilePhoto = document.getElementById('navProfilePhoto');
+
+            if (data.authenticated) {
+                unauthButtons.style.display = 'none';
+                logoutLink.style.display = 'flex';
+                if (data.user && data.user.profile_photo) {
+                    let photoPath = data.user.profile_photo;
+                    if (!photoPath.startsWith('http') && !photoPath.startsWith('/')) {
+                        photoPath = '/' + photoPath;
+                    }
+                    navProfilePhoto.src = photoPath;
+                    profilePhotoLink.style.display = 'flex';
+                    profileLink.style.display = 'none';
+                } else {
+                    profileLink.style.display = 'flex';
+                    profilePhotoLink.style.display = 'none';
+                }
+                
+                // Initial load
+                window.refreshNotifications();
+                // Start polling every 30 seconds
+                setInterval(window.refreshNotifications, 30000);
+            }
+        } catch (error) { console.error('Auth check error:', error); }
+    }
+
+    async function loadInboxBadge() {
+        try {
+            const response = await fetch('/api/announcements', { method: 'GET', credentials: 'same-origin' });
+            const data = await response.json();
+            const badge = document.getElementById('inboxBadge');
+            if (badge && data.success && data.unreadCount > 0) {
+                badge.textContent = data.unreadCount > 9 ? '9+' : data.unreadCount;
+                badge.style.display = 'flex';
+            }
+        } catch (e) {}
+    }
+
+    function checkAuth(event) {
+        event.preventDefault();
+        const targetUrl = event.currentTarget.href;
+        fetch('/auth/status').then(r => r.json()).then(d => {
+            window.location.href = d.authenticated ? targetUrl : '/auth?returnUrl=' + encodeURIComponent(targetUrl);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAuthStatus();
+        loadInboxBadge();
+        
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const updateIcon = (isDark) => {
+            if (darkModeToggle) {
+                darkModeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            }
+        };
+        updateIcon(document.body.classList.contains('dark-mode-active'));
+        
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                window.toggleAppTheme();
+                updateIcon(document.body.classList.contains('dark-mode-active'));
+            });
+        }
+    });
+
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('.navbar');
+        if (window.scrollY > 20) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+    });
+</script>

@@ -1,0 +1,988 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<% if (user && user.theme === 'dark') { var bodyClass = 'dark-mode-active'; } else { var bodyClass = ''; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= __('title_products') %> - Kapan Beli</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" type="image/x-icon">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-orange: #FF9D42;
+            --primary-black: #0F172A;
+            --accent-blue: #3B82F6;
+            --bg-light: #F8FAFC;
+            --white: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+            --card-shadow-hover: 0 10px 30px rgba(15, 23, 42, 0.08);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        body.dark-mode-active {
+            --bg-light: #020617;
+            --white: rgba(15, 23, 42, 0.7);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* --- HEADER SECTION --- */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-black);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark-mode-active .page-title { color: #F8FAFC; }
+
+        .add-btn {
+            background-color: var(--primary-black);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+        }
+
+        body.dark-mode-active .add-btn {
+            background-color: var(--primary-orange);
+            color: var(--primary-black);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+        }
+
+        /* --- SEARCH & FILTER --- */
+        .search-area {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border-radius: 12px;
+            border: 2px solid rgba(15, 23, 42, 0.05);
+            background: var(--bg-light);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-input:focus { border-color: var(--primary-orange); }
+
+        .filter-select {
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(15, 23, 42, 0.05);
+            background: var(--bg-light);
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .count-badge {
+            background: rgba(255, 157, 66, 0.1);
+            color: var(--primary-orange);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- PRODUCTS GRID --- */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
+        }
+
+        body.dark-mode-active .product-card {
+            border-color: var(--border-glass);
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--primary-orange);
+        }
+
+        .card-header {
+            position: relative;
+            height: 220px;
+            background: #F1F5F9;
+            overflow: hidden;
+        }
+
+        body.dark-mode-active .card-header { background: #1E293B; }
+
+        .card-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .card-header img { transform: scale(1.1); }
+
+        .card-icon-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: var(--primary-orange);
+            opacity: 0.2;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            color: var(--primary-black);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 10;
+        }
+
+        body.dark-mode-active .category-badge { background: rgba(15, 23, 42, 0.8); color: white; }
+
+        .status-indicator {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.4);
+        }
+
+        .status-indicator.normal { background: var(--success); }
+        .status-indicator.low { background: var(--warning); animation: pulse 2s infinite; }
+        .status-indicator.empty { background: var(--danger); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .card-body {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prod-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .prod-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 3em;
+        }
+
+        .info-pills {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-pill {
+            background: rgba(15, 23, 42, 0.03);
+            padding: 12px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: var(--transition);
+        }
+
+        body.dark-mode-active .info-pill {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .info-pill:hover {
+            background: rgba(255, 157, 66, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .pill-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pill-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .pill-value small {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        /* Status Colors in Pills */
+        .pill-value.danger { color: #EF4444; }
+        .pill-value.warning { color: #F59E0B; }
+        .pill-value.success { color: #10B981; }
+
+        .prod-notes-v2 {
+            background: rgba(255, 157, 66, 0.05);
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: auto;
+            border-left: 3px solid var(--primary-orange);
+        }
+
+        body.dark-mode-active .prod-notes-v2 {
+            background: rgba(255, 157, 66, 0.03);
+            color: #CBD5E1;
+        }
+
+        .card-footer {
+            padding: 20px 24px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-premium {
+            padding: 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-premium-edit {
+            background: var(--primary-black);
+            color: white;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+        }
+
+        body.dark-mode-active .btn-premium-edit {
+            background: var(--primary-orange);
+            color: var(--primary-black);
+        }
+
+        .btn-premium-edit:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+        }
+
+        .btn-premium-delete {
+            background: transparent;
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+
+        .btn-premium-delete:hover {
+            background: #EF4444;
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Action Buttons - Edit & Delete */
+        .action-btn {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-input);
+            color: var(--text-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--primary-blue), #1B5F9E);
+            color: white;
+            box-shadow: 0 4px 12px rgba(46, 134, 222, 0.2);
+        }
+
+        body.dark-mode-active .btn-edit {
+            background: linear-gradient(135deg, #54A0FF, #2E86DE);
+            box-shadow: 0 4px 12px rgba(84, 160, 255, 0.3);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(46, 134, 222, 0.3);
+        }
+
+        body.dark-mode-active .btn-edit:hover {
+            box-shadow: 0 8px 20px rgba(84, 160, 255, 0.4);
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+        }
+
+        body.dark-mode-active .btn-delete {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-delete:hover {
+            background: #EF4444;
+            color: white;
+            border-color: #EF4444;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        body.dark-mode-active .btn-delete:hover {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            pointer-events: none;
+        }
+
+        .btn-disabled:hover {
+            transform: none !important;
+        }
+
+        .btn-disabled::before {
+            display: none;
+        }
+
+        /* --- DEACTIVATED STATE --- */
+        .product-card.deactivated-card { opacity: 0.8; }
+        .deactivated-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .deactivated-badge {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state i { font-size: 5rem; color: var(--primary-orange); margin-bottom: 20px; }
+
+        @media (max-width: 768px) {
+            .header-section { flex-direction: column; align-items: flex-start; }
+            .search-area { grid-template-columns: 1fr; }
+            .add-btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body class="<%= (typeof user !== 'undefined' && user && user.theme === 'dark') ? 'dark-mode-active' : '' %>">
+
+    <%- include('./partials/navbar', { currentPage: 'products' }) %>
+
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">
+                <i class="fas fa-clipboard-list" style="color: var(--primary-orange);"></i>
+                <%= __('title_products') %>
+            </h1>
+            <a href="/products/add" class="add-btn">
+                <i class="fas fa-plus"></i>
+                <%= __('products_add') %>
+            </a>
+        </div>
+
+        <div class="search-area">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="<%= __('products_search') %>">
+            </div>
+            
+            <select id="categoryFilter" class="filter-select">
+                <option value=""><%= __('all_categories') || 'Semua Kategori' %></option>
+                <option value="Bumbu Dapur">Bumbu Dapur</option>
+                <option value="Sayuran">Sayuran</option>
+                <option value="Buah-buahan">Buah-buahan</option>
+                <option value="Protein">Protein</option>
+                <option value="Bahan Kering">Bahan Kering</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+            
+            <div class="count-badge" id="filterBadge" style="display: none;">
+                <i class="fas fa-box"></i>
+                <span id="filterCount">0</span>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <!-- Data rendered via JS -->
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <script>
+        // --- LOGIC SERVER UTAMA (INTAK DIPERTAHANKAN) ---
+
+        // 1. Auth & Dark Mode
+        async function loadUserInfo() {
+            try {
+                const res = await fetch('/auth/status', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (!data.authenticated) {
+                    window.location.href = '/auth';
+                }
+            } catch(e) { 
+                console.error('Auth check failed:', e);
+                window.location.href = '/auth'; 
+            }
+        }
+
+
+        document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+            const data = await response.json();
+            if (response.ok) {
+                window.location.href = data.redirect || '/';
+            }
+        });
+
+        // 2. Notification System
+        function showNotification(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `notification notif-${type}`;
+            div.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> <span>${msg}</span>`;
+            document.getElementById('notificationContainer').appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // 3. Product Logic (Fetch, Render, Delete)
+        async function loadProducts() {
+            try {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                if(data.success) {
+                    allProducts = data.products; // Store for filtering
+                    renderProducts(data.products);
+                } else {
+                    renderProducts([]);
+                }
+            } catch (err) {
+                console.error(err);
+                renderProducts([]);
+            }
+        }
+
+        // Category ID mapping Fallback
+        const categoryNames = {
+            1: 'Bumbu Dapur',
+            2: 'Sayuran',
+            3: 'Buah-buahan',
+            4: 'Protein',
+            5: 'Bahan Kering',
+            6: 'Lainnya'
+        };
+
+        // MODIFIED: renderProducts for modern, premium look with REAL DATA
+        function renderProducts(items) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            const filterBadge = document.getElementById('filterBadge');
+            const filterCount = document.getElementById('filterCount');
+            
+            if (filterBadge && filterCount) {
+                filterCount.textContent = items.length;
+                filterBadge.style.display = items.length > 0 ? 'inline-flex' : 'none';
+            }
+
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Belum ada bahan</h3>
+                        <p>Stok dapur Anda masih kosong atau tidak ditemukan.</p>
+                    </div>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const stockNum = parseFloat(item.stock_quantity);
+                const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
+                
+                const minStockNum = parseFloat(item.min_stock_level);
+                const isLow = stockNum <= minStockNum;
+                
+                const expiryDate = item.expiry_date ? (() => {
+                    const d = new Date(item.expiry_date);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const year = d.getFullYear();
+                    const dateStr = `${day}/${month}/${year}`;
+
+                    if (diffDays < 0) return { text: 'Kadaluarsa', class: 'danger' };
+                    if (diffDays === 0) return { text: 'Hari ini', class: 'danger' };
+                    if (diffDays <= 3) return { text: `${diffDays} hari lagi`, class: 'warning' };
+                    return { text: dateStr, class: 'safe' };
+                })() : { text: 'Tanpa Kadaluarsa', class: 'safe' };
+
+                let iconClass = 'fa-box-open';
+                const name = item.name.toLowerCase();
+                if (name.includes('ayam') || name.includes('daging')) iconClass = 'fa-drumstick-bite';
+                else if (name.includes('susu') || name.includes('minum')) iconClass = 'fa-glass-water';
+                else if (name.includes('telur')) iconClass = 'fa-egg';
+                else if (name.includes('ikan') || name.includes('seafood')) iconClass = 'fa-fish';
+                else if (name.includes('beras') || name.includes('mie')) iconClass = 'fa-bowl-rice';
+                else if (name.includes('bumbu') || name.includes('bawang')) iconClass = 'fa-mortar-pestle';
+                else if (name.includes('sayur') || name.includes('cabai')) iconClass = 'fa-leaf';
+
+                let stockStatusColor = 'normal';
+                if (stockNum <= 0) stockStatusColor = 'empty';
+                else if (isLow) stockStatusColor = 'low';
+
+                const isDeactivated = item.is_deactivated_by_admin === 1 || item.is_deactivated_by_admin === true;
+                
+                // Get real category name from API or fallback
+                const categoryName = item.category_name || categoryNames[parseInt(item.category_id)] || 'Lainnya';
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                if (isDeactivated) card.classList.add('deactivated-card');
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="status-indicator ${stockStatusColor}"></div>
+                        <span class="category-badge">${categoryName}</span>
+                        ${item.image_url 
+                            ? `<img src="${item.image_url}" alt="${item.name}" onerror="this.nextElementSibling.style.display='block'; this.style.display='none';">` 
+                            : ''
+                        }
+                        <i class="fas ${iconClass} card-icon-placeholder" style="${item.image_url ? 'display:none' : ''}"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="prod-name" onclick="${isDeactivated ? '' : `window.location='/products/detail/${item.id}'`}" title="${item.name}">
+                            ${item.name}
+                        </h3>
+                        
+                        <div class="info-pills">
+                            <div class="info-pill">
+                                <span class="pill-label"><i class="fas fa-cubes"></i> Stok</span>
+                                <span class="pill-value ${isLow ? 'warning' : 'success'}">${stockDisplay} <small>${item.unit || 'pcs'}</small></span>
+                            </div>
+                            <div class="info-pill">
+                                <span class="pill-label"><i class="fas fa-calendar-day"></i> Exp</span>
+                                <span class="pill-value ${expiryDate.class}">${expiryDate.text}</span>
+                            </div>
+                        </div>
+
+                        ${item.notes ? `
+                            <div class="prod-notes-v2">
+                                <i class="fas fa-sticky-note" style="margin-top: 3px; color: var(--primary-orange);"></i>
+                                <span>${item.notes}</span>
+                            </div>
+                        ` : ''}
+
+                        ${isDeactivated ? `
+                            <div class="deactivated-overlay">
+                                <div class="deactivated-badge">
+                                    <i class="fas fa-ban"></i> NONAKTIF ADMIN
+                                </div>
+                                <div style="font-size: 0.75rem; font-weight: 600; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px; max-width: 80%;">
+                                    <p>Hubungi Admin untuk mengaktifkan kembali</p>
+                                    ${item.deactivated_reason ? `<p style="color: #FF6B6B; margin-top: 4px;">Alasan: ${item.deactivated_reason}</p>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="action-btn btn-edit ${isDeactivated ? 'btn-disabled' : ''}" 
+                                onclick="${isDeactivated ? `showDeactivatedWarning('${item.name.replace(/'/g, "\\'")}', '${item.deactivated_reason ? item.deactivated_reason.replace(/'/g, "\\'") : 'Tidak ada alasan'}')` : `handleEdit(${item.id})`}" 
+                                ${isDeactivated ? 'disabled' : ''}>
+                            <i class="fas ${isDeactivated ? 'fa-lock' : 'fa-pen-to-square'}"></i> Edit
+                        </button>
+                        <button class="action-btn btn-delete" 
+                                onclick="handleDelete(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash-can"></i> Hapus
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 4. Actions
+        function showDeactivatedWarning(productName, reason) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Produk Dinonaktifkan!',
+                html: `
+                    <p>Produk <strong>"${productName}"</strong> telah dinonaktifkan oleh admin.</p>
+                    ${reason ? `<p style="color: #FF6B6B; margin-top: 10px;"><strong>Alasan:</strong> ${reason}</p>` : ''}
+                    <p style="color: #636E72; margin-top: 10px;">Menunggu konfirmasi admin untuk mengaktifkan kembali.</p>
+                `,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#2E86DE'
+            });
+        }
+
+        async function handleEdit(id) {
+            // First check if product is deactivated
+            try {
+                const res = await fetch(`/api/products/${id}`);
+                const data = await res.json();
+                
+                if (data.success && data.product) {
+                    const product = data.product;
+                    const isDeactivated = product.is_deactivated_by_admin === 1 || product.is_deactivated_by_admin === true;
+                    
+                    if (isDeactivated) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Produk Dinonaktifkan!',
+                            html: `
+                                <p>Produk ini telah <strong>dinonaktifkan oleh admin</strong>.</p>
+                                ${product.deactivated_reason ? `<p style="color: #FF6B6B; margin-top: 10px;"><strong>Alasan:</strong> ${product.deactivated_reason}</p>` : ''}
+                                <p style="color: #636E72; margin-top: 10px;">Menunggu konfirmasi admin untuk mengaktifkan kembali.</p>
+                            `,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#2E86DE'
+                        });
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking product status:', error);
+            }
+            
+            // If not deactivated, proceed to edit
+            window.location.href = `/products/edit/${id}`;
+        }
+
+        async function handleDelete(id, name) {
+            // We allow deletion even if product is deactivated by admin
+            // users should be able to remove unwanted items from their list.
+            const result = await Swal.fire({
+                title: 'Hapus Produk?',
+                text: `Apakah Anda yakin ingin menghapus "${name}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FF6B6B',
+                cancelButtonColor: '#2E86DE',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+                background: document.body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                color: document.body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if(data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Terhapus!',
+                            text: `"${name}" telah dihapus.`,
+                            confirmButtonText: 'OK',
+                            background: document.body.classList.contains('dark-mode-active') ? '#2d3b45' : '#fff',
+                            color: document.body.classList.contains('dark-mode-active') ? '#fff' : '#2C3E50'
+                        });
+                        window.dispatchEvent(new CustomEvent('productAdded'));
+                        loadProducts();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: data.message || 'Terjadi kesalahan.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } catch(e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Gagal terhubung ke server.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        }
+
+        // 5. Search & Filter
+        let allProducts = []; // Store all products for filtering
+        
+        // Category ID mapping
+        const categoryToId = {
+            'Bumbu Dapur': 1,
+            'Sayuran': 2,
+            'Buah-buahan': 3,
+            'Protein': 4,
+            'Bahan Kering': 5,
+            'Lainnya': 6
+        };
+
+        // Category filter
+        document.getElementById('categoryFilter').addEventListener('change', async (e) => {
+            const category = e.target.value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (allProducts.length === 0) {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                if(data.success) allProducts = data.products;
+            }
+
+            let filtered = allProducts;
+
+            // Filter by category (convert category name to ID)
+            if (category) {
+                const categoryId = categoryToId[category];
+                filtered = filtered.filter(p => p.category_id === categoryId);
+            }
+
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            renderProducts(filtered);
+        });
+        
+        // Search input
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            if (allProducts.length === 0) {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                if(data.success) allProducts = data.products;
+            }
+
+            let filtered = allProducts;
+
+            // Filter by category (convert category name to ID)
+            if (category) {
+                const categoryId = categoryToId[category];
+                filtered = filtered.filter(p => p.category_id === categoryId);
+            }
+
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            renderProducts(filtered);
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserInfo();
+            await loadProducts();
+        });
+    </script>
+
+    <!-- Footer -->
+    <%- include('./partials/footer') %>
+</body>
+</html>

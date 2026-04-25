@@ -1,0 +1,689 @@
+<% if (typeof user === 'undefined') { var user = null; } %>
+<% if (user && user.theme === 'dark') { var bodyClass = 'dark-mode-active'; } else { var bodyClass = ''; } %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= __('title_about') %> - Kapan Beli</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Animations CSS -->
+    <link rel="stylesheet" href="/css/animations.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
+
+    <style>
+        /* --- LUXURY ELITE DESIGN SYSTEM --- */
+        :root {
+            --primary: #FF9F43;
+            --primary-dark: #FF8C1A;
+            --secondary: #3B82F6;
+            --accent-red: #FF6B6B;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --bg-glass-dark: rgba(15, 23, 42, 0.75);
+            --border-glass: rgba(255, 255, 255, 0.3);
+            --border-glass-dark: rgba(255, 255, 255, 0.1);
+            
+            /* Light Mode Tokens */
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --nav-bg: rgba(248, 250, 252, 0.85);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.15);
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode-active {
+            --bg-body: #020617;
+            --bg-card: #0F172A;
+            --bg-glass: var(--bg-glass-dark);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --nav-bg: rgba(2, 6, 23, 0.85);
+            --border-glass: var(--border-glass-dark);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        /* --- GLOBAL RESET --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 159, 67, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* --- ANIMATIONS --- */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: var(--transition);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* --- HERO SECTION --- */
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 159, 67, 0.2) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: -1;
+            animation: pulse 8s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+        }
+
+        .badge-premium {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+        }
+
+        .hero-section h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* --- MODERN CARDS --- */
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 159, 67, 0.4);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 32px;
+            box-shadow: 0 10px 20px rgba(255, 159, 67, 0.3);
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        /* --- FEATURE GRID --- */
+        .modern-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            transition: var(--transition);
+        }
+
+        .feature-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.02);
+            border-color: var(--primary);
+        }
+
+        .feature-box i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .feature-box h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-box p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* --- TEAM SECTION --- */
+        .team-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .team-modern-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-modern-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(255, 159, 67, 0.1), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .team-modern-card:hover::before {
+            opacity: 1;
+        }
+
+        .team-modern-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .avatar-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
+            border: 6px solid var(--bg-card);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .team-modern-card:hover .avatar-circle {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 15px 30px rgba(255, 159, 67, 0.4);
+        }
+
+        .team-modern-card.manager .avatar-circle {
+            background: linear-gradient(135deg, #FF6B6B, #FF9F43);
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .role-badge.manager {
+            background: rgba(255, 107, 107, 0.15);
+            color: #FF6B6B;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .role-badge.member {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3B82F6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- STATS SECTION --- */
+        .stats-modern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            margin: 80px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-val {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .hero-section { padding: 60px 20px; }
+            .hero-section h1 { font-size: 3rem; }
+            .glass-card { padding: 40px 24px; }
+            .stats-modern-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .stats-modern-grid { grid-template-columns: 1fr; }
+            .hero-section h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body class="<%= bodyClass %>">
+
+    <%- include('./partials/navbar') %>
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-glow"></div>
+        <div class="badge-premium animate-on-scroll">
+            <i class="fas fa-sparkles"></i>
+            <span><%= __('about_hero_badge') %></span>
+        </div>
+        <h1 class="animate-on-scroll delay-1">
+            <%= __('about_hero_title') %>
+        </h1>
+        <p class="animate-on-scroll delay-2">
+            <%= __('about_hero_desc') %>
+        </p>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+        
+        <!-- ABOUT CARD -->
+        <section class="glass-card animate-on-scroll">
+            <div class="card-icon">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <h2 class="card-title"><%= __('about_what_is') %></h2>
+            <p class="card-text">
+                <%= __('about_what_is_desc1') %>
+            </p>
+            <p class="card-text">
+                <%= __('about_what_is_desc2') %>
+            </p>
+            
+            <div class="modern-features">
+                <div class="feature-box animate-on-scroll delay-1">
+                    <i class="fas fa-boxes"></i>
+                    <h4><%= __('about_feat_inv') %></h4>
+                    <p><%= __('about_feat_inv_desc') %></p>
+                </div>
+                <div class="feature-box animate-on-scroll delay-2">
+                    <i class="fas fa-bell"></i>
+                    <h4><%= __('about_feat_alert') %></h4>
+                    <p><%= __('about_feat_alert_desc') %></p>
+                </div>
+                <div class="feature-box animate-on-scroll delay-3">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h4><%= __('about_feat_list') %></h4>
+                    <p><%= __('about_feat_list_desc') %></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MISSION SECTION -->
+        <section class="glass-card animate-on-scroll">
+            <div class="card-icon" style="background: linear-gradient(135deg, var(--secondary), var(--accent-red));">
+                <i class="fas fa-bullseye"></i>
+            </div>
+            <h2 class="card-title"><%= __('about_vision_mission') %></h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
+                <div class="feature-box">
+                    <h3 style="color: var(--secondary); margin-bottom: 16px;"><%= __('about_vision') %></h3>
+                    <p><%= __('about_vision_desc') %></p>
+                </div>
+                <div class="feature-box">
+                    <h3 style="color: var(--primary); margin-bottom: 16px;"><%= __('about_mission') %></h3>
+                    <ul style="list-style: none; color: var(--text-muted);">
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> <%= __('about_mission_li1') %></li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> <%= __('about_mission_li2') %></li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> <%= __('about_mission_li3') %></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECH STACK -->
+        <section class="glass-card animate-on-scroll">
+            <div class="card-icon" style="background: linear-gradient(135deg, #020617, #1E293B);">
+                <i class="fas fa-code"></i>
+            </div>
+            <h2 class="card-title"><%= __('about_tech') %></h2>
+            <p class="card-text"><%= __('about_tech_desc') %></p>
+            
+            <div class="modern-features" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                <div class="feature-box" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🟢</div>
+                    <div style="font-weight: 700;">Node.js</div>
+                </div>
+                <div class="feature-box" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">💾</div>
+                    <div style="font-weight: 700;">MySQL</div>
+                </div>
+                <div class="feature-box" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">⚡</div>
+                    <div style="font-weight: 700;">Express</div>
+                </div>
+                <div class="feature-box" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🎨</div>
+                    <div style="font-weight: 700;">EJS & CSS3</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TEAM SECTION -->
+    <section class="container" style="max-width: 1200px; margin: 80px auto; padding: 0 24px;">
+        <div class="team-header animate-on-scroll">
+            <h2 class="card-title" style="text-align: center; font-size: 3rem;"><%= __('about_team') %></h2>
+            <p class="card-text" style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <%= __('about_team_subtitle') %>
+            </p>
+        </div>
+
+        <div class="team-grid">
+            <!-- Manager - Bintang -->
+            <div class="team-modern-card manager animate-on-scroll delay-1">
+                <div class="avatar-circle">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="role-badge manager">Lead Architect</div>
+                <h3 class="team-name">Bintang</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><%= __('team_bintang_desc') %></p>
+                <div class="team-social" style="opacity: 1; transform: translateY(0);">
+                    <a href="#" class="team-social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="team-social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Member 1 - Rezy -->
+            <div class="team-modern-card animate-on-scroll delay-2">
+                <div class="avatar-circle">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="role-badge member">Full-Stack Engineer</div>
+                <h3 class="team-name">Rezy</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><%= __('team_rezy_desc') %></p>
+                <div class="team-social" style="opacity: 1; transform: translateY(0);">
+                    <a href="https://github.com/kerlan404" target="_blank" class="team-social-link"><i class="fab fa-github"></i></a>
+                    <a href="https://www.instagram.com/devick404" target="_blank" class="team-social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="mailto:rezyalfaraby1@gmail.com" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Member 2 - Nayo -->
+            <div class="team-modern-card animate-on-scroll delay-3">
+                <div class="avatar-circle">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+                <div class="role-badge member">UX Designer</div>
+                <h3 class="team-name">Nayo</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><%= __('team_nayo_desc') %></p>
+                <div class="team-social" style="opacity: 1; transform: translateY(0);">
+                    <a href="#" class="team-social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="team-social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Member 3 - Emir -->
+            <div class="team-modern-card animate-on-scroll delay-4">
+                <div class="avatar-circle">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="role-badge member">Database Architect</div>
+                <h3 class="team-name">Emir</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><%= __('team_emir_desc') %></p>
+                <div class="team-social" style="opacity: 1; transform: translateY(0);">
+                    <a href="#" class="team-social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="team-social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Member 4 - Ar Raafi -->
+            <div class="team-modern-card animate-on-scroll delay-1">
+                <div class="avatar-circle">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="role-badge member">Mobile Strategy</div>
+                <h3 class="team-name">Ar Raafi</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><%= __('team_raafi_desc') %></p>
+                <div class="team-social" style="opacity: 1; transform: translateY(0);">
+                    <a href="#" class="team-social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="team-social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Member 5 - Zhiran -->
+            <div class="team-modern-card animate-on-scroll delay-2">
+                <div class="avatar-circle">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="role-badge member">Systems Integrator</div>
+                <h3 class="team-name">Zhiran</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><%= __('team_zhiran_desc') %></p>
+                <div class="team-social" style="opacity: 1; transform: translateY(0);">
+                    <a href="#" class="team-social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="team-social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY SECTION -->
+    <section class="container" style="max-width: 1200px; margin: 80px auto; padding: 0 24px; text-align: center;">
+        <div class="team-header animate-on-scroll">
+            <h2 class="card-title">Momen <span>Kolektif</span></h2>
+            <p class="card-text">Sekilas tentang perjalanan kreasi kami.</p>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-top: 40px;">
+            <div class="team-modern-card animate-on-scroll delay-1" style="padding: 15px; width: 280px; animation: float 6s infinite;">
+                <img src="/images/blehhhhhh.gif" alt="Team Moment" style="width: 100%; border-radius: 20px; box-shadow: var(--shadow);">
+                <div style="margin-top: 15px; font-weight: 700; color: var(--secondary);">Energi Puncak</div>
+            </div>
+            <div class="team-modern-card animate-on-scroll delay-2" style="padding: 15px; width: 280px; animation: float 6s infinite 1s;">
+                <img src="/images/くるくるヘルタ.gif" alt="Team Moment" style="width: 100%; border-radius: 20px; box-shadow: var(--shadow);">
+                <div style="margin-top: 15px; font-weight: 700; color: var(--primary);">Loop Sistem</div>
+            </div>
+            <div class="team-modern-card animate-on-scroll delay-3" style="padding: 15px; width: 280px; animation: float 6s infinite 2s;">
+                <img src="/images/uma-musume-meep.gif" alt="Team Moment" style="width: 100%; border-radius: 20px; box-shadow: var(--shadow);">
+                <div style="margin-top: 15px; font-weight: 700; color: var(--accent-red);">Kortisol Rendah</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="container" style="max-width: 1200px; margin: 80px auto; padding: 0 24px;">
+        <div class="stats-modern-grid">
+            <div class="stat-item animate-on-scroll delay-1">
+                <div class="stat-val">6</div>
+                <div class="stat-label">Visioner</div>
+            </div>
+            <div class="stat-item animate-on-scroll delay-2">
+                <div class="stat-val">100%</div>
+                <div class="stat-label">Dedikasi</div>
+            </div>
+            <div class="stat-item animate-on-scroll delay-3">
+                <div class="stat-val">24/7</div>
+                <div class="stat-label">Evolusi</div>
+            </div>
+            <div class="stat-item animate-on-scroll delay-4">
+                <div class="stat-val">∞</div>
+                <div class="stat-label">Kreativitas</div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer') %>
+
+    <script>
+        // --- SCROLL ANIMATIONS ---
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Optional: stop observing after animation triggers
+                    // scrollObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const animElements = document.querySelectorAll('.animate-on-scroll, .animate-from-left, .animate-from-right, .animate-zoom');
+            animElements.forEach(el => scrollObserver.observe(el));
+        });
+
+        // --- LOGOUT ---
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+                    const data = await response.json();
+                    if (response.ok) {
+                        window.location.href = data.redirect || '/';
+                    }
+                } catch (error) { console.error('Logout error', error); }
+            });
+        }
+    </script>
+</body>
+</html>

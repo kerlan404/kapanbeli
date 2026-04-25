@@ -1,0 +1,214 @@
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <div class="footer-logo">
+                <i class="fas fa-book-open"></i>
+                <span>Kapan Beli</span>
+            </div>
+            <p class="footer-description"><%= __('footer_desc') %></p>
+            <div class="footer-social">
+                <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h4 class="footer-title"><%= __('footer_nav') %></h4>
+            <ul class="footer-links">
+                <li><a href="/"><i class="fas fa-chevron-right"></i> <%= __('nav_home') %></a></li>
+                <li><a href="/notes"><i class="fas fa-chevron-right"></i> <%= __('nav_notes') %></a></li>
+                <li><a href="/products"><i class="fas fa-chevron-right"></i> <%= __('nav_products') %></a></li>
+                <li><a href="/suggestions"><i class="fas fa-chevron-right"></i> <%= __('nav_suggestions') %></a></li>
+                <li><a href="/about"><i class="fas fa-chevron-right"></i> <%= __('nav_about') %></a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4 class="footer-title"><%= __('footer_features') %></h4>
+            <ul class="footer-links">
+                <li><i class="fas fa-check-circle"></i> <%= __('footer_stock_mgmt') %></li>
+                <li><i class="fas fa-check-circle"></i> <%= __('footer_expiry_notif') %></li>
+                <li><i class="fas fa-check-circle"></i> <%= __('footer_shopping_list') %></li>
+                <li><i class="fas fa-check-circle"></i> <%= __('footer_recipe_notes') %></li>
+                <li><i class="fas fa-check-circle"></i> <%= __('footer_multi_cat') %></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4 class="footer-title"><%= __('footer_contact') %></h4>
+            <ul class="footer-links">
+                <li><i class="fas fa-envelope"></i> info@kapanbeli.com</li>
+                <li><i class="fas fa-map-marker-alt"></i> Indonesia</li>
+                <li><i class="fas fa-clock"></i> 24/7 Online</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; <%= new Date().getFullYear() %> Kapan Beli - <%= __('footer_desc') %>. <%= __('footer_made_with') %> <i class="fas fa-heart" style="color: var(--accent-red);"></i> di Indonesia.</p>
+        <p class="footer-rights"><%= typeof footerText !== 'undefined' ? footerText : __('footer_all_rights') %></p>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        background: var(--bg-card);
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding: 60px 0 0 0;
+        margin-top: 80px;
+        color: var(--text-muted);
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px 40px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+    }
+
+    .footer-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--text-main);
+        margin-bottom: 10px;
+    }
+
+    .footer-logo i {
+        color: var(--primary-orange);
+        font-size: 1.8rem;
+    }
+
+    .footer-description {
+        font-size: 0.9rem;
+        line-height: 1.8;
+        color: var(--text-muted);
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(46, 134, 222, 0.1);
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .social-link:hover {
+        background: var(--primary-orange);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    .footer-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 10px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .footer-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--primary-orange);
+        border-radius: 2px;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .footer-links li {
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+
+    .footer-links li a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .footer-links li a:hover {
+        color: var(--primary-orange);
+        padding-left: 8px;
+    }
+
+    .footer-links li i {
+        font-size: 0.75rem;
+        color: var(--primary-orange);
+    }
+
+    .footer-bottom {
+        background: rgba(0,0,0,0.02);
+        padding: 25px;
+        text-align: center;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .footer-bottom p {
+        margin: 5px 0;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .footer-rights {
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+        .footer {
+            padding: 40px 0 0 0;
+        }
+
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 30px;
+            padding: 0 20px 30px;
+        }
+
+        .footer-bottom {
+            padding: 20px;
+        }
+    }
+</style>

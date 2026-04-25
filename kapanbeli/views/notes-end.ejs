@@ -1,0 +1,23 @@
+        // --- 6. LOGOUT FUNCTIONALITY ---
+        document.getElementById('logoutLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect || '/auth';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/auth';
+            }
+        });
+    </script>
+</body>
+</html>

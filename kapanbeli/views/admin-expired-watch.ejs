@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Kadaluarsa - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-blue: #2E86DE; --primary-dark: #1B5FA5; --primary-orange: #FF9F43;
+            --accent-green: #1DD1A1; --accent-red: #FF6B6B;
+            --bg-sidebar: #1A1D23; --bg-sidebar-hover: rgba(255,255,255,0.05);
+            --bg-sidebar-active: rgba(46,134,222,0.15);
+            --text-sidebar: rgba(255,255,255,0.7); --text-sidebar-active: var(--primary-blue);
+            --text-sidebar-heading: #FFFFFF; --sidebar-border: rgba(255,255,255,0.1);
+            --bg-body: #F0F2F5; --bg-card: #FFFFFF;
+            --text-main: #1A1D21; --text-muted: #6C757D;
+            --border-color: #E5E7EB; --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1); --radius: 16px;
+            --sidebar-width: 260px;
+        }
+        body.dark-mode-active {
+            --bg-sidebar: #1A1D23; --bg-body: #0F1115; --bg-card: #1A1D23;
+            --text-main: #E5E7EB; --text-muted: #9CA3AF; --border-color: #2D3139;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; }
+
+        /* ========== MAIN ========== */
+        .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 32px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 20px; flex-wrap: wrap; }
+        .page-title { font-size: 1.5rem; font-weight: 700; }
+        .page-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+        .top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .form-control { padding: 9px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-main); font-size: 0.85rem; font-family: 'Poppins', sans-serif; outline: none; }
+        .form-control:focus { border-color: var(--primary-blue); }
+        .btn { padding: 9px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .theme-toggle { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 1rem; }
+        .theme-toggle:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+
+        /* ========== FILTERS ========== */
+        .filters-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; background: var(--bg-card); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border-color); }
+        .filters-bar .form-control { min-width: 180px; }
+        .filter-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .filter-label i { color: var(--primary-blue); }
+
+        /* ========== STATS ========== */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-box { background: var(--bg-card); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border-color); }
+        .stat-box .label { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 6px; }
+        .stat-box h3 { font-size: 1.6rem; font-weight: 700; }
+        .stat-box.red h3 { color: var(--accent-red); }
+        .stat-box.orange h3 { color: var(--primary-orange); }
+        .stat-box.blue h3 { color: var(--primary-blue); }
+
+        /* ========== PANEL & TABLE ========== */
+        .panel-card { background: var(--bg-card); border-radius: var(--radius); padding: 20px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .panel-title { font-size: 1rem; font-weight: 600; }
+        .panel-title i { color: var(--accent-red); }
+        .table-wrapper { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); }
+        .data-table td { padding: 11px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; }
+        .data-table tbody tr:hover { background: rgba(255,107,107,0.04); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-red { background: rgba(255,107,107,0.12); color: var(--accent-red); }
+        .badge-orange { background: rgba(255,159,67,0.12); color: var(--primary-orange); }
+        .badge-blue { background: rgba(46,134,222,0.12); color: var(--primary-blue); }
+
+        /* ========== PAGINATION ========== */
+        .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        .pagination-info { font-size: 0.8rem; color: var(--text-muted); }
+        .pagination { display: flex; gap: 6px; align-items: center; }
+        .page-btn { min-width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+        .page-btn:hover:not(:disabled) { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
+        .loading-state, .empty-state { text-align: center; padding: 50px 20px; }
+        .loading-state i { font-size: 2rem; color: var(--primary-blue); margin-bottom: 12px; animation: spin 1s linear infinite; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .empty-state i { font-size: 3rem; color: var(--accent-green); margin-bottom: 16px; }
+        .empty-state h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-main); }
+        .empty-state p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            border-left: 4px solid var(--accent-green);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error { border-left-color: var(--accent-red); }
+        .toast.warning { border-left-color: var(--primary-orange); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) { .main-content { margin-left: 0; padding: 20px; } .filters-bar { flex-direction: column; } .filters-bar .form-control { width: 100%; } }
+    </style>
+</head>
+<body>
+    <%- include('./partials/admin-sidebar', { currentPage: 'expired-watch', user: typeof user !== 'undefined' ? user : null }) %>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title">🍎 Monitoring Kadaluarsa</h1>
+                <p class="page-subtitle">Pantau bahan makanan yang sudah expired dari seluruh user</p>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-outline" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+                <button class="btn btn-primary" onclick="loadExpired(1, true)"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box red"><div class="label">Total Item Expired</div><h3 id="totalExpired">0</h3></div>
+            <div class="stat-box orange"><div class="label">User Terkena</div><h3 id="affectedUsers">0</h3></div>
+            <div class="stat-box blue"><div class="label">Rata-rata Umur Simpan</div><h3 id="avgShelfLife">0 hari</h3></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <span class="filter-label"><i class="fas fa-filter"></i> Filter:</span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari bahan/user...">
+            <select id="categoryFilter" class="form-control">
+                <option value="">Semua Kategori</option>
+                <option value="Bumbu Dapur">Bumbu Dapur</option>
+                <option value="Sayuran">Sayuran</option>
+                <option value="Buah-buahan">Buah-buahan</option>
+                <option value="Protein">Protein</option>
+                <option value="Bahan Kering">Bahan Kering</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+            <button class="btn btn-primary" onclick="applyFilters()" style="margin-left:auto;"><i class="fas fa-search"></i> Filter</button>
+            <button class="btn" style="background:var(--border-color);color:var(--text-muted);" onclick="resetFilters()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <!-- Table -->
+        <div class="panel-card">
+            <div class="panel-header"><h3 class="panel-title"><i class="fas fa-exclamation-triangle"></i> Daftar Bahan Kadaluarsa</h3></div>
+            <div id="loadingState" class="loading-state"><i class="fas fa-circle-notch"></i><p>Memuat data...</p></div>
+            <div class="table-wrapper" id="tableWrapper" style="display:none;">
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>Bahan</th><th>Pemilik</th><th>Email</th><th>Kategori</th><th>Stok</th><th>Tgl Expired</th><th>Lama Expired</th><th>Status</th></tr></thead>
+                    <tbody id="expiredTableBody"></tbody>
+                </table>
+                <!-- Pagination -->
+                <div class="pagination-bar">
+                    <div class="pagination-info" id="paginationInfo">Menampilkan 0 dari 0 data</div>
+                    <div class="pagination" id="paginationBtns"></div>
+                </div>
+            </div>
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <i class="fas fa-check-circle"></i>
+                <h3>Semua Bahan Aman!</h3>
+                <p>Tidak ada item yang expired</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        let allData = [], currentPage = 1, totalPages = 1, totalItems = 0;
+        let filterSearch = '', filterCategory = '';
+
+        // Toast notification function - consistent with other pages
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${esc(message)}</span>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Dark Mode
+        function initDarkMode() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) document.body.classList.add('dark-mode-active');
+            updateThemeIcon();
+        }
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-active');
+            const isDark = document.body.classList.contains('dark-mode-active');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+        function updateThemeIcon() {
+            const isDark = document.body.classList.contains('dark-mode-active');
+            const btn = document.querySelector('.top-actions .btn-outline');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { initDarkMode(); loadExpired(); });
+
+        async function loadExpired(page = 1, showNotification = false) {
+            currentPage = page;
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('tableWrapper').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            try {
+                const q = new URLSearchParams({ page, limit: 20, search: filterSearch, category: filterCategory });
+                const res = await fetch(`/admin/api/expired-items?${q}`, { credentials: 'same-origin' });
+
+                // Handle auth error - redirect to login
+                if (res.status === 401 || res.status === 403) {
+                    window.location.href = '/auth';
+                    return;
+                }
+
+                const result = await res.json();
+                if (!result.success) { console.error('API Error:', result); return; }
+
+                allData = result.data || [];
+                totalItems = result.pagination?.total || 0;
+                totalPages = result.pagination?.totalPages || 1;
+
+                // Update stats
+                document.getElementById('totalExpired').textContent = totalItems;
+                const uniqueUsers = new Set(allData.map(i => i.user_id)).size;
+                document.getElementById('affectedUsers').textContent = uniqueUsers;
+                if (allData.length > 0) {
+                    const avg = allData.reduce((s, i) => s + (i.shelf_life_days || 0), 0) / allData.length;
+                    document.getElementById('avgShelfLife').textContent = Math.round(avg) + ' hari';
+                }
+
+                renderTable();
+                renderPagination();
+                
+                if (showNotification) {
+                    showToast('Data berhasil disegarkan', 'success');
+                }
+            } catch (e) { console.error('Fetch error:', e); }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('expiredTableBody');
+            document.getElementById('loadingState').style.display = 'none';
+            if (!allData.length) {
+                document.getElementById('emptyState').style.display = 'flex';
+                document.getElementById('tableWrapper').style.display = 'none';
+                return;
+            }
+            document.getElementById('tableWrapper').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+
+            const start = (currentPage - 1) * 20 + 1;
+            document.getElementById('paginationInfo').textContent = `Menampilkan ${start}-${Math.min(start + 20 - 1, totalItems)} dari ${totalItems} data`;
+
+            tbody.innerHTML = allData.map((item, i) => `
+                <tr>
+                    <td>${start + i}</td>
+                    <td><strong>${esc(item.name)}</strong></td>
+                    <td>${esc(item.user_name)}</td>
+                    <td>${esc(item.user_email)}</td>
+                    <td><span class="badge badge-blue">${esc(item.category_name || '-')}</span></td>
+                    <td>${parseFloat(item.stock_quantity || 0).toLocaleString()} ${item.unit || ''}</td>
+                    <td>${formatDate(item.expiry_date)}</td>
+                    <td><span class="badge badge-red">${item.days_expired || 0} hari lalu</span></td>
+                    <td><span class="badge ${item.status === 'Aktif' ? 'badge-orange' : 'badge-red'}">${item.status || 'Aktif'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('paginationBtns');
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+            let html = `<button class="page-btn" onclick="loadExpired(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+            const maxShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxShow - 1);
+            if (endPage - startPage < maxShow - 1) startPage = Math.max(1, endPage - maxShow + 1);
+            for (let p = startPage; p <= endPage; p++) {
+                html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="loadExpired(${p})">${p}</button>`;
+            }
+            html += `<button class="page-btn" onclick="loadExpired(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+            container.innerHTML = html;
+        }
+
+        function applyFilters() {
+            filterSearch = document.getElementById('searchInput').value.trim();
+            filterCategory = document.getElementById('categoryFilter').value;
+            loadExpired(1, false);
+        }
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            filterSearch = ''; filterCategory = '';
+            loadExpired(1, true);
+            showToast('Filter berhasil direset', 'success');
+        }
+
+        // Enter key for search
+        document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyFilters(); });
+
+        function formatDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }); }
+        function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    </script>
+</body>
+</html>
