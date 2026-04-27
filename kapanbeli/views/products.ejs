@@ -633,14 +633,7 @@
         }
 
 
-        document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
-            const data = await response.json();
-            if (response.ok) {
-                window.location.href = data.redirect || '/';
-            }
-        });
+
 
         // 2. Notification System
         function showNotification(msg, type = 'success') {

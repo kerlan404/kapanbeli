@@ -321,7 +321,8 @@ const analyticsController = {
                     c.name,
                     COUNT(p.id) as count
                 FROM categories c
-                LEFT JOIN products p ON c.id = p.category_id
+                INNER JOIN products p ON c.id = p.category_id
+                WHERE c.id IN (1, 2, 3, 4, 5, 6)
                 GROUP BY c.id, c.name
                 ORDER BY count DESC
             `);

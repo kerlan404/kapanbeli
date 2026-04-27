@@ -32,7 +32,7 @@ const authenticateToken = (req, res, next) => {
 // Fungsi untuk membuat transporter email (gunakan konfigurasi SMTP Anda)
 const createTransporter = () => {
     // Check if nodemailer is properly loaded
-    if (!nodemailer || typeof nodemailer.createTransporter !== 'function') {
+    if (!nodemailer || typeof nodemailer.createTransport !== 'function') {
         console.error('Nodemailer is not properly loaded');
         return null;
     }
@@ -41,7 +41,7 @@ const createTransporter = () => {
     // Pastikan untuk mengaktifkan "Less Secure App Access" atau "App Passwords" di akun Gmail Anda
     // Atau gunakan layanan email lain seperti SendGrid, Mailgun, dll.
     try {
-        return nodemailer.createTransporter({
+        return nodemailer.createTransport({
             service: 'gmail', // Gunakan layanan email Anda
             auth: {
                 user: process.env.EMAIL_USER, // Alamat email pengirim
@@ -576,13 +576,10 @@ const authController = {
 // Fungsi untuk menampilkan halaman lupa password
 authController.showForgotPassword = async (req, res) => {
     try {
-        res.sendFile(path.join(__dirname, '../views/forgot-password.html'));
+        res.render('forgot-password');
     } catch (error) {
         console.error('Show forgot password page error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Terjadi kesalahan saat menampilkan halaman'
-        });
+        res.status(500).send('Terjadi kesalahan saat menampilkan halaman');
     }
 };
 
@@ -664,28 +661,19 @@ authController.showResetPassword = async (req, res) => {
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
         } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: 'Token tidak valid atau telah kedaluwarsa'
-            });
-        }
-
-        // Cek apakah token valid di database (opsional, tergantung implementasi)
-        const user = await User.getById(decoded.userId);
-        if (!user || user.password_reset_token !== token) {
-            return res.status(400).json({
-                success: false,
-                message: 'Token tidak valid atau telah digunakan'
+            return res.status(400).render('reset-password', {
+                error: 'Token tidak valid atau telah kedaluwarsa',
+                token: null
             });
         }
 
         // Kirim halaman reset password
-        res.sendFile(path.join(__dirname, '../views/reset-password.html'));
+        res.render('reset-password', { token });
     } catch (error) {
         console.error('Show reset password page error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Terjadi kesalahan saat menampilkan halaman'
+        res.status(500).render('reset-password', {
+            error: 'Terjadi kesalahan saat menampilkan halaman',
+            token: null
         });
     }
 };

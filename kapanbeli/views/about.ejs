@@ -440,20 +440,7 @@
             animElements.forEach(el => scrollObserver.observe(el));
         });
 
-        // --- LOGOUT ---
-        const logoutLink = document.getElementById('logoutLink');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
-                    const data = await response.json();
-                    if (response.ok) {
-                        window.location.href = data.redirect || '/';
-                    }
-                } catch (error) { console.error('Logout error', error); }
-            });
-        }
+
     </script>
 </body>
 </html>

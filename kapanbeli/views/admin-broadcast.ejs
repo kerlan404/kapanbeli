@@ -195,25 +195,78 @@
         }
 
         /* Stats Cards */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px; margin-bottom: 30px;
+        /* Stats Cards - Ultra Premium */
+        .analytics-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
         }
-        .stat-card {
-            background: var(--bg-card); border-radius: 12px; padding: 20px;
-            border: 1px solid var(--border-color); display: flex;
-            align-items: center; gap: 15px;
+
+        .analytics-stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
         }
-        .stat-icon {
-            width: 50px; height: 50px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
+
+        .analytics-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
-        .stat-icon.blue { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
-        .stat-icon.orange { background: rgba(255, 159, 67, 0.15); color: var(--primary-orange); }
-        .stat-icon.green { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+
+        .analytics-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-blue);
+        }
+
+        .analytics-stat-card.success::before { background: var(--accent-green); }
+        .analytics-stat-card.warning::before { background: var(--primary-orange); }
+
+        .analytics-stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .analytics-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .analytics-stat-icon.blue { background: rgba(46, 134, 222, 0.12); color: var(--primary-blue); }
+        .analytics-stat-icon.green { background: rgba(29, 209, 161, 0.12); color: var(--accent-green); }
+        .analytics-stat-icon.orange { background: rgba(255, 159, 67, 0.12); color: var(--primary-orange); }
+
+        .analytics-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .analytics-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
 
         /* Toast Container */
         .toast-container {
@@ -270,32 +323,40 @@
         <!-- Content -->
         <div class="content-container">
             <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i class="fas fa-users"></i>
+            <div class="analytics-stats-grid">
+                <div class="analytics-stat-card info">
+                    <div class="analytics-stat-header">
+                        <div class="analytics-stat-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
                     </div>
                     <div>
-                        <div class="stat-value" id="statTotalUsers">-</div>
-                        <div class="stat-label">Total User</div>
+                        <div class="analytics-stat-label">Total User</div>
+                        <div class="analytics-stat-value" id="statTotalUsers">-</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i class="fas fa-user-check"></i>
+
+                <div class="analytics-stat-card success">
+                    <div class="analytics-stat-header">
+                        <div class="analytics-stat-icon green">
+                            <i class="fas fa-user-check"></i>
+                        </div>
                     </div>
                     <div>
-                        <div class="stat-value" id="statActiveUsers">-</div>
-                        <div class="stat-label">User Aktif</div>
+                        <div class="analytics-stat-label">User Aktif</div>
+                        <div class="analytics-stat-value" id="statActiveUsers">-</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <i class="fas fa-paper-plane"></i>
+
+                <div class="analytics-stat-card warning">
+                    <div class="analytics-stat-header">
+                        <div class="analytics-stat-icon orange">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
                     </div>
                     <div>
-                        <div class="stat-value" id="statTotalSent">-</div>
-                        <div class="stat-label">Total Terkirim</div>
+                        <div class="analytics-stat-label">Total Terkirim</div>
+                        <div class="analytics-stat-value" id="statTotalSent">-</div>
                     </div>
                 </div>
             </div>
@@ -463,7 +524,7 @@
                 });
                 const historyData = await historyRes.json();
                 if (historyData.success) {
-                    totalSent = historyData.data?.reduce((sum, item) => sum + (parseInt(item.sent_to) || 0), 0) || 0;
+                    totalSent = historyData.total_sent || 0;
                     document.getElementById('statTotalSent').textContent = totalSent;
                 }
             } catch (error) {

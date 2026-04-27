@@ -67,20 +67,21 @@ const broadcastService = {
                     title,
                     message,
                     type,
-                    created_at,
-                    COUNT(DISTINCT user_id) as sent_to
+                    COUNT(user_id) as sent_to,
+                    MAX(created_at) as created_at
                 FROM notifications
-                WHERE title IN (
-                    SELECT DISTINCT title FROM notifications
-                    ORDER BY created_at DESC
-                    LIMIT 50
-                )
-                GROUP BY title, message, type, created_at
+                GROUP BY title, message, type
                 ORDER BY created_at DESC
                 LIMIT 20
             `);
 
-            return { success: true, data: history };
+            const [totalCount] = await db.execute('SELECT COUNT(*) as total_sent FROM (SELECT 1 FROM notifications GROUP BY title, message, type) as broadcasts');
+
+            return { 
+                success: true, 
+                data: history,
+                total_sent: totalCount[0].total_sent
+            };
         } catch (error) {
             console.error('[broadcastService.getAnnouncementHistory] Error:', error);
             throw error;

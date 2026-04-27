@@ -596,11 +596,22 @@
         }
 
         /* Category Table Styles */
-        .category-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .category-table th { text-align: left; padding: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-        .category-table td { padding: 10px 8px; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); }
-        .progress-bar-mini { width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; margin-top: 4px; }
-        .progress-fill-mini { height: 100%; border-radius: 3px; background: var(--primary-blue); }
+        .category-table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
+        .category-table th { text-align: left; padding: 6px; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .category-table th:nth-child(1) { width: 45%; }
+        .category-table th:nth-child(2) { width: 20%; }
+        .category-table th:nth-child(3) { width: 35%; }
+        .category-table td { padding: 8px 6px; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .category-table td:first-child { font-weight: 500; word-wrap: break-word; line-height: 1.2; }
+        .progress-bar-mini { width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; margin-top: 2px; }
+        .progress-fill-mini { height: 100%; border-radius: 3px; background: var(--primary-blue); transition: width 0.8s ease-out; }
+        
+        /* Custom slim scrollbar for category list to replace ugly native one */
+        .category-scroll-wrapper::-webkit-scrollbar { width: 5px; }
+        .category-scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
+        .category-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+        .category-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+        .category-scroll-wrapper { padding-right: 5px; }
 
         .analytics-loading {
             text-align: center;
@@ -1016,32 +1027,33 @@
                             </div>
                         </div>
 
-                        <!-- Category Distribution Chart -->
-                        <div class="analytics-chart-card">
-                            <div class="analytics-chart-header">
-                                <h3 class="analytics-chart-title">
-                                    <i class="fas fa-layer-group"></i>
-                                    Distribusi per Kategori
-                                </h3>
+                    </div> <!-- Tutup grid sebelumnya -->
+
+                    <!-- Category Distribution Chart (Full Width) -->
+                    <div class="analytics-chart-card" style="margin-top: 24px;">
+                        <div class="analytics-chart-header">
+                            <h3 class="analytics-chart-title">
+                                <i class="fas fa-layer-group"></i>
+                                Distribusi per Kategori
+                            </h3>
+                        </div>
+                        <div style="display: grid; grid-template-columns: minmax(250px, 300px) 1fr; gap: 40px; align-items: stretch; padding: 10px 0;">
+                            <div class="analytics-chart-container" style="height: 250px; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="categoryChart"></canvas>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; align-items: center;">
-                                <div class="analytics-chart-container" style="height: 220px;">
-                                    <canvas id="categoryChart"></canvas>
-                                </div>
-                                <div class="table-responsive" style="max-height: 220px; overflow-y: auto;">
-                                    <table class="category-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Kategori</th>
-                                                <th>Produk</th>
-                                                <th>%</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="categoryTableBody">
-                                            <tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Memuat...</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div class="table-responsive category-scroll-wrapper" style="height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 15px;">
+                                <table class="category-table" style="margin-top: 0; font-size: 0.9rem;">
+                                    <thead>
+                                        <tr>
+                                            <th style="font-size: 0.8rem; padding: 10px 8px;">Kategori</th>
+                                            <th style="font-size: 0.8rem; padding: 10px 8px;">Produk</th>
+                                            <th style="font-size: 0.8rem; padding: 10px 8px;">Persentase (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="categoryTableBody">
+                                        <tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Memuat...</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
