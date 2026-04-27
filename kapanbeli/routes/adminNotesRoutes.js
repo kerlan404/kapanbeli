@@ -70,13 +70,10 @@ router.get('/', async (req, res) => {
             params.push(userId);
         }
 
-        // Add status filter (completed/pending)
+        // Add status filter (Selesai/Pending/Belum Selesai)
         if (status) {
-            if (status === 'completed') {
-                whereClause += ' AND n.is_completed = TRUE';
-            } else if (status === 'pending') {
-                whereClause += ' AND n.is_completed = FALSE';
-            }
+            whereClause += ' AND n.status = ?';
+            params.push(status);
         }
 
         // Get total count
@@ -92,7 +89,7 @@ router.get('/', async (req, res) => {
         // Get notes with user info
         const [notes] = await db.execute(`
             SELECT
-                n.id, n.title, n.content, n.is_completed, n.created_at, n.updated_at,
+                n.id, n.title, n.content, n.status, n.is_completed, n.created_at, n.updated_at,
                 n.user_id,
                 u.name as user_name, u.email as user_email
             FROM notes n
@@ -124,15 +121,17 @@ router.get('/', async (req, res) => {
 router.get('/statistics', async (req, res) => {
     try {
         const [totalResult] = await db.execute('SELECT COUNT(*) as total FROM notes');
-        const [completedResult] = await db.execute('SELECT COUNT(*) as total FROM notes WHERE is_completed = TRUE');
-        const [pendingResult] = await db.execute('SELECT COUNT(*) as total FROM notes WHERE is_completed = FALSE');
+        const [selesaiResult] = await db.execute("SELECT COUNT(*) as total FROM notes WHERE status = 'Selesai'");
+        const [pendingResult] = await db.execute("SELECT COUNT(*) as total FROM notes WHERE status = 'Pending'");
+        const [belumSelesaiResult] = await db.execute("SELECT COUNT(*) as total FROM notes WHERE status = 'Belum Selesai'");
 
         res.json({
             success: true,
             data: {
                 total: totalResult[0].total,
-                completed: completedResult[0].total,
-                pending: pendingResult[0].total
+                selesai: selesaiResult[0].total,
+                pending: pendingResult[0].total,
+                belumSelesai: belumSelesaiResult[0].total
             }
         });
     } catch (error) {
@@ -187,13 +186,13 @@ router.get('/:id', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
     try {
-        const { title, content, is_completed } = req.body;
+        const { title, content, status, is_completed } = req.body;
 
         await db.execute(`
             UPDATE notes
-            SET title = ?, content = ?, is_completed = ?, updated_at = NOW()
+            SET title = ?, content = ?, status = ?, is_completed = ?, updated_at = NOW()
             WHERE id = ?
-        `, [title, content, is_completed, req.params.id]);
+        `, [title, content, status, is_completed, req.params.id]);
 
         res.json({
             success: true,

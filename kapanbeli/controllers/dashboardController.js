@@ -93,14 +93,14 @@ const dashboardController = {
             const [notesStats] = await db.execute(notesQuery, [userId]);
 
             // Query untuk shopping list items (produk yang perlu dibeli)
-            // Shopping list = low stock + out of stock
+            // Shopping list = low stock + out of stock + expired + expiring soon
             const shoppingListQuery = `
-                SELECT COUNT(*) as shopping_list
+                SELECT COUNT(DISTINCT id) as shopping_list
                 FROM products
                 WHERE user_id = ?
                 AND (
-                    stock_quantity <= 0 
-                    OR (stock_quantity > 0 AND stock_quantity <= min_stock_level)
+                    stock_quantity <= min_stock_level
+                    OR (expiry_date IS NOT NULL AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY))
                 )
             `;
             const [shoppingListStats] = await db.execute(shoppingListQuery, [userId]);

@@ -1206,7 +1206,7 @@
                                 </button>
                                 
                                 <div class="stock-value-display">
-                                    <input id="swal-stock" class="stock-field-modern" type="number" value="1" min="1" onfocus="this.select()">
+                                    <input id="swal-stock" class="stock-field-modern" type="number" value="${Math.max(1, (parseFloat(item.min_stock_level) || 5) - (parseFloat(item.stock_quantity) || 0) + 1)}" min="1" onfocus="this.select()">
                                     <span class="unit-pill">${unit}</span>
                                 </div>
                                 
@@ -1295,12 +1295,16 @@
                             const addedStock = parseFloat(result.value.stock);
                             const currentStock = parseFloat(item.stock_quantity || 0);
                             const newTotalStock = currentStock + addedStock;
+                            // Prevent sending overwritten category properties
+                            const payload = { ...item };
+                            delete payload.category;
+                            delete payload.type;
                             
                             const response = await fetch(`/api/products/${id}`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    ...item, // Use existing data
+                                    ...payload, // Use existing data
                                     stock_quantity: newTotalStock,
                                     expiry_date: result.value.expiry || item.expiry_date
                                 })
@@ -1315,9 +1319,10 @@
                                     // If it was low stock, it MUST have newTotalStock > minStock.
                                     const minStock = item.min_stock_level || 0;
                                     const isStillExpired = item.type === 'expired' && !result.value.expiry;
+                                    const isStillExpiring = item.type === 'expiring' && !result.value.expiry;
                                     const isStillLowStock = newTotalStock <= minStock;
 
-                                    if (!isStillExpired && !isStillLowStock) {
+                                    if (!isStillExpired && !isStillExpiring && !isStillLowStock) {
                                         // Instant removal animation
                                         const card = document.querySelector(`.suggestion-card[data-id="${id}"]`);
                                         if (card) {
@@ -1342,11 +1347,11 @@
                                         loadSuggestions();
                                         if (window.refreshNotifications) window.refreshNotifications();
                                         
-                                        if (isStillExpired) {
+                                        if (isStillExpired || isStillExpiring) {
                                             Swal.fire({
                                                 icon: 'warning',
                                                 title: 'Stok Diupdate, Tapi...',
-                                                text: 'Bahan ini masih dalam daftar saran karena tanggal kadaluarsanya sudah lewat. Silakan update tanggal kadaluarsa juga.',
+                                                text: 'Bahan ini masih dalam daftar saran karena tanggal kadaluarsanya belum diperbarui. Silakan update tanggal kadaluarsa juga.',
                                                 confirmButtonColor: 'var(--primary-orange)'
                                             });
                                         }

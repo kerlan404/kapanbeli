@@ -460,6 +460,11 @@
             transform: scale(1) translateY(0);
         }
 
+        /* Custom Scrollbar for Modal */
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .modal-content::-webkit-scrollbar-thumb { background: var(--primary-blue); border-radius: 10px; }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -591,6 +596,12 @@
             <div class="stat-card">
                 <div class="stat-info">
                     <h3 id="statPending" style="color: var(--primary-orange);">0</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="statBelumSelesai" style="color: var(--accent-red);">0</h3>
                     <p>Belum Selesai</p>
                 </div>
             </div>
@@ -610,8 +621,9 @@
                             <label class="filter-label"><i class="fas fa-check-circle"></i> Status</label>
                             <select id="statusFilter" class="form-control" onchange="loadNotes()">
                                 <option value="">Semua Status</option>
-                                <option value="completed">Selesai</option>
-                                <option value="pending">Belum Selesai</option>
+                                <option value="Selesai">Selesai</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Belum Selesai">Belum Selesai</option>
                             </select>
                         </div>
                         <div class="filter-actions">
@@ -673,62 +685,87 @@
             
             <!-- View Mode -->
             <div id="noteViewMode" style="display: none;">
-                <div class="modal-header" style="background: linear-gradient(135deg, rgba(255, 159, 67, 0.1) 0%, rgba(46, 134, 222, 0.1) 100%); padding: 24px; border-radius: 12px 12px 0 0; position: relative;">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));"></div>
-                    <h3 class="modal-title" id="modalTitle" style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-sticky-note" style="color: var(--primary-orange);"></i>
-                        <span>Detail Catatan</span>
-                    </h3>
+                <div class="modal-header" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); padding: 40px; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, #3B82F6, #8B5CF6, #FF9F43);"></div>
+                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);"></div>
+                    
+                    <div style="z-index: 1; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <h3 class="modal-title" id="modalTitle" style="display: flex; align-items: center; gap: 20px; font-size: 1.8rem; font-weight: 800; color: white; letter-spacing: -0.5px;">
+                            <div style="width: 55px; height: 55px; border-radius: 18px; background: linear-gradient(135deg, #3B82F6, #1D4ED8); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4); border: 1px solid rgba(255,255,255,0.2);">
+                                <i class="fas fa-file-signature"></i>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <span>Detail Dokumen</span>
+                                <span style="font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">Arsip Digital #<%= Date.now().toString().slice(-6) %></span>
+                            </div>
+                        </h3>
+                    </div>
                 </div>
                 
-                <div class="modal-body" style="padding: 24px;">
-                    <!-- User Info -->
-                    <div style="background: rgba(46, 134, 222, 0.05); padding: 16px; border-radius: 10px; margin-bottom: 20px; border-left: 3px solid var(--primary-blue);">
-                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                            <i class="fas fa-user"></i> Informasi User
+                <div class="modal-body" style="padding: 40px; background: #0f172a; position: relative;">
+                    <!-- Glass Background Decoration -->
+                    <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%); pointer-events: none;"></div>
+
+                    <!-- User Information Card -->
+                    <div style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); padding: 24px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; gap: 24px; margin-bottom: 35px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+                        <div id="noteUserAvatar" style="width: 70px; height: 70px; border-radius: 20px; background: linear-gradient(135deg, #3B82F6, #8B5CF6); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.8rem; font-weight: 800; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); position: relative; overflow: hidden;">
+                            <div style="position: absolute; inset: 0; background: linear-gradient(rgba(255,255,255,0.2), transparent); pointer-events: none;"></div>
+                            U
                         </div>
-                        <div style="font-weight: 600; color: var(--text-main); font-size: 1rem;" id="noteUserName">-</div>
-                        <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;" id="noteUserEmail">-</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.7rem; color: #3B82F6; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px;">Otoritas Penulis</div>
+                            <div style="font-size: 1.4rem; font-weight: 800; color: white; letter-spacing: -0.5px;" id="noteUserName">Nama User</div>
+                            <div style="font-size: 0.9rem; color: rgba(255,255,255,0.4);" id="noteUserEmail">user@email.com</div>
+                        </div>
+                        <div id="noteViewStatus">
+                            <!-- Status Badge -->
+                        </div>
                     </div>
 
-                    <!-- Title -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-size: 0.8rem; color: var(--primary-blue); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                            <i class="fas fa-heading"></i> Judul Catatan
+                    <!-- Document Body -->
+                    <div style="position: relative; margin-bottom: 35px;">
+                        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.3); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 20px; height: 1px; background: rgba(255,255,255,0.2);"></div>
+                            Isi Dokumen Utama
+                            <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.2);"></div>
                         </div>
-                        <div id="noteViewTitle" style="font-size: 1.3rem; font-weight: 700; color: var(--text-main); padding: 14px 16px; background: var(--bg-body); border-radius: 10px; border: 2px solid rgba(0,0,0,0.05);"></div>
-                    </div>
-
-                    <!-- Content -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-size: 0.8rem; color: var(--primary-blue); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                            <i class="fas fa-align-left"></i> Isi Catatan
-                        </div>
-                        <div id="noteViewContent" style="font-size: 0.95rem; color: var(--text-main); padding: 16px; background: var(--bg-body); border-radius: 10px; border: 2px solid rgba(0,0,0,0.05); line-height: 1.7; white-space: pre-wrap; max-height: 300px; overflow-y: auto;"></div>
-                    </div>
-
-                    <!-- Meta Info -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                        <div style="background: rgba(29, 209, 161, 0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(29, 209, 161, 0.2);">
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">
-                                <i class="fas fa-calendar"></i> Dibuat
+                        
+                        <div style="background: rgba(255,255,255,0.02); border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); padding: 35px; min-height: 250px; position: relative;">
+                            <div id="noteViewTitle" style="font-size: 2rem; font-weight: 800; color: white; margin-bottom: 25px; line-height: 1.2; letter-spacing: -1px;">
+                                Judul Catatan
                             </div>
-                            <div id="noteViewCreated" style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);"></div>
-                        </div>
-                        <div style="background: rgba(255, 159, 67, 0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(255, 159, 67, 0.2);">
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">
-                                <i class="fas fa-sync-alt"></i> Diperbarui
+                            <div style="width: 60px; height: 4px; background: #3B82F6; border-radius: 2px; margin-bottom: 25px;"></div>
+                            <div id="noteViewContent" style="font-size: 1.1rem; color: rgba(255,255,255,0.7); line-height: 1.9; white-space: pre-wrap; font-weight: 400;">
+                                Isi catatan...
                             </div>
-                            <div id="noteViewUpdated" style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);"></div>
+                            
+                            <!-- Digital Watermark -->
+                            <div style="position: absolute; bottom: 25px; right: 35px; opacity: 0.05; font-size: 3rem; transform: rotate(-15deg); font-weight: 900; user-select: none; pointer-events: none;">
+                                KAPANBELI
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Status Badge -->
-                    <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, rgba(255, 159, 67, 0.05) 0%, rgba(46, 134, 222, 0.05) 100%); border-radius: 10px;">
-                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">
-                            <i class="fas fa-check-circle"></i> Status
+                    <!-- Footnote Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #3B82F6; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3); font-weight: 700; text-transform: uppercase;">Terdaftar Pada</div>
+                                <div id="noteViewCreated" style="font-weight: 700; color: white; font-size: 0.95rem;">27/04/2026</div>
+                            </div>
                         </div>
-                        <div id="noteViewStatus"></div>
+                        <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(139, 92, 246, 0.1); color: #8B5CF6; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-pen-nib"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3); font-weight: 700; text-transform: uppercase;">Penyuntingan Terakhir</div>
+                                <div id="noteViewUpdated" style="font-weight: 700; color: white; font-size: 0.95rem;">27/04/2026</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -877,8 +914,10 @@
                         <small style="color: var(--text-muted);">${note.user_email || '-'}</small>
                     </td>
                     <td>
-                        <span class="badge ${note.is_completed ? 'badge-completed' : 'badge-pending'}">
-                            ${note.is_completed ? 'Selesai' : 'Belum Selesai'}
+                        <%# Logic for status color and text based on note.status %>
+                        <span class="badge ${note.status === 'Selesai' ? 'badge-completed' : (note.status === 'Pending' ? 'badge-pending' : 'badge-danger')}" 
+                              style="${note.status === 'Belum Selesai' ? 'background-color: rgba(255, 107, 107, 0.15); color: var(--accent-red);' : ''}">
+                            ${escapeHtml(note.status || 'Belum Selesai')}
                         </span>
                     </td>
                     <td>${formatDate(note.created_at)}</td>
@@ -938,8 +977,9 @@
 
                 if (result.success) {
                     document.getElementById('statTotal').textContent = result.data.total;
-                    document.getElementById('statCompleted').textContent = result.data.completed;
+                    document.getElementById('statCompleted').textContent = result.data.selesai;
                     document.getElementById('statPending').textContent = result.data.pending;
+                    document.getElementById('statBelumSelesai').textContent = result.data.belumSelesai;
                 }
             } catch (error) {
                 console.error('Error loading statistics:', error);
@@ -959,6 +999,10 @@
                     document.getElementById('noteViewContent').textContent = note.content || 'Tidak ada isi catatan.';
                     document.getElementById('noteUserName').textContent = note.user_name || '-';
                     document.getElementById('noteUserEmail').textContent = note.user_email || '-';
+
+                    // Avatar initial
+                    const initial = (note.user_name || 'U').charAt(0).toUpperCase();
+                    document.getElementById('noteUserAvatar').textContent = initial;
                     
                     // Format dates
                     const createdDate = new Date(note.created_at).toLocaleString('id-ID', {
@@ -974,9 +1018,21 @@
                     document.getElementById('noteViewUpdated').textContent = updatedDate;
                     
                     // Status badge
-                    const statusHtml = note.is_completed 
-                        ? '<span class="badge badge-completed" style="font-size: 1rem; padding: 10px 24px;"><i class="fas fa-check-circle"></i> Selesai</span>'
-                        : '<span class="badge badge-pending" style="font-size: 1rem; padding: 10px 24px;"><i class="fas fa-clock"></i> Belum Selesai</span>';
+                    let statusBadgeClass = 'badge-pending';
+                    let statusIcon = 'fa-clock';
+                    let statusStyle = 'background: rgba(255, 159, 67, 0.1); border: 1px solid rgba(255, 159, 67, 0.2); color: #FF9F43;';
+                    
+                    if (note.status === 'Selesai') {
+                        statusBadgeClass = '';
+                        statusIcon = 'fa-circle-check';
+                        statusStyle = 'background: rgba(29, 209, 161, 0.1); border: 1px solid rgba(29, 209, 161, 0.2); color: #1DD1A1;';
+                    } else if (note.status === 'Belum Selesai') {
+                        statusBadgeClass = '';
+                        statusIcon = 'fa-circle-exclamation';
+                        statusStyle = 'background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.2); color: #FF6B6B;';
+                    }
+                    
+                    const statusHtml = `<span class="badge" style="font-size: 0.85rem; padding: 10px 20px; border-radius: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; ${statusStyle}"><i class="fas ${statusIcon}"></i> ${escapeHtml(note.status || 'Belum Selesai')}</span>`;
                     document.getElementById('noteViewStatus').innerHTML = statusHtml;
                     
                     // Open Modal

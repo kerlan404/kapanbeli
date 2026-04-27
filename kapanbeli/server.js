@@ -202,10 +202,10 @@ app.get('/', async (req, res) => {
             const statsQuery = `
                 SELECT
                     COUNT(DISTINCT p.id) as total_bahan,
-                    SUM(CASE WHEN p.stock_quantity > 0 AND p.stock_quantity <= 5 THEN 1 ELSE 0 END) as stok_menipis,
+                    SUM(CASE WHEN p.stock_quantity > 0 AND p.stock_quantity <= p.min_stock_level THEN 1 ELSE 0 END) as stok_menipis,
                     SUM(CASE WHEN p.stock_quantity <= 0 THEN 1 ELSE 0 END) as habis_stok,
                     SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE() THEN 1 ELSE 0 END) as kadaluarsa,
-                    SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date >= CURDATE() AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 3 DAY) THEN 1 ELSE 0 END) as hampir_kadaluarsa,
+                    SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date >= CURDATE() AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as hampir_kadaluarsa,
                     SUM(CASE WHEN p.stock_quantity > p.min_stock_level THEN 1 ELSE 0 END) as good_stock
                 FROM products p
                 WHERE p.user_id = ?
@@ -217,12 +217,15 @@ app.get('/', async (req, res) => {
             const notesQuery = 'SELECT COUNT(*) as total_catatan FROM notes WHERE user_id = ?';
             const [notesResults] = await db.execute(notesQuery, [userId]);
 
-            // 3. Query untuk daftar belanja (stok rendah/habis)
+            // 3. Query untuk daftar belanja (stok rendah/habis/kadaluarsa/hampir kadaluarsa)
             const shoppingQuery = `
-                SELECT COUNT(*) as daftar_belanja
+                SELECT COUNT(DISTINCT id) as daftar_belanja
                 FROM products
                 WHERE user_id = ?
-                AND (stock_quantity <= 0 OR stock_quantity <= 5)
+                AND (
+                    stock_quantity <= min_stock_level
+                    OR (expiry_date IS NOT NULL AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY))
+                )
             `;
             const [shoppingResults] = await db.execute(shoppingQuery, [userId]);
 
@@ -234,7 +237,37 @@ app.get('/', async (req, res) => {
                 ORDER BY created_at DESC 
                 LIMIT 8
             `;
-            const [activities] = await db.execute(activityQuery, [userId]);
+            const [dbActivities] = await db.execute(activityQuery, [userId]);
+
+            // 4.5. FETCH URGENT SUGGESTIONS TO INJECT INTO LOG
+            const urgentSuggestionsQuery = `
+                SELECT name, stock_quantity, min_stock_level, expiry_date,
+                    CASE 
+                        WHEN stock_quantity <= 0 THEN 'Habis'
+                        WHEN stock_quantity <= min_stock_level THEN 'Stok Rendah'
+                        WHEN expiry_date < CURDATE() THEN 'Kadaluarsa'
+                        ELSE 'Hampir Kadaluarsa'
+                    END as alert_type
+                FROM products
+                WHERE user_id = ?
+                AND (
+                    stock_quantity <= min_stock_level
+                    OR (expiry_date IS NOT NULL AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL 3 DAY))
+                )
+                ORDER BY created_at DESC
+                LIMIT 3
+            `;
+            const [urgentSuggestions] = await db.execute(urgentSuggestionsQuery, [userId]);
+            
+            // Map suggestions to activity format
+            const suggestionActivities = urgentSuggestions.map(s => ({
+                activity_type: 'SUGGESTION',
+                description: `Saran: ${s.name} (${s.alert_type})`,
+                created_at: new Date() // Current time for alerts
+            }));
+
+            // Merge and sort by date (alerts always on top or mixed)
+            const activities = [...suggestionActivities, ...dbActivities].slice(0, 8);
 
             // 5. FETCH RECENT NOTES
             const recentNotesQuery = `
