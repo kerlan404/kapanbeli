@@ -502,6 +502,28 @@
             color: var(--accent);
         }
 
+        .activity-stream-wrapper {
+            display: grid;
+            grid-template-rows: 1fr;
+            transition: grid-template-rows 0.5s ease-in-out, opacity 0.5s ease-in-out, margin 0.5s ease;
+            opacity: 1;
+        }
+        .activity-stream-wrapper.collapsed {
+            grid-template-rows: 0fr;
+            opacity: 0;
+            pointer-events: none;
+            margin-top: -20px;
+        }
+        .activity-stream { overflow: hidden; }
+        
+        .log-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+            cursor: pointer; transition: background 0.3s ease; padding: 20px; border-radius: 20px; margin-left: -20px; margin-right: -20px;
+        }
+        .log-header:hover { background: rgba(255, 255, 255, 0.05); }
+        .collapse-icon { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .log-header.collapsed .collapse-icon { transform: rotate(180deg); }
+
         /* --- FOOTER FEATURES --- */
         .footer-features {
             padding: 120px 0;
@@ -713,15 +735,19 @@
         <section style="margin-bottom: 120px;">
             <div class="activity-container">
                 <div class="activity-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                    <div id="logHeader" class="log-header" onclick="toggleLog()">
                         <div>
                             <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;"><%= __('index_log') %></h2>
                             <p style="opacity: 0.5; font-weight: 600;"><%= __('index_log_desc') %></p>
                         </div>
-                        <i class="fas fa-shield-halved" style="font-size: 3rem; color: var(--primary); opacity: 0.2;"></i>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <i class="fas fa-shield-halved" style="font-size: 3rem; color: var(--primary); opacity: 0.2;"></i>
+                            <i class="fas fa-chevron-up collapse-icon" style="font-size: 2rem; color: var(--primary); opacity: 0.5;"></i>
+                        </div>
                     </div>
 
-                    <div class="activity-stream">
+                    <div class="activity-stream-wrapper" id="activityStreamWrapper">
+                        <div class="activity-stream">
                         <% if (activities && activities.length > 0) { %>
                             <% activities.forEach(act => { %>
                                 <div class="activity-row">
@@ -751,6 +777,7 @@
                                 <p>Tidak ada log operasional terekam.</p>
                             </div>
                         <% } %>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -789,5 +816,14 @@
 
     <!-- FOOTER -->
     <%- include('./partials/footer') %>
+
+    <script>
+        function toggleLog() {
+            const wrapper = document.getElementById('activityStreamWrapper');
+            const header = document.getElementById('logHeader');
+            wrapper.classList.toggle('collapsed');
+            header.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>

@@ -4,272 +4,292 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - Kapan Beli</title>
-    
-    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght @300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
-
     <style>
-        /* --- CSS VARIABLES --- */
         :root {
-            --primary-orange: #FF9F43;
-            --primary-blue: #2E86DE;
-            --bg-body: #F7F9FC;
-            --bg-card: #FFFFFF;
-            --text-main: #2C3E50;
-            --text-muted: #8395A7;
-            --shadow-card: 0 10px 30px rgba(149, 157, 165, 0.2);
-            --border-radius: 20px;
-            --dot-color: #E1E8ED;
+            --primary: #3B82F6;
+            --accent: #FF9F43;
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-panel: rgba(255, 255, 255, 0.03);
+            --input-bg: rgba(0, 0, 0, 0.2);
         }
 
-        body.dark-mode-active {
-            --bg-body: #1E272E;
-            --bg-card: #2C3E50;
-            --text-main: #DFE6E9;
-            --text-muted: #808E9B;
-            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --dot-color: #34495E;
+        body.light-mode {
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-panel: rgba(255, 255, 255, 0.4);
+            --input-bg: rgba(255, 255, 255, 0.6);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-body);
-            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        body.auth-page {
-            overflow: hidden; /* Prevent scrolling on auth pages */
             height: 100vh;
-        }
-
-        .bg-decoration {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 40%;
-            height: 100%;
-            background-image: url('https://z-cdn-media.chatglm.cn/files/3aaa6c94-c363-47e0-886e-817084f4b407.jpeg?auth_key=1870694353-37fd08f5dca94279b617d21318047ad0-0-84c2bb20f2aedb79ed770e63f95cd4fe');
+            overflow: hidden;
+            background: url('/images/bahan%20dapur.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            opacity: 0.15;
-            z-index: -1;
-            mask-image: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0));
-            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0));
-        }
-
-        /* --- AUTH CONTAINER --- */
-        .auth-container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-card);
             display: flex;
-            overflow: hidden;
-            margin: 20px;
-            min-height: 600px; /* Sedikit lebih tinggi untuk form register */
-            max-height: calc(100vh - 40px); /* Ensure it fits within viewport */
-        }
-
-        /* Left Panel */
-        .auth-brand-panel {
-            flex: 1;
-            background: linear-gradient(135deg, var(--primary-orange), #ffbf69);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 40px;
-            text-align: center;
-            color: white;
+            justify-content: center;
             position: relative;
-            overflow: hidden;
         }
 
-        .auth-brand-panel::before {
+        body::before {
             content: '';
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-            top: -50%;
-            left: -50%;
-            animation: rotateBg 20s linear infinite;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.4));
+            z-index: 1;
+            transition: 0.5s ease;
+        }
+        body.light-mode::before {
+            background: linear-gradient(135deg, rgba(248, 250, 252, 0.85), rgba(248, 250, 252, 0.5));
         }
 
-        @keyframes rotateBg {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .auth-brand-panel i { font-size: 5rem; margin-bottom: 20px; position: relative; z-index: 2; }
-        .auth-brand-panel h2 { font-size: 2rem; margin-bottom: 10px; position: relative; z-index: 2; }
-        .auth-brand-panel p { opacity: 0.9; position: relative; z-index: 2; }
-
-        /* Right Panel */
-        .auth-form-panel {
-            flex: 1.5;
-            padding: 40px;
+        .auth-wrapper {
             position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            margin: 20px;
+            display: flex;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            overflow: hidden;
+            transition: 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-40px) scale(0.95); opacity: 0; }
+        }
+
+        .slide-out {
+            animation: slideOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
+
+        /* LEFT PANEL (Branding) */
+        .brand-panel {
+            flex: 1;
+            padding: 50px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-
-        /* Dark Mode Toggle */
-        .dark-mode-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: transparent;
-            border: 2px solid var(--text-muted);
+            position: relative;
+            overflow: hidden;
             color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+        }
+
+        .brand-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+            animation: spin 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .brand-panel i.main-icon {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--accent), #FF7675);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 10px 15px rgba(255, 159, 67, 0.3));
+        }
+
+        .brand-panel h1 { font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 800; line-height: 1.1; margin-bottom: 16px; letter-spacing: -1px; }
+        .brand-panel p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; }
+
+        /* RIGHT PANEL (Form) */
+        .form-panel {
+            flex: 1.1;
+            background: var(--glass-panel);
+            padding: 40px 60px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            cursor: pointer;
-            z-index: 10;
+            border-left: 1px solid var(--glass-border);
+            position: relative;
+            transition: 0.5s ease;
         }
-        .dark-mode-toggle:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
 
-        /* Form Styling */
-        .form-header { margin-bottom: 25px; }
-        .form-header h3 { font-size: 1.8rem; color: var(--text-main); }
-        .form-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+        .form-header { margin-bottom: 24px; }
+        .form-header h2 { font-size: 2rem; font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .form-header p { color: var(--text-muted); margin-top: 5px; font-size: 0.95rem; }
 
-        .input-group { position: relative; margin-bottom: 18px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-main); }
-        
+        .input-group { margin-bottom: 16px; }
         .input-wrapper { position: relative; }
-        .input-wrapper i.icon-left {
-            position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);
-        }
+        .input-wrapper i.icon-left { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
         .input-wrapper input {
-            width: 100%; padding: 12px 45px 12px 45px;
-            border: 2px solid rgba(0,0,0,0.05); border-radius: 12px;
-            background: var(--bg-body); color: var(--text-main);
-            font-size: 0.95rem; outline: none; font-family: 'Poppins', sans-serif;
-            transition: all 0.3s;
+            width: 100%;
+            padding: 16px 50px;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
         }
+        body.light-mode .input-wrapper input { color: #1E293B; border-color: rgba(0,0,0,0.1); }
+        
         .input-wrapper input:focus {
-            border-color: var(--primary-blue); background: var(--bg-card);
-            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
-        .input-wrapper i.icon-eye {
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
-            color: var(--text-muted); cursor: pointer;
-        }
-        .input-wrapper i.icon-eye:hover { color: var(--primary-orange); }
+        .input-wrapper i.icon-eye { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .input-wrapper i.icon-eye:hover { color: var(--accent); }
 
         .btn-submit {
-            width: 100%; padding: 15px; background: var(--primary-orange); color: white;
-            border: none; border-radius: 12px; font-size: 1rem; font-weight: 600;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3); margin-top: 10px;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #2563EB);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            margin-top: 10px;
+            transition: all 0.3s ease;
         }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4); background: #f08c38; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(59, 130, 246, 0.4); }
 
-        .form-links { text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; }
-        .form-links a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
-        .form-links a:hover { text-decoration: underline; }
+        .form-links { text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 0.95rem; }
+        .form-links a { color: var(--accent); text-decoration: none; font-weight: 700; transition: 0.3s; }
+        .form-links a:hover { text-shadow: 0 0 10px rgba(255, 159, 67, 0.5); }
 
-        /* Alert Box */
-        .alert-box {
-            padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;
-            display: none; align-items: center; gap: 10px;
+        .theme-toggle {
+            position: absolute; top: 30px; right: 30px;
+            background: var(--input-bg); border: 1px solid var(--glass-border);
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-main); cursor: pointer; transition: 0.3s; z-index: 10;
         }
-        .alert-box.show { display: flex; animation: fadeIn 0.3s; }
-        .alert-error { background: rgba(255, 107, 107, 0.1); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.2); }
-        .alert-success { background: rgba(29, 209, 161, 0.1); color: #1DD1A1; border: 1px solid rgba(29, 209, 161, 0.2); }
+        .theme-toggle:hover { color: var(--accent); border-color: var(--accent); transform: rotate(15deg); }
 
-        @media (max-width: 768px) {
-            .auth-container { flex-direction: column; margin: 0; border-radius: 0; height: 100vh; max-height: 100vh; }
-            .auth-brand-panel { display: none; }
-            .auth-form-panel { padding: 30px 20px; justify-content: center; }
-            .bg-decoration { display: none; }
+        /* LOADING OVERLAY */
+        .loading-overlay {
+            position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+        }
+        body.light-mode .loading-overlay { background: rgba(248, 250, 252, 0.9); }
+        .loading-overlay.active { opacity: 1; pointer-events: all; }
+        .loading-icon {
+            font-size: 5rem; color: var(--accent);
+            animation: floatBook 2s ease-in-out infinite;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 0 30px rgba(255, 159, 67, 0.4));
+        }
+        .loading-text {
+            color: white; font-size: 1.4rem; font-family: 'Outfit', sans-serif; font-weight: 700;
+        }
+        body.light-mode .loading-text { color: #1E293B; }
+        .dots::after { content: ''; animation: dots 1.5s infinite steps(4, end); }
+        @keyframes floatBook { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
+
+        /* ALERT */
+        .alert-box { padding: 12px 20px; border-radius: 14px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 600; display: none; align-items: center; gap: 12px; }
+        .alert-box.show { display: flex; animation: slideDown 0.3s ease; }
+        .alert-error { background: rgba(239, 68, 68, 0.15); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        body.light-mode .alert-error { color: #EF4444; }
+        .alert-success { background: rgba(34, 197, 94, 0.15); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3); }
+        body.light-mode .alert-success { color: #22C55E; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 900px) {
+            .auth-wrapper { flex-direction: column; height: auto; max-height: 95vh; max-width: 500px; overflow-y: auto; }
+            .brand-panel { padding: 30px; text-align: center; flex: none; border-bottom: 1px solid var(--glass-border); }
+            .form-panel { padding: 30px; border-left: none; }
         }
     </style>
 </head>
-<body class="auth-page">
+<body>
 
-    <div class="bg-decoration"></div>
+    <!-- Loading Modal -->
+    <div class="loading-overlay" id="loadingModal">
+        <i class="fas fa-book-open loading-icon"></i>
+        <div class="loading-text">Membangun Dapur Anda<span class="dots"></span></div>
+    </div>
 
-    <div class="auth-container">
-        <!-- Panel Kiri: Branding -->
-        <div class="auth-brand-panel">
-            <i class="fas fa-carrot"></i>
-            <h2>Kapan Beli</h2>
-            <p>Mulai catat stok dapur Anda hari ini.</p>
+    <div class="auth-wrapper">
+        <button class="theme-toggle" title="Ganti Mode" onclick="toggleTheme()">
+            <i class="fas fa-sun" id="themeIcon"></i>
+        </button>
+
+        <!-- Kiri: Branding -->
+        <div class="brand-panel">
+            <i class="fas fa-kitchen-set main-icon"></i>
+            <h1>Join The<br>Ecosystem.</h1>
+            <p>Mulailah perjalanan Anda menuju manajemen dapur tingkat lanjut. Buat akun Kapan Beli Anda sekarang dan optimalkan efisiensi.</p>
         </div>
 
-        <!-- Panel Kanan: Form Register -->
-        <div class="auth-form-panel">
-            
-            <button class="dark-mode-toggle" title="Ganti Mode">
-                <i class="fas fa-moon" id="themeIcon"></i>
-            </button>
-
+        <!-- Kanan: Form -->
+        <div class="form-panel">
             <div id="authAlert" class="alert-box"></div>
 
             <div class="form-header">
-                <h3>Buat Akun Baru</h3>
+                <h2>Buat Akun Baru</h2>
                 <p>Isi formulir di bawah untuk mendaftar.</p>
             </div>
-            
+
             <form id="registerForm">
                 <div class="input-group">
-                    <label>Nama Lengkap</label>
                     <div class="input-wrapper">
                         <i class="fas fa-user icon-left"></i>
-                        <input type="text" id="regName" placeholder="Jhon Doe" required>
+                        <input type="text" id="regName" placeholder="Nama Lengkap" required>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Email</label>
                     <div class="input-wrapper">
                         <i class="fas fa-envelope icon-left"></i>
-                        <input type="email" id="regEmail" placeholder="nama @email.com" required>
+                        <input type="email" id="regEmail" placeholder="Alamat Email" required>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock icon-left"></i>
-                        <input type="password" id="regPassword" placeholder="Masukkan password Anda" required>
+                        <input type="password" id="regPassword" placeholder="Kata Sandi" required>
                         <i class="fas fa-eye icon-eye" onclick="togglePassword('regPassword', this)"></i>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Konfirmasi Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock icon-left"></i>
-                        <input type="password" id="regConfirmPassword" placeholder="Ulangi password" required>
+                        <input type="password" id="regConfirmPassword" placeholder="Konfirmasi Kata Sandi" required>
                         <i class="fas fa-eye icon-eye" onclick="togglePassword('regConfirmPassword', this)"></i>
                     </div>
                 </div>
@@ -278,71 +298,70 @@
             </form>
 
             <div class="form-links">
-                <p>Sudah punya akun? <a href="/auth">Masuk di sini</a></p>
+                Sudah punya akun? <a href="/auth" onclick="navigateSmooth(event, '/auth')">Masuk di sini</a>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. DARK MODE LOGIC ---
-        const toggleBtn = document.querySelector('.dark-mode-toggle');
-        const themeIcon = document.getElementById('themeIcon');
+        // --- THEME LOGIC ---
         const body = document.body;
-
-        if (localStorage.getItem('theme') === 'dark' || 
-           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            enableDarkMode();
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode-active')) {
-                disableDarkMode();
+        const themeIcon = document.getElementById('themeIcon');
+        
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'light') {
+                body.classList.add('light-mode');
+                themeIcon.className = 'fas fa-moon';
             } else {
-                enableDarkMode();
+                body.classList.remove('light-mode');
+                themeIcon.className = 'fas fa-sun';
             }
-        });
+        }
+        initTheme();
 
-        function enableDarkMode() {
-            body.classList.add('dark-mode-active');
-            localStorage.setItem('theme', 'dark');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-            themeIcon.style.color = "#F1C40F"; 
+        function toggleTheme() {
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+            }
         }
 
-        function disableDarkMode() {
-            body.classList.remove('dark-mode-active');
-            localStorage.setItem('theme', 'light');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-            themeIcon.style.color = ""; 
-        }
-
-        // --- 2. PASSWORD TOGGLE ---
-        function togglePassword(inputId, iconElement) {
-            const input = document.getElementById(inputId);
+        // --- PASSWORD TOGGLE ---
+        function togglePassword(id, icon) {
+            const input = document.getElementById(id);
             if (input.type === 'password') {
                 input.type = 'text';
-                iconElement.classList.remove('fa-eye');
-                iconElement.classList.add('fa-eye-slash');
+                icon.className = 'fas fa-eye-slash icon-eye';
             } else {
                 input.type = 'password';
-                iconElement.classList.remove('fa-eye-slash');
-                iconElement.classList.add('fa-eye');
+                icon.className = 'fas fa-eye icon-eye';
             }
         }
 
-        // --- 3. ALERT LOGIC ---
-        function showAlert(message, type = 'error') {
+        // --- ALERT ---
+        function showAlert(msg, type = 'error') {
             const alertBox = document.getElementById('authAlert');
             alertBox.className = `alert-box show ${type === 'error' ? 'alert-error' : 'alert-success'}`;
-            alertBox.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> <span>${message}</span>`;
+            alertBox.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> <span>${msg}</span>`;
         }
-        function hideAlert() {
-            document.getElementById('authAlert').classList.remove('show');
+        function hideAlert() { document.getElementById('authAlert').classList.remove('show'); }
+
+        // --- SMOOTH NAVIGATION ---
+        function navigateSmooth(e, url) {
+            e.preventDefault();
+            const wrapper = document.querySelector('.auth-wrapper');
+            wrapper.classList.add('slide-out');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 400);
         }
 
-        // --- 4. REGISTER HANDLER (TERHUBUNG KE BACKEND) ---2
+        // --- REGISTER HANDLER ---
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             hideAlert();
@@ -352,59 +371,33 @@
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
 
-            // Validasi Client Side
-            if (!name || !email || !password || !confirmPassword) {
-                showAlert('Mohon lengkapi semua kolom.', 'error');
-                return;
-            }
+            if (!name || !email || !password || !confirmPassword) return showAlert('Mohon lengkapi semua kolom.');
+            if (password !== confirmPassword) return showAlert('Konfirmasi password tidak cocok!');
 
-            if (password.length < 1) {
-                showAlert('Password harus diisi.', 'error');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showAlert('Konfirmasi password tidak cocok!', 'error');
-                return;
-            }
-
-            // Kirim data ke server
             const btn = document.querySelector('.btn-submit');
             const originalText = btn.innerText;
-
             btn.innerText = 'Mendaftar...';
             btn.disabled = true;
 
             try {
                 const response = await fetch('/auth/signup', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        password: password,
-                        confirmPassword: confirmPassword
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, confirmPassword })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert(`${data.message} Selamat datang, ${data.user?.name || 'Pengguna'}!`, 'success');
-
-                    // Redirect ke beranda setelah delay
-                    setTimeout(() => {
-                        window.location.href = data.redirect || '/';
-                    }, 2000);
+                    document.getElementById('loadingModal').classList.add('active');
+                    setTimeout(() => window.location.href = data.redirect || '/', 2000);
                 } else {
                     showAlert(data.message, 'error');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
                 }
             } catch (error) {
-                console.error('Registration error:', error);
-                showAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi nanti.', 'error');
-            } finally {
+                showAlert('Gagal terhubung ke server. Silakan coba lagi.');
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
