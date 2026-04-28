@@ -36,4 +36,7 @@ router.get('/stats', productsController.getStats);
 // Endpoint untuk mendapatkan aktivitas terbaru
 router.get('/recent-activities', productsController.getRecentActivities);
 
+// Endpoint untuk menyetujui saran (isi stok)
+router.post('/:id/approve-suggestion', productsController.approveSuggestion);
+
 module.exports = router;

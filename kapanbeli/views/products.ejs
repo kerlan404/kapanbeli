@@ -759,7 +759,7 @@
                         <div class="info-pills">
                             <div class="info-pill">
                                 <span class="pill-label"><i class="fas fa-cubes"></i> Stok</span>
-                                <span class="pill-value ${isLow ? 'warning' : 'success'}">${stockDisplay} <small>${item.unit || 'pcs'}</small></span>
+                                <span class="pill-value ${isLow ? 'warning' : 'success'}">${stockDisplay} <small>${item.unit === 'bungkus' ? 'pcs' : (item.unit === 'liter' ? 'Liter (Vol)' : (item.unit || 'pcs'))}</small></span>
                             </div>
                             <div class="info-pill">
                                 <span class="pill-label"><i class="fas fa-calendar-day"></i> Exp</span>

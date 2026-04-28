@@ -277,8 +277,71 @@
             transition: transform 0.2s;
         }
         .qv-item:hover { transform: translateY(-2px); }
-        .qv-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
-        .qv-value { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .qv-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; opacity: 0.8; }
+        .qv-value { font-size: 1.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+
+        .qv-action-container {
+            margin-top: 32px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-buy-now {
+            flex: 1;
+            background: linear-gradient(135deg, #FF9F43, #FF6B6B);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(255, 159, 67, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-buy-now:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(255, 159, 67, 0.4);
+        }
+
+        .btn-buy-now:active { transform: scale(0.98); }
+
+        .btn-goto-product {
+            width: 60px;
+            height: 60px;
+            background: var(--white);
+            border: 2px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode-active .btn-goto-product {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-goto-product:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            transform: translateY(-5px) rotate(15deg);
+            box-shadow: 0 10px 20px rgba(46, 134, 222, 0.3);
+        }
         
         /* Premium Isi Stok SwiftAlert Styles - Modernized */
         .premium-swal-container {
@@ -507,27 +570,52 @@
             text-align: center;
             padding: 20px;
         }
+        /* --- DEACTIVATED OVERLAY (Unified) --- */
+        .deactivated-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+
         .deactivated-badge {
-            background: var(--danger);
-            color: white;
-            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            padding: 8px 16px;
             border-radius: 100px;
             font-weight: 800;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .deactivation-info {
-            background: rgba(0,0,0,0.4);
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
             font-weight: 500;
-            max-width: 90%;
-            border: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.5;
+        }
+
+        .deactivation-reason-text {
+            color: var(--danger);
+            font-weight: 700;
+            margin-top: 8px;
+            background: rgba(239, 68, 68, 0.05);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border-left: 3px solid var(--danger);
         }
 
         .swal2-html-container {
@@ -571,166 +659,202 @@
 
         .suggestion-card {
             background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 24px;
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 28px;
             box-shadow: var(--card-shadow);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
-            border: 2px solid transparent;
-            animation: fadeInUp 0.4s ease forwards;
+            border: 1px solid var(--border-glass);
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             opacity: 0;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .suggestion-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             box-shadow: var(--card-shadow-hover);
+            border-color: rgba(255, 159, 67, 0.2);
         }
 
-        .suggestion-card.type-expired {
-            border-left: 4px solid var(--danger);
+        /* Border indicator for condition type */
+        .suggestion-card::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+            border-radius: 6px 0 0 6px;
         }
 
-        .suggestion-card.type-low-stock {
-            border-left: 4px solid var(--warning);
-        }
-
-        .suggestion-card.type-expiring {
-            border-left: 4px solid var(--primary-orange);
-        }
+        .suggestion-card.type-expired::after { background: var(--danger); }
+        .suggestion-card.type-low-stock::after { background: var(--warning); }
+        .suggestion-card.type-expiring::after { background: var(--primary-orange); }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
+            gap: 18px;
         }
 
         .card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: 2rem;
             flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .suggestion-card.type-expired .card-icon {
-            background: linear-gradient(135deg, #EF4444, #DC2626);
+            background: linear-gradient(135deg, #EF4444, #991B1B);
             color: white;
         }
 
         .suggestion-card.type-low-stock .card-icon {
-            background: linear-gradient(135deg, #F59E0B, #D97706);
+            background: linear-gradient(135deg, #F59E0B, #B45309);
             color: white;
         }
 
         .suggestion-card.type-expiring .card-icon {
-            background: linear-gradient(135deg, #FF9F43, #E67E22);
+            background: linear-gradient(135deg, #FF9F43, #D97706);
             color: white;
         }
 
         .card-info {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
         .card-title {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
 
         .card-category {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            opacity: 0.8;
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
+            display: inline-flex;
+            padding: 8px 16px;
             border-radius: 100px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 16px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
         }
 
-        .status-badge.expired {
-            background: rgba(239, 68, 68, 0.1);
-            color: #EF4444;
-        }
-
-        .status-badge.low-stock {
-            background: rgba(245, 158, 11, 0.1);
-            color: #F59E0B;
-        }
-
-        .status-badge.expiring {
-            background: rgba(255, 159, 67, 0.1);
-            color: #FF9F43;
-        }
+        .status-badge.expired { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .status-badge.low-stock { background: rgba(245, 158, 11, 0.1); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-badge.expiring { background: rgba(255, 159, 67, 0.1); color: #FF9F43; border: 1px solid rgba(255, 159, 67, 0.2); }
 
         .card-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
         }
 
         .detail-item {
-            padding: 12px;
-            background: var(--bg-light);
-            border-radius: 10px;
+            padding: 18px;
+            background: rgba(46, 134, 222, 0.03);
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: var(--transition);
         }
 
-        body.dark-mode-active .detail-item {
-            background: rgba(30, 41, 51, 0.5);
+        .suggestion-card:hover .detail-item {
+            background: rgba(46, 134, 222, 0.06);
         }
 
         .detail-label {
             font-size: 0.7rem;
             color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .detail-value {
-            font-size: 1rem;
             font-weight: 700;
-            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .detail-value i {
+        .detail-label i { color: var(--primary-orange); }
+
+        .detail-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .detail-value.warning { color: #F59E0B; }
+        .detail-value.danger { color: #EF4444; }
+
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .action-btn {
+            padding: 14px 20px;
+            border-radius: 18px;
+            font-weight: 800;
             font-size: 0.9rem;
-            color: var(--primary-orange);
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .detail-value.warning {
-            color: #F59E0B;
+        .btn-detail {
+            background: var(--bg-light);
+            color: var(--primary-blue);
+            border: 1px solid rgba(46, 134, 222, 0.2);
         }
 
-        .detail-value.danger {
-            color: #EF4444;
+        .btn-detail:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 134, 222, 0.2);
+        }
+
+        .btn-approve {
+            background: transparent;
+            border: 2px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .btn-approve:hover {
+            background: var(--accent-green);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(29, 209, 161, 0.3);
         }
 
         .card-actions {
@@ -1051,11 +1175,15 @@
                     ${isDeactivated ? `
                         <div class="deactivated-overlay">
                             <div class="deactivated-badge">
-                                <i class="fas fa-ban"></i> <%= __('status_deactivated') || 'NONAKTIF' %>
+                                <i class="fas fa-lock"></i> <%= __('status_deactivated') || 'NONAKTIF' %>
                             </div>
                             <div class="deactivation-info">
-                                <p style="margin-bottom: 5px;"><%= __('contact_admin_to_reactivate') || 'Hubungi Admin untuk mengaktifkan kembali' %></p>
-                                ${item.deactivated_reason ? `<p style="color: #FF6B6B; font-weight: 700;">${window.i18n.alasan || 'Alasan'}: ${item.deactivated_reason}</p>` : ''}
+                                <p><%= __('contact_admin_to_reactivate') || 'Hubungi Admin untuk mengaktifkan kembali' %></p>
+                                ${item.deactivated_reason ? `
+                                    <div class="deactivation-reason-text">
+                                        ${window.i18n.alasan || 'Alasan'}: ${item.deactivated_reason}
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     ` : ''}
@@ -1147,16 +1275,15 @@
                         </div>
                     ` : ''}
 
-                    <div style="margin-top:32px; display:flex; gap:12px;">
-                        <button class="btn-primary ${isDeactivated ? 'btn-disabled' : ''}" 
-                                style="flex:1; justify-content:center; padding:16px; border-radius:16px;" 
+                    <div class="qv-action-container">
+                        <button class="btn-buy-now ${isDeactivated ? 'btn-disabled' : ''}" 
                                 onclick="${isDeactivated ? '' : `closeModal(); approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')`}"
                                 ${isDeactivated ? 'disabled' : ''}>
-                            <i class="fas ${isDeactivated ? 'fa-lock' : 'fa-cart-plus'}"></i> 
-                            ${isDeactivated ? 'Stok Terkunci' : 'Isi Stok Sekarang'}
+                            <i class="fas ${isDeactivated ? 'fa-lock' : 'fa-shopping-basket'}"></i> 
+                            ${isDeactivated ? 'Stok Terkunci' : 'Beli & Isi Stok'}
                         </button>
-                        <button class="btn-outline" style="padding:16px; border-radius:16px; aspect-ratio:1; display:flex; align-items:center; justify-content:center;" onclick="window.location='/products/detail/${item.id}'" title="Halaman Produk">
-                            <i class="fas fa-external-link-alt"></i>
+                        <button class="btn-goto-product" onclick="window.location='/products/detail/${item.id}'" title="Halaman Produk">
+                            <i class="fas fa-arrow-up-right-from-square"></i>
                         </button>
                     </div>
                 </div>

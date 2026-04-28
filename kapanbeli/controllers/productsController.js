@@ -554,6 +554,59 @@ const productsController = {
                 message: 'Terjadi kesalahan saat mengambil aktivitas terbaru.'
             });
         }
+    },
+
+    // Fungsi untuk menyetujui saran (isi stok/update kadaluarsa)
+    async approveSuggestion(req, res) {
+        try {
+            const userId = req.session.user?.id;
+            const productId = req.params.id;
+            const { new_stock, new_expiry } = req.body;
+
+            if (!userId) {
+                return res.status(401).json({ success: false, message: 'Akses ditolak.' });
+            }
+
+            // Validasi produk
+            const product = await ProductModel.getByIdAndUserId(productId, userId);
+            if (!product) {
+                return res.status(404).json({ success: false, message: 'Produk tidak ditemukan.' });
+            }
+
+            // Update produk - MUST pass all existing fields because the model's update query expects them
+            const updatedProduct = await ProductModel.update(productId, userId, {
+                name: product.name,
+                description: product.description,
+                category_id: product.category_id,
+                stock_quantity: parseFloat(new_stock),
+                min_stock_level: product.min_stock_level,
+                image_url: product.image_url,
+                unit: product.unit,
+                quantity: product.quantity,
+                expiry_date: new_expiry || product.expiry_date,
+                notes: product.notes
+            });
+
+            // Log activity
+            const activityLogsService = require('../services/activityLogsService');
+            await activityLogsService.log(
+                userId, 
+                'UPDATE', 
+                `Isi stok produk "${product.name}": +${new_stock} ${product.unit || 'pcs'}`, 
+                req.ip || 'unknown', 
+                req.get('user-agent') || 'unknown'
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'Stok berhasil diperbarui.',
+                product: updatedProduct
+            });
+
+        } catch (error) {
+            console.error('Approve suggestion error:', error);
+            res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+        }
     }
 };
 

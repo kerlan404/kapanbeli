@@ -13,6 +13,13 @@
     
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
         /* --- PREMIUM DESIGN SYSTEM --- */
@@ -619,6 +626,137 @@
             filter: drop-shadow(0 15px 15px var(--primary-glow));
         }
 
+        /* --- SUGGESTIONS SECTION (HOME) --- */
+        .suggestions-section {
+            margin-bottom: 100px;
+        }
+
+        .suggestions-grid-home {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .suggestion-card-home {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-glass);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .suggestion-card-home:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .suggestion-card-home::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+            border-radius: 6px 0 0 6px;
+        }
+
+        .suggestion-card-home.type-expired::after { background: #EF4444; }
+        .suggestion-card-home.type-low-stock::after { background: #F59E0B; }
+        .suggestion-card-home.type-expiring::after { background: #FF9F43; }
+
+        .s-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .s-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .type-expired .s-icon { background: linear-gradient(135deg, #EF4444, #991B1B); }
+        .type-low-stock .s-icon { background: linear-gradient(135deg, #F59E0B, #B45309); }
+        .type-expiring .s-icon { background: linear-gradient(135deg, #FF9F43, #D97706); }
+
+        .s-info { flex: 1; overflow: hidden; }
+        .s-title { font-weight: 800; font-size: 1.1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .s-category { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .s-status {
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+
+        .status-expired { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+        .status-low-stock { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .status-expiring { background: rgba(255, 159, 67, 0.1); color: #FF9F43; }
+
+        .s-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .s-detail-item {
+            padding: 12px;
+            background: rgba(var(--primary-glow), 0.05);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .s-label { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .s-value { font-size: 0.9rem; font-weight: 800; color: var(--text-main); }
+        .s-value.warning { color: #F59E0B; }
+        .s-value.danger { color: #EF4444; }
+
+        .s-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .s-btn {
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .s-btn-detail { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .s-btn-detail:hover { background: var(--primary); color: white; }
+
+        .s-btn-buy { background: transparent; border: 1px solid #10B981; color: #10B981; }
+        .s-btn-buy:hover { background: #10B981; color: white; }
+
         /* --- RESPONSIVE --- */
         @media (max-width: 1024px) {
             .hero { flex-direction: column; text-align: center; gap: 60px; }
@@ -738,7 +876,75 @@
             </div>
         </div>
 
-        <!-- PRODUCTS SECTION -->
+        <!-- SUGGESTIONS SECTION -->
+        <% if (typeof homeSuggestions !== 'undefined' && homeSuggestions && homeSuggestions.length > 0) { %>
+        <section class="suggestions-section animate__animated animate__fadeInUp">
+            <div class="section-header">
+                <div class="header-title">
+                    <h2 style="background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Saran Pembelian</h2>
+                    <p>Produk yang butuh perhatian segera karena stok menipis atau kadaluarsa.</p>
+                </div>
+                <a href="/suggestions" class="btn btn-outline" style="padding: 10px 24px; font-size: 0.9rem;">Lihat Semua Saran</a>
+            </div>
+
+            <div class="suggestions-grid-home">
+                <% homeSuggestions.forEach(item => { %>
+                    <div class="suggestion-card-home type-<%= item.type %>">
+                        <div class="s-header">
+                            <div class="s-icon">
+                                <i class="fas <%= 
+                                    item.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' : 
+                                    item.name.toLowerCase().includes('telur') ? 'fa-egg' : 
+                                    item.name.toLowerCase().includes('bawang') ? 'fa-seedling' : 
+                                    item.name.toLowerCase().includes('beras') ? 'fa-wheat' : 
+                                    item.name.toLowerCase().includes('cabai') ? 'fa-pepper-hot' : 
+                                    item.name.toLowerCase().includes('minyak') ? 'fa-bottle-droplet' : 
+                                    'fa-box-open'
+                                %>"></i>
+                            </div>
+                            <div class="s-info">
+                                <div class="s-title"><%= item.name %></div>
+                                <div class="s-category"><%= item.category_name || 'Bahan' %></div>
+                            </div>
+                        </div>
+
+                        <span class="s-status status-<%= item.type %>">
+                            <%= item.type === 'expired' ? 'Kadaluarsa' : 
+                                item.type === 'low-stock' ? (item.stock_quantity <= 0 ? 'Habis' : 'Stok Rendah') : 
+                                'Hampir Kadaluarsa' %>
+                        </span>
+
+                        <div class="s-details">
+                            <div class="s-detail-item">
+                                <div class="s-label">Stok</div>
+                                <div class="s-value <%= item.stock_quantity <= 0 ? 'danger' : item.stock_quantity <= item.min_stock_level ? 'warning' : '' %>">
+                                    <%= item.stock_quantity %> <%= item.unit || 'pcs' %>
+                                </div>
+                            </div>
+                            <div class="s-detail-item">
+                                <div class="s-label">Kadaluarsa</div>
+                                <div class="s-value <%= item.type === 'expired' ? 'danger' : item.type === 'expiring' ? 'warning' : '' %>">
+                                    <% if (item.expiry_date) { %>
+                                        <% const d = new Date(item.expiry_date); %>
+                                        <%= d.getDate().toString().padStart(2, '0') %>/<%= (d.getMonth()+1).toString().padStart(2, '0') %>/<%= d.getFullYear() %>
+                                    <% } else { %>-<% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="s-actions">
+                            <button class="s-btn s-btn-detail" onclick="window.location='/products/detail/<%= item.id %>'">
+                                <i class="fas fa-eye"></i> Detail
+                            </button>
+                            <button class="s-btn s-btn-buy" onclick="quickApprove(<%= item.id %>, '<%= item.name.replace(/'/g, "\\'") %>', '<%= item.type %>')">
+                                <i class="fas fa-cart-plus"></i> Isi Stok
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+        <% } %>
         <section style="margin-bottom: 100px;">
             <div class="section-header">
                 <div class="header-title">
@@ -921,6 +1127,78 @@
             const header = document.getElementById('logHeader');
             wrapper.classList.toggle('collapsed');
             header.classList.toggle('collapsed');
+        }
+
+        async function quickApprove(id, name, type) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Isi Stok Sekarang',
+                html: `
+                    <div style="text-align: left; padding: 0 10px;">
+                        <p style="margin-bottom: 15px; font-weight: 600; color: var(--text-main);">Produk: <span style="color: var(--primary);">${name}</span></p>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px;">JUMLAH STOK BARU</label>
+                            <input id="swal-stock" class="swal2-input" type="number" step="0.01" placeholder="Masukkan jumlah stok..." style="width: 100%; margin: 0; border-radius: 12px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px;">TANGGAL KADALUARSA BARU</label>
+                            <input id="swal-expiry" class="swal2-input" placeholder="Pilih tanggal..." style="width: 100%; margin: 0; border-radius: 12px;">
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Konfirmasi',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: '#6c757d',
+                didOpen: () => {
+                    flatpickr("#swal-expiry", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today",
+                        disableMobile: "true"
+                    });
+                },
+                preConfirm: () => {
+                    const stock = document.getElementById('swal-stock').value;
+                    const expiry = document.getElementById('swal-expiry').value;
+                    if (!stock) {
+                        Swal.showValidationMessage('Jumlah stok wajib diisi!');
+                        return false;
+                    }
+                    return { stock, expiry };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch(`/api/products/${id}/approve-suggestion`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            new_stock: formValues.stock,
+                            new_expiry: formValues.expiry
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Stok produk telah diperbarui.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Gagal!', result.message || 'Terjadi kesalahan.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error approving suggestion:', error);
+                    Swal.fire('Error!', 'Gagal menghubungkan ke server.', 'error');
+                }
+            }
         }
     </script>
 </body>

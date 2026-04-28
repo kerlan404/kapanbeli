@@ -291,6 +291,35 @@ app.get('/', async (req, res) => {
             `;
             const [recentProducts] = await db.execute(recentProductsQuery, [userId]);
 
+            // 7. FETCH TOP SUGGESTIONS FOR HOME SECTION
+            const suggestionsQuery = `
+                SELECT p.id, p.name, p.stock_quantity, p.min_stock_level, p.unit, p.image_url, p.expiry_date,
+                       c.name as category_name, p.is_deactivated_by_admin, p.deactivated_reason,
+                       CASE 
+                           WHEN p.stock_quantity <= 0 THEN 'low-stock'
+                           WHEN p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE() THEN 'expired'
+                           WHEN p.stock_quantity <= p.min_stock_level THEN 'low-stock'
+                           WHEN p.expiry_date IS NOT NULL AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 'expiring'
+                       END as type
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.user_id = ?
+                AND (
+                    p.stock_quantity <= p.min_stock_level
+                    OR (p.expiry_date IS NOT NULL AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY))
+                )
+                ORDER BY 
+                    CASE 
+                        WHEN p.stock_quantity <= 0 THEN 1
+                        WHEN (p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE()) THEN 2
+                        WHEN p.stock_quantity <= p.min_stock_level THEN 3
+                        ELSE 4
+                    END,
+                    p.created_at DESC
+                LIMIT 4
+            `;
+            const [homeSuggestions] = await db.execute(suggestionsQuery, [userId]);
+
             // Gabungkan semua stats
             stats = {
                 totalBahan: parseInt(productStats.total_bahan) || 0,
@@ -309,11 +338,12 @@ app.get('/', async (req, res) => {
             // Render dengan data lengkap
             return res.render('index', {
                 currentPage: 'home',
-                stats: stats,
                 user: user,
+                stats: stats,
                 activities: activities,
                 recentNotes: recentNotes,
-                recentProducts: recentProducts
+                recentProducts: recentProducts,
+                homeSuggestions: homeSuggestions
             });
         }
 

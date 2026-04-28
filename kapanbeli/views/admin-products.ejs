@@ -777,8 +777,8 @@
                                 <option value="kg">Kilogram (kg)</option>
                                 <option value="gram">Gram (gr)</option>
                                 <option value="pcs">Buah/Pcs</option>
-                                <option value="liter">Liter</option>
-                                <option value="bungkus">Bungkus</option>
+                                <option value="liter">Liter (Volume)</option>
+                                <option value="bungkus">Bungkus (pcs)</option>
                             </select>
                         </div>
                     </div>
@@ -1074,13 +1074,13 @@
                                 <img src="${profileImg}" alt="${product.name}" class="profile-img-sm">
                                 <div>
                                     <div style="font-weight: 600;">${product.name}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${product.unit || 'pcs'}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${product.unit === 'bungkus' ? 'pcs' : (product.unit === 'liter' ? 'Liter (Vol)' : (product.unit || 'pcs'))}</div>
                                 </div>
                             </div>
                         </td>
                         <td>${product.category_name || product.category ? `<span class="badge badge-primary">${product.category_name || product.category}</span>` : '<span class="text-muted">Lainnya</span>'}</td>
                         <td>
-                            <div style="font-weight: 500;">${stockDisplay} ${product.unit || ''}</div>
+                            <div style="font-weight: 500;">${stockDisplay} ${product.unit === 'bungkus' ? 'pcs' : (product.unit === 'liter' ? 'Liter (Vol)' : (product.unit || ''))}</div>
                             <div style="font-size: 0.75rem; color: var(--text-muted);">Min: ${minStockDisplay}</div>
                         </td>
                         <td>${expiry}</td>
