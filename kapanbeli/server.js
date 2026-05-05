@@ -106,6 +106,7 @@ const announcementsRoutes = require('./routes/announcements');
 
 // Import controllers for upload routes
 const productsController = require('./controllers/productsController');
+const settingsController = require('./controllers/settingsController');
 
 // Middleware untuk mengecek status akun user dari database
 const checkUserStatus = async (req, res, next) => {
@@ -519,6 +520,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/dashboard', dashboardSSRRoutes);
 
 // Use profile routes (protected)
+app.post('/api/profile/photo', upload.single('profile_photo'), isAuthenticated, settingsController.uploadProfilePhoto);
 app.use('/api/profile', settingsRoutes);
 
 // Use settings API routes (protected)

@@ -771,28 +771,42 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal" id="deleteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Konfirmasi Hapus</h3>
-                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+    <!-- Action Confirmation Modal (Premium Design) -->
+    <div class="modal" id="actionModal">
+        <div class="modal-content" style="max-width: 450px; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg);">
+            <div class="modal-header" style="border-bottom: none; padding: 25px 25px 15px;">
+                <h3 class="modal-title" id="actionModalTitle" style="display: flex; align-items: center; gap: 12px; font-weight: 700;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--accent-red);"></i> 
+                    Konfirmasi Hapus
+                </h3>
+                <button class="modal-close" onclick="closeActionModal()" style="font-size: 1.2rem;">&times;</button>
             </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus user ini?</p>
-                <p style="color: var(--accent-red); margin-top: 10px;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Tindakan ini tidak dapat dibatalkan.
+            <div class="modal-body" style="padding: 0 25px 25px;">
+                <p id="actionModalMessage" style="font-size: 1rem; color: var(--text-main); margin-bottom: 20px; line-height: 1.5;">
+                    Apakah Anda yakin ingin menghapus user ini?
                 </p>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>
-                        <input type="checkbox" id="permanentDelete"> Hapus permanen (tidak dapat dikembalikan)
+                
+                <div id="actionWarningBox" style="background: rgba(255, 71, 87, 0.1); padding: 15px; border-radius: 12px; border-left: 4px solid var(--accent-red); margin-bottom: 20px;">
+                    <p style="color: var(--accent-red); font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Tindakan ini tidak dapat dibatalkan.</span>
+                    </p>
+                </div>
+
+                <div class="form-group" id="actionCheckboxGroup" style="margin-top: 15px; display: none;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;">
+                        <input type="checkbox" id="actionPermanentCheck" style="width: 18px; height: 18px;"> 
+                        <span>Hapus permanen (tidak dapat dikembalikan)</span>
                     </label>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeDeleteModal()">Batal</button>
-                <button class="btn btn-danger" onclick="confirmDelete()">Hapus</button>
+            <div class="modal-footer" style="border-top: none; padding: 0 25px 25px; gap: 15px;">
+                <button class="btn btn-outline" onclick="closeActionModal()" style="flex: 1; padding: 12px; border-radius: 10px; font-weight: 600;">
+                    Batal
+                </button>
+                <button class="btn" id="actionConfirmBtn" style="flex: 1; padding: 12px; border-radius: 10px; font-weight: 700; background: var(--accent-red); color: white;">
+                    Hapus
+                </button>
             </div>
         </div>
     </div>
@@ -1436,96 +1450,113 @@
             const isCurrentlyActive = userRow?.classList.contains('btn-warning');
             const newStatus = isCurrentlyActive ? 'nonaktifkan' : 'aktifkan';
             
-            // Show custom confirmation
-            if (!await showCustomConfirm(`Apakah Anda yakin ingin ${newStatus}kan ${userName}?`, 
-                isCurrentlyActive ? 'warning' : 'success')) {
-                return;
-            }
+            // Premium Confirmation Modal
+            const modal = document.getElementById('actionModal');
+            const title = document.getElementById('actionModalTitle');
+            const message = document.getElementById('actionModalMessage');
+            const confirmBtn = document.getElementById('actionConfirmBtn');
+            const warningBox = document.getElementById('actionWarningBox');
+            const checkboxGroup = document.getElementById('actionCheckboxGroup');
 
-            try {
-                showLoading(true);
-                const response = await fetch(`/api/users/${userId}/toggle-status`, {
-                    method: 'PATCH',
-                    credentials: 'same-origin'
-                });
+            title.innerHTML = `<i class="fas fa-user-shield" style="color: ${isCurrentlyActive ? 'var(--primary-orange)' : 'var(--accent-green)'};"></i> Konfirmasi Status`;
+            message.innerHTML = `Apakah Anda yakin ingin <strong>${newStatus}kan</strong> akun <strong>${userName}</strong>?`;
+            warningBox.style.background = isCurrentlyActive ? 'rgba(255, 165, 2, 0.1)' : 'rgba(46, 213, 115, 0.1)';
+            warningBox.style.borderLeftColor = isCurrentlyActive ? 'var(--primary-orange)' : 'var(--accent-green)';
+            warningBox.querySelector('p').style.color = isCurrentlyActive ? 'var(--primary-orange)' : 'var(--accent-green)';
+            warningBox.querySelector('span').innerText = isCurrentlyActive ? 'Pengguna tidak akan bisa login sementara.' : 'Pengguna akan mendapatkan kembali akses penuh.';
+            checkboxGroup.style.display = 'none';
+            confirmBtn.style.background = isCurrentlyActive ? 'var(--primary-orange)' : 'var(--accent-green)';
+            confirmBtn.innerText = isCurrentlyActive ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan';
+            
+            modal.classList.add('active');
 
-                const result = await response.json();
+            confirmBtn.onclick = async () => {
+                modal.classList.remove('active');
+                try {
+                    showLoading(true);
+                    const response = await fetch(`/api/users/${userId}/toggle-status`, {
+                        method: 'PATCH',
+                        credentials: 'same-origin'
+                    });
 
-                if (result.success) {
-                    showToast(`User berhasil di${newStatus}kan`, 'success');
-                    loadUsers();
-                    loadUserStatistics();
-                } else {
-                    showToast(result.message || `Gagal ${newStatus}kan user`, 'error');
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showToast(`User berhasil di${newStatus}kan`, 'success');
+                        loadUsers();
+                        loadUserStatistics();
+                    } else {
+                        showToast(result.message || `Gagal ${newStatus}kan user`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error toggling status:', error);
+                    showToast('Terjadi kesalahan saat mengubah status user', 'error');
+                } finally {
+                    showLoading(false);
                 }
-            } catch (error) {
-                console.error('Error toggling status:', error);
-                showToast('Terjadi kesalahan saat mengubah status user', 'error');
-            } finally {
-                showLoading(false);
-            }
+            };
         }
 
         // ============================================
-        // DELETE USER
+        // ACTION MODAL UTILS
         // ============================================
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.remove('active');
+        }
+
         function confirmDeleteUser(userId) {
-            // Get user info for better message
             const userRow = document.querySelector(`button[onclick="confirmDeleteUser(${userId})"]`);
             const row = userRow?.closest('tr');
             const userName = row?.querySelector('.profile-img-sm')?.alt || 'User ini';
             
-            deleteUserTargetId = userId;
+            const modal = document.getElementById('actionModal');
+            const title = document.getElementById('actionModalTitle');
+            const message = document.getElementById('actionModalMessage');
+            const confirmBtn = document.getElementById('actionConfirmBtn');
+            const warningBox = document.getElementById('actionWarningBox');
+            const checkboxGroup = document.getElementById('actionCheckboxGroup');
+            const permCheck = document.getElementById('actionPermanentCheck');
+
+            title.innerHTML = `<i class="fas fa-trash-alt" style="color: var(--accent-red);"></i> Konfirmasi Hapus`;
+            message.innerHTML = `Apakah Anda yakin ingin menghapus user <strong>${userName}</strong>?`;
+            warningBox.style.background = 'rgba(255, 71, 87, 0.1)';
+            warningBox.style.borderLeftColor = 'var(--accent-red)';
+            warningBox.querySelector('p').style.color = 'var(--accent-red)';
+            warningBox.querySelector('span').innerText = 'Tindakan ini tidak dapat dibatalkan.';
+            checkboxGroup.style.display = 'block';
+            permCheck.checked = false;
+            confirmBtn.style.background = 'var(--accent-red)';
+            confirmBtn.innerText = 'Ya, Hapus User';
             
-            // Show custom confirmation modal with user name
-            const modal = document.getElementById('deleteModal');
-            const title = modal.querySelector('.modal-title');
-            const message = modal.querySelector('.modal-body p');
-            
-            title.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: var(--accent-red);"></i> Konfirmasi Hapus`;
-            message.innerHTML = `Apakah Anda yakin ingin menghapus <strong>${userName}</strong>?<br><br>
-                <span style="color: var(--accent-red);">
-                    <i class="fas fa-exclamation-circle"></i>
-                    Tindakan ini tidak dapat dibatalkan.
-                </span>`;
-            
-            document.getElementById('permanentDelete').checked = false;
             modal.classList.add('active');
-        }
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-            deleteUserTargetId = null;
-        }
+            confirmBtn.onclick = async () => {
+                const isPermanent = permCheck.checked;
+                modal.classList.remove('active');
+                
+                try {
+                    showLoading(true);
+                    const response = await fetch(`/api/users/${userId}${isPermanent ? '/permanent' : ''}`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin'
+                    });
 
-        async function confirmDelete() {
-            if (!deleteUserTargetId) return;
+                    const result = await response.json();
 
-            const isPermanent = document.getElementById('permanentDelete').checked;
-
-            try {
-                showLoading(true);
-                const response = await fetch(`/api/users/${deleteUserTargetId}${isPermanent ? '/permanent' : ''}`, {
-                    method: 'DELETE',
-                    credentials: 'same-origin'
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    showToast('User berhasil dihapus', 'success');
-                    closeDeleteModal();
-                    loadUsers();
-                    loadUserStatistics();
-                } else {
-                    showToast(result.message || 'Gagal menghapus user', 'error');
+                    if (result.success) {
+                        showToast('User berhasil dihapus', 'success');
+                        loadUsers();
+                        loadUserStatistics();
+                    } else {
+                        showToast(result.message || 'Gagal menghapus user', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    showToast('Terjadi kesalahan', 'error');
+                } finally {
+                    showLoading(false);
                 }
-            } catch (error) {
-                console.error('Error deleting user:', error);
-                showToast('Terjadi kesalahan', 'error');
-            } finally {
-                showLoading(false);
-            }
+            };
         }
 
         // ============================================

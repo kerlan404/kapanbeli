@@ -46,16 +46,9 @@ const settingsController = {
                 });
             }
 
-            upload.single('profile_photo')(req, res, async (err) => {
+            const processUpload = async (file) => {
                 try {
-                    if (err) {
-                        return res.status(400).json({
-                            success: false,
-                            message: err.message
-                        });
-                    }
-
-                    if (!req.file) {
+                    if (!file) {
                         return res.status(400).json({
                             success: false,
                             message: 'Tidak ada file yang diupload'
@@ -63,7 +56,10 @@ const settingsController = {
                     }
 
                     const userId = req.session.user.id;
-                    const photoUrl = '/uploads/profiles/' + req.file.filename;
+                    
+                    // Support both server-level upload and controller-level upload paths
+                    const isFromProfilesDir = file.destination && file.destination.includes('profiles');
+                    const photoUrl = isFromProfilesDir ? '/uploads/profiles/' + file.filename : '/uploads/' + file.filename;
 
                     // Delete old profile photo if exists
                     const user = await User.findById(userId);
@@ -74,10 +70,14 @@ const settingsController = {
                         });
                     }
 
-                    if (user.profile_photo && user.profile_photo.startsWith('/uploads/profiles/')) {
+                    if (user.profile_photo && (user.profile_photo.startsWith('/uploads/'))) {
                         const oldPhotoPath = path.join(__dirname, '../public', user.profile_photo);
                         if (fs.existsSync(oldPhotoPath)) {
-                            fs.unlinkSync(oldPhotoPath);
+                            try {
+                                fs.unlinkSync(oldPhotoPath);
+                            } catch (err) {
+                                console.error('Failed to delete old photo:', err);
+                            }
                         }
                     }
 
@@ -90,10 +90,11 @@ const settingsController = {
 
                     // Update session
                     req.session.user.profile_photo = photoUrl;
+                    req.session.save();
 
                     res.json({
                         success: true,
-                        message: 'Foto profil berhasil diupload',
+                        message: 'Foto profil berhasil diperbarui',
                         photo_url: photoUrl
                     });
                 } catch (innerError) {
@@ -105,13 +106,29 @@ const settingsController = {
                         });
                     }
                 }
-            });
+            };
+
+            if (req.file) {
+                await processUpload(req.file);
+            } else {
+                upload.single('profile_photo')(req, res, async (err) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: false,
+                            message: err.message
+                        });
+                    }
+                    await processUpload(req.file);
+                });
+            }
         } catch (error) {
             console.error('Upload profile photo error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Terjadi kesalahan saat upload foto profil'
-            });
+            if (!res.headersSent) {
+                res.status(500).json({
+                    success: false,
+                    message: 'Terjadi kesalahan saat upload foto profil'
+                });
+            }
         }
     },
 
@@ -204,7 +221,7 @@ const settingsController = {
                 });
             }
 
-            const { name, email, language } = req.body;
+            const { name, email, theme, language } = req.body;
             const userId = req.session.user.id;
 
             // Validate input
@@ -227,6 +244,16 @@ const settingsController = {
             // Update user profile
             await User.update(userId, { name, email });
 
+            // Update theme if provided
+            if (theme && User.updateTheme) {
+                try {
+                    await User.updateTheme(userId, theme);
+                    req.session.user.theme = theme;
+                } catch (themeError) {
+                    console.error('Theme update error:', themeError);
+                }
+            }
+
             // Update session
             req.session.user.name = name;
             req.session.user.email = email;
@@ -242,7 +269,8 @@ const settingsController = {
                     user: {
                         id: userId,
                         name: name,
-                        email: email
+                        email: email,
+                        theme: theme || req.session.user.theme
                     }
                 });
             });
