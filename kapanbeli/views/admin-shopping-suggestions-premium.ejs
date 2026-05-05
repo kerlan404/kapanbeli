@@ -25,11 +25,11 @@
             --text-secondary: #a3a3a3;
             --text-muted: #737373;
             
-            --accent-orange: #f97316;
-            --accent-orange-light: #fb923c;
-            --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
-            --accent-green: #10b981;
+            --accent-orange: #3B82F6;
+            --accent-orange-light: #60A5FA;
+            --accent-amber: #2563EB;
+            --accent-red: #EF4444;
+            --accent-green: #10B981;
             
             --border-color: #262626;
             --border-light: #404040;
@@ -38,9 +38,9 @@
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
-            --shadow-glow-orange: 0 0 20px rgba(249, 115, 22, 0.3);
+            --shadow-glow-orange: 0 0 20px rgba(59, 130, 246, 0.3);
             --shadow-glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
-            --shadow-glow-amber: 0 0 20px rgba(245, 158, 11, 0.3);
+            --shadow-glow-amber: 0 0 20px rgba(37, 99, 235, 0.3);
             
             --sidebar-width: 280px;
             --radius-sm: 8px;
@@ -763,7 +763,7 @@
                     <span class="priority-badge high">Urgent</span>
                     <button class="btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        <span>Beli</span>
+                        <span>Isi Stok</span>
                     </button>
                 </div>
             </div>
@@ -788,7 +788,7 @@
                     <span class="priority-badge high">Urgent</span>
                     <button class="btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        <span>Beli</span>
+                        <span>Isi Stok</span>
                     </button>
                 </div>
             </div>
@@ -813,7 +813,7 @@
                     <span class="priority-badge medium">Medium</span>
                     <button class="btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        <span>Beli</span>
+                        <span>Isi Stok</span>
                     </button>
                 </div>
             </div>
@@ -838,7 +838,7 @@
                     <span class="priority-badge low">Low</span>
                     <button class="btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        <span>Beli</span>
+                        <span>Isi Stok</span>
                     </button>
                 </div>
             </div>
@@ -863,7 +863,7 @@
                     <span class="priority-badge high">Urgent</span>
                     <button class="btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        <span>Beli</span>
+                        <span>Isi Stok</span>
                     </button>
                 </div>
             </div>
@@ -900,7 +900,7 @@
                 const productName = productCard.querySelector('.product-name').textContent;
                 
                 // Visual feedback
-                this.innerHTML = '<i class="fas fa-check"></i><span>Dibeli</span>';
+                this.innerHTML = '<i class="fas fa-check"></i><span>Berhasil</span>';
                 this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
                 
                 setTimeout(() => {

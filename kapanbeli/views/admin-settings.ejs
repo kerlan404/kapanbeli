@@ -21,18 +21,18 @@
         :root {
             --primary: #3B82F6;
             --primary-glow: rgba(59, 130, 246, 0.5);
-            --accent: #FF9F43;
-            --accent-glow: rgba(255, 159, 67, 0.4);
-            --bg-light: #F8FAFC;
-            --bg-dark: #020617;
-            --card-glass: rgba(255, 255, 255, 0.7);
-            --card-glass-dark: rgba(15, 23, 42, 0.75);
+            --accent: #2563EB; /* Unified to Blue */
+            --accent-glow: rgba(37, 99, 235, 0.4);
+            --bg-light: #F1F5F9;
+            --bg-dark: #0F172A;
+            --card-glass: #FFFFFF;
+            --card-glass-dark: #1E293B;
             --text-main: #1E293B;
             --text-muted: #64748B;
-            --border-glass: rgba(255, 255, 255, 0.3);
-            --border-glass-dark: rgba(255, 255, 255, 0.1);
-            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.12);
+            --border-glass: rgba(0, 0, 0, 0.05);
+            --border-glass-dark: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.08);
             --radius-xl: 32px;
             --radius-lg: 24px;
             --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -71,31 +71,16 @@
             overflow: hidden;
         }
 
-        .mesh-bg::before, .mesh-bg::after {
+        /* Simplified mesh - only subtle blue glow */
+        .mesh-bg::after {
             content: '';
             position: absolute;
             width: 800px; height: 800px;
             border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            z-index: -1;
-            animation: meshMove 20s infinite alternate;
-        }
-
-        .mesh-bg::before {
+            filter: blur(150px);
+            opacity: 0.1;
             background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-            top: -20%; left: -10%;
-        }
-
-        .mesh-bg::after {
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
             bottom: -20%; right: -10%;
-            animation-delay: -10s;
-        }
-
-        @keyframes meshMove {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 100px) scale(1.2); }
         }
 
         /* Main Content Area */
@@ -120,9 +105,7 @@
             font-weight: 800;
             letter-spacing: -1.5px;
             margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--text-main), var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
         }
 
         .page-title p {
@@ -146,8 +129,6 @@
 
         .glass-card {
             background: var(--card-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-glass);
             border-radius: var(--radius-lg);
             padding: 40px;
@@ -575,6 +556,16 @@
     <script>
         // Theme Management
         function initTheme() {
+            // Check localStorage first for immediate sync
+            const localTheme = localStorage.getItem('theme');
+            if (localTheme) {
+                if (localTheme === 'dark') {
+                    document.body.classList.add('dark-mode-active');
+                } else {
+                    document.body.classList.remove('dark-mode-active');
+                }
+            }
+            
             const isDark = document.body.classList.contains('dark-mode-active');
             updateThemeIcon(isDark);
         }

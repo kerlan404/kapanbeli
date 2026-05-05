@@ -27,10 +27,11 @@
 
     <style>
         :root {
-            --primary-blue: #2E86DE;
-            --primary-orange: #FF9F43;
-            --accent-green: #1DD1A1;
-            --accent-red: #FF6B6B;
+            --primary-blue: #3B82F6;
+            --primary-blue-dark: #2563EB;
+            --primary-orange: #3B82F6; /* Change orange to blue as requested */
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
             --bg-light: #F8FAFC;
             --white: #FFFFFF;
             --text-main: #1E293B;
@@ -41,7 +42,7 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
             --success: #10B981;
-            --warning: #F59E0B;
+            --warning: #3B82F6;
             --danger: #EF4444;
         }
 
@@ -98,9 +99,9 @@
         body.dark-mode-active .page-title { color: #F8FAFC; }
 
         .page-title i {
-            color: var(--primary-orange);
+            color: var(--primary-blue);
             font-size: 2.2rem;
-            filter: drop-shadow(0 4px 12px rgba(255, 159, 67, 0.3));
+            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
         }
 
         .stats-row {
@@ -246,7 +247,7 @@
         .modal-close:hover { background: var(--accent-red); transform: rotate(90deg); }
         
         .qv-header-premium {
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            background: linear-gradient(135deg, var(--primary-blue), #1E293B);
             padding: 48px 32px 32px;
             text-align: center;
             position: relative;
@@ -289,7 +290,7 @@
 
         .btn-buy-now {
             flex: 1;
-            background: linear-gradient(135deg, #FF9F43, #FF6B6B);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
             color: white;
             border: none;
             padding: 18px;
@@ -301,7 +302,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 10px 20px rgba(255, 159, 67, 0.3);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -348,8 +349,8 @@
             border-radius: 32px !important;
             padding: 1.5rem !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-            background: var(--bg-card) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: var(--white) !important;
+            border: none !important;
         }
 
         .swal-modern-header {
@@ -373,11 +374,11 @@
         }
 
         .stock-control-card {
-            background: rgba(255, 159, 67, 0.03);
+            background: rgba(59, 130, 246, 0.05);
             border-radius: 28px;
             padding: 30px 20px;
             margin-bottom: 24px;
-            border: 1px solid rgba(255, 159, 67, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -401,7 +402,7 @@
             border-radius: 18px;
             border: none;
             background: var(--white);
-            color: var(--primary-orange);
+            color: var(--primary-blue);
             font-size: 1.4rem;
             cursor: pointer;
             display: flex;
@@ -491,11 +492,11 @@
         }
 
         .chip-btn:hover {
-            background: var(--primary-orange);
+            background: var(--primary-blue);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(255, 159, 67, 0.2);
-            border-color: var(--primary-orange);
+            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2);
+            border-color: var(--primary-blue);
         }
 
         /* --- DATE PICKER PREMIUM STYLE --- */
@@ -1168,7 +1169,7 @@
                             <i class="fas fa-eye"></i> ${window.i18n.detail || 'Detail'}
                         </button>
                         <button class="action-btn btn-approve" onclick="approveSuggestion(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">
-                            <i class="fas fa-check"></i> ${item.type === 'low-stock' ? (window.i18n.isi_stok || 'Isi Stok') : (window.i18n.tandai || 'Tandai')}
+                            <i class="fas fa-check"></i> ${window.i18n.isi_stok || 'Isi Stok'}
                         </button>
                     </div>
 
@@ -1328,7 +1329,7 @@
                             <label style="font-size:0.7rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:20px; text-align:center;">Jumlah Tambahan</label>
                             
                             <div class="stock-stepper">
-                                <button class="stepper-btn" onclick="const input = document.getElementById('swal-stock'); if(parseInt(input.value) > 1) { input.value = parseInt(input.value) - 1; input.dispatchEvent(new Event('input')); }">
+                                <button class="stepper-btn" onclick="const input = document.getElementById('swal-stock'); if(parseFloat(input.value) > 1) { input.value = parseFloat(input.value) - 1; input.dispatchEvent(new Event('input')); }">
                                     <i class="fas fa-minus"></i>
                                 </button>
                                 
@@ -1337,15 +1338,15 @@
                                     <span class="unit-pill">${unit}</span>
                                 </div>
                                 
-                                <button class="stepper-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseInt(input.value) + 1; input.dispatchEvent(new Event('input'));">
+                                <button class="stepper-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseFloat(input.value) + 1; input.dispatchEvent(new Event('input'));">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                             
                             <div class="quick-chips">
-                                <button class="chip-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseInt(input.value) + 5; input.dispatchEvent(new Event('input'));">+5</button>
-                                <button class="chip-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseInt(input.value) + 10; input.dispatchEvent(new Event('input'));">+10</button>
-                                <button class="chip-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseInt(input.value) + 20; input.dispatchEvent(new Event('input'));">+20</button>
+                                <button class="chip-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseFloat(input.value) + 5; input.dispatchEvent(new Event('input'));">+5</button>
+                                <button class="chip-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseFloat(input.value) + 10; input.dispatchEvent(new Event('input'));">+10</button>
+                                <button class="chip-btn" onclick="const input = document.getElementById('swal-stock'); input.value = parseFloat(input.value) + 20; input.dispatchEvent(new Event('input'));">+20</button>
                             </div>
 
                             <div style="text-align:center;">
@@ -1422,18 +1423,13 @@
                             const addedStock = parseFloat(result.value.stock);
                             const currentStock = parseFloat(item.stock_quantity || 0);
                             const newTotalStock = currentStock + addedStock;
-                            // Prevent sending overwritten category properties
-                            const payload = { ...item };
-                            delete payload.category;
-                            delete payload.type;
                             
-                            const response = await fetch(`/api/products/${id}`, {
-                                method: 'PUT',
+                            const response = await fetch(`/api/products/${id}/approve-suggestion`, {
+                                method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    ...payload, // Use existing data
-                                    stock_quantity: newTotalStock,
-                                    expiry_date: result.value.expiry || item.expiry_date
+                                    new_stock: newTotalStock,
+                                    new_expiry: result.value.expiry || item.expiry_date
                                 })
                             });
 
@@ -1463,15 +1459,18 @@
                                                 renderSuggestions(allSuggestions);
                                                 
                                                 // Sync stats & notifications after animation
-                                                setTimeout(() => {
-                                                    loadSuggestions();
-                                                    if (window.refreshNotifications) window.refreshNotifications();
-                                                }, 400);
+                                                if (window.refreshNotifications) window.refreshNotifications();
                                             }, 600);
                                         }
                                     } else {
-                                        // If still in suggestion state (e.g. still expired or still low stock)
-                                        loadSuggestions();
+                                        // Update local data and re-render if still in suggestions
+                                        const index = allSuggestions.findIndex(s => s.id === id);
+                                        if (index !== -1) {
+                                            allSuggestions[index].stock_quantity = newTotalStock;
+                                            if (result.value.expiry) allSuggestions[index].expiry_date = result.value.expiry;
+                                            renderSuggestions(allSuggestions);
+                                        }
+                                        
                                         if (window.refreshNotifications) window.refreshNotifications();
                                         
                                         if (isStillExpired || isStillExpiring) {
@@ -1479,7 +1478,7 @@
                                                 icon: 'warning',
                                                 title: 'Stok Diupdate, Tapi...',
                                                 text: 'Bahan ini masih dalam daftar saran karena tanggal kadaluarsanya belum diperbarui. Silakan update tanggal kadaluarsa juga.',
-                                                confirmButtonColor: 'var(--primary-orange)'
+                                                confirmButtonColor: 'var(--primary-blue)'
                                             });
                                         }
                                     }
