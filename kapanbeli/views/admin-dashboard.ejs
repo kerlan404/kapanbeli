@@ -195,27 +195,29 @@
             flex-shrink: 0;
         }
 
-        .activity-info { flex: 1; }
-        .activity-title { font-weight: 800; font-size: 0.95rem; }
-        .activity-time { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .activity-info { flex: 1; min-width: 0; }
+        .activity-title { font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .activity-desc { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 4px; display: block; }
+        .activity-user { font-size: 0.75rem; font-weight: 800; color: var(--primary-blue); margin-bottom: 2px; display: block; text-transform: uppercase; }
 
-        /* Mobile Adjustments */
-        .menu-toggle {
-            display: none;
-            width: 50px; height: 50px;
-            border: 4px solid var(--border-color);
-            background: var(--bg-card);
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 4px 4px 0px var(--shadow-color);
-            margin-bottom: 20px;
+        /* Status Badges for Lists */
+        .status-badge {
+            font-size: 0.7rem; padding: 2px 8px; border: 2px solid var(--border-color);
+            font-weight: 900; text-transform: uppercase;
+        }
+        .status-pending { background: var(--primary-orange); color: white; }
+        .status-unfinished { background: var(--accent-red); color: white; }
+        .status-suggestion { background: var(--primary-blue); color: white; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 40px 20px; color: var(--text-muted);
+            font-weight: 800; text-transform: uppercase; font-size: 0.85rem;
         }
 
         @media (max-width: 992px) {
             .main-content { margin-left: 0; padding: 24px; }
-            .menu-toggle { display: flex; }
             .page-title { font-size: 2rem; }
         }
     </style>
@@ -231,10 +233,21 @@
         </button>
 
         <div class="header-section">
-            <h1 class="page-title">Dashboard Overview</h1>
-            <button class="nb-btn" id="themeToggleBtn" onclick="toggleTheme()">
-                <i class="fas fa-moon"></i> Tema
-            </button>
+            <div>
+                <h1 class="page-title">Dashboard Overview</h1>
+                <p style="color: var(--text-muted); font-weight: 700;">Selamat datang kembali, Admin!</p>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <select id="analyticsRange" class="nb-btn" style="padding: 10px 15px; font-weight: 800; cursor: pointer; outline: none;" onchange="handleRangeChange()">
+                    <option value="today">Hari Ini</option>
+                    <option value="7days" selected>7 Hari Terakhir</option>
+                    <option value="7weeks">7 Minggu Terakhir</option>
+                    <option value="month">Bulan Ini</option>
+                </select>
+                <button class="nb-btn" id="themeToggleBtn" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
+            </div>
         </div>
 
         <!-- Stats Grid -->
@@ -278,11 +291,11 @@
         </div>
 
         <!-- Charts Grid -->
-        <div class="charts-grid">
+        <div class="charts-grid" style="grid-template-columns: 2fr 1fr 1fr;">
             <div class="nb-card">
                 <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                     <i class="fas fa-chart-line" style="color: var(--primary-blue);"></i>
-                    Pertumbuhan Pengguna & Produk
+                    Pertumbuhan <span id="currentRangeLabel">7 Hari Terakhir</span>
                 </h3>
                 <div style="height: 350px;">
                     <canvas id="growthChart"></canvas>
@@ -296,36 +309,97 @@
                     <canvas id="roleChart"></canvas>
                 </div>
             </div>
+            <div class="nb-card">
+                <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 20px;">
+                    Kategori Produk
+                </h3>
+                <div style="height: 350px; display: flex; align-items: center; justify-content: center;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <!-- Previews Grid -->
-        <div class="previews-grid">
-            <!-- Recent Activity -->
+        <!-- Monitoring Grid -->
+        <div class="previews-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-bottom: 40px;">
+            <!-- Global Activity Log -->
             <div class="nb-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="font-weight: 900; text-transform: uppercase;">Aktivitas Terakhir</h3>
-                    <a href="/admin/activity-logs" class="nb-btn" style="padding: 6px 12px; font-size: 0.75rem;">Semua</a>
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
+                        <i class="fas fa-history" style="color: var(--primary-blue); margin-right: 10px;"></i>
+                        Aktivitas Global
+                    </h3>
+                    <a href="/admin/activity-logs" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Lihat</a>
                 </div>
                 <div id="activityLoading" style="text-align: center; padding: 20px;">
                     <i class="fas fa-circle-notch fa-spin"></i>
                 </div>
-                <ul class="preview-list" id="activityList">
-                    <!-- Activities will be loaded here -->
-                </ul>
+                <div id="activityList" class="preview-list"></div>
             </div>
 
-            <!-- Urgent Products -->
+            <!-- Notes Monitor -->
             <div class="nb-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="font-weight: 900; text-transform: uppercase;">Stok Kritis</h3>
-                    <a href="/admin/shopping-suggestions" class="nb-btn" style="padding: 6px 12px; font-size: 0.75rem;">Cek Semua</a>
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
+                        <i class="fas fa-sticky-note" style="color: var(--primary-orange); margin-right: 10px;"></i>
+                        Catatan Monitor
+                    </h3>
+                    <a href="/admin/notes" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Kelola</a>
                 </div>
-                <div id="productsLoading" style="text-align: center; padding: 20px;">
+                <div id="notesLoading" style="text-align: center; padding: 20px;">
                     <i class="fas fa-circle-notch fa-spin"></i>
                 </div>
-                <ul class="preview-list" id="productsList">
-                    <!-- Products will be loaded here -->
-                </ul>
+                <div id="notesMonitorList" class="preview-list"></div>
+            </div>
+
+            <!-- Shopping Suggestions -->
+            <div class="nb-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
+                        <i class="fas fa-shopping-basket" style="color: var(--accent-green); margin-right: 10px;"></i>
+                        Saran Pembelian
+                    </h3>
+                    <a href="/admin/shopping-suggestions" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Cek</a>
+                </div>
+                <div id="suggestionsLoading" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                </div>
+                <div id="suggestionList" class="preview-list"></div>
+            </div>
+        </div>
+
+        <!-- Product Management Section -->
+        <div class="nb-card" style="margin-bottom: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.2rem; display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 40px; height: 40px; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; border: 3px solid #000; box-shadow: 3px 3px 0 #000;">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    Manajemen Produk Terbaru
+                </h3>
+                <a href="/admin/products" class="nb-btn" style="padding: 10px 20px; font-size: 0.85rem;">
+                    <i class="fas fa-external-link-alt" style="margin-right: 8px;"></i> Ke Halaman Produk
+                </a>
+            </div>
+            
+            <div style="overflow-x: auto; border: 4px solid #000; background: var(--bg-card);">
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                    <thead>
+                        <tr style="background: var(--primary-blue); border-bottom: 4px solid #000;">
+                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Produk</th>
+                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Kategori</th>
+                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Stok</th>
+                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Pemilik</th>
+                            <th style="padding: 15px; text-align: center; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="latestProductsTable">
+                        <tr>
+                            <td colspan="5" style="padding: 40px; text-align: center; font-weight: 800; color: var(--text-muted);">
+                                <i class="fas fa-circle-notch fa-spin" style="margin-right: 10px;"></i> Memuat produk...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
@@ -347,12 +421,29 @@
             const btn = document.getElementById('themeToggleBtn');
             if (btn) btn.innerHTML = isDark ? '<i class="fas fa-sun"></i> Tema' : '<i class="fas fa-moon"></i> Tema';
             
+            const savedRange = localStorage.getItem('dashboard_range') || '7days';
+            document.getElementById('analyticsRange').value = savedRange;
+            
             loadStats();
             loadActivities();
-            loadUrgentProducts();
-            initGrowthChart();
-            initRoleChart();
+            loadNotesMonitor();
+            loadSuggestions();
+            loadLatestProducts();
+            initCharts(savedRange);
         });
+
+        function handleRangeChange() {
+            const range = document.getElementById('analyticsRange').value;
+            localStorage.setItem('dashboard_range', range);
+            initCharts(range);
+            loadStats(); // Reload stats as some might be range-dependent
+        }
+
+        async function initCharts(range = '7days') {
+            initGrowthChart(range);
+            initRoleChart();
+            initCategoryChart();
+        }
 
         async function loadStats() {
             try {
@@ -370,31 +461,208 @@
 
         async function loadActivities() {
             try {
-                const res = await fetch('/api/activity-logs?limit=5', { credentials: 'same-origin' });
+                const res = await fetch('/api/activity-logs?limit=8', { credentials: 'same-origin' });
                 const result = await res.json();
                 document.getElementById('activityLoading').style.display = 'none';
                 if (result.success && result.data) {
                     const list = document.getElementById('activityList');
                     list.innerHTML = result.data.map(log => {
-                        let color = '#3B82F6';
-                        if (log.activity_type === 'DELETE') color = '#EF4444';
-                        if (log.activity_type === 'CREATE') color = '#10B981';
-                        if (log.activity_type === 'LOGIN') color = '#FF9F43';
-
+                        let color = 'var(--primary-blue)';
+                        if (log.activity_type === 'DELETE') color = 'var(--accent-red)';
+                        if (log.activity_type === 'CREATE') color = 'var(--accent-green)';
+                        if (log.activity_type === 'LOGIN') color = 'var(--primary-orange)';
+                        
                         return `
-                            <li class="preview-item">
-                                <div class="activity-icon" style="background: ${color}20; border-color: ${color}; color: ${color};">
+                            <div class="preview-item">
+                                <div class="activity-icon" style="background: ${color}10; border-color: ${color}; color: ${color}; width: 36px; height: 36px; font-size: 0.9rem;">
                                     <i class="fas ${getActivityIcon(log.activity_type)}"></i>
                                 </div>
                                 <div class="activity-info">
-                                    <div class="activity-title"><strong>${log.user_name}</strong> ${log.description}</div>
-                                    <div class="activity-time">${new Date(log.created_at).toLocaleString('id-ID')}</div>
+                                    <div class="activity-user" style="font-size: 0.7rem; font-weight: 900; color: ${color}; margin-bottom: 2px;">${log.user_name} • ${log.activity_type}</div>
+                                    <div class="activity-title" style="font-size: 0.85rem; font-weight: 700;">${log.description}</div>
+                                    <div class="activity-time" style="font-size: 0.7rem;">${formatTimeAgo(log.created_at)}</div>
                                 </div>
-                            </li>
+                            </div>
                         `;
                     }).join('');
                 }
             } catch (err) { console.error('Error activity:', err); }
+        }
+
+        async function loadNotesMonitor() {
+            try {
+                const res = await fetch('/api/admin/notes?limit=8', { credentials: 'same-origin' });
+                const result = await res.json();
+                document.getElementById('notesLoading').style.display = 'none';
+                const notes = (result.data || []).filter(n => n.status !== 'Selesai').slice(0, 8);
+                
+                const list = document.getElementById('notesMonitorList');
+                if (notes.length === 0) {
+                    list.innerHTML = '<div class="empty-state">Semua catatan selesai</div>';
+                    return;
+                }
+
+                list.innerHTML = notes.map(n => `
+                    <div class="preview-item">
+                        <div class="activity-icon" style="background: ${n.status === 'Pending' ? 'var(--primary-orange)' : 'var(--accent-red)'}10; border-color: ${n.status === 'Pending' ? 'var(--primary-orange)' : 'var(--accent-red)'}; color: ${n.status === 'Pending' ? 'var(--primary-orange)' : 'var(--accent-red)'}; width: 36px; height: 36px; font-size: 0.9rem;">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-user" style="font-size: 0.7rem; font-weight: 900; color: var(--text-muted); margin-bottom: 2px;">${n.user_name} • <span class="status-badge ${n.status === 'Pending' ? 'status-pending' : 'status-unfinished'}" style="font-size: 0.6rem; padding: 1px 4px;">${n.status}</span></div>
+                            <div class="activity-title" style="font-size: 0.85rem; font-weight: 700;">${n.title}</div>
+                            <div class="activity-time" style="font-size: 0.7rem;">${formatTimeAgo(n.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error('Error notes:', err); }
+        }
+
+        async function loadSuggestions() {
+            try {
+                const res = await fetch('/api/admin/shopping-suggestions?limit=8', { credentials: 'same-origin' });
+                const result = await res.json();
+                document.getElementById('suggestionsLoading').style.display = 'none';
+                const suggestions = result.data || [];
+                
+                const list = document.getElementById('suggestionList');
+                if (suggestions.length === 0) {
+                    list.innerHTML = '<div class="empty-state">Stok aman semua</div>';
+                    return;
+                }
+
+                list.innerHTML = suggestions.map(s => `
+                    <div class="preview-item">
+                        <div class="activity-icon" style="background: var(--accent-green)10; border-color: var(--accent-green); color: var(--accent-green); width: 36px; height: 36px; font-size: 0.9rem;">
+                            <i class="fas fa-shopping-basket"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-user" style="font-size: 0.7rem; font-weight: 900; color: var(--text-muted); margin-bottom: 2px;">${s.user_name} • Stok: ${s.stock_quantity}</div>
+                            <div class="activity-title" style="font-size: 0.85rem; font-weight: 700;">${s.name}</div>
+                            <div class="activity-time" style="font-size: 0.7rem;">Disarankan beli di ${s.category_name || 'Pasar/Toko'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error('Error suggestions:', err); }
+        }
+
+        function formatTimeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'Baru saja';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} menit lalu`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} jam lalu`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days} hari lalu`;
+            return date.toLocaleDateString('id-ID');
+        }
+
+        let growthChart, roleChart, categoryChart;
+
+        async function loadLatestProducts() {
+            try {
+                const res = await fetch('/api/admin/products?limit=10', { credentials: 'same-origin' });
+                const result = await res.json();
+                const tbody = document.getElementById('latestProductsTable');
+                
+                if (result.success && result.data) {
+                    const products = result.data;
+                    if (products.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="padding: 40px; text-align: center; font-weight: 800;">Belum ada produk</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = products.map(p => {
+                        let stockColor = 'var(--text-primary)';
+                        let stockLabel = 'Aman';
+                        if (p.stock_quantity <= 0) { stockColor = 'var(--accent-red)'; stockLabel = 'Habis'; }
+                        else if (p.stock_quantity <= p.min_stock_level) { stockColor = 'var(--primary-orange)'; stockLabel = 'Menipis'; }
+
+                        return `
+                            <tr style="border-bottom: 2px solid #000;">
+                                <td style="padding: 15px; font-weight: 800; border-right: 2px solid #000;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 32px; height: 32px; border: 2px solid #000; background: ${p.image_url ? `url(${p.image_url})` : 'var(--primary-blue)'}; background-size: cover; background-position: center;"></div>
+                                        <span>${p.name}</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 15px; font-weight: 700; color: var(--text-muted); border-right: 2px solid #000;">${p.category_name || 'Lainnya'}</td>
+                                <td style="padding: 15px; font-weight: 900; color: ${stockColor}; border-right: 2px solid #000;">${p.stock_quantity} ${p.unit || ''}</td>
+                                <td style="padding: 15px; border-right: 2px solid #000;">
+                                    <div style="font-weight: 800; font-size: 0.85rem;">${p.user_name || 'System'}</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted);">${p.user_email || ''}</div>
+                                </td>
+                                <td style="padding: 15px; text-align: center;">
+                                    <span class="status-badge" style="background: ${stockColor}10; color: ${stockColor}; border-color: ${stockColor}; padding: 4px 10px; font-size: 0.65rem;">${stockLabel}</span>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--accent-red); font-weight: 800;">Gagal memuat data</td></tr>';
+                }
+            } catch (err) { 
+                console.error('Error loading latest products:', err); 
+                document.getElementById('latestProductsTable').innerHTML = '<tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--accent-red); font-weight: 800;">Kesalahan Server</td></tr>';
+            }
+        }
+
+        async function initGrowthChart(range = '7days') {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            try {
+                const res = await fetch(`/api/admin/analytics?range=${range}`, { credentials: 'same-origin' });
+                const result = await res.json();
+                
+                if (result.success) {
+                    const data = result.chart;
+                    document.getElementById('currentRangeLabel').textContent = result.period;
+
+                    if (growthChart) growthChart.destroy();
+
+                    growthChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'User Baru',
+                                    data: data.users,
+                                    borderColor: '#3B82F6',
+                                    borderWidth: 4,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    fill: true,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'Produk Baru',
+                                    data: data.products,
+                                    borderColor: '#FF9F43',
+                                    borderWidth: 4,
+                                    backgroundColor: 'rgba(255, 159, 67, 0.1)',
+                                    fill: true,
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { font: { weight: 'bold', family: 'Outfit' } } }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                    updateChartsTheme(document.body.classList.contains('dark-mode-active'));
+                }
+            } catch (err) { console.error('Error growth chart:', err); }
         }
 
         function getActivityIcon(type) {
@@ -409,113 +677,96 @@
             return icons[type] || 'fa-circle';
         }
 
-        async function loadUrgentProducts() {
-            try {
-                const res = await fetch('/api/admin/shopping-suggestions?limit=5', { credentials: 'same-origin' });
-                const result = await res.json();
-                document.getElementById('productsLoading').style.display = 'none';
-                if (result.success && result.data) {
-                    const list = document.getElementById('productsList');
-                    list.innerHTML = result.data.map(p => `
-                        <li class="preview-item">
-                            <div class="activity-icon" style="background: #EF444420; border-color: #EF4444; color: #EF4444;">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="activity-info">
-                                <div class="activity-title"><strong>${p.name}</strong> - Stok: ${p.stock_quantity} ${p.unit}</div>
-                                <div class="activity-time">Pemilik: ${p.user_name}</div>
-                            </div>
-                            <div style="font-weight: 900; color: #EF4444; font-size: 0.7rem; text-transform: uppercase;">
-                                ${p.stock_quantity <= 0 ? 'Habis' : 'Kritis'}
-                            </div>
-                        </li>
-                    `).join('');
-                }
-            } catch (err) { console.error('Error products:', err); }
-        }
-
-        let growthChart, roleChart;
-
-        async function initGrowthChart() {
-            const ctx = document.getElementById('growthChart').getContext('2d');
+        function formatTimeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const seconds = Math.floor((now - date) / 1000);
             
-            // Ambil data analitik jika ada endpoint-nya, atau gunakan dummy untuk demo visual
-            // Karena analitik biasanya butuh data agregat per hari
-            const labels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-            const userData = [5, 12, 8, 25, 18, 30, 45];
-            const productData = [10, 20, 15, 35, 25, 45, 60];
-
-            growthChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'User Baru',
-                            data: userData,
-                            borderColor: '#3B82F6',
-                            borderWidth: 4,
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Produk Baru',
-                            data: productData,
-                            borderColor: '#FF9F43',
-                            borderWidth: 4,
-                            backgroundColor: 'rgba(255, 159, 67, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { font: { weight: 'bold', family: 'Outfit' } } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
+            if (seconds < 60) return 'Baru saja';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} menit lalu`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} jam lalu`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days} hari lalu`;
+            return date.toLocaleDateString('id-ID');
         }
 
         async function initRoleChart() {
             const ctx = document.getElementById('roleChart').getContext('2d');
             
-            // Get data from stats
-            const res = await fetch('/api/users/statistics', { credentials: 'same-origin' });
-            const result = await res.json();
-            
-            let adminCount = 1, userCount = 10; // Defaults
-            if (result.success) {
-                adminCount = result.data.admin_users;
-                userCount = result.data.total_users - adminCount;
-            }
-
-            roleChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Admin', 'User'],
-                    datasets: [{
-                        data: [adminCount, userCount],
-                        backgroundColor: ['#3B82F6', '#FF9F43'],
-                        borderWidth: 4,
-                        borderColor: '#000'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { font: { weight: 'bold', family: 'Outfit' } } }
-                    }
+            try {
+                const res = await fetch('/api/users/statistics', { credentials: 'same-origin' });
+                const result = await res.json();
+                
+                let adminCount = 1, userCount = 10;
+                if (result.success) {
+                    adminCount = result.data.admin_users;
+                    userCount = result.data.total_users - adminCount;
                 }
-            });
+
+                if (roleChart) roleChart.destroy();
+
+                roleChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Admin', 'User'],
+                        datasets: [{
+                            data: [adminCount, userCount],
+                            backgroundColor: ['#3B82F6', '#FF9F43'],
+                            borderWidth: 4,
+                            borderColor: '#000'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { weight: 'bold', family: 'Outfit' } } }
+                        }
+                    }
+                });
+                updateChartsTheme(document.body.classList.contains('dark-mode-active'));
+            } catch (err) { console.error('Error role chart:', err); }
+        }
+
+        async function initCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            try {
+                const res = await fetch('/api/admin/analytics/category-distribution', { credentials: 'same-origin' });
+                const result = await res.json();
+                
+                if (result.success) {
+                    const data = result.categories;
+                    const labels = data.map(c => c.name);
+                    const counts = data.map(c => c.count);
+                    const colors = ['#3B82F6', '#FF9F43', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6'];
+
+                    if (categoryChart) categoryChart.destroy();
+
+                    categoryChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: colors,
+                                borderWidth: 4,
+                                borderColor: '#000'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { font: { weight: 'bold', family: 'Outfit', size: 10 } } }
+                            }
+                        }
+                    });
+                    updateChartsTheme(document.body.classList.contains('dark-mode-active'));
+                }
+            } catch (err) { console.error('Error category chart:', err); }
         }
 
         function updateChartsTheme(isDark) {
@@ -533,6 +784,11 @@
                 roleChart.options.plugins.legend.labels.color = color;
                 roleChart.data.datasets[0].borderColor = isDark ? '#1E293B' : '#000';
                 roleChart.update();
+            }
+            if (categoryChart) {
+                categoryChart.options.plugins.legend.labels.color = color;
+                categoryChart.data.datasets[0].borderColor = isDark ? '#1E293B' : '#000';
+                categoryChart.update();
             }
         }
     </script>

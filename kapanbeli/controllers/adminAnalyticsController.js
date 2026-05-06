@@ -32,6 +32,7 @@ const analyticsController = {
             const config = {
                 today: { days: 1, interval: 0, hourFormat: true },
                 '7days': { days: 7, interval: 6, hourFormat: false },
+                '7weeks': { days: 49, interval: 48, hourFormat: false },
                 month: { days: 30, interval: 29, hourFormat: false }
             };
 
@@ -268,7 +269,7 @@ const analyticsController = {
     },
 
     getPeriodLabel(range) {
-        const labels = { today: 'Hari Ini', '7days': '7 Hari Terakhir', month: 'Bulan Ini' };
+        const labels = { today: 'Hari Ini', '7days': '7 Hari Terakhir', '7weeks': '7 Minggu Terakhir', month: 'Bulan Ini' };
         return labels[range] || '7 Hari Terakhir';
     },
 
