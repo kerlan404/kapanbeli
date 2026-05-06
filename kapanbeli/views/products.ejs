@@ -464,7 +464,7 @@
         }
 
         .btn-edit {
-            background: linear-gradient(135deg, var(--primary-blue), #1B5F9E);
+            background: linear-gradient(135deg, var(--accent-blue), #1B5F9E);
             color: white;
             box-shadow: 0 4px 12px rgba(46, 134, 222, 0.2);
         }
@@ -695,8 +695,8 @@
             }
 
             items.forEach(item => {
-                const stockNum = parseFloat(item.stock_quantity);
-                const stockDisplay = Number.isInteger(stockNum) ? stockNum.toString() : stockNum.toFixed(1);
+                const stockNum = Math.round(parseFloat(item.stock_quantity) * 100) / 100;
+                const stockDisplay = stockNum;
                 
                 const minStockNum = parseFloat(item.min_stock_level);
                 const isLow = stockNum <= minStockNum;

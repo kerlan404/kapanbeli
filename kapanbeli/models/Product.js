@@ -141,8 +141,12 @@ const Product = {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
             const [result] = await db.execute(query, [
-                user_id, name, description, category_id, stock_quantity,
-                min_stock_level, image_url, unit, quantity, expiryDateValue, notes
+                user_id, name, description, category_id, 
+                Math.round(parseFloat(stock_quantity) * 100) / 100,
+                Math.round(parseFloat(min_stock_level) * 100) / 100,
+                image_url, unit, 
+                Math.round(parseFloat(quantity) * 100) / 100,
+                expiryDateValue, notes
             ]);
 
             // Update user stats after creating product (lazy require to avoid circular dependency)
@@ -262,8 +266,12 @@ const Product = {
                 WHERE id = ? AND user_id = ?
             `;
             const [result] = await db.execute(query, [
-                name, description, category_id, stock_quantity,
-                min_stock_level, image_url, unit, quantity, expiryDateValue, notes,
+                name, description, category_id, 
+                Math.round(parseFloat(stock_quantity) * 100) / 100,
+                Math.round(parseFloat(min_stock_level) * 100) / 100,
+                image_url, unit, 
+                Math.round(parseFloat(quantity) * 100) / 100,
+                expiryDateValue, notes,
                 productId, userId
             ]);
 

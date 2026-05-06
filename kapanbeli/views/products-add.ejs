@@ -589,12 +589,12 @@
                     // Satuan
                     document.getElementById('productUnit').value = p.unit || 'pcs';
 
-                    // Stok
-                    const stockNum = parseFloat(p.stock_quantity);
-                    document.getElementById('productQuantity').value = Number.isInteger(stockNum) ? stockNum : stockNum;
+                    // Stok (Round to 2 decimal places to prevent 49.99 issue)
+                    const stockNum = Math.round(parseFloat(p.stock_quantity) * 100) / 100;
+                    document.getElementById('productQuantity').value = isNaN(stockNum) ? 0 : stockNum;
 
-                    const minStockNum = parseFloat(p.min_stock_level);
-                    document.getElementById('productMinStock').value = Number.isInteger(minStockNum) ? minStockNum : minStockNum;
+                    const minStockNum = Math.round(parseFloat(p.min_stock_level) * 100) / 100;
+                    document.getElementById('productMinStock').value = isNaN(minStockNum) ? 1 : minStockNum;
 
                     // ✅ FIX TANGGAL: konversi dari ISO "YYYY-MM-DD" ke "DD/MM/YYYY"
                     if (p.expiry_date) {

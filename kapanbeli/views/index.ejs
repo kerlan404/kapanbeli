@@ -628,13 +628,17 @@
 
         /* --- SUGGESTIONS SECTION (HOME) --- */
         .suggestions-section {
-            margin-bottom: 100px;
+            margin-bottom: 120px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .suggestions-grid-home {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
         }
 
         .suggestion-card-home {
@@ -877,74 +881,8 @@
         </div>
 
         <!-- SUGGESTIONS SECTION -->
-        <% if (typeof homeSuggestions !== 'undefined' && homeSuggestions && homeSuggestions.length > 0) { %>
-        <section class="suggestions-section animate__animated animate__fadeInUp">
-            <div class="section-header">
-                <div class="header-title">
-                    <h2 style="color: var(--primary);">Saran Pembelian</h2>
-                    <p>Produk yang butuh perhatian segera karena stok menipis atau kadaluarsa.</p>
-                </div>
-                <a href="/suggestions" class="btn btn-outline" style="padding: 10px 24px; font-size: 0.9rem;">Lihat Semua Saran</a>
-            </div>
 
-            <div class="suggestions-grid-home">
-                <% homeSuggestions.forEach(item => { %>
-                    <div class="suggestion-card-home type-<%= item.type %>">
-                        <div class="s-header">
-                            <div class="s-icon">
-                                <i class="fas <%= 
-                                    item.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' : 
-                                    item.name.toLowerCase().includes('telur') ? 'fa-egg' : 
-                                    item.name.toLowerCase().includes('bawang') ? 'fa-seedling' : 
-                                    item.name.toLowerCase().includes('beras') ? 'fa-wheat' : 
-                                    item.name.toLowerCase().includes('cabai') ? 'fa-pepper-hot' : 
-                                    item.name.toLowerCase().includes('minyak') ? 'fa-bottle-droplet' : 
-                                    'fa-box-open'
-                                %>"></i>
-                            </div>
-                            <div class="s-info">
-                                <div class="s-title"><%= item.name %></div>
-                                <div class="s-category"><%= item.category_name || 'Bahan' %></div>
-                            </div>
-                        </div>
 
-                        <span class="s-status status-<%= item.type %>">
-                            <%= item.type === 'expired' ? 'Kadaluarsa' : 
-                                item.type === 'low-stock' ? (item.stock_quantity <= 0 ? 'Habis' : 'Stok Rendah') : 
-                                'Hampir Kadaluarsa' %>
-                        </span>
-
-                        <div class="s-details">
-                            <div class="s-detail-item">
-                                <div class="s-label">Stok</div>
-                                <div class="s-value <%= item.stock_quantity <= 0 ? 'danger' : item.stock_quantity <= item.min_stock_level ? 'warning' : '' %>">
-                                    <%= item.stock_quantity %> <%= item.unit || 'pcs' %>
-                                </div>
-                            </div>
-                            <div class="s-detail-item">
-                                <div class="s-label">Kadaluarsa</div>
-                                <div class="s-value <%= item.type === 'expired' ? 'danger' : item.type === 'expiring' ? 'warning' : '' %>">
-                                    <% if (item.expiry_date) { %>
-                                        <% const d = new Date(item.expiry_date); %>
-                                        <%= d.getDate().toString().padStart(2, '0') %>/<%= (d.getMonth()+1).toString().padStart(2, '0') %>/<%= d.getFullYear() %>
-                                    <% } else { %>-<% } %>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="s-actions">
-                            <button class="s-btn s-btn-detail" onclick="window.location='/products/detail/<%= item.id %>'">
-                                <i class="fas fa-eye"></i> Detail
-                            </button>
-                            <button class="s-btn s-btn-buy" onclick="quickApprove(<%= item.id %>, '<%= item.name.replace(/'/g, "\\'") %>', '<%= item.type %>')">
-                                <i class="fas fa-cart-plus"></i> Isi Stok
-                            </button>
-                        </div>
-                    </div>
-                <% }) %>
-            </div>
-        </section>
-        <% } %>
         <section style="margin-bottom: 100px;">
             <div class="section-header">
                 <div class="header-title">
@@ -980,7 +918,7 @@
                             <div class="card-body">
                                 <h4><%= prod.name %></h4>
                                 <div class="card-stats">
-                                    <span><%= prod.stock_quantity %> <%= prod.unit %></span>
+                                    <span><%= Math.round(parseFloat(prod.stock_quantity) * 100) / 100 %> <%= prod.unit %></span>
                                     <span style="<%= isDeactivated ? 'color: #EF4444;' : 'color: var(--primary);' %>">
                                         <%= isDeactivated ? __('restricted') : __('available') %>
                                     </span>
@@ -1034,61 +972,84 @@
             </div>
         </section>
 
-        <section style="margin-bottom: 120px;">
-            <div class="activity-container">
-                <div class="activity-content">
-                    <div id="logHeader" class="log-header" onclick="toggleLog()">
-                        <div>
-                            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;"><%= __('index_log') %></h2>
-                            <p style="opacity: 0.5; font-weight: 600;"><%= __('index_log_desc') %></p>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 20px;">
-                            <i class="fas fa-shield-halved" style="font-size: 3rem; color: var(--primary); opacity: 0.2;"></i>
-                            <i class="fas fa-chevron-up collapse-icon" style="font-size: 2rem; color: var(--primary); opacity: 0.5;"></i>
-                        </div>
-                    </div>
 
-                    <div class="activity-stream-wrapper" id="activityStreamWrapper">
-                        <div class="activity-stream">
-                        <% if (activities && activities.length > 0) { %>
-                            <% activities.forEach(act => { %>
-                                <div class="activity-row">
-                                    <div class="row-icon">
-                                        <% if(act.activity_type === 'CREATE') { %>
-                                            <i class="fas fa-plus-circle"></i>
-                                        <% } else if(act.activity_type === 'UPDATE') { %>
-                                            <i class="fas fa-sync"></i>
-                                        <% } else if(act.activity_type === 'DELETE') { %>
-                                            <i class="fas fa-minus-circle"></i>
-                                        <% } else if(act.activity_type === 'SUGGESTION') { %>
-                                            <i class="fas fa-shopping-cart" style="color: var(--primary);"></i>
-                                        <% } else { %>
-                                            <i class="fas fa-info-circle"></i>
-                                        <% } %>
-                                    </div>
-                                    <div style="flex-grow: 1;">
-                                        <h5 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;"><%= act.description %></h5>
-                                        <p style="font-size: 0.85rem; opacity: 0.5;"><%= new Date(act.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) %></p>
-                                    </div>
-                                    <div style="font-size: 0.7rem; font-weight: 800; color: var(--primary); background: rgba(59, 130, 246, 0.1); padding: 4px 10px; border-radius: 6px;">
-                                        <%= act.activity_type %>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        <% } else { %>
-                            <div style="text-align: center; padding: 60px; opacity: 0.3;">
-                                <i class="fas fa-terminal" style="font-size: 3rem; margin-bottom: 20px;"></i>
-                                <p>Tidak ada log operasional terekam.</p>
+
+        <!-- SUGGESTIONS SECTION -->
+        <% if (typeof homeSuggestions !== 'undefined' && homeSuggestions && homeSuggestions.length > 0) { %>
+        <section class="suggestions-section animate__animated animate__fadeInUp" style="margin-top: 100px;">
+            <div class="section-header">
+                <div class="header-title">
+                    <h2 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1px;"><%= __('index_suggestions') || 'Saran Pembelian' %></h2>
+                    <p style="color: var(--text-muted); font-weight: 500;"><%= __('index_suggestions_desc') || 'Produk yang butuh perhatian segera karena stok menipis atau kadaluarsa.' %></p>
+                </div>
+                <a href="/suggestions" class="btn btn-outline" style="padding: 10px 24px; font-size: 0.9rem;">Lihat Semua Saran</a>
+            </div>
+
+            <div class="suggestions-grid-home">
+                <% homeSuggestions.forEach(item => { %>
+                    <div class="suggestion-card-home type-<%= item.type %>">
+                        <div class="s-header">
+                            <div class="s-icon">
+                                <i class="fas <%= 
+                                    item.name.toLowerCase().includes('susu') ? 'fa-glass-whiskey' : 
+                                    item.name.toLowerCase().includes('telur') ? 'fa-egg' : 
+                                    item.name.toLowerCase().includes('bawang') ? 'fa-seedling' : 
+                                    item.name.toLowerCase().includes('beras') ? 'fa-wheat' : 
+                                    item.name.toLowerCase().includes('cabai') ? 'fa-pepper-hot' : 
+                                    item.name.toLowerCase().includes('minyak') ? 'fa-bottle-droplet' : 
+                                    'fa-box-open'
+                                %>"></i>
                             </div>
-                        <% } %>
+                            <div class="s-info">
+                                <div class="s-title" title="<%= item.name %>"><%= item.name %></div>
+                                <div class="s-category"><%= item.category_name || 'Bahan' %></div>
+                            </div>
+                        </div>
+
+                        <span class="s-status status-<%= item.type %>">
+                            <%= item.type === 'expired' ? 'Kadaluarsa' : 
+                                item.type === 'low-stock' ? (item.stock_quantity <= 0 ? 'Habis' : 'Stok Rendah') : 
+                                'Hampir Kadaluarsa' %>
+                        </span>
+
+                        <div class="s-details">
+                            <div class="s-detail-item">
+                                <div class="s-label">Stok</div>
+                                <div class="s-value <%= item.stock_quantity <= 0 ? 'danger' : item.stock_quantity <= item.min_stock_level ? 'warning' : '' %>">
+                                    <%= Math.round(parseFloat(item.stock_quantity) * 100) / 100 %> <%= item.unit || 'pcs' %>
+                                </div>
+                            </div>
+                            <div class="s-detail-item">
+                                <div class="s-label">Kadaluarsa</div>
+                                <div class="s-value <%= item.type === 'expired' ? 'danger' : item.type === 'expiring' ? 'warning' : '' %>">
+                                    <% if (item.expiry_date) { %>
+                                        <% const d = new Date(item.expiry_date); %>
+                                        <%= d.getDate().toString().padStart(2, '0') %>/<%= (d.getMonth()+1).toString().padStart(2, '0') %>/<%= d.getFullYear() %>
+                                    <% } else { %>-<% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="s-actions">
+                            <button class="s-btn s-btn-detail" onclick="window.location='/products/detail/<%= item.id %>'">
+                                <i class="fas fa-eye"></i> Detail
+                            </button>
+                            <button class="s-btn s-btn-buy" onclick="quickApprove(<%= item.id %>, '<%= item.name.replace(/'/g, "\\'") %>', '<%= item.type %>')">
+                                <i class="fas fa-cart-plus"></i> Isi Stok
+                            </button>
                         </div>
                     </div>
-                </div>
+                <% }) %>
             </div>
         </section>
+        <% } %>
+
     </div>
 
-    <!-- FEATURES EXPLANATION -->
+
+
+        <!-- FEATURES EXPLANATION -->
+
     <section class="footer-features">
         <div class="container">
             <div class="hero-badge">

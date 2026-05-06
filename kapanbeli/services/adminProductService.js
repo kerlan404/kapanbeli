@@ -21,7 +21,8 @@ function formatWeight(weight, unit = 'kg') {
     if (Number.isInteger(numWeight)) {
         return numWeight + ' ' + unit;
     }
-    return parseFloat(numWeight.toFixed(1)) + ' ' + unit;
+    // Round to 2 decimals to be precise
+    return Math.round(numWeight * 100) / 100 + ' ' + unit;
 }
 
 /**
@@ -39,7 +40,8 @@ function formatStockQuantity(quantity) {
     if (Number.isInteger(numQty)) {
         return numQty.toString();
     }
-    return parseFloat(numQty.toFixed(1)).toString();
+    // Round to 2 decimals to be precise
+    return (Math.round(numQty * 100) / 100).toString();
 }
 
 const adminProductService = {
@@ -232,7 +234,13 @@ const adminProductService = {
             for (const field of allowedFields) {
                 if (updateData[field] !== undefined) {
                     updates.push(`${field} = ?`);
-                    values.push(updateData[field]);
+                    
+                    let val = updateData[field];
+                    // Round numeric fields to 2 decimals to prevent precision errors
+                    if (['stock_quantity', 'min_stock_level', 'quantity'].includes(field)) {
+                        val = Math.round(parseFloat(val) * 100) / 100;
+                    }
+                    values.push(val);
                 }
             }
 
@@ -413,8 +421,8 @@ const adminProductService = {
                 name,
                 description || null,
                 categoryIdToUse,
-                stock_quantity !== undefined ? stock_quantity : 0,
-                min_stock_level !== undefined ? min_stock_level : 5,
+                stock_quantity !== undefined ? Math.round(parseFloat(stock_quantity) * 100) / 100 : 0,
+                min_stock_level !== undefined ? Math.round(parseFloat(min_stock_level) * 100) / 100 : 5,
                 unit || 'pcs',
                 expiry_date || null,
                 user_id,

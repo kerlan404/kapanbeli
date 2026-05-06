@@ -107,6 +107,11 @@ const productsController = {
                 }
             }
 
+            // Round values to 2 decimal places to prevent precision errors (e.g. 49.99 instead of 50)
+            stock_quantity = Math.round(parseFloat(stock_quantity) * 100) / 100;
+            min_stock_level = Math.round(parseFloat(min_stock_level) * 100) / 100;
+            quantity = Math.round(parseFloat(quantity) * 100) / 100;
+
             // Panggil fungsi dari model untuk membuat produk baru
             const newProduct = await ProductModel.create({
                 user_id: userId,
@@ -196,6 +201,11 @@ const productsController = {
             stock_quantity = typeof stock_quantity === 'string' ? parseFloat(stock_quantity) || 0 : (stock_quantity || 0);
             min_stock_level = typeof min_stock_level === 'string' ? parseFloat(min_stock_level) || 5 : (min_stock_level || 5);
             quantity = typeof quantity === 'string' ? parseFloat(quantity) || 1 : (quantity || 1);
+
+            // Round values to 2 decimal places to prevent precision errors
+            stock_quantity = Math.round(stock_quantity * 100) / 100;
+            min_stock_level = Math.round(min_stock_level * 100) / 100;
+            quantity = Math.round(quantity * 100) / 100;
 
             // Handle expiry_date: convert empty string to NULL for products without expiry
             if (expiry_date === '' || expiry_date === null || expiry_date === undefined) {
@@ -574,11 +584,12 @@ const productsController = {
             }
 
             // Update produk - MUST pass all existing fields because the model's update query expects them
+            const roundedStock = Math.round(parseFloat(new_stock) * 100) / 100;
             const updatedProduct = await ProductModel.update(productId, userId, {
                 name: product.name,
                 description: product.description,
                 category_id: product.category_id,
-                stock_quantity: parseFloat(new_stock),
+                stock_quantity: roundedStock,
                 min_stock_level: product.min_stock_level,
                 image_url: product.image_url,
                 unit: product.unit,
