@@ -87,13 +87,26 @@
     }
 
     function confirmLogout() {
-        if (confirm('Yakin ingin keluar dari panel admin?')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/auth/logout';
-            document.body.appendChild(form);
-            form.submit();
-        }
+        Swal.fire({
+            title: 'Keluar Panel Admin?',
+            text: "Yakin ingin keluar dari panel admin?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#FF6B6B',
+            cancelButtonColor: '#2E86DE',
+            confirmButtonText: 'Ya, Keluar!',
+            cancelButtonText: 'Batal',
+            background: document.body.classList.contains('dark-mode-active') ? '#1e2128' : '#fff',
+            color: document.body.classList.contains('dark-mode-active') ? '#ecf0f1' : '#2C3E50'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/auth/logout';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 </script>
 

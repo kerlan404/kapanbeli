@@ -14,6 +14,9 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --primary-blue: #3B82F6;
@@ -749,16 +752,35 @@
         }
 
         async function deleteUser(id) {
-            if (!confirm('Yakin ingin menghapus user ini?')) return;
-            try {
-                const res = await fetch(`/api/users/${id}`, { method: 'DELETE', credentials: 'same-origin' });
-                const result = await res.json();
-                if (result.success) {
-                    showToast('User dihapus', 'success');
-                    loadUsers(currentPage);
-                    loadUserStatistics();
+            Swal.fire({
+                title: 'Hapus User?',
+                text: "Data user yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#3B82F6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                background: document.body.classList.contains('dark-mode-active') ? '#1E293B' : '#fff',
+                color: document.body.classList.contains('dark-mode-active') ? '#F1F5F9' : '#1E293B'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`/api/users/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+                        const resultData = await res.json();
+                        if (resultData.success) {
+                            showToast('User dihapus', 'success');
+                            loadUsers(currentPage);
+                            loadUserStatistics();
+                        } else {
+                            showToast(resultData.message || 'Gagal menghapus user', 'error');
+                        }
+                    } catch (err) { 
+                        console.error('Error delete:', err);
+                        showToast('Terjadi kesalahan koneksi', 'error');
+                    }
                 }
-            } catch (err) { console.error('Error delete:', err); }
+            });
         }
 
         function showToast(msg, type = 'success') {
