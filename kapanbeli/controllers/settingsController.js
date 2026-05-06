@@ -506,6 +506,51 @@ const settingsController = {
                 message: 'Terjadi kesalahan saat mengambil data user'
             });
         }
+    },
+
+    // Update theme only
+    async updateTheme(req, res) {
+        try {
+            if (!req.session.user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Unauthorized'
+                });
+            }
+
+            const { theme } = req.body;
+            const userId = req.session.user.id;
+
+            if (!theme || (theme !== 'light' && theme !== 'dark')) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Theme tidak valid'
+                });
+            }
+
+            if (User.updateTheme) {
+                await User.updateTheme(userId, theme);
+                req.session.user.theme = theme;
+                req.session.save();
+
+                res.json({
+                    success: true,
+                    message: 'Theme berhasil diperbarui',
+                    theme: theme
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: 'Fitur update theme belum tersedia di model'
+                });
+            }
+        } catch (error) {
+            console.error('Update theme error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat memperbarui theme'
+            });
+        }
     }
 };
 

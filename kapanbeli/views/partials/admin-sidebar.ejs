@@ -1,20 +1,21 @@
 <!--
-  Admin Sidebar Component
-  Theme-aware sidebar - follows selected theme
+  Admin Sidebar Component - Premium Neubrutalism Edition
 -->
 
-<div class="sidebar" id="sidebar">
+<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="logo">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Kapan Beli Admin</span>
-        </div>
+        <a href="/admin" class="logo">
+            <i class="fas fa-box-open"></i>
+            <span>KAPANBELI</span>
+        </a>
     </div>
 
     <div class="sidebar-menu">
-        <div class="menu-label">Main Menu</div>
+        <div class="menu-label">Navigasi Utama</div>
         <a href="/admin" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
-            <i class="fas fa-home"></i>
+            <i class="fas fa-th-large"></i>
             <span>Dashboard</span>
         </a>
         <a href="/admin/users" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'users' ? 'active' : '' %>">
@@ -22,25 +23,23 @@
             <span>Manajemen Pengguna</span>
         </a>
         <a href="/admin/products" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>">
-            <i class="fas fa-box"></i>
+            <i class="fas fa-boxes"></i>
             <span>Semua Produk</span>
         </a>
         <a href="/admin/expired-watch" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'expired-watch' ? 'active' : '' %>">
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-hourglass-end"></i>
             <span>Monitoring Kadaluarsa</span>
         </a>
         <a href="/admin/shopping-suggestions" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'shopping-suggestions' ? 'active' : '' %>">
-            <i class="fas fa-shopping-cart"></i>
+            <i class="fas fa-shopping-basket"></i>
             <span>Saran Pembelian</span>
         </a>
 
-        <div class="menu-label">Communication</div>
+        <div class="menu-label">Komunikasi & Log</div>
         <a href="/admin/broadcast" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'broadcast' ? 'active' : '' %>">
             <i class="fas fa-bullhorn"></i>
-            <span>Broadcast Pengumuman</span>
+            <span>Broadcast</span>
         </a>
-
-        <div class="menu-label">Content</div>
         <a href="/admin/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
             <i class="fas fa-sticky-note"></i>
             <span>Catatan User</span>
@@ -50,7 +49,7 @@
             <span>Log Aktivitas</span>
         </a>
 
-        <div class="menu-label">System Settings</div>
+        <div class="menu-label">Sistem</div>
         <a href="/admin/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
             <i class="fas fa-cog"></i>
             <span>Pengaturan</span>
@@ -59,214 +58,251 @@
 
     <div class="sidebar-footer">
         <div class="user-mini-profile">
-            <div class="user-avatar">
+            <div class="user-avatar-container">
                 <% if (typeof user !== 'undefined' && user && (user.profile_image || user.profile_photo)) { %>
-                    <img src="<%= user.profile_image || user.profile_photo %>" alt="<%= user.name %>" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    <img src="<%= user.profile_image || user.profile_photo %>" alt="<%= user.name %>" class="user-avatar-img">
                 <% } else { %>
-                    <%= typeof user !== 'undefined' && user && user.name ? user.name[0].toUpperCase() : 'A' %>
+                    <div class="user-avatar-placeholder">
+                        <%= typeof user !== 'undefined' && user && user.name ? user.name[0].toUpperCase() : 'A' %>
+                    </div>
                 <% } %>
             </div>
-            <div class="user-info" style="flex: 1; min-width: 0;">
-                <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= typeof user !== 'undefined' && user && user.name ? user.name : 'Admin' %></h4>
-                <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= typeof user !== 'undefined' && user && user.email ? user.email : 'admin@kapanbeli.com' %></p>
+            <div class="user-details-mini">
+                <div class="user-name-mini"><%= typeof user !== 'undefined' && user && user.name ? user.name : 'Admin' %></div>
+                <div class="user-role-mini">Administrator</div>
             </div>
-            <form action="/auth/logout" method="POST" style="display: inline;">
-                <button type="submit" class="logout-btn" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </form>
+            <button class="logout-btn-nb" onclick="confirmLogout()" title="Keluar">
+                <i class="fas fa-power-off"></i>
+            </button>
         </div>
     </div>
-</div>
+</aside>
 
 <script>
-    // Sidebar theme handler - Sync with global body class
-    (function() {
+    function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active');
+    }
 
-        function applyTheme() {
-            const isDark = document.body.classList.contains('dark-mode-active') || 
-                          localStorage.getItem('theme') === 'dark';
-            
-            if (isDark) {
-                sidebar.classList.remove('light-theme');
-            } else {
-                sidebar.classList.add('light-theme');
-            }
+    function confirmLogout() {
+        if (confirm('Yakin ingin keluar dari panel admin?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/auth/logout';
+            document.body.appendChild(form);
+            form.submit();
         }
-
-        // Apply immediately
-        applyTheme();
-        
-        // Watch for body class changes
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'class') applyTheme();
-            });
-        });
-        observer.observe(document.body, { attributes: true });
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'theme') applyTheme();
-        });
-    })();
+    }
 </script>
 
 <style>
-    /* ========== PREMIUM SIDEBAR STYLES ========== */
+    /* ========== NEUBRUTALISM SIDEBAR STYLES ========== */
+    :root {
+        --sb-bg: #FFFFFF;
+        --sb-text: #000000;
+        --sb-border: #000000;
+        --sb-accent: #3B82F6;
+        --sb-shadow: #000000;
+    }
+
+    body.dark-mode-active {
+        --sb-bg: #1E293B;
+        --sb-text: #F1F5F9;
+        --sb-border: #F1F5F9;
+        --sb-accent: #3B82F6;
+        --sb-shadow: #3B82F6;
+    }
+
     .sidebar {
-        width: var(--sidebar-width, 260px);
-        background: #0F172A; /* Darker Slate for Premium Feel */
-        color: rgba(248, 250, 252, 0.7);
+        width: 280px;
+        background: var(--sb-bg);
+        border-right: 4px solid var(--sb-border);
         height: 100vh;
         position: fixed;
-        top: 0;
-        left: 0;
+        left: 0; top: 0;
+        z-index: 1000;
         display: flex;
         flex-direction: column;
-        z-index: 1000;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-        overflow: hidden;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        transition: all 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Outfit', sans-serif;
     }
-    
+
     .sidebar-header {
         height: 80px;
         display: flex;
         align-items: center;
         padding: 0 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        flex-shrink: 0;
+        border-bottom: 4px solid var(--sb-border);
     }
-    
+
     .sidebar-header .logo {
-        font-weight: 800;
-        font-size: 1.1rem;
-        color: #F8FAFC;
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: var(--sb-text);
         display: flex;
         align-items: center;
         gap: 12px;
+        text-decoration: none;
         letter-spacing: -0.5px;
     }
-    
-    .sidebar-header .logo i { 
-        color: #3B82F6; 
-        font-size: 1.5rem;
-        filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+
+    .sidebar-header .logo i {
+        color: var(--sb-accent);
+        font-size: 1.8rem;
     }
-    
-    .sidebar-menu { 
-        flex: 1; 
-        padding: 24px 12px; 
-        overflow-y: auto; 
+
+    .sidebar-menu {
+        flex: 1;
+        padding: 24px 12px;
+        overflow-y: auto;
     }
-    
-    .sidebar-menu::-webkit-scrollbar { width: 4px; }
-    .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-    
+
+    .sidebar-menu::-webkit-scrollbar { width: 6px; }
+    .sidebar-menu::-webkit-scrollbar-thumb { background: var(--sb-border); border-radius: 10px; }
+
     .menu-label {
         padding: 0 16px 12px;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        color: rgba(148, 163, 184, 0.5);
-        font-weight: 800;
-        letter-spacing: 1.5px;
+        color: var(--sb-text);
+        font-weight: 900;
+        letter-spacing: 1px;
         margin-top: 24px;
+        opacity: 0.6;
     }
-    
+
     .menu-label:first-child { margin-top: 0; }
-    
+
     .nav-item {
         display: flex;
         align-items: center;
-        padding: 12px 16px;
-        color: rgba(148, 163, 184, 0.8);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 12px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        margin-bottom: 4px;
+        padding: 14px 16px;
+        color: var(--sb-text);
         text-decoration: none;
-    }
-    
-    .nav-item:hover { 
-        background: rgba(255, 255, 255, 0.05); 
-        color: #F8FAFC;
-        transform: translateX(5px);
-    }
-    
-    .nav-item.active {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
-        color: #3B82F6;
-        box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.2);
-    }
-    
-    .nav-item i { 
-        width: 24px; 
-        margin-right: 12px; 
-        text-align: center; 
-        font-size: 1.1rem;
-    }
-    
-    .sidebar-footer {
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.2);
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        flex-shrink: 0;
-    }
-    
-    .user-mini-profile { display: flex; align-items: center; gap: 12px; }
-    
-    .user-avatar {
-        width: 40px; height: 40px; border-radius: 12px;
-        background: linear-gradient(135deg, #3B82F6, #FF9F43);
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; color: white; font-size: 1rem; flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        overflow: hidden;
-    }
-    
-    .user-info { flex: 1; min-width: 0; }
-    .user-info h4 { font-size: 0.85rem; font-weight: 700; color: #F8FAFC; margin-bottom: 2px; }
-    .user-info p { font-size: 0.7rem; color: rgba(148, 163, 184, 0.6); }
-    
-    .logout-btn {
-        background: rgba(239, 68, 68, 0.15); 
-        color: #EF4444; 
-        border: none;
-        border-radius: 10px; 
-        width: 36px; height: 36px; 
-        display: flex;
-        align-items: center; justify-content: center; 
-        cursor: pointer; 
-        transition: all 0.3s;
-    }
-    
-    .logout-btn:hover { 
-        background: #EF4444; 
-        color: white; 
-        transform: rotate(90deg);
+        font-weight: 800;
+        border: 4px solid transparent;
+        transition: all 0.2s;
+        gap: 14px;
+        margin-bottom: 8px;
     }
 
-    /* Light theme overrides */
-    .sidebar.light-theme { 
-        background-color: #FFFFFF !important; 
-        border-right: 1px solid rgba(0, 0, 0, 0.05); 
+    .nav-item i {
+        width: 24px;
+        font-size: 1.2rem;
+        text-align: center;
     }
-    .sidebar.light-theme .sidebar-header { border-bottom-color: rgba(0,0,0,0.05) !important; }
-    .sidebar.light-theme .sidebar-header .logo { color: #1E293B !important; }
-    .sidebar.light-theme .nav-item { color: #64748B !important; }
-    .sidebar.light-theme .nav-item:hover { background-color: #F1F5F9 !important; color: #1E293B !important; }
-    .sidebar.light-theme .nav-item.active { 
-        background: rgba(59, 130, 246, 0.08) !important; 
-        color: #3B82F6 !important; 
-        box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.1) !important;
+
+    .nav-item:hover {
+        background: var(--sb-accent);
+        color: #fff;
+        border: 4px solid var(--sb-border);
+        box-shadow: 4px 4px 0px var(--sb-shadow);
+        transform: translate(-2px, -2px);
     }
-    .sidebar.light-theme .menu-label { color: #94A3B8 !important; }
-    .sidebar.light-theme .user-info h4 { color: #1E293B !important; }
-    .sidebar.light-theme .user-info p { color: #64748B !important; }
-    .sidebar.light-theme .sidebar-footer { background: #F8FAFC !important; border-top-color: rgba(0,0,0,0.05) !important; }
-    .sidebar.light-theme .logout-btn { background: rgba(239, 68, 68, 0.1) !important; }
+
+    .nav-item.active {
+        background: var(--sb-accent);
+        color: #fff;
+        border: 4px solid var(--sb-border);
+        box-shadow: 4px 4px 0px var(--sb-shadow);
+    }
+
+    .sidebar-footer {
+        padding: 20px;
+        border-top: 4px solid var(--sb-border);
+        background: var(--sb-bg);
+    }
+
+    .user-mini-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar-container {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--sb-border);
+        flex-shrink: 0;
+        overflow: hidden;
+        background: var(--primary-orange);
+    }
+
+    .user-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #fff;
+        font-size: 1.2rem;
+    }
+
+    .user-details-mini {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name-mini {
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: var(--sb-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-role-mini {
+        font-size: 0.75rem;
+        color: var(--sb-text);
+        opacity: 0.7;
+        font-weight: 600;
+    }
+
+    .logout-btn-nb {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--sb-border);
+        background: var(--accent-red);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 3px 3px 0px var(--sb-shadow);
+        transition: all 0.1s;
+    }
+
+    .logout-btn-nb:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 5px 5px 0px var(--sb-shadow);
+    }
+
+    /* Sidebar Overlay for Mobile */
+    #sidebarOverlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 999;
+        display: none;
+    }
+    #sidebarOverlay.active { display: block; }
+
+    @media (max-width: 992px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+    }
 </style>

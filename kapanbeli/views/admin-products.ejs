@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+<%- include('./partials/theme-guard', { user: typeof user !== 'undefined' ? user : null }) %>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,51 +19,48 @@
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
-            --primary-blue: #2E86DE;
-            --primary-dark: #205A9E;
+            --primary-blue: #3B82F6;
+            --primary-dark: #1D4ED8;
             --primary-orange: #FF9F43;
-            --accent-green: #1DD1A1;
-            --accent-red: #FF6B6B;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
             --bg-sidebar: #ffffff;
-            --bg-sidebar-hover: rgba(46, 134, 222, 0.08);
-            --bg-sidebar-active: rgba(46, 134, 222, 0.12);
-            --text-sidebar: #546E7A;
-            --text-sidebar-active: var(--primary-blue);
-            --text-sidebar-heading: #2C3E50;
-            --sidebar-border: #e9ecef;
-            --bg-body: #F4F6F9;
+            --bg-sidebar-hover: #f1f5f9;
+            --bg-sidebar-active: #e2e8f0;
+            --text-sidebar: #475569;
+            --text-sidebar-active: #000000;
+            --text-sidebar-heading: #000000;
+            --sidebar-border: #000000;
+            --bg-body: #F8FAFC;
             --bg-card: #FFFFFF;
-            --text-main: #2C3E50;
-            --text-muted: #8395A7;
-            --text-light: #ecf0f1;
-            --border-color: #e9ecef;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
-            --sidebar-width: 240px;
-            --header-height: 64px;
-            --content-padding: 24px;
+            --text-main: #000000;
+            --text-muted: #64748B;
+            --border-color: #000000;
+            --shadow-brutal: 8px 8px 0px #000;
+            --shadow-brutal-sm: 4px 4px 0px #000;
+            --radius: 0px;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --content-padding: 40px;
         }
 
         body.dark-mode-active {
-            --bg-sidebar: #1a1d23;
-            --bg-sidebar-hover: rgba(255,255,255,0.05);
-            --bg-sidebar-active: rgba(46, 134, 222, 0.15);
-            --text-sidebar: rgba(255,255,255,0.7);
-            --text-sidebar-active: var(--primary-blue);
-            --text-sidebar-heading: white;
-            --sidebar-border: rgba(255,255,255,0.1);
-            --bg-body: #121418;
-            --bg-card: #1e2128;
-            --text-main: #ecf0f1;
-            --text-muted: #bdc3c7;
-            --border-color: #2c3e50;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+            --bg-sidebar: #1A1D23;
+            --bg-body: #0F1115;
+            --bg-card: #1A1D23;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --border-color: #FFFFFF;
+            --shadow-brutal: 8px 8px 0px #000;
+            --shadow-brutal-sm: 4px 4px 0px #000;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
             background-color: var(--bg-body);
@@ -70,530 +68,207 @@
             display: flex;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.3s;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--bg-sidebar);
-            color: var(--text-sidebar);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-header {
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--sidebar-border);
-        }
-
-        .logo {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: var(--text-sidebar-heading);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo i { color: var(--primary-orange); }
-
-        .sidebar-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
-
-        .menu-label {
-            padding: 0 24px 10px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 1px;
-            margin-top: 15px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 24px;
-            color: var(--text-sidebar);
-            text-decoration: none;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-            cursor: pointer;
-        }
-
-        .nav-item:hover { background-color: var(--bg-sidebar-hover); color: var(--text-sidebar-heading); }
-        .nav-item.active {
-            background-color: var(--bg-sidebar-active);
-            color: var(--text-sidebar-active);
-            border-left-color: var(--primary-blue);
-        }
-        .nav-item i { width: 24px; margin-right: 12px; text-align: center; }
-
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid var(--sidebar-border);
-        }
-
-        .user-mini-profile { display: flex; align-items: center; gap: 12px; }
-        .user-avatar {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            background: var(--primary-orange);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; color: white;
-            flex-shrink: 0;
-        }
-        .user-info { flex: 1; min-width: 0; overflow: hidden; }
-        .user-info h4 { font-size: 0.9rem; color: var(--text-sidebar-heading); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-info p { font-size: 0.75rem; color: var(--text-sidebar); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .logout-btn {
-            background: rgba(255, 107, 107, 0.15);
-            color: var(--accent-red);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            border-radius: 6px;
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            padding: 0;
-        }
-        .logout-btn:hover {
-            background: var(--accent-red);
-            color: white;
-            border-color: var(--accent-red);
-        }
+        /* Sidebar Overlay */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
 
         /* Main Content */
         .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: var(--content-padding);
+            margin-left: var(--sidebar-width); flex: 1; padding: var(--content-padding); transition: margin-left 0.3s ease;
         }
 
         .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 40px; gap: 20px; flex-wrap: wrap;
         }
+        .page-title { font-size: 2.2rem; font-weight: 900; letter-spacing: -1.5px; text-transform: uppercase; }
+        .page-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
+        
+        .top-actions { display: flex; gap: 15px; align-items: center; }
 
-        .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
-        .top-actions { display: flex; gap: 15px; }
-
+        /* Buttons */
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            padding: 14px 28px; border: 4px solid var(--border-color); border-radius: var(--radius);
+            font-weight: 800; font-size: 1rem; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.2s; font-family: inherit;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            box-shadow: var(--shadow-brutal-sm);
         }
+        .btn:hover { transform: translate(-4px, -4px); box-shadow: 8px 8px 0px var(--border-color); }
+        .btn:active { transform: translate(0, 0); box-shadow: 2px 2px 0px var(--border-color); }
 
         .btn-primary { background: var(--primary-blue); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-        }
-        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .btn-outline { background: var(--bg-card); color: var(--text-main); }
         .btn-success { background: var(--accent-green); color: white; }
-        .btn-danger { background: var(--accent-red); color: white; }
         .btn-warning { background: var(--primary-orange); color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-danger { background: var(--accent-red); color: white; }
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; border-width: 3px; }
+        
+        .theme-toggle { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
 
-        /* Stats Cards */
+        /* Stats Grid */
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px; margin-bottom: 40px;
         }
-
         .stat-card {
-            background: var(--bg-card);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
+            background: var(--bg-card); border: 4px solid var(--border-color);
+            padding: 30px; box-shadow: var(--shadow-brutal);
+            transition: all 0.2s;
         }
-
-        .stat-info h3 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
-        .stat-info p { color: var(--text-muted); font-size: 0.85rem; }
+        .stat-card:hover { transform: translate(-4px, -4px); box-shadow: 12px 12px 0px var(--border-color); }
+        .stat-card h3 { font-size: 2.8rem; font-weight: 900; margin-bottom: 5px; line-height: 1; }
+        .stat-card p { font-size: 0.95rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
         /* Panel Card */
         .panel-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 30px;
+            background: var(--bg-card); border: 4px solid var(--border-color);
+            padding: 35px; box-shadow: var(--shadow-brutal);
+            margin-bottom: 40px;
         }
-
         .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 20px; border-bottom: 4px solid var(--border-color);
+            flex-wrap: wrap; gap: 20px;
         }
+        .panel-title { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; }
 
-        .panel-title { font-size: 1.25rem; font-weight: 600; }
-
-        /* Filters */
+        /* Search & Filters */
         .filters-container {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: flex-end;
+            display: flex; gap: 20px; width: 100%; flex-wrap: wrap;
         }
-
-        .filter-group { flex: 1; min-width: 150px; }
-        .filter-group.filter-buttons { flex: 0 0 auto; }
-        .filter-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-main);
-            font-size: 0.9rem;
-        }
-
+        .filter-group { flex: 1; min-width: 200px; }
+        .filter-label { display: block; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; font-size: 0.85rem; }
+        
         .form-control {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-size: 0.9rem;
-            outline: none;
+            width: 100%; padding: 15px 20px;
+            border: 3px solid var(--border-color); border-radius: var(--radius);
+            background: var(--bg-card); color: var(--text-main);
+            font-size: 1rem; font-weight: 700; box-shadow: var(--shadow-brutal-sm);
+            transition: all 0.2s; outline: none;
         }
-        .form-control:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
-        }
+        .form-control:focus { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-color); border-color: var(--primary-blue); }
 
         /* Table */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-
         th {
-            text-align: left;
-            padding: 15px;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.85rem;
-            border-bottom: 2px solid var(--border-color);
+            text-align: left; padding: 20px; font-weight: 900;
+            color: var(--text-main); font-size: 0.9rem; text-transform: uppercase;
+            letter-spacing: 1px; border-bottom: 4px solid var(--border-color);
+            background: rgba(0,0,0,0.05);
         }
+        body.dark-mode-active th { background: rgba(255,255,255,0.05); }
+        td { padding: 20px; border-bottom: 3px solid var(--border-color); font-weight: 700; font-size: 1rem; }
+        tr:hover { background: rgba(0,0,0,0.02); }
+        body.dark-mode-active tr:hover { background: rgba(255,255,255,0.02); }
+        tr.deactivated-row { background: rgba(239, 68, 68, 0.05); }
 
-        td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-size: 0.95rem;
+        .product-info { display: flex; align-items: center; gap: 20px; }
+        .product-img {
+            width: 70px; height: 70px; border: 3px solid var(--border-color);
+            object-fit: cover; box-shadow: var(--shadow-brutal-sm); background: #eee;
         }
+        .product-name { font-size: 1.1rem; font-weight: 800; }
+        .product-meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
 
-        tr:hover td { background-color: rgba(0,0,0,0.02); }
-
-        /* Badges */
         .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
+            display: inline-block; padding: 6px 14px; border: 3px solid var(--border-color);
+            font-size: 0.8rem; font-weight: 900; text-transform: uppercase;
+            box-shadow: 3px 3px 0px var(--border-color);
         }
-        .badge-success { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
-        .badge-danger { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
-        .badge-warning { background: rgba(254, 202, 87, 0.15); color: var(--primary-orange); }
-        .badge-primary { background: rgba(46, 134, 222, 0.15); color: var(--primary-blue); }
-        .badge-secondary { background: rgba(149, 165, 166, 0.15); color: var(--text-muted); }
-        .badge-good { background: rgba(29, 209, 161, 0.15); color: var(--accent-green); }
-        .badge-low { background: rgba(254, 202, 87, 0.15); color: var(--primary-orange); }
-        .badge-out { background: rgba(255, 107, 107, 0.15); color: var(--accent-red); }
+        .badge-info { background: var(--primary-blue); color: white; }
+        .badge-success { background: var(--accent-green); color: white; }
+        .badge-warning { background: var(--primary-orange); color: white; }
+        .badge-danger { background: var(--accent-red); color: white; }
 
-        /* Deactivated Row Styling */
-        .deactivated-row {
-            background: rgba(255, 107, 107, 0.05);
-            border-left: 4px solid var(--accent-red);
-        }
-        .deactivated-row:hover {
-            background: rgba(255, 107, 107, 0.08);
-        }
-        .deactivated-row td {
-            opacity: 0.85;
-        }
-        .deactivated-row td:first-child {
-            border-left: 4px solid var(--accent-red);
-        }
-
-        /* Profile Image */
-        .profile-img-sm {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--border-color);
-        }
-
-        /* Pagination */
-        .pagination-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .pagination-info { color: var(--text-muted); font-size: 0.9rem; }
-
-        .pagination { display: flex; gap: 5px; list-style: none; }
-        .pagination button {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-card);
-            color: var(--text-main);
-            border-radius: 6px;
+        /* Action Buttons Group */
+        .action-group { display: flex; gap: 10px; }
+        .btn-icon {
+            width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--border-color); background: var(--bg-card);
+            color: var(--text-main); font-size: 1.1rem; transition: all 0.2s;
+            box-shadow: 4px 4px 0px var(--border-color);
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .pagination button:hover:not(:disabled) {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-        }
-        .pagination button.active {
-            background: var(--primary-blue);
-            color: white;
-            border-color: var(--primary-blue);
-        }
-        .pagination button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn-icon:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-color); }
+        .btn-icon.edit:hover { color: var(--primary-blue); border-color: var(--primary-blue); box-shadow: 6px 6px 0px var(--primary-blue); }
+        .btn-icon.delete:hover { color: var(--accent-red); border-color: var(--accent-red); box-shadow: 6px 6px 0px var(--accent-red); }
 
-        /* Loading */
-        .loading-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Premium Modal Design */
+        /* Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(9, 9, 11, 0.6);
-            backdrop-filter: blur(10px);
-            z-index: 9998;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+            opacity: 0; transition: all 0.2s;
         }
         .modal.active { display: flex; opacity: 1; }
-        
         .modal-content {
-            background: var(--bg-card);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 550px;
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--border-color);
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: var(--bg-card); border: 6px solid var(--border-color);
+            width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto;
+            position: relative; box-shadow: 20px 20px 0px rgba(0,0,0,0.5);
+            padding: 40px; transform: scale(0.95); transition: all 0.2s;
         }
-        .modal.active .modal-content { transform: translateY(0) scale(1); }
-
+        .modal.active .modal-content { transform: scale(1); }
         .modal-header {
-            padding: 24px 30px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.02);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 35px; padding-bottom: 20px; border-bottom: 4px solid var(--border-color);
         }
+        .modal-title { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 15px; }
+        .modal-close { font-size: 2.5rem; cursor: pointer; color: var(--text-main); line-height: 1; transition: transform 0.2s; background: none; border: none; }
+        .modal-close:hover { transform: rotate(90deg); color: var(--accent-red); }
 
-        .modal-title { 
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.4rem; 
-            font-weight: 700; 
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .modal-close {
-            background: var(--bg-body);
-            border: 1px solid var(--border-color);
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .modal-close:hover { background: var(--accent-red); color: white; border-color: var(--accent-red); }
-
-        .modal-body { 
-            padding: 30px; 
-            overflow-y: auto;
-            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.01));
-        }
-
-        .modal-footer {
-            padding: 24px 30px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 14px;
-            background: rgba(0,0,0,0.02);
-        }
-
-        /* Improved Form Styling */
-        .form-group { margin-bottom: 24px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .form-group label i { color: var(--primary-blue); font-size: 0.8rem; }
-        
-        .form-group input, 
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            background: var(--bg-card);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            outline: none;
-        }
-        
-        .form-group input:focus, 
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(46, 134, 222, 0.1);
-            background: var(--bg-card);
-        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .full-width { grid-column: span 2; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px; }
+        .form-group .form-control { padding: 15px 20px; }
 
         /* Custom Checkbox */
         .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 12px;
-            background: rgba(0,0,0,0.02);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
+            display: flex; align-items: center; gap: 15px; cursor: pointer; padding: 20px;
+            background: rgba(0,0,0,0.02); border: 3px solid var(--border-color);
+            transition: all 0.2s; font-weight: 800; text-transform: uppercase;
         }
-        .checkbox-group:hover { background: rgba(46, 134, 222, 0.05); }
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
+        .checkbox-group:hover { background: rgba(0,0,0,0.05); transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-color); }
+        .checkbox-group input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; }
 
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
+        /* Pagination */
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 4px solid var(--border-color); flex-wrap: wrap; gap: 20px; }
+        .pagination-info { font-weight: 800; color: var(--text-muted); font-size: 0.95rem; }
+        .pagination { display: flex; gap: 10px; list-style: none; }
+        .pagination button {
+            min-width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--border-color); background: var(--bg-card); font-weight: 900;
+            cursor: pointer; transition: all 0.2s; box-shadow: 4px 4px 0px var(--border-color);
+            padding: 0 15px; font-family: inherit; text-transform: uppercase;
         }
-        .toast {
-            background: var(--bg-card);
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 300px;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .toast.success { border-left: 4px solid var(--accent-green); }
-        .toast.error { border-left: 4px solid var(--accent-red); }
-        .toast.warning { border-left: 4px solid var(--primary-orange); }
+        .pagination button:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-color); }
+        .pagination button.active { background: var(--primary-blue); color: white; }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Loading */
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.2); border-top-color: var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Responsive */
-        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
-
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; }
+            .main-content { margin-left: 0; padding: 25px; }
             .menu-toggle { display: block; }
         }
     </style>
-
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <!-- Sidebar -->
     <%- include('./partials/admin-sidebar', { currentPage: 'products', user: typeof user !== 'undefined' ? user : null }) %>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- Main Content -->
     <main class="main-content">
         <!-- Top Bar -->
         <div class="top-bar">
@@ -601,11 +276,14 @@
                 <div class="menu-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </div>
-                <h2 class="page-title">Manajemen Produk</h2>
+                <div>
+                    <h1 class="page-title">📦 Manajemen Produk</h1>
+                    <p class="page-subtitle">Kelola inventaris produk dan kategori bahan makanan</p>
+                </div>
             </div>
             <div class="top-actions">
-                <button class="btn btn-outline" onclick="toggleTheme()">
-                    <i class="fas fa-moon"></i> Tema
+                <button class="btn btn-outline theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+                    <i class="fas fa-moon"></i>
                 </button>
                 <button class="btn btn-primary" onclick="openAddModal()">
                     <i class="fas fa-plus"></i> Tambah Produk
@@ -616,28 +294,20 @@
         <!-- Statistics -->
         <div class="stats-grid" id="productStatsGrid">
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="statTotalProducts">0</h3>
-                    <p>Total Produk</p>
-                </div>
+                <h3 id="statTotalProducts">0</h3>
+                <p>Total Produk</p>
             </div>
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="statActiveProducts">0</h3>
-                    <p>Produk Aktif</p>
-                </div>
+                <h3 id="statActiveProducts">0</h3>
+                <p>Produk Aktif</p>
             </div>
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="statLowStock">0</h3>
-                    <p>Stok Rendah</p>
-                </div>
+                <h3 id="statLowStock">0</h3>
+                <p>Stok Rendah</p>
             </div>
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="statOutOfStock">0</h3>
-                    <p>Habis Stok</p>
-                </div>
+                <h3 id="statOutOfStock">0</h3>
+                <p>Habis Stok</p>
             </div>
         </div>
 
@@ -647,21 +317,11 @@
                 <h3 class="panel-title">Daftar Produk</h3>
                 <div class="filters-container">
                     <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-search"></i> Cari
-                        </label>
-                        <input
-                            type="text"
-                            id="searchInput"
-                            class="form-control"
-                            placeholder="Nama produk atau kategori..."
-                            onkeyup="debounceSearch()"
-                        >
+                        <label class="filter-label"><i class="fas fa-search"></i> Cari</label>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Nama produk atau kategori..." onkeyup="debounceSearch()">
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-tags"></i> Kategori
-                        </label>
+                        <label class="filter-label"><i class="fas fa-tags"></i> Kategori</label>
                         <select id="categoryFilter" class="form-control" onchange="loadProducts()">
                             <option value="">Semua Kategori</option>
                             <option value="Bumbu Dapur">Bumbu Dapur</option>
@@ -673,9 +333,7 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-filter"></i> Status Stok
-                        </label>
+                        <label class="filter-label"><i class="fas fa-filter"></i> Status Stok</label>
                         <select id="stockStatusFilter" class="form-control" onchange="loadProducts()">
                             <option value="">Semua Status</option>
                             <option value="good">Aman</option>
@@ -683,16 +341,13 @@
                             <option value="out">Habis</option>
                         </select>
                     </div>
-                    <div class="filter-group filter-buttons">
-                        <label class="filter-label" style="visibility: hidden;">Action</label>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-outline" onclick="resetFilters()" style="min-width: 120px;">
-                                <i class="fas fa-redo"></i> Reset Filter
-                            </button>
-                            <button class="btn btn-primary" onclick="refreshData()" style="min-width: 120px;">
-                                <i class="fas fa-sync-alt"></i> Refresh Data
-                            </button>
-                        </div>
+                    <div style="display: flex; gap: 10px; align-items: flex-end;">
+                        <button class="btn btn-outline" onclick="resetFilters()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="btn btn-primary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
                     </div>
                 </div>
             </div>
@@ -700,7 +355,7 @@
             <!-- Loading -->
             <div id="tableLoading" style="text-align: center; padding: 40px; display: none;">
                 <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-blue);"></i>
-                <p style="margin-top: 15px; color: var(--text-muted);">Memuat data...</p>
+                <p style="margin-top: 15px; font-weight: 800;">Memuat data...</p>
             </div>
 
             <!-- Table -->
@@ -727,28 +382,28 @@
                 <div class="pagination-info">
                     Menampilkan <span id="showingFrom">0</span> - <span id="showingTo">0</span> dari <span id="totalItems">0</span> data
                 </div>
-                <ul class="pagination" id="paginationButtons">
+                <div class="pagination" id="paginationButtons">
                     <!-- Pagination buttons will be inserted here -->
-                </ul>
+                </div>
             </div>
 
             <!-- Empty State -->
             <div id="emptyState" style="text-align: center; padding: 60px 20px; display: none;">
                 <i class="fas fa-box-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
-                <p style="color: var(--text-muted);">Belum ada data produk</p>
+                <p style="font-weight: 800;">Belum ada data produk</p>
             </div>
         </div>
     </main>
 
     <!-- Product Edit/Add Modal -->
     <div class="modal" id="productModal">
-        <div class="modal-content animate-fade-in">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
                     <i class="fas fa-box-open" style="color: var(--primary-blue);"></i>
                     <span>Tambah Produk Baru</span>
                 </h3>
-                <button class="modal-close" onclick="closeModal()" title="Tutup">&times;</button>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="productForm">
@@ -756,13 +411,13 @@
 
                     <div class="form-group">
                         <label for="productName"><i class="fas fa-heading"></i> Nama Produk *</label>
-                        <input type="text" id="productName" required minlength="3" placeholder="Contoh: Bawang Merah Super">
+                        <input type="text" id="productName" class="form-control" required minlength="3" placeholder="Contoh: Bawang Merah Super">
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-grid">
                         <div class="form-group">
                             <label for="productCategory"><i class="fas fa-tags"></i> Kategori</label>
-                            <select id="productCategory">
+                            <select id="productCategory" class="form-control">
                                 <option value="Bumbu Dapur">Bumbu Dapur</option>
                                 <option value="Sayuran">Sayuran</option>
                                 <option value="Buah-buahan">Buah-buahan</option>
@@ -773,7 +428,7 @@
                         </div>
                         <div class="form-group">
                             <label for="productUnit"><i class="fas fa-balance-scale"></i> Satuan</label>
-                            <select id="productUnit">
+                            <select id="productUnit" class="form-control">
                                 <option value="kg">Kilogram (kg)</option>
                                 <option value="gram">Gram (gr)</option>
                                 <option value="pcs">Buah/Pcs</option>
@@ -783,29 +438,26 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-grid">
                         <div class="form-group">
                             <label for="productStock"><i class="fas fa-cubes"></i> Stok Saat Ini *</label>
-                            <input type="number" id="productStock" required min="0" step="0.01" placeholder="0.00">
+                            <input type="number" id="productStock" class="form-control" required min="0" step="0.01" placeholder="0.00">
                         </div>
                         <div class="form-group">
                             <label for="productMinStock"><i class="fas fa-exclamation-circle"></i> Stok Minimal *</label>
-                            <input type="number" id="productMinStock" required min="0" step="0.01" placeholder="0.00">
+                            <input type="number" id="productMinStock" class="form-control" required min="0" step="0.01" placeholder="0.00">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="productExpiryDate"><i class="fas fa-calendar-times"></i> Tanggal Kadaluarsa (dd/mm/yyyy)</label>
-                        <div style="position: relative;">
-                            <input type="text" id="productExpiryDate" placeholder="Pilih tanggal..." style="cursor: pointer; background: var(--bg-card);">
-                            <i class="fas fa-calendar" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
-                        </div>
+                        <label for="productExpiryDate"><i class="fas fa-calendar-times"></i> Tanggal Kadaluarsa</label>
+                        <input type="text" id="productExpiryDate" class="form-control" placeholder="Pilih tanggal...">
                     </div>
 
                     <div class="form-group">
                         <label class="checkbox-group">
                             <input type="checkbox" id="productIsActive" checked>
-                            <span style="font-weight: 500;">Aktifkan Produk (Dapat dilihat oleh pengguna)</span>
+                            <span>Aktifkan Produk (Dapat dilihat oleh pengguna)</span>
                         </label>
                     </div>
                 </form>
@@ -829,11 +481,12 @@
                 <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus produk ini?</p>
-                <p style="color: var(--accent-red); margin-top: 10px;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Tindakan ini tidak dapat dibatalkan.
-                </p>
+                <p style="font-weight: 800;">Apakah Anda yakin ingin menghapus produk ini?</p>
+                <div style="background: rgba(239, 68, 68, 0.1); border-left: 6px solid var(--accent-red); padding: 15px; margin-top: 20px;">
+                    <p style="color: var(--accent-red); font-weight: 900; text-transform: uppercase; font-size: 0.85rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeDeleteModal()">Batal</button>
@@ -850,25 +503,21 @@
                 <button class="modal-close" onclick="closeDeactivateModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Anda akan menonaktifkan produk:</p>
-                <p style="font-weight: 600; font-size: 1.1rem; margin: 10px 0; color: var(--primary-blue);">
+                <p style="font-weight: 800;">Anda akan menonaktifkan produk:</p>
+                <p style="font-weight: 900; font-size: 1.3rem; margin: 15px 0; color: var(--primary-blue); text-transform: uppercase;">
                     <i class="fas fa-box"></i> <span id="deactivateProductName"></span>
                 </p>
-                <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid var(--accent-red); padding: 12px; border-radius: 6px; margin: 15px 0;">
-                    <p style="color: var(--accent-red); font-weight: 500; margin: 0;">
+                <div style="background: rgba(239, 68, 68, 0.1); border-left: 6px solid var(--accent-red); padding: 20px; margin: 20px 0;">
+                    <p style="color: var(--accent-red); font-weight: 900; text-transform: uppercase; font-size: 0.85rem;">
                         <i class="fas fa-exclamation-triangle"></i> Perhatian:
                     </p>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 5px 0 0 0;">
+                    <p style="color: var(--text-main); font-weight: 700; margin-top: 5px;">
                         Produk yang dinonaktifkan tidak dapat diedit atau dihapus oleh user sampai diaktifkan kembali.
                     </p>
                 </div>
-                <div style="margin-top: 15px;">
-                    <label style="display: block; font-weight: 500; margin-bottom: 8px;">
-                        <i class="fas fa-comment"></i> Alasan Nonaktifkan:
-                    </label>
-                    <textarea id="deactivateReason" rows="4" 
-                        placeholder="Jelaskan alasan menonaktifkan produk ini..."
-                        style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.95rem; resize: vertical; background: var(--bg-card); color: var(--text-main);"></textarea>
+                <div class="form-group">
+                    <label style="font-weight: 900;"><i class="fas fa-comment"></i> Alasan Nonaktifkan:</label>
+                    <textarea id="deactivateReason" class="form-control" rows="4" placeholder="Jelaskan alasan menonaktifkan produk ini..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -889,225 +538,161 @@
     </div>
 
     <script>
-        // ============================================
-        // GLOBAL VARIABLES
-        // ============================================
         let currentPage = 1;
         let currentLimit = 20;
         let deleteProductTargetId = null;
         let deactivateProductTargetId = null;
         let searchTimer = null;
 
-        // ============================================
-        // INIT
-        // ============================================
+        // Theme Toggle Bridge
+        function toggleTheme() {
+            if (window.toggleAppTheme) {
+                window.toggleAppTheme();
+            }
+        }
+
+        // Listen for global theme changes to update UI
+        window.addEventListener('themeChanged', (e) => {
+            const { isDark } = e.detail;
+            const icon = document.querySelector('#themeToggleBtn i');
+            if (icon) {
+                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        });
+
+        // Sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
+            const isDark = document.body.classList.contains('dark-mode-active');
+            const icon = document.querySelector('#themeToggleBtn i');
+            if (icon) {
+                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
+            
             loadProducts();
             loadProductStatistics();
 
-            // Initialize Flatpickr for premium date picking
             flatpickr("#productExpiryDate", {
                 dateFormat: "d/m/Y",
                 allowInput: true,
                 minDate: "today",
                 theme: "material_blue",
                 altInput: true,
-                altFormat: "d/m/Y",
-                "locale": {
-                    "firstDayOfWeek": 1
-                },
-                // Ensure manual input is parsed correctly
-                onReady: function(selectedDates, dateStr, instance) {
-                    if (instance.altInput) {
-                        instance.altInput.addEventListener('blur', function() {
-                            const val = instance.altInput.value;
-                            if (val) instance.setDate(val, true, "d/m/Y");
-                        });
-                    }
-                }
+                altFormat: "d/m/Y"
             });
         });
 
-        // ============================================
-        // THEME
-        // ============================================
-        function initTheme() {
-            if (localStorage.getItem('theme') === 'dark' ||
-               (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.body.classList.add('dark-mode-active');
-            }
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i><span style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode-active');
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode-active') ? 'dark' : 'light');
-            
-            // Update button icon
-            const btn = document.querySelector('.top-actions .btn-outline');
-            if (btn) {
-                const icon = btn.querySelector('i');
-                if (icon) {
-                    icon.className = document.body.classList.contains('dark-mode-active') 
-                        ? 'fas fa-sun' 
-                        : 'fas fa-moon';
+        async function loadProductStatistics() {
+            try {
+                const res = await fetch('/api/admin/products/statistics', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.success) {
+                    const stats = data.data;
+                    document.getElementById('statTotalProducts').textContent = stats.total_products || 0;
+                    document.getElementById('statActiveProducts').textContent = stats.active_products || 0;
+                    document.getElementById('statLowStock').textContent = stats.low_stock || 0;
+                    document.getElementById('statOutOfStock').textContent = stats.out_of_stock || 0;
                 }
-            }
+            } catch (error) { console.error('Error stats:', error); }
         }
 
-        // ============================================
-        // SIDEBAR
-        // ============================================
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
-
-        // ============================================
-        // RESET FILTERS
-        // ============================================
-        function resetFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('stockStatusFilter').value = '';
-            currentPage = 1;
-            loadProducts();
-            showToast('Filter berhasil direset', 'success');
-        }
-
-        // ============================================
-        // REFRESH DATA
-        // ============================================
-        function refreshData() {
-            currentPage = 1;
-            loadProducts();
-            loadProductStatistics();
-            showToast('Data berhasil disegarkan', 'success');
-        }
-
-        // ============================================
-        // LOAD PRODUCTS
-        // ============================================
-        async function loadProducts() {
+        async function loadProducts(page = 1) {
+            currentPage = page;
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
             const stockStatus = document.getElementById('stockStatusFilter').value;
-
-            const params = new URLSearchParams({
-                page: currentPage,
-                limit: currentLimit,
-                ...(search && { search }),
-                ...(category && { category }),
-                ...(stockStatus && { stockStatus })
-            });
-
-            console.log('Loading products with params:', Object.fromEntries(params));
-            showTableLoading(true);
+            
+            document.getElementById('tableLoading').style.display = 'block';
+            document.getElementById('productsTableBody').style.opacity = '0.5';
 
             try {
-                const response = await fetch(`/api/admin/products?${params}`, {
-                    credentials: 'same-origin'
-                });
+                const url = `/api/admin/products?page=${page}&limit=${currentLimit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&stockStatus=${stockStatus}`;
+                const res = await fetch(url, { credentials: 'same-origin' });
+                const data = await res.json();
+                
+                document.getElementById('tableLoading').style.display = 'none';
+                document.getElementById('productsTableBody').style.opacity = '1';
 
-                if (response.status === 401) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Authentication required');
-                }
-
-                const result = await response.json();
-
-                if (result.success) {
-                    renderProductsTable(result.data);
-                    renderPagination(result.pagination);
-                    updatePaginationInfo(result.pagination);
-                } else {
-                    showToast('Gagal memuat data: ' + result.message, 'error');
+                if (data.success) {
+                    renderProducts(data.data);
+                    renderPagination(data.pagination);
+                    updatePaginationInfo(data.pagination);
                 }
             } catch (error) {
-                console.error('Error loading products:', error);
-                showToast('Terjadi kesalahan saat memuat data: ' + error.message, 'error');
-            } finally {
-                showTableLoading(false);
+                console.error('Error products:', error);
+                document.getElementById('tableLoading').style.display = 'none';
             }
         }
 
-        // ============================================
-        // RENDER PRODUCTS TABLE
-        // ============================================
-        function renderProductsTable(products) {
+        function renderProducts(products) {
             const tbody = document.getElementById('productsTableBody');
             const emptyState = document.getElementById('emptyState');
-            const paginationContainer = document.getElementById('paginationContainer');
-
+            
             if (!products || products.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.style.display = 'block';
-                paginationContainer.style.display = 'none';
                 return;
             }
 
             emptyState.style.display = 'none';
-            paginationContainer.style.display = 'flex';
-
-            tbody.innerHTML = products.map(product => {
-                const profileImg = product.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=2E86DE&color=fff`;
-                const stockBadge = getStockBadge(product.stock_status);
-                const activeBadge = product.is_active
-                    ? '<span class="badge badge-success">Aktif</span>'
-                    : '<span class="badge badge-secondary">Non-Aktif</span>';
+            tbody.innerHTML = products.map(p => {
+                const isLow = p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0;
+                const isOut = p.stock_quantity <= 0;
+                const stockBadge = isOut ? 'badge-danger' : (isLow ? 'badge-warning' : 'badge-success');
+                const stockText = isOut ? 'Habis' : (isLow ? 'Rendah' : 'Aman');
                 
-                // Deactivated badge
-                const isDeactivated = product.is_deactivated_by_admin === 1 || product.is_deactivated_by_admin === true;
-                const deactivatedBadge = isDeactivated
-                    ? '<span class="badge badge-danger" title="Dinonaktifkan oleh admin"><i class="fas fa-ban"></i> Deactivated</span>'
-                    : '';
-                
-                const expiry = product.expiry_date 
-                    ? formatDateToDMY(product.expiry_date)
-                    : '<span style="color: var(--text-muted); font-size: 0.8rem;">-</span>';
-                const stockDisplay = formatStock(product.stock_quantity);
-                const minStockDisplay = formatStock(product.min_stock_level);
-
                 return `
-                    <tr class="${isDeactivated ? 'deactivated-row' : ''}">
+                    <tr class="${p.is_active ? '' : 'deactivated-row'}">
                         <td>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="${profileImg}" alt="${product.name}" class="profile-img-sm">
+                            <div class="product-info">
+                                <img src="${p.image_url || '/img/placeholder-product.png'}" class="product-img" onerror="this.src='/img/placeholder-product.png'">
                                 <div>
-                                    <div style="font-weight: 600;">${product.name}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${product.unit === 'bungkus' ? 'pcs' : (product.unit === 'liter' ? 'Liter (Vol)' : (product.unit || 'pcs'))}</div>
+                                    <div class="product-name">${p.name}</div>
+                                    <div class="product-meta">ID: ${p.id}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>${product.category_name || product.category ? `<span class="badge badge-primary">${product.category_name || product.category}</span>` : '<span class="text-muted">Lainnya</span>'}</td>
+                        <td><span class="badge badge-info">${p.category_name || 'Lainnya'}</span></td>
                         <td>
-                            <div style="font-weight: 500;">${stockDisplay} ${product.unit === 'bungkus' ? 'pcs' : (product.unit === 'liter' ? 'Liter (Vol)' : (product.unit || ''))}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">Min: ${minStockDisplay}</div>
+                            <div style="font-weight: 900;">${p.stock_quantity} ${p.unit}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Min: ${p.min_stock_level}</div>
                         </td>
-                        <td>${expiry}</td>
+                        <td>${p.expiry_date ? new Date(p.expiry_date).toLocaleDateString('id-ID') : '-'}</td>
+                        <td><span class="badge ${stockBadge}">${stockText}</span></td>
                         <td>
-                            <div style="display: flex; flex-direction: column; gap: 5px;">
-                                ${activeBadge}
-                                ${stockBadge}
-                                ${deactivatedBadge}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                                <button class="btn btn-sm btn-primary" onclick="openEditModal(${product.id})" title="Edit" ${isDeactivated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                ${isDeactivated ? `
-                                <button class="btn btn-sm btn-success" onclick="reactivateProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')" title="Aktifkan Kembali">
-                                    <i class="fas fa-check-circle"></i>
-                                </button>
+                            <div class="action-group">
+                                ${p.is_active ? `
+                                    <button class="btn-icon edit" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon delete" onclick="openDeactivateModal('${p.id}', '${p.name}')" title="Nonaktifkan">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
                                 ` : `
-                                <button class="btn btn-sm btn-danger" onclick="openDeactivateModal(${product.id}, '${product.name.replace(/'/g, "\\'")}')" title="Nonaktifkan">
-                                    <i class="fas fa-ban"></i>
-                                </button>
+                                    <button class="btn-icon" onclick="reactivateProduct('${p.id}', '${p.name}')" title="Aktifkan" style="color: var(--accent-green); border-color: var(--accent-green);">
+                                        <i class="fas fa-check"></i>
+                                    </button>
                                 `}
-                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteProduct(${product.id})" title="Hapus" ${isDeactivated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                                    <i class="fas fa-trash"></i>
-                                </button>
                             </div>
                         </td>
                     </tr>
@@ -1115,462 +700,199 @@
             }).join('');
         }
 
-        function getStockBadge(status) {
-            const badges = {
-                'good': '<span class="badge badge-good">Aman</span>',
-                'low': '<span class="badge badge-low">Rendah</span>',
-                'out': '<span class="badge badge-out">Habis</span>'
-            };
-            return badges[status] || badges['good'];
-        }
-
-        function formatStock(quantity) {
-            if (quantity === null || quantity === undefined) return '-';
-            const num = parseFloat(quantity);
-            if (Number.isInteger(num)) return num.toString();
-            return parseFloat(num.toFixed(1)).toString();
-        }
-
-        // ============================================
-        // PAGINATION
-        // ============================================
         function renderPagination(pagination) {
-            const { page, totalPages, hasNext, hasPrev } = pagination;
             const container = document.getElementById('paginationButtons');
-
-            let buttons = '';
-
-            // Previous
-            buttons += `<button ${!hasPrev ? 'disabled' : ''} onclick="goToPage(${page - 1})">
-                <i class="fas fa-chevron-left"></i>
-            </button>`;
-
-            // Page numbers
-            const maxVisible = 5;
-            let startPage = Math.max(1, page - Math.floor(maxVisible / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-
-            if (endPage - startPage + 1 < maxVisible) {
-                startPage = Math.max(1, endPage - maxVisible + 1);
+            if (!pagination || pagination.total_pages <= 1) {
+                container.innerHTML = '';
+                document.getElementById('paginationContainer').style.display = 'none';
+                return;
             }
 
-            for (let i = startPage; i <= endPage; i++) {
-                buttons += `<button class="${i === page ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
-            }
-
-            // Next
-            buttons += `<button ${!hasNext ? 'disabled' : ''} onclick="goToPage(${page + 1})">
-                <i class="fas fa-chevron-right"></i>
-            </button>`;
-
-            container.innerHTML = buttons;
-        }
-
-        function updatePaginationInfo(pagination) {
-            const { page, limit, total } = pagination;
-            const from = (page - 1) * limit + 1;
-            const to = Math.min(page * limit, total);
-
-            document.getElementById('showingFrom').textContent = total > 0 ? from : 0;
-            document.getElementById('showingTo').textContent = to;
-            document.getElementById('totalItems').textContent = total;
-        }
-
-        function goToPage(page) {
-            currentPage = page;
-            loadProducts();
-        }
-
-        // ============================================
-        // SEARCH
-        // ============================================
-        function debounceSearch() {
-            if (searchTimer) clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => {
-                currentPage = 1;
-                loadProducts();
-            }, 500);
-        }
-
-        // ============================================
-        // STATISTICS
-        // ============================================
-        async function loadProductStatistics() {
-            try {
-                const response = await fetch('/api/admin/products/statistics', {
-                    credentials: 'same-origin'
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    const stats = result.data;
-                    document.getElementById('statTotalProducts').textContent = stats.total_products || 0;
-                    document.getElementById('statActiveProducts').textContent = stats.active_products || 0;
-                    document.getElementById('statLowStock').textContent = stats.low_stock || 0;
-                    document.getElementById('statOutOfStock').textContent = stats.out_of_stock || 0;
+            document.getElementById('paginationContainer').style.display = 'flex';
+            let html = '';
+            
+            html += `<button onclick="loadProducts(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>`;
+            
+            for (let i = 1; i <= pagination.total_pages; i++) {
+                if (i === 1 || i === pagination.total_pages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="loadProducts(${i})">${i}</button>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<button disabled>...</button>`;
                 }
-            } catch (error) {
-                console.error('Error loading statistics:', error);
             }
+            
+            html += `<button onclick="loadProducts(${currentPage + 1})" ${currentPage === pagination.total_pages ? 'disabled' : ''}>Next</button>`;
+            container.innerHTML = html;
         }
 
-        // Helper to format date to DD/MM/YYYY
-        function formatDateToDMY(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return '-';
-            
-            const d = String(date.getDate()).padStart(2, '0');
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const y = date.getFullYear();
-            return `${d}/${m}/${y}`;
+        function updatePaginationInfo(p) {
+            document.getElementById('showingFrom').textContent = ((currentPage - 1) * currentLimit) + 1;
+            document.getElementById('showingTo').textContent = Math.min(currentPage * currentLimit, p.total);
+            document.getElementById('totalItems').textContent = p.total;
         }
 
-        // Helper to parse DD/MM/YYYY or DD-MM-YYYY to YYYY-MM-DD
-        function parseDMYToYMD(dmyString) {
-            if (!dmyString) return null;
-            
-            // Handle both / and - as separators
-            const parts = dmyString.includes('/') ? dmyString.split('/') : dmyString.split('-');
-            
-            if (parts.length !== 3) return null;
-            
-            let [d, m, y] = parts;
-            
-            // Basic validation and normalization
-            d = d.padStart(2, '0');
-            m = m.padStart(2, '0');
-            if (y.length === 2) y = '20' + y; // Assume 20xx for 2-digit years
-            
-            return `${y}-${m}-${d}`;
+        function debounceSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => loadProducts(1), 500);
         }
 
-        // TABLE LOADING
-        function showTableLoading(show) {
-            document.getElementById('tableLoading').style.display = show ? 'block' : 'none';
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('stockStatusFilter').value = '';
+            loadProducts(1);
         }
 
-        let modalMode = 'edit';
+        function refreshData() {
+            loadProducts(currentPage);
+            loadProductStatistics();
+            showToast('Data diperbarui', 'success');
+        }
 
         function openAddModal() {
-            modalMode = 'add';
-            document.getElementById('modalTitle').textContent = 'Tambah Produk Baru';
-            document.getElementById('editProductId').value = '';
+            document.getElementById('modalTitle').querySelector('span').textContent = 'Tambah Produk Baru';
             document.getElementById('productForm').reset();
-            
-            // Set defaults
-            document.getElementById('productCategory').value = 'Lainnya';
-            document.getElementById('productUnit').value = 'pcs';
-            document.getElementById('productIsActive').checked = true;
-            
+            document.getElementById('editProductId').value = '';
             document.getElementById('productModal').classList.add('active');
         }
 
-        function openEditModal(productId) {
-            modalMode = 'edit';
-            document.getElementById('modalTitle').textContent = 'Edit Produk';
-            // Fetch product data and populate modal
-            fetch(`/api/admin/products/${productId}`, {
-                credentials: 'same-origin'
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    const product = result.data;
-                    console.log('Product data for edit:', product);
-                    
-                    document.getElementById('editProductId').value = product.id;
-                    document.getElementById('productName').value = product.name;
-                    
-                    // Set category - use product's category or default to 'Lainnya' only if not in list
-                    const validCategories = ['Bumbu Dapur', 'Sayuran', 'Buah-buahan', 'Protein', 'Bahan Kering', 'Lainnya'];
-                    const productCategory = product.category_name || product.category;
-                    console.log('Product category:', productCategory, '| category_name:', product.category_name, '| category:', product.category);
-                    
-                    document.getElementById('productCategory').value = validCategories.includes(productCategory) ? productCategory : 'Lainnya';
-                    
-                    // Format stock values to remove unnecessary decimals (1 instead of 1.0)
-                    const stockQty = parseFloat(product.stock_quantity);
-                    const minStock = parseFloat(product.min_stock_level);
-                    
-                    document.getElementById('productStock').value = Number.isInteger(stockQty) ? stockQty : parseFloat(stockQty.toFixed(1));
-                    document.getElementById('productMinStock').value = Number.isInteger(minStock) ? minStock : parseFloat(minStock.toFixed(1));
-                    
-                    document.getElementById('productUnit').value = product.unit || 'pcs';
-                    
-                    // Format for Flatpickr (DD/MM/YYYY)
-                    const dateInput = document.getElementById('productExpiryDate');
-                    if (product.expiry_date) {
-                        const dmy = formatDateToDMY(product.expiry_date);
-                        dateInput._flatpickr.setDate(dmy, true, "d/m/Y");
-                    } else {
-                        dateInput._flatpickr.clear();
-                    }
-                    
-                    document.getElementById('productIsActive').checked = product.is_active;
-
-                    document.getElementById('productModal').classList.add('active');
-                } else {
-                    showToast('Gagal memuat data produk', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading product:', error);
-                showToast('Terjadi kesalahan', 'error');
-            });
+        function openEditModal(p) {
+            document.getElementById('modalTitle').querySelector('span').textContent = 'Edit Produk';
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('productName').value = p.name;
+            document.getElementById('productCategory').value = p.category_name;
+            document.getElementById('productUnit').value = p.unit;
+            document.getElementById('productStock').value = p.stock_quantity;
+            document.getElementById('productMinStock').value = p.min_stock_level;
+            document.getElementById('productIsActive').checked = p.is_active;
+            
+            if (p.expiry_date) {
+                const date = new Date(p.expiry_date);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                document.getElementById('productExpiryDate')._flatpickr.setDate(`${day}/${month}/${year}`);
+            } else {
+                document.getElementById('productExpiryDate')._flatpickr.clear();
+            }
+            
+            document.getElementById('productModal').classList.add('active');
         }
 
         function closeModal() {
             document.getElementById('productModal').classList.remove('active');
         }
 
-        function handleFormSubmit() {
-            const productId = document.getElementById('editProductId').value;
-            const data = {
+        async function handleFormSubmit() {
+            const id = document.getElementById('editProductId').value;
+            const formData = {
                 name: document.getElementById('productName').value,
                 category: document.getElementById('productCategory').value,
-                stock_quantity: parseFloat(document.getElementById('productStock').value),
-                min_stock_level: parseFloat(document.getElementById('productMinStock').value),
                 unit: document.getElementById('productUnit').value,
-                expiry_date: parseDMYToYMD(document.getElementById('productExpiryDate').value),
+                stock: parseFloat(document.getElementById('productStock').value),
+                min_stock: parseFloat(document.getElementById('productMinStock').value),
+                expiry_date: document.getElementById('productExpiryDate').value,
                 is_active: document.getElementById('productIsActive').checked
             };
 
-            const url = modalMode === 'add' ? '/api/admin/products' : `/api/admin/products/${productId}`;
-            const method = modalMode === 'add' ? 'POST' : 'PUT';
+            if (!formData.name || isNaN(formData.stock) || isNaN(formData.min_stock)) {
+                showToast('Harap isi field yang wajib (*)', 'error');
+                return;
+            }
 
-            fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin',
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    showToast(modalMode === 'add' ? 'Produk berhasil ditambahkan' : 'Produk berhasil diupdate', 'success');
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `/api/admin/products/${id}` : '/api/admin/products';
+                const res = await fetch(url, {
+                    method: method,
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                if (data.success) {
+                    showToast(id ? 'Produk diperbarui' : 'Produk ditambahkan', 'success');
                     closeModal();
-                    loadProducts();
+                    loadProducts(currentPage);
                     loadProductStatistics();
                 } else {
-                    showToast('Gagal: ' + result.message, 'error');
+                    showToast(data.message || 'Gagal menyimpan produk', 'error');
                 }
-            })
-            .catch(error => {
-                console.error(`Error ${modalMode} product:`, error);
+            } catch (error) {
+                console.error('Error save:', error);
+                document.getElementById('loadingOverlay').style.display = 'none';
                 showToast('Terjadi kesalahan', 'error');
-            });
+            }
         }
 
-        function confirmDeleteProduct(productId) {
-            deleteProductTargetId = productId;
-            document.getElementById('deleteModal').classList.add('active');
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-            deleteProductTargetId = null;
-        }
-
-        function confirmDelete() {
-            if (!deleteProductTargetId) return;
-
-            fetch(`/api/admin/products/${deleteProductTargetId}`, {
-                method: 'DELETE',
-                credentials: 'same-origin'
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    showToast('Produk berhasil dihapus', 'success');
-                    closeDeleteModal();
-                    loadProducts();
-                    loadProductStatistics();
-                } else {
-                    showToast('Gagal: ' + result.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting product:', error);
-                showToast('Terjadi kesalahan', 'error');
-            });
-        }
-
-        function toggleProductStatus(productId) {
-            fetch(`/api/admin/products/${productId}/toggle-status`, {
-                method: 'PATCH',
-                credentials: 'same-origin'
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    loadProducts();
-                } else {
-                    showToast('Gagal: ' + result.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error toggling status:', error);
-                showToast('Terjadi kesalahan', 'error');
-            });
-        }
-
-        // ============================================
-        // DEACTIVATE PRODUCT FUNCTIONS
-        // ============================================
-        function openDeactivateModal(productId, productName) {
-            deactivateProductTargetId = productId;
-            document.getElementById('deactivateProductName').textContent = productName;
+        function openDeactivateModal(id, name) {
+            deactivateProductTargetId = id;
+            document.getElementById('deactivateProductName').textContent = name;
             document.getElementById('deactivateReason').value = '';
             document.getElementById('deactivateModal').classList.add('active');
         }
 
         function closeDeactivateModal() {
             document.getElementById('deactivateModal').classList.remove('active');
-            deactivateProductTargetId = null;
         }
 
-        function confirmDeactivate() {
-            if (!deactivateProductTargetId) return;
-
+        async function confirmDeactivate() {
             const reason = document.getElementById('deactivateReason').value.trim();
-            
             if (!reason) {
-                showToast('Harap isi alasan nonaktifkan produk', 'error');
+                showToast('Harap isi alasan', 'error');
                 return;
             }
 
-            // Show loading state
-            const confirmBtn = event.target.closest('button');
-            const originalHTML = confirmBtn.innerHTML;
-            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-            confirmBtn.disabled = true;
-
-            fetch(`/api/admin/products/${deactivateProductTargetId}/deactivate`, {
-                method: 'PATCH',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ reason: reason })
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    showToast('Produk berhasil dinonaktifkan', 'success');
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                const res = await fetch(`/api/admin/products/${deactivateProductTargetId}/deactivate`, {
+                    method: 'PATCH',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                const data = await res.json();
+                document.getElementById('loadingOverlay').style.display = 'none';
+                if (data.success) {
+                    showToast('Produk dinonaktifkan', 'success');
                     closeDeactivateModal();
-                    loadProducts();
+                    loadProducts(currentPage);
                     loadProductStatistics();
-                } else {
-                    showToast('Gagal: ' + result.message, 'error');
                 }
-            })
-            .catch(error => {
-                console.error('Error deactivating product:', error);
-                showToast('Terjadi kesalahan saat menonaktifkan produk', 'error');
-            })
-            .finally(() => {
-                // Restore button state
-                confirmBtn.innerHTML = originalHTML;
-                confirmBtn.disabled = false;
-            });
+            } catch (error) { console.error('Error deactivate:', error); document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // ============================================
-        // REACTIVATE PRODUCT FUNCTION
-        // ============================================
-        function reactivateProduct(productId, productName) {
-            Swal.fire({
-                title: 'Aktifkan Kembali Produk?',
-                html: `
-                    <p>Anda akan mengaktifkan kembali produk:</p>
-                    <p style="font-weight: 600; font-size: 1.1rem; margin: 10px 0; color: #2E86DE;">
-                        <i class="fas fa-box"></i> ${productName}
-                    </p>
-                    <p style="color: #636E72; font-size: 0.9rem;">
-                        User akan dapat mengedit dan menghapus produk ini kembali.
-                    </p>
-                `,
+        async function reactivateProduct(id, name) {
+            const result = await Swal.fire({
+                title: 'Aktifkan Kembali?',
+                text: `Aktifkan kembali produk ${name}?`,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#1DD1A1',
-                cancelButtonColor: '#636E72',
-                confirmButtonText: '<i class="fas fa-check"></i> Ya, Aktifkan',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading
-                    Swal.fire({
-                        title: 'Memproses...',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                confirmButtonColor: '#10B981',
+                confirmButtonText: 'Ya, Aktifkan'
+            });
 
-                    fetch(`/api/admin/products/${productId}/reactivate`, {
+            if (result.isConfirmed) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                try {
+                    const res = await fetch(`/api/admin/products/${id}/reactivate`, {
                         method: 'PATCH',
                         credentials: 'same-origin'
-                    })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: 'Produk berhasil diaktifkan kembali',
-                                confirmButtonColor: '#1DD1A1'
-                            });
-                            loadProducts();
-                            loadProductStatistics();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal!',
-                                text: result.message || 'Gagal mengaktifkan produk',
-                                confirmButtonColor: '#FF6B6B'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error reactivating product:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'Terjadi kesalahan saat mengaktifkan produk',
-                            confirmButtonColor: '#FF6B6B'
-                        });
                     });
-                }
-            });
-        }
-
-        // ============================================
-        // TOAST
-        // ============================================
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icon = type === 'success' ? 'fa-check-circle' :
-                        type === 'error' ? 'fa-exclamation-circle' :
-                        'fa-info-circle';
-            
-            toast.innerHTML = `
-                <i class="fas ${icon}"></i>
-                <span>${message}</span>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+                    const data = await res.json();
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if (data.success) {
+                        showToast('Produk diaktifkan kembali', 'success');
+                        loadProducts(currentPage);
+                        loadProductStatistics();
+                    }
+                } catch (error) { console.error('Error reactivate:', error); document.getElementById('loadingOverlay').style.display = 'none'; }
+            }
         }
     </script>
 </body>

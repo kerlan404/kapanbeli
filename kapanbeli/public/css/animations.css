@@ -181,7 +181,8 @@ html {
     top: 0;
     left: 0;
     height: 4px;
-    background: linear-gradient(90deg, #FF9F43, #2E86DE);
+    background: linear-gradient(to right, #3B82F6, #1D4ED8);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     z-index: 9999;
     transition: width 0.1s ease-out;
 }
@@ -194,7 +195,7 @@ html {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF9F43, #2E86DE);
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
     color: white;
     display: flex;
     align-items: center;
@@ -206,7 +207,7 @@ html {
     transform: translateY(20px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 999;
-    box-shadow: 0 8px 24px rgba(255, 159, 67, 0.4);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
 }
 
 .scroll-to-top.visible {

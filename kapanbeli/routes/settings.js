@@ -17,6 +17,9 @@ router.post('/photo', settingsController.uploadProfilePhoto);
 // Delete account
 router.delete('/account', settingsController.deleteAccount);
 
+// Update theme only
+router.patch('/theme', settingsController.updateTheme);
+
 // Get current user's data (products, suggestions, notes)
 router.get('/data', settingsController.getUserData);
 

@@ -29,7 +29,7 @@
         :root {
             --primary-blue: #3B82F6;
             --primary-blue-dark: #2563EB;
-            --primary-orange: #3B82F6; /* Change orange to blue as requested */
+            --primary-orange: #3B82F6;
             --accent-green: #10B981;
             --accent-red: #EF4444;
             --bg-light: #F8FAFC;
@@ -48,12 +48,12 @@
 
         body.dark-mode-active {
             --bg-light: #020617;
-            --white: rgba(15, 23, 42, 0.7);
+            --white: #1e293b;
             --text-main: #F8FAFC;
             --text-muted: #94A3B8;
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            --card-shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.6);
-            --border-glass: rgba(255, 255, 255, 0.05);
+            --card-shadow: 10px 10px 0px #000;
+            --card-shadow-hover: 15px 15px 0px #000;
+            --border-glass: #000;
         }
 
         * {
@@ -207,27 +207,26 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.3s ease;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-card {
-            background: var(--bg-card);
+            background: var(--white);
             width: 95%;
             max-width: 500px;
-            border-radius: 32px;
+            border-radius: 0;
             padding: 0;
-            box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 15px 15px 0px #000;
             position: relative;
-            transform: translateY(40px) scale(0.95);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            border: 4px solid #000;
             overflow: hidden;
         }
         .modal-overlay.active .modal-card { transform: translateY(0) scale(1); }
@@ -346,11 +345,31 @@
         
         /* Premium Isi Stok SwiftAlert Styles - Modernized */
         .premium-swal-container {
-            border-radius: 32px !important;
-            padding: 1.5rem !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 0 !important;
+            padding: 2rem !important;
+            box-shadow: 12px 12px 0px #000 !important;
             background: var(--white) !important;
-            border: none !important;
+            border: 4px solid #000 !important;
+        }
+        
+        .premium-swal-container .swal2-confirm.btn-primary {
+            background: var(--primary-blue) !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            border-radius: 0 !important;
+            box-shadow: 4px 4px 0px #000 !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+
+        .premium-swal-container .swal2-cancel.btn-outline {
+            background: #fff !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            border-radius: 0 !important;
+            box-shadow: 4px 4px 0px #000 !important;
+            font-weight: 800 !important;
         }
 
         .swal-modern-header {
@@ -374,18 +393,19 @@
         }
 
         .stock-control-card {
-            background: rgba(59, 130, 246, 0.05);
-            border-radius: 28px;
+            background: #fff;
+            border-radius: 0;
             padding: 30px 20px;
             margin-bottom: 24px;
-            border: 2px solid rgba(59, 130, 246, 0.1);
+            border: 3px solid #000;
             position: relative;
             overflow: hidden;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
         }
 
         body.dark-mode-active .stock-control-card {
-            background: rgba(255, 159, 67, 0.05);
-            border: 1px solid rgba(255, 159, 67, 0.2);
+            background: #1e2128;
+            border: 3px solid #000;
         }
 
         .stock-stepper {
@@ -399,17 +419,17 @@
         .stepper-btn {
             width: 54px;
             height: 54px;
-            border-radius: 18px;
-            border: none;
+            border-radius: 0;
+            border: 3px solid #000;
             background: var(--white);
-            color: var(--primary-blue);
+            color: #000;
             font-size: 1.4rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s;
         }
 
         .stepper-btn:hover {
@@ -475,42 +495,36 @@
 
         .chip-btn {
             background: var(--white);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            color: var(--text-main);
+            border: 3px solid #000;
+            color: #000;
             padding: 10px 20px;
-            border-radius: 16px;
-            font-weight: 700;
+            border-radius: 0;
+            font-weight: 800;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-        }
-
-        body.dark-mode-active .chip-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.05);
+            transition: all 0.1s;
+            box-shadow: 4px 4px 0px #000;
         }
 
         .chip-btn:hover {
             background: var(--primary-blue);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2);
-            border-color: var(--primary-blue);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
         }
 
         /* --- DATE PICKER PREMIUM STYLE --- */
         .expiry-control-card {
-            background: var(--bg-light);
-            border-radius: 20px;
+            background: var(--white);
+            border-radius: 0;
             padding: 16px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 2px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s;
+            border: 3px solid #000;
+            transition: all 0.2s;
             cursor: pointer;
             width: 100%;
+            box-shadow: 4px 4px 0px #000;
         }
 
         .expiry-control-card:hover {
@@ -660,14 +674,13 @@
 
         .suggestion-card {
             background: var(--white);
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
+            border-radius: 0;
             padding: 28px;
-            box-shadow: var(--card-shadow);
+            box-shadow: 8px 8px 0px #000;
             transition: var(--transition);
             position: relative;
             overflow: hidden;
-            border: 1px solid var(--border-glass);
+            border: 4px solid #000;
             animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             opacity: 0;
             display: flex;
@@ -676,9 +689,9 @@
         }
 
         .suggestion-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--card-shadow-hover);
-            border-color: rgba(255, 159, 67, 0.2);
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px #000;
+            border-color: #000;
         }
 
         /* Border indicator for condition type */
@@ -1219,7 +1232,7 @@
             const statusClass = isDeactivated ? 'expired' : (item.type === 'expired' ? 'expired' : (item.type === 'low-stock' ? 'low' : 'expiring'));
 
             content.innerHTML = `
-                <div class="qv-header-premium" style="${isDeactivated ? 'background: linear-gradient(135deg, #1e293b, #ef4444);' : ''}">
+                <div class="qv-header-premium" style="${isDeactivated ? 'background: #1e293b;' : ''}">
                     <div class="qv-img-wrapper">
                         ${item.image_url 
                             ? `<img src="${item.image_url}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=2E86DE&color=fff'">`
@@ -1374,7 +1387,7 @@
                     showCancelButton: true,
                     confirmButtonText: '<i class="fas fa-save" style="margin-right:8px;"></i> Simpan Perubahan',
                     cancelButtonText: 'Batal',
-                    background: 'transparent',
+                    background: '#fff',
                     showClass: {
                         popup: 'animate__animated animate__zoomIn animate__faster'
                     },
