@@ -83,24 +83,27 @@ const authController = {
                 });
             }
 
-            // Cek apakah ini login admin default
+            // 1. Cari pengguna berdasarkan email di Database terlebih dahulu
+            const user = await User.findByEmail(email);
+
+            // 2. Jika tidak ada di DB, cek apakah ini login admin default dari .env
             const defaultAdminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@kapanbeli.com';
             const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
             
-            if (email === defaultAdminEmail && password === defaultAdminPassword) {
-                // Login sebagai admin default
+            if (!user && email === defaultAdminEmail && password === defaultAdminPassword) {
+                // Login sebagai admin default (Fallback)
                 req.session.userId = 'default_admin';
                 req.session.user = {
                     id: 'default_admin',
                     name: 'Administrator',
                     email: defaultAdminEmail,
                     role: 'admin',
-                    theme: 'dark' // Default admin to dark for premium feel
+                    theme: 'dark'
                 };
 
                 return res.json({ 
                     success: true, 
-                    message: 'Login admin berhasil! Selamat datang kembali.', 
+                    message: 'Login admin default berhasil!', 
                     redirect: '/admin',
                     user: {
                         name: 'Administrator',
@@ -110,9 +113,7 @@ const authController = {
                 });
             }
 
-            // Cari pengguna berdasarkan email
-            const user = await User.findByEmail(email);
-
+            // 3. Jika user ditemukan di DB, lanjutkan verifikasi normal
             if (!user) {
                 return res.status(401).json({
                     success: false,
@@ -200,9 +201,9 @@ const authController = {
             // Redirect ke halaman yang sesuai berdasarkan role
             let redirectUrl = user.role === 'admin' ? '/admin' : '/';
 
-            // Check if there's a returnUrl in session (passed from login page)
-            if (req.body.returnUrl && req.body.returnUrl.startsWith('/')) {
-                // Make sure returnUrl is not /auth or /register
+            // Gunakan returnUrl hanya jika itu bukan root '/' (agar admin tidak terlempar ke user dashboard)
+            // Atau jika user adalah user biasa.
+            if (req.body.returnUrl && req.body.returnUrl.startsWith('/') && req.body.returnUrl !== '/') {
                 if (req.body.returnUrl !== '/auth' && req.body.returnUrl !== '/register') {
                     redirectUrl = req.body.returnUrl;
                 }

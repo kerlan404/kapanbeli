@@ -384,6 +384,19 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Tentukan ikon berdasarkan role
+                    const loadingIcon = document.querySelector('.loading-icon');
+                    const loadingText = document.querySelector('.loading-text');
+                    
+                    if (data.user && data.user.role === 'admin') {
+                        loadingIcon.className = 'fas fa-user-shield loading-icon';
+                        loadingText.innerHTML = 'Menyiapkan Markas Admin<span class="dots"></span>';
+                        loadingIcon.style.color = 'var(--accent)';
+                    } else {
+                        loadingIcon.className = 'fas fa-book-open loading-icon';
+                        loadingText.innerHTML = 'Menyiapkan Dapur Anda<span class="dots"></span>';
+                    }
+
                     document.getElementById('loadingModal').classList.add('active');
                     setTimeout(() => window.location.href = data.redirect || '/', 2000);
                 } else {

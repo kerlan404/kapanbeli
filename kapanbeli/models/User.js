@@ -131,24 +131,27 @@ const User = {
 
     // Fungsi untuk memperbarui informasi pengguna
     update: async (id, { name, email, profile_photo }) => {
-        let query;
-        let params;
-        
-        if (profile_photo !== undefined) {
-            query = 'UPDATE users SET name = ?, email = ?, profile_photo = ? WHERE id = ?';
-            params = [name, email, profile_photo, id];
-        } else {
-            query = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
-            params = [name, email, id];
-        }
-        
-        const [result] = await db.execute(query, params);
+        try {
+            let query;
+            let params;
+            
+            if (profile_photo !== undefined) {
+                query = 'UPDATE users SET name = ?, email = ?, profile_photo = ? WHERE id = ?';
+                params = [name, email, profile_photo, id];
+            } else {
+                query = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
+                params = [name, email, id];
+            }
+            
+            const [result] = await db.execute(query, params);
 
-        if (result.affectedRows === 0) {
-            throw new Error('User tidak ditemukan');
+            // Jangan lempar error jika 0 baris terpengaruh (mungkin data tidak berubah atau user virtual)
+            // Cukup kembalikan data yang diupdate
+            return { id, name, email, profile_photo: profile_photo || null, affectedRows: result.affectedRows };
+        } catch (error) {
+            console.error('Database update error:', error);
+            throw error;
         }
-
-        return { id, name, email, profile_photo: profile_photo || null };
     },
 
     // Fungsi untuk menghapus pengguna

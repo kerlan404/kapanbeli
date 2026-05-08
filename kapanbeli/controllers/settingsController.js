@@ -217,14 +217,14 @@ const settingsController = {
             if (!req.session.user) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Unauthorized'
+                    message: 'Silakan login terlebih dahulu'
                 });
             }
 
-            const { name, email, theme, language } = req.body;
             const userId = req.session.user.id;
+            const { name, email, theme, language } = req.body;
 
-            // Validate input
+            // Validasi input
             if (!name || !email) {
                 return res.status(400).json({
                     success: false,
@@ -232,16 +232,33 @@ const settingsController = {
                 });
             }
 
-            // Check if email is already used by another user
+            // Handle virtual admin (default_admin)
+            if (userId === 'default_admin') {
+                console.log('Updating virtual admin profile (session only)');
+                req.session.user.name = name;
+                req.session.user.email = email;
+                
+                return req.session.save((err) => {
+                    if (err) console.error('Session save error for default_admin:', err);
+                    return res.json({
+                        success: true,
+                        message: 'Profil admin default diperbarui (hanya untuk sesi ini)',
+                        user: req.session.user
+                    });
+                });
+            }
+
+            // Periksa apakah email sudah digunakan oleh orang lain
             const existingUser = await User.findByEmail(email);
-            if (existingUser && existingUser.id !== userId) {
+            if (existingUser && existingUser.id != userId) { // Use != for loose comparison in case of string vs int
                 return res.status(400).json({
                     success: false,
                     message: 'Email sudah digunakan oleh pengguna lain'
                 });
             }
 
-            // Update user profile
+            // Update user profile in database
+            console.log(`Updating DB profile for user ID: ${userId}`);
             await User.update(userId, { name, email });
 
             // Update theme if provided
@@ -254,31 +271,36 @@ const settingsController = {
                 }
             }
 
-            // Update session
+            // Update session data
             req.session.user.name = name;
             req.session.user.email = email;
 
-            // Save session explicitly to ensure middleware picks it up on next request
             req.session.save((err) => {
                 if (err) {
                     console.error('Session save error:', err);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Gagal menyimpan sesi setelah update profil'
+                    });
                 }
+                
+                console.log('Profile updated successfully for user ID:', userId);
                 res.json({
                     success: true,
                     message: 'Profil berhasil diperbarui',
                     user: {
                         id: userId,
                         name: name,
-                        email: email,
-                        theme: theme || req.session.user.theme
+                        email: email
                     }
                 });
             });
+
         } catch (error) {
             console.error('Update profile error:', error);
             res.status(500).json({
                 success: false,
-                message: 'Terjadi kesalahan saat memperbarui profil'
+                message: 'Terjadi kesalahan saat memperbarui profil: ' + error.message
             });
         }
     },
@@ -289,12 +311,14 @@ const settingsController = {
             if (!req.session.user) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Unauthorized'
+                    message: 'Silakan login terlebih dahulu'
                 });
             }
 
             const { newPassword, confirmPassword } = req.body;
-            const userId = req.session.user.id;
+            let userId = req.session.user.id;
+            const userEmail = req.session.user.email;
+            const userName = req.session.user.name;
 
             // Validate input
             if (!newPassword || !confirmPassword) {
@@ -322,18 +346,66 @@ const settingsController = {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-            // Update password
-            await User.updatePassword(userId, hashedPassword);
+            // Handle virtual admin (default_admin) - Materialize to DB
+            if (userId === 'default_admin') {
+                console.log('Materializing virtual admin to database...');
+                
+                // Cek apakah email sudah ada
+                const existingUser = await User.findByEmail(userEmail);
+                
+                if (!existingUser) {
+                    // Buat user baru di database sebagai ADMIN
+                    const newUser = await User.create({
+                        name: userName,
+                        email: userEmail,
+                        password: hashedPassword,
+                        role: 'admin' // PAKSA JADI ADMIN
+                    });
+                    
+                    userId = newUser.id;
+                    req.session.userId = userId;
+                    req.session.user = {
+                        id: userId,
+                        name: userName,
+                        email: userEmail,
+                        role: 'admin' // UPDATE SESI
+                    };
+                    console.log('Virtual admin successfully materialized as REAL ADMIN with ID:', userId);
+                } else {
+                    // Jika email sudah ada, pastikan dia jadi ADMIN dan update password
+                    userId = existingUser.id;
+                    await User.updatePassword(userId, hashedPassword);
+                    
+                    // Pastikan role di DB juga admin (jika sebelumnya bukan)
+                    const db = require('../config/database');
+                    await db.execute('UPDATE users SET role = "admin" WHERE id = ?', [userId]);
+                    
+                    req.session.userId = userId;
+                    req.session.user = {
+                        id: userId,
+                        name: existingUser.name,
+                        email: existingUser.email,
+                        role: 'admin' // PAKSA SESI JADI ADMIN
+                    };
+                }
+            } else {
+                // Update password untuk user biasa
+                console.log(`Updating password in DB for user ID: ${userId}`);
+                await User.updatePassword(userId, hashedPassword);
+            }
 
-            res.json({
-                success: true,
-                message: 'Password berhasil diubah'
+            req.session.save((err) => {
+                if (err) console.error('Session save error after password change:', err);
+                res.json({
+                    success: true,
+                    message: 'Password berhasil diperbarui dan hak akses Admin Anda telah dikonfirmasi!'
+                });
             });
         } catch (error) {
             console.error('Update password error:', error);
             res.status(500).json({
                 success: false,
-                message: 'Terjadi kesalahan saat mengubah password'
+                message: 'Terjadi kesalahan saat mengubah password: ' + error.message
             });
         }
     },

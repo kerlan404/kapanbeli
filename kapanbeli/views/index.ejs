@@ -30,11 +30,11 @@
             --accent-glow: rgba(255, 159, 67, 0.4);
             --bg-light: #F8FAFC;
             --bg-dark: #020617;
-            --card-glass: rgba(255, 255, 255, 0.7);
-            --card-glass-dark: rgba(15, 23, 42, 0.75);
+            --card-glass: #ffffff;
+            --card-glass-dark: #1e293b;
             --text-main: #1E293B;
             --text-muted: #64748B;
-            --border-glass: rgba(255, 255, 255, 0.3);
+            --border-glass: #e2e8f0;
             --border-glass-dark: rgba(255, 255, 255, 0.1);
             --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.12);
@@ -67,11 +67,7 @@
 
         /* Mesh Gradient Background */
         .mesh-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: var(--bg-light);
-            overflow: hidden;
+            display: none;
         }
 
         .mesh-bg::before, .mesh-bg::after {
@@ -80,7 +76,7 @@
             width: 800px; height: 800px;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.15;
+            opacity: 0.08;
             z-index: -1;
             animation: meshMove 20s infinite alternate;
         }
@@ -422,7 +418,6 @@
         .glass-card:hover {
             transform: translateY(-12px);
             box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
         }
 
         .card-img {
@@ -486,7 +481,7 @@
 
         .progress-bar {
             height: 100%;
-            background: var(--primary);
+            background: #475569;
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -917,15 +912,31 @@
                             </div>
                             <div class="card-body">
                                 <h4><%= prod.name %></h4>
-                                <div class="card-stats">
-                                    <span><%= Math.round(parseFloat(prod.stock_quantity) * 100) / 100 %> <%= prod.unit %></span>
-                                    <span style="<%= isDeactivated ? 'color: #EF4444;' : 'color: var(--primary);' %>">
-                                        <%= isDeactivated ? __('restricted') : __('available') %>
+                                <div class="card-stats" style="margin-bottom: 10px; display: flex; gap: 15px; font-size: 0.85rem;">
+                                    <span style="font-weight: 800; color: var(--text-main);"><%= Math.round(parseFloat(prod.stock_quantity) * 100) / 100 %> <%= prod.unit %></span>
+                                    <% 
+                                        const stockVal = parseFloat(prod.stock_quantity);
+                                        const minVal = parseFloat(prod.min_stock_level);
+                                        const isLow = stockVal <= minVal && stockVal > 0;
+                                        const isOut = stockVal <= 0;
+                                    %>
+                                    <span style="<%= isDeactivated ? 'color: #EF4444;' : (isOut ? 'color: #EF4444;' : (isLow ? 'color: #F59E0B;' : 'color: #10B981;')) %>; font-weight: 700;">
+                                        <% if (isDeactivated) { %>
+                                            Dibatasi
+                                        <% } else if (isOut) { %>
+                                            Habis
+                                        <% } else if (isLow) { %>
+                                            Stok Menipis
+                                        <% } else { %>
+                                            Tersedia
+                                        <% } %>
                                     </span>
                                 </div>
-                                <div class="stock-progress">
-                                    <div class="progress-bar <%= prod.stock_quantity <= 5 ? 'low' : '' %>" style="width: <%= Math.min(100, (prod.stock_quantity / 20) * 100) %>%"></div>
-                                </div>
+                                <% if (prod.description || prod.notes) { %>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 10px;">
+                                        <%= prod.description || prod.notes %>
+                                    </p>
+                                <% } %>
                             </div>
                         </div>
                     <% }) %>
