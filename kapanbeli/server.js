@@ -203,11 +203,11 @@ app.get('/', async (req, res) => {
             const statsQuery = `
                 SELECT
                     COUNT(DISTINCT p.id) as total_bahan,
-                    SUM(CASE WHEN p.stock_quantity > 0 AND p.stock_quantity <= p.min_stock_level THEN 1 ELSE 0 END) as stok_menipis,
+                    SUM(CASE WHEN p.stock_quantity > 0 AND p.stock_quantity <= COALESCE(p.min_stock_level, 1.0) THEN 1 ELSE 0 END) as stok_menipis,
                     SUM(CASE WHEN p.stock_quantity <= 0 THEN 1 ELSE 0 END) as habis_stok,
                     SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE() THEN 1 ELSE 0 END) as kadaluarsa,
                     SUM(CASE WHEN p.expiry_date IS NOT NULL AND p.expiry_date >= CURDATE() AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as hampir_kadaluarsa,
-                    SUM(CASE WHEN p.stock_quantity > p.min_stock_level THEN 1 ELSE 0 END) as good_stock
+                    SUM(CASE WHEN p.stock_quantity > COALESCE(p.min_stock_level, 1.0) THEN 1 ELSE 0 END) as good_stock
                 FROM products p
                 WHERE p.user_id = ?
             `;
@@ -224,7 +224,7 @@ app.get('/', async (req, res) => {
                 FROM products
                 WHERE user_id = ?
                 AND (
-                    stock_quantity <= min_stock_level
+                    stock_quantity <= COALESCE(min_stock_level, 1.0)
                     OR (expiry_date IS NOT NULL AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY))
                 )
             `;
@@ -282,13 +282,17 @@ app.get('/', async (req, res) => {
 
             // 6. FETCH RECENT PRODUCTS
             const recentProductsQuery = `
-                SELECT p.id, p.name, p.stock_quantity, p.unit, p.image_url, c.name as category_name,
+                SELECT p.id, p.name, p.stock_quantity, p.min_stock_level, p.unit, p.image_url, c.name as category_name,
                        p.is_deactivated_by_admin, p.deactivated_reason
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.user_id = ?
+                -- Filter hanya produk "Hijau" (Stok Aman & Tidak Kadaluarsa)
+                AND p.stock_quantity > COALESCE(p.min_stock_level, 1.0)
+                AND (p.expiry_date IS NULL OR p.expiry_date > DATE_ADD(CURDATE(), INTERVAL 7 DAY))
+                AND (p.is_deactivated_by_admin = 0 OR p.is_deactivated_by_admin IS NULL)
                 ORDER BY p.created_at DESC
-                LIMIT 4
+                LIMIT 8
             `;
             const [recentProducts] = await db.execute(recentProductsQuery, [userId]);
 
@@ -299,21 +303,21 @@ app.get('/', async (req, res) => {
                        CASE 
                            WHEN p.stock_quantity <= 0 THEN 'low-stock'
                            WHEN p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE() THEN 'expired'
-                           WHEN p.stock_quantity <= p.min_stock_level THEN 'low-stock'
+                           WHEN p.stock_quantity <= COALESCE(p.min_stock_level, 1.0) THEN 'low-stock'
                            WHEN p.expiry_date IS NOT NULL AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 'expiring'
                        END as type
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.user_id = ?
                 AND (
-                    p.stock_quantity <= p.min_stock_level
+                    p.stock_quantity <= COALESCE(p.min_stock_level, 1.0)
                     OR (p.expiry_date IS NOT NULL AND p.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY))
                 )
                 ORDER BY 
                     CASE 
                         WHEN p.stock_quantity <= 0 THEN 1
                         WHEN (p.expiry_date IS NOT NULL AND p.expiry_date < CURDATE()) THEN 2
-                        WHEN p.stock_quantity <= p.min_stock_level THEN 3
+                        WHEN p.stock_quantity <= COALESCE(p.min_stock_level, 1.0) THEN 3
                         ELSE 4
                     END,
                     p.created_at DESC

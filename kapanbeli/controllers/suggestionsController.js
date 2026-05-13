@@ -46,9 +46,11 @@ const suggestionsController = {
             console.log('Products retrieved:', products.length);
 
             const lowStock = products.filter(p => {
-                const minLevel = p.min_stock_level || 0;
+                const stock = Number(p.stock_quantity);
+                // Jika min_stock_level null atau 0, gunakan default 1 (atau p.stock_quantity jika ingin mendeteksi habis)
+                const minLevel = p.min_stock_level !== null ? Number(p.min_stock_level) : 1;
                 // Hanya masukkan jika stok kurang dari atau sama dengan batas minimum
-                return p.stock_quantity <= minLevel;
+                return stock <= minLevel;
             });
             console.log('Low stock products:', lowStock.length);
 
@@ -78,7 +80,8 @@ const suggestionsController = {
 
             // Tambahkan low stock
             lowStock.forEach(p => {
-                const isOutOfStock = p.stock_quantity <= 0;
+                const stock = Number(p.stock_quantity) || 0;
+                const isOutOfStock = stock <= 0;
                 suggestionMap.set(p.id, {
                     ...p,
                     category: isOutOfStock ? 'Habis' : 'Stok Rendah',
@@ -150,8 +153,8 @@ const suggestionsController = {
 
             // 6. Stats
             const expiredCount = suggestions.filter(s => s.type === 'expired').length;
-            const outOfStock = suggestions.filter(s => s.type === 'low-stock' && s.stock_quantity <= 0).length;
-            const lowStockCount = suggestions.filter(s => s.type === 'low-stock' && s.stock_quantity > 0).length;
+            const outOfStock = suggestions.filter(s => s.type === 'low-stock' && Number(s.stock_quantity) <= 0).length;
+            const lowStockCount = suggestions.filter(s => s.type === 'low-stock' && Number(s.stock_quantity) > 0).length;
             const expiringCount = suggestions.filter(s => s.type === 'expiring').length;
 
             console.log('Total suggestions:', suggestions.length);
