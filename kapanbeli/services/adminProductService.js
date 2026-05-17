@@ -142,6 +142,7 @@ const adminProductService = {
                     p.image_url,
                     u.name as user_name,
                     u.email as user_email,
+                    u.role as user_role,
                     CASE
                         WHEN p.stock_quantity <= 0 THEN 'out_of_stock'
                         WHEN p.stock_quantity <= p.min_stock_level THEN 'low_stock'
@@ -194,7 +195,8 @@ const adminProductService = {
                     c.name as category_name,
                     u.id as user_id,
                     u.name as user_name,
-                    u.email as user_email
+                    u.email as user_email,
+                    u.role as user_role
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 JOIN users u ON p.user_id = u.id

@@ -221,9 +221,7 @@
             <a href="/notes" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>" onclick="checkAuth(event)"><%= __('nav_notes') %></a>
             <a href="/products" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>" onclick="checkAuth(event)"><%= __('nav_products') %></a>
             <a href="/suggestions" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'suggestions' ? 'active' : '' %>" onclick="checkAuth(event)"><%= __('nav_suggestions') %></a>
-            <% if (typeof currentPage === 'undefined' || currentPage !== 'inbox') { %>
-                <a href="/about" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'about' ? 'active' : '' %>"><%= __('nav_about') %></a>
-            <% } %>
+            <a href="/about" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'about' ? 'active' : '' %>"><%= __('nav_about') %></a>
         </div>
 
         <div class="nav-actions">

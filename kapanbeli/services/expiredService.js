@@ -47,7 +47,7 @@ const expiredService = {
                     DATEDIFF(CURDATE(), p.expiry_date) as days_expired,
                     DATEDIFF(p.expiry_date, p.created_at) as shelf_life_days,
                     c.name as category_name, c.id as category_id,
-                    u.id as user_id, u.name as user_name, u.email as user_email,
+                    u.id as user_id, u.name as user_name, u.email as user_email, u.role as user_role,
                     CASE WHEN p.is_deactivated_by_admin = 1 THEN 'Dinonaktifkan Admin' ELSE 'Aktif' END as status
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
@@ -119,7 +119,8 @@ const expiredService = {
                     DATEDIFF(p.expiry_date, CURDATE()) as days_until_expiry,
                     c.name as category_name,
                     u.name as user_name,
-                    u.email as user_email
+                    u.email as user_email,
+                    u.role as user_role
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 JOIN users u ON p.user_id = u.id

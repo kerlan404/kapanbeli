@@ -194,6 +194,42 @@
         .pagination button.active { background: var(--primary-blue); color: white; }
         .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
 
+        /* Action Buttons */
+        .btn-icon {
+            width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--border-color); background: var(--bg-card);
+            color: var(--text-main); font-size: 1.1rem; transition: all 0.2s;
+            box-shadow: 4px 4px 0px var(--border-color);
+            cursor: pointer;
+        }
+        .btn-icon:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-color); }
+        .btn-icon.edit:hover { color: var(--primary-blue); border-color: var(--primary-blue); box-shadow: 6px 6px 0px var(--primary-blue); }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+            opacity: 0; transition: all 0.2s;
+        }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-content {
+            background: var(--bg-card); border: 6px solid var(--border-color);
+            width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto;
+            position: relative; box-shadow: 20px 20px 0px rgba(0,0,0,0.5);
+            padding: 40px; transform: scale(0.95); transition: all 0.2s;
+        }
+        .modal.active .modal-content { transform: scale(1); }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 35px; padding-bottom: 20px; border-bottom: 4px solid var(--border-color);
+        }
+        .modal-title { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 15px; }
+        .modal-close { font-size: 2.5rem; cursor: pointer; color: var(--text-main); line-height: 1; transition: color 0.2s; background: none; border: none; }
+        .modal-close:hover { color: var(--accent-red); }
+
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px; }
+
         /* Loading */
         .loading-state { text-align: center; padding: 60px; }
         .loading-state i { font-size: 3rem; color: var(--primary-blue); margin-bottom: 20px; }
@@ -303,6 +339,7 @@
                             <th>Kadaluarsa</th>
                             <th>Status</th>
                             <th>Prioritas</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="suggestionsTableBody">
@@ -323,6 +360,33 @@
             </div>
         </div>
     </main>
+
+    <!-- Update Stock Modal -->
+    <div class="modal" id="updateStockModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-box"></i> Edit Stok Produk</h2>
+                <button class="modal-close" onclick="closeUpdateStockModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="updateStockName">Nama Produk</label>
+                <input type="text" id="updateStockName" class="form-control" disabled style="background: rgba(0,0,0,0.05);">
+            </div>
+            
+            <div class="form-group">
+                <label for="updateStockQuantity" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">STOK SAAT INI <span style="color:var(--accent-red)">*</span></label>
+                <input type="number" id="updateStockQuantity" class="form-control" required min="0" step="0.01">
+            </div>
+            
+            <input type="hidden" id="updateStockId">
+            
+            <div style="display: flex; gap: 15px; margin-top: 35px;">
+                <button class="btn btn-outline" onclick="closeUpdateStockModal()" style="flex: 1;">Batal</button>
+                <button class="btn btn-primary" onclick="submitUpdateStock()" style="flex: 1;">Simpan</button>
+            </div>
+        </div>
+    </div>
 
     <div class="toast-container" id="toastContainer"></div>
 
@@ -350,18 +414,23 @@
         }
 
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.style.borderColor = type === 'success' ? 'var(--accent-green)' : 'var(--accent-red)';
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-            toast.innerHTML = `<i class="fas ${icon}" style="color: ${type === 'success' ? 'var(--accent-green)' : 'var(--accent-red)'}"></i><span style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;">${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                customClass: { popup: 'nb-popup' },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            Toast.fire({
+                icon: type,
+                title: message
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -482,6 +551,13 @@
                             </div>
                         </td>
                         <td>${getPriorityBadge(p.priority)}</td>
+                        <td>
+                            ${p.user_role === 'admin' ? `
+                                <button class="btn-icon edit" onclick="openUpdateStockModal(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.stock_quantity})" title="Update Stok" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            ` : '-'}
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -534,6 +610,58 @@
             document.getElementById('userFilter').value = '';
             currentPage = 1;
             loadSuggestions();
+        }
+
+        // Update Stock Modal Logic
+        function openUpdateStockModal(id, name, currentStock) {
+            document.getElementById('updateStockId').value = id;
+            document.getElementById('updateStockName').value = name;
+            document.getElementById('updateStockQuantity').value = currentStock;
+            document.getElementById('updateStockModal').classList.add('active');
+        }
+
+        function closeUpdateStockModal() {
+            document.getElementById('updateStockModal').classList.remove('active');
+        }
+
+        async function submitUpdateStock() {
+            const id = document.getElementById('updateStockId').value;
+            const stock = parseFloat(document.getElementById('updateStockQuantity').value);
+            
+            if (isNaN(stock) || stock < 0) {
+                showToast('Jumlah stok tidak valid', 'error');
+                return;
+            }
+
+            document.getElementById('tableLoading').style.display = 'block';
+            document.getElementById('suggestionsTableBody').style.opacity = '0.5';
+            closeUpdateStockModal();
+
+            try {
+                // Menggunakan PUT /api/admin/products/:id untuk update stok
+                const res = await fetch(`/api/admin/products/${id}`, {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stock_quantity: stock })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('Stok berhasil diupdate', 'success');
+                    loadSuggestions();
+                    loadStatistics();
+                } else {
+                    showToast(data.message || 'Gagal update stok', 'error');
+                    document.getElementById('tableLoading').style.display = 'none';
+                    document.getElementById('suggestionsTableBody').style.opacity = '1';
+                }
+            } catch (error) {
+                console.error('Error update stock:', error);
+                showToast('Terjadi kesalahan sistem', 'error');
+                document.getElementById('tableLoading').style.display = 'none';
+                document.getElementById('suggestionsTableBody').style.opacity = '1';
+            }
         }
     </script>
 </body>

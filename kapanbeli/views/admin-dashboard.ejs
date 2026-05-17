@@ -173,11 +173,28 @@
             gap: 24px;
         }
 
+        .previews-grid .nb-card {
+            min-height: 420px;
+            max-height: 420px;
+            display: flex;
+            flex-direction: column;
+        }
+
         @media (max-width: 600px) {
             .previews-grid { grid-template-columns: 1fr; }
         }
 
-        .preview-list { list-style: none; }
+        .preview-list {
+            list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        /* Custom Scrollbar for Preview List */
+        .preview-list::-webkit-scrollbar { width: 6px; }
+        .preview-list::-webkit-scrollbar-track { background: var(--glass-bg); border-radius: 4px; }
+        .preview-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         .preview-item {
             display: flex;
             align-items: center;
@@ -368,6 +385,21 @@
                 </div>
                 <div id="suggestionList" class="preview-list"></div>
             </div>
+
+            <!-- Login Activity -->
+            <div class="nb-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
+                        <i class="fas fa-sign-in-alt" style="color: #A855F7; margin-right: 10px;"></i>
+                        Aktivitas Login
+                    </h3>
+                    <a href="/admin/activity-logs?type=LOGIN" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Lihat</a>
+                </div>
+                <div id="loginActivityLoading" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                </div>
+                <div id="loginActivityList" class="preview-list"></div>
+            </div>
         </div>
 
         <!-- Product Management Section -->
@@ -429,6 +461,7 @@
             
             loadStats();
             loadActivities();
+            loadLoginActivities();
             loadNotesMonitor();
             loadSuggestions();
             loadLatestProducts();
@@ -490,6 +523,35 @@
                     }).join('');
                 }
             } catch (err) { console.error('Error activity:', err); }
+        }
+
+        async function loadLoginActivities() {
+            try {
+                const res = await fetch('/api/activity-logs?activityType=LOGIN&limit=8', { credentials: 'same-origin' });
+                const result = await res.json();
+                document.getElementById('loginActivityLoading').style.display = 'none';
+                if (result.success && result.data) {
+                    const list = document.getElementById('loginActivityList');
+                    if (result.data.length === 0) {
+                        list.innerHTML = '<div class="empty-state">Belum ada aktivitas login</div>';
+                        return;
+                    }
+                    list.innerHTML = result.data.map(log => {
+                        return `
+                            <div class="preview-item">
+                                <div class="activity-icon" style="background: rgba(168, 85, 247, 0.1); border-color: #A855F7; color: #A855F7; width: 36px; height: 36px; font-size: 0.9rem;">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-user" style="font-size: 0.7rem; font-weight: 900; color: #A855F7; margin-bottom: 2px;">${log.user_name}</div>
+                                    <div class="activity-title" style="font-size: 0.85rem; font-weight: 700;">${log.description}</div>
+                                    <div class="activity-time" style="font-size: 0.7rem;">${formatTimeAgo(log.created_at)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) { console.error('Error login activity:', err); }
         }
 
         async function loadNotesMonitor() {

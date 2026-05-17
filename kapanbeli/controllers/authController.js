@@ -146,10 +146,13 @@ const authController = {
             }
 
             // Cek apakah user di-ban
-            if (user.is_banned || user.status === 'banned') {
+            if (user.is_banned || user.account_status === 'banned' || user.status === 'banned') {
                 return res.status(403).json({
                     success: false,
-                    message: `Akun Anda telah di-ban. Alasan: ${user.ban_reason || 'Tidak ada alasan yang diberikan'}`
+                    isBanned: true,
+                    banReason: user.ban_reason || 'Melanggar ketentuan layanan',
+                    banUntil: user.ban_until,
+                    message: `Akun Anda telah di-ban.`
                 });
             }
 

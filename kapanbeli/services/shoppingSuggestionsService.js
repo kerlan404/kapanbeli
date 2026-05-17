@@ -88,6 +88,7 @@ const shoppingSuggestionsService = {
                     c.name as category_name,
                     u.name as user_name,
                     u.email as user_email,
+                    u.role as user_role,
                     CASE
                         WHEN p.stock_quantity <= 0 THEN 'out_of_stock'
                         WHEN p.stock_quantity <= p.min_stock_level THEN 'low_stock'

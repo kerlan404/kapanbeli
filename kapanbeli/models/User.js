@@ -374,20 +374,21 @@ const User = {
     },
 
     // Fungsi untuk ban user
-    banUser: async (userId, reason, bannedBy) => {
+    banUser: async (userId, reason, bannedBy, banUntil) => {
         try {
             // Update both is_banned and account_status for consistency
             const query = `
                 UPDATE users
                 SET is_banned = TRUE,
                     ban_reason = ?,
+                    ban_until = ?,
                     banned_by = ?,
                     banned_at = NOW(),
-                    account_status = 'suspended',
+                    account_status = 'banned',
                     status = 'banned'
                 WHERE id = ?
             `;
-            await db.execute(query, [reason, bannedBy, userId]);
+            await db.execute(query, [reason, banUntil, bannedBy, userId]);
             return { success: true };
         } catch (error) {
             console.error('Error banning user:', error);
@@ -403,6 +404,7 @@ const User = {
                 UPDATE users
                 SET is_banned = FALSE,
                     ban_reason = NULL,
+                    ban_until = NULL,
                     banned_by = NULL,
                     banned_at = NULL,
                     account_status = 'active',
@@ -422,7 +424,7 @@ const User = {
         try {
             const query = `
                 SELECT
-                    u.id, u.name, u.email, u.role, u.is_banned, u.ban_reason,
+                    u.id, u.name, u.email, u.role, u.is_banned, u.ban_reason, u.ban_until,
                     u.banned_at, u.last_login, u.last_logout, u.login_count,
                     COALESCE(u.account_status, u.status, 'active') as status,
                     u.created_at,

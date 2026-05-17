@@ -276,6 +276,40 @@ const userController = {
     }),
 
     // ============================================
+    // BAN USER
+    // ============================================
+    banUser: errorHandler.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const { reason, banUntil } = req.body;
+        const adminId = req.session?.user?.id;
+
+        const user = await userService.findById(id);
+        if (!user) {
+            return errorHandler.notFoundError(res, 'User tidak ditemukan');
+        }
+        
+        if (req.session.user && req.session.user.id == id) {
+            return errorHandler.forbidden(res, 'Tidak dapat mem-ban akun sendiri');
+        }
+
+        if (user.role === 'admin') {
+            return errorHandler.forbidden(res, 'Tidak dapat mem-ban admin lain');
+        }
+
+        const result = await userService.banUser(id, reason || 'Melanggar ketentuan layanan', banUntil, adminId);
+        res.json(result);
+    }),
+
+    // ============================================
+    // UNBAN USER
+    // ============================================
+    unbanUser: errorHandler.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const result = await userService.unbanUser(id);
+        res.json(result);
+    }),
+
+    // ============================================
     // DELETE USER (SOFT DELETE)
     // ============================================
     deleteUser: errorHandler.asyncHandler(async (req, res) => {

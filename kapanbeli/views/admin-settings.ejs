@@ -134,19 +134,13 @@
         .avatar-wrapper {
             width: 150px; height: 150px; border: 5px solid var(--border-color);
             background: var(--bg-body); border-radius: 0; position: relative;
-            cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-brutal);
+            cursor: default; transition: all 0.2s; box-shadow: var(--shadow-brutal);
             overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-        .avatar-wrapper:hover { transform: translate(-4px, -4px); box-shadow: 12px 12px 0px var(--border-color); }
         .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-wrapper span { font-size: 4rem; font-weight: 900; color: var(--primary-blue); }
         
-        .upload-badge {
-            position: absolute; bottom: 0; right: 0; width: 40px; height: 40px;
-            background: var(--primary-orange); color: white; border: 3px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-        }
+        .avatar-wrapper span { font-size: 4rem; font-weight: 900; color: var(--primary-blue); }
 
         /* Form Controls */
         .form-group { margin-bottom: 25px; }
@@ -223,17 +217,13 @@
                 </div>
 
                 <div class="profile-photo-container">
-                    <div class="avatar-wrapper" onclick="document.getElementById('profilePhotoInput').click()">
+                    <div class="avatar-wrapper">
                         <% if (user && (user.profile_photo || user.profile_image)) { %>
                             <img src="<%= user.profile_photo || user.profile_image %>" alt="Profile" id="previewImg">
                         <% } else { %>
                             <span id="previewInitial"><%= user && user.name ? user.name[0].toUpperCase() : 'A' %></span>
-                            <img src="" alt="Profile" id="previewImg" style="display: none;">
                         <% } %>
-                        <div class="upload-badge"><i class="fas fa-camera"></i></div>
                     </div>
-                    <input type="file" id="profilePhotoInput" style="display: none;" accept="image/*" onchange="handlePhotoChange(event)">
-                    <p style="margin-top: 15px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem;">Klik untuk ganti foto</p>
                 </div>
 
                 <form id="profileForm">
@@ -396,33 +386,7 @@
             finally { btn.disabled = false; btn.innerHTML = originalText; }
         });
 
-        // Photo Change
-        async function handlePhotoChange(event) {
-            const file = event.target.files[0];
-            if (!file) return;
 
-            const confirm = await Swal.fire({
-                title: 'Ganti Foto Profil?',
-                text: 'Foto profil admin akan diperbarui secara global.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Ganti',
-                confirmButtonColor: '#3B82F6'
-            });
-
-            if (confirm.isConfirmed) {
-                const formData = new FormData();
-                formData.append('profile_photo', file);
-                try {
-                    Swal.fire({ title: 'Mengunggah...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-                    const response = await fetch('/api/profile/photo', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (result.success) {
-                        Swal.fire({ icon: 'success', title: 'Berhasil', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
-                    } else { showToast(result.message || 'Gagal upload', 'error'); }
-                } catch (error) { showToast('Gagal terhubung ke server', 'error'); }
-            } else { event.target.value = ''; }
-        }
     </script>
 </body>
 </html>

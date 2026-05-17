@@ -249,10 +249,44 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.2rem;
             font-weight: 900;
             color: #fff;
-            font-size: 1.2rem;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(8px);
+        }
+        .modal-overlay.active { display: flex; }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 3px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            border-radius: 0;
+            box-shadow: 4px 4px 0px var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--border-color);
+            border-color: var(--primary-blue);
         }
 
         .badge {
@@ -609,7 +643,7 @@
                     <tr>
                         <td>
                             <div class="user-info">
-                                <div class="user-avatar">${u.profile_image ? `<img src="${u.profile_image}" style="width:100%; height:100%; object-fit:cover;">` : initials}</div>
+                                <div class="user-avatar">${u.profile_image && !u.profile_image.includes('placeholder-product') ? `<img src="${u.profile_image}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=random';" style="width:100%; height:100%; object-fit:cover;">` : initials}</div>
                                 <div>
                                     <div style="font-weight: 800;">${u.name}</div>
                                     <div style="font-size: 0.8rem; color: var(--text-muted);">ID: ${u.id}</div>
@@ -622,9 +656,16 @@
                         <td>${new Date(u.created_at).toLocaleDateString('id-ID')}</td>
                         <td>
                             <div style="display: flex; gap: 8px;">
-                                <button class="btn-icon edit" onclick="openEditModal(${u.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                                ${u.role !== 'admin' ? `<button class="btn-icon" onclick="viewUserDetails(${u.id})" title="Detail User" style="background: var(--primary-blue); color: white; border: 2px solid #000;"><i class="fas fa-eye"></i></button>` : ''}
                                 <button class="btn-icon status" onclick="toggleStatus(${u.id})" title="Toggle Status"><i class="fas fa-sync"></i></button>
-                                <button class="btn-icon delete" onclick="deleteUser(${u.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+                                ${u.role === 'admin' ? `
+                                    <button class="btn-icon" onclick="editAdminUser(${u.id}, '${u.name.replace(/'/g, "\\'")}', '${u.email}', '${u.role}', '${u.account_status}')" title="Edit Admin" style="background: var(--primary-blue); color: white; border: 2px solid #000;"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon" onclick="deleteAdminUser(${u.id})" title="Hapus Admin" style="background: var(--accent-red); color: white; border: 2px solid #000;"><i class="fas fa-trash"></i></button>
+                                ` :
+                                    (u.account_status === 'banned' ? 
+                                    `<button class="btn-icon" onclick="unbanUser(${u.id})" title="Unban User" style="background: var(--accent-green); color: black; border: 2px solid #000;"><i class="fas fa-user-check"></i></button>` : 
+                                    `<button class="btn-icon" onclick="openBanModal(${u.id})" title="Ban User" style="background: var(--primary-orange); color: black; border: 2px solid #000;"><i class="fas fa-ban"></i></button>`)
+                                }
                             </div>
                         </td>
                     </tr>
@@ -677,24 +718,6 @@
             document.getElementById('editUserId').value = '';
             document.getElementById('passwordGroup').style.display = 'block';
             document.getElementById('userModal').classList.add('active');
-        }
-
-        async function openEditModal(id) {
-            try {
-                const res = await fetch(`/api/users/${id}`, { credentials: 'same-origin' });
-                const result = await res.json();
-                if (result.success) {
-                    const u = result.data;
-                    document.getElementById('modalTitle').textContent = 'Edit User';
-                    document.getElementById('editUserId').value = u.id;
-                    document.getElementById('userName').value = u.name;
-                    document.getElementById('userEmail').value = u.email;
-                    document.getElementById('userRole').value = u.role;
-                    document.getElementById('userStatus').value = u.account_status;
-                    document.getElementById('passwordGroup').style.display = 'none';
-                    document.getElementById('userModal').classList.add('active');
-                }
-            } catch (err) { console.error('Error edit:', err); }
         }
 
         function closeModal() {
@@ -751,36 +774,288 @@
             } catch (err) { console.error('Error status:', err); }
         }
 
-        async function deleteUser(id) {
-            Swal.fire({
-                title: 'Hapus User?',
-                text: "Data user yang dihapus tidak dapat dikembalikan!",
+        let currentBanUserId = null;
+        async function openBanModal(id) {
+            const confirm = await Swal.fire({
+                title: 'Ban User?',
+                text: 'Apakah Anda yakin ingin mem-ban pengguna ini? Anda akan dimintai alasan dan durasi setelah ini.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#EF4444',
-                cancelButtonColor: '#3B82F6',
-                confirmButtonText: 'Ya, Hapus!',
+                confirmButtonText: 'Ya, Lanjutkan',
                 cancelButtonText: 'Batal',
-                background: document.body.classList.contains('dark-mode-active') ? '#1E293B' : '#fff',
-                color: document.body.classList.contains('dark-mode-active') ? '#F1F5F9' : '#1E293B'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const res = await fetch(`/api/users/${id}`, { method: 'DELETE', credentials: 'same-origin' });
-                        const resultData = await res.json();
-                        if (resultData.success) {
-                            showToast('User dihapus', 'success');
-                            loadUsers(currentPage);
-                            loadUserStatistics();
-                        } else {
-                            showToast(resultData.message || 'Gagal menghapus user', 'error');
-                        }
-                    } catch (err) { 
-                        console.error('Error delete:', err);
-                        showToast('Terjadi kesalahan koneksi', 'error');
+                customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary', cancelButton: 'nb-btn' }
+            });
+            
+            if (confirm.isConfirmed) {
+                currentBanUserId = id;
+                document.getElementById('banReason').value = '';
+                document.getElementById('banDuration').value = '1';
+                document.getElementById('banModal').classList.add('active');
+            }
+        }
+
+        function closeBanModal() {
+            currentBanUserId = null;
+            document.getElementById('banModal').classList.remove('active');
+        }
+
+        async function submitBan(e) {
+            e.preventDefault();
+            if (!currentBanUserId) return;
+            
+            const reason = document.getElementById('banReason').value;
+            const durationDays = parseInt(document.getElementById('banDuration').value) || 1;
+            
+            const banUntil = new Date();
+            if (durationDays === 9999) { // 9999 means permanent
+                banUntil.setFullYear(banUntil.getFullYear() + 100);
+            } else {
+                banUntil.setDate(banUntil.getDate() + durationDays);
+            }
+
+            try {
+                const res = await fetch(`/api/users/${currentBanUserId}/ban`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason, banUntil: banUntil.toISOString() })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    Swal.fire({ title: 'Berhasil!', text: 'User berhasil di-ban.', icon: 'success', customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary' } });
+                    closeBanModal();
+                    loadUsers(currentPage);
+                    loadUserStatistics();
+                } else {
+                    Swal.fire('Error!', data.message || 'Gagal melakukan ban.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+            }
+        }
+
+        async function unbanUser(id) {
+            const confirm = await Swal.fire({
+                title: 'Unban User?',
+                text: 'User akan dapat login kembali.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Unban!',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary', cancelButton: 'nb-btn' }
+            });
+
+            if (confirm.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/users/${id}/unban`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        Swal.fire({ title: 'Berhasil!', text: 'User berhasil di-unban.', icon: 'success', customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary' } });
+                        loadUsers(currentPage);
+                        loadUserStatistics();
+                    } else {
+                        Swal.fire('Error!', data.message || 'Gagal unban user.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                }
+            }
+        }
+
+        async function viewUserDetails(id) {
+            try {
+                const res = await fetch(`/api/users/${id}`, { credentials: 'same-origin' });
+                const result = await res.json();
+                
+                if (result.success && result.data) {
+                    const u = result.data;
+                    const joinDate = new Date(u.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                    const initials = u.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    
+                    const profileImg = (u.profile_image && !u.profile_image.includes('placeholder-product')) 
+                        ? `<img src="${u.profile_photo_url || u.profile_image}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=random';" style="width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid #000; position: relative; z-index: 1;">` 
+                        : `<div style="width:90px; height:90px; border-radius:50%; border:3px solid #000; background:var(--primary-blue); color:white; display:flex; align-items:center; justify-content:center; font-size:2.5rem; font-weight:900; margin:0 auto; position: relative; z-index: 1;">${initials}</div>`;
+                    
+                    let banInfo = '';
+                    if (u.account_status === 'banned') {
+                        const banDate = u.ban_until ? new Date(u.ban_until).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Permanen';
+                        banInfo = `
+                            <div style="background: var(--accent-red); padding: 15px; margin-top: 20px; border: 3px solid #000; box-shadow: 4px 4px 0px #000; text-align: left; position: relative; overflow: hidden;">
+                                <div style="position: absolute; right: -15px; top: -15px; opacity: 0.2; font-size: 5rem; color: #000;"><i class="fas fa-ban"></i></div>
+                                <div style="position: relative; z-index: 1;">
+                                    <h4 style="margin:0 0 5px 0; font-weight:900; color:#000; text-transform:uppercase; font-size: 1.1rem;"><i class="fas fa-exclamation-triangle"></i> AKUN DIBANNED</h4>
+                                    <p style="margin:0; font-size:0.9rem; color:#000; font-weight: 700;">Sampai: ${banDate}</p>
+                                    <p style="margin:5px 0 0; font-size:0.95rem; color:#000; font-weight: 800; background: rgba(255,255,255,0.4); padding: 8px; border: 2px solid #000; border-radius: 8px;">Alasan: ${u.ban_reason || 'Pelanggaran ketentuan'}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    let statusColor = 'var(--accent-green)';
+                    if (u.account_status === 'inactive') statusColor = '#9CA3AF';
+                    if (u.account_status === 'suspended') statusColor = 'var(--primary-orange)';
+                    if (u.account_status === 'banned') statusColor = 'var(--accent-red)';
+                    
+                    const roleColor = u.role === 'admin' ? 'var(--primary-blue)' : '#FCD34D';
+
+                    Swal.fire({
+                        html: `
+                            <div style="padding: 5px;">
+                                <!-- Header Section -->
+                                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;">
+                                    <div style="position: relative; margin-bottom: 15px; display: inline-block;">
+                                        <div style="position: absolute; top: 5px; left: 5px; width: 100%; height: 100%; background: var(--primary-orange); border-radius: 50%; border: 3px solid #000; z-index: 0;"></div>
+                                        ${profileImg}
+                                    </div>
+                                    <h3 style="margin: 0; font-weight: 900; font-size: 1.8rem; text-transform: uppercase; letter-spacing: -0.5px; color: var(--text-main);">${u.name}</h3>
+                                    <div style="margin: 8px 0 0; color: var(--text-main); font-weight: 700; font-size: 0.95rem; background: var(--bg-body); padding: 6px 16px; border: 2px solid #000; border-radius: 20px; box-shadow: 3px 3px 0px #000; display: inline-block;">${u.email}</div>
+                                </div>
+                                
+                                <!-- Stats/Info Grid -->
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                                    <!-- Role Box -->
+                                    <div style="background: ${roleColor}; padding: 15px; border: 3px solid #000; box-shadow: 4px 4px 0px #000; text-align: center; border-radius: 8px;">
+                                        <div style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; color: #000; letter-spacing: 1px;">Role</div>
+                                        <div style="font-size: 1.2rem; font-weight: 900; color: #000; text-transform: uppercase;">${u.role}</div>
+                                    </div>
+                                    <!-- Status Box -->
+                                    <div style="background: ${statusColor}; padding: 15px; border: 3px solid #000; box-shadow: 4px 4px 0px #000; text-align: center; border-radius: 8px;">
+                                        <div style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; color: #000; letter-spacing: 1px;">Status</div>
+                                        <div style="font-size: 1.2rem; font-weight: 900; color: #000; text-transform: uppercase;">${u.account_status}</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Timeline Info -->
+                                <div style="background: var(--bg-card); border: 3px solid #000; padding: 20px; box-shadow: 5px 5px 0px #000; text-align: left; border-radius: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border-bottom: 3px solid #000; padding-bottom: 15px;">
+                                        <div style="width: 40px; height: 40px; background: #DBEAFE; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border-radius: 8px; color: #1D4ED8;">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Bergabung Sejak</div>
+                                            <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${joinDate}</div>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div style="width: 40px; height: 40px; background: #D1FAE5; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border-radius: 8px; color: #047857;">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Terakhir Login</div>
+                                            <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${u.last_login ? new Date(u.last_login).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Belum pernah'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                ${banInfo}
+                            </div>
+                        `,
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        width: '450px',
+                        padding: '1.5em',
+                        customClass: { popup: 'nb-popup', closeButton: 'nb-close-btn' }
+                    });
+                } else {
+                    Swal.fire('Error', 'Gagal memuat detail user', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error', 'Terjadi kesalahan jaringan', 'error');
+            }
+        }
+
+        async function editAdminUser(id, name, email, role, status) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Edit Admin User',
+                html: `
+                    <div style="text-align: left;">
+                        <label style="font-weight: 800; font-size: 0.9rem; margin-bottom: 5px; display: block; text-transform: uppercase;">Nama Lengkap</label>
+                        <input id="swal-name" class="form-input" style="width: 100%; margin-bottom: 15px;" value="${name}">
+                        
+                        <label style="font-weight: 800; font-size: 0.9rem; margin-bottom: 5px; display: block; text-transform: uppercase;">Email</label>
+                        <input id="swal-email" type="email" class="form-input" style="width: 100%; margin-bottom: 15px;" value="${email}">
+                        
+                        <label style="font-weight: 800; font-size: 0.9rem; margin-bottom: 5px; display: block; text-transform: uppercase;">Role</label>
+                        <select id="swal-role" class="form-input" style="width: 100%; margin-bottom: 15px; cursor: pointer;">
+                            <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="user" ${role === 'user' ? 'selected' : ''}>User</option>
+                        </select>
+                        
+                        <label style="font-weight: 800; font-size: 0.9rem; margin-bottom: 5px; display: block; text-transform: uppercase;">Status</label>
+                        <select id="swal-status" class="form-input" style="width: 100%; margin-bottom: 15px; cursor: pointer;">
+                            <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="suspended" ${status === 'suspended' ? 'selected' : ''}>Suspended</option>
+                            <option value="banned" ${status === 'banned' ? 'selected' : ''}>Banned</option>
+                        </select>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary', cancelButton: 'nb-btn' },
+                preConfirm: () => {
+                    return {
+                        name: document.getElementById('swal-name').value,
+                        email: document.getElementById('swal-email').value,
+                        role: document.getElementById('swal-role').value,
+                        account_status: document.getElementById('swal-status').value
                     }
                 }
             });
+
+            if (formValues) {
+                try {
+                    const res = await fetch(`/api/users/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        Swal.fire({ title: 'Berhasil!', text: 'Admin user berhasil diperbarui.', icon: 'success', customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary' } });
+                        loadUsers(currentPage);
+                    } else {
+                        Swal.fire('Error!', data.message || 'Gagal memperbarui user.', 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                }
+            }
+        }
+
+        async function deleteAdminUser(id) {
+            const confirm = await Swal.fire({
+                title: 'Hapus Admin?',
+                text: 'Admin ini akan dihapus secara soft-delete (inactive).',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#EF4444',
+                customClass: { popup: 'nb-popup', confirmButton: 'nb-btn', cancelButton: 'nb-btn' }
+            });
+
+            if (confirm.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if (data.success) {
+                        Swal.fire({ title: 'Berhasil!', text: 'Admin berhasil dihapus.', icon: 'success', customClass: { popup: 'nb-popup', confirmButton: 'nb-btn nb-btn-primary' } });
+                        loadUsers(currentPage);
+                        loadUserStatistics();
+                    } else {
+                        Swal.fire('Error!', data.message || 'Gagal menghapus admin.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                }
+            }
         }
 
         function showToast(msg, type = 'success') {
@@ -802,5 +1077,35 @@
             window.location.href = '/';
         }
     </script>
+    
+    <!-- Ban Modal -->
+    <div class="modal-overlay" id="banModal">
+        <div class="nb-card" style="width: 100%; max-width: 400px; margin: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-weight: 900; text-transform: uppercase;">Ban User</h2>
+                <button class="btn-icon delete" onclick="closeBanModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="banForm" onsubmit="submitBan(event)">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label" style="font-weight: 800; font-size: 0.9rem; margin-bottom: 8px; display: block; text-transform: uppercase;">Alasan Ban</label>
+                    <textarea id="banReason" class="form-input" rows="3" required placeholder="Contoh: Melanggar kebijakan spam..."></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label class="form-label" style="font-weight: 800; font-size: 0.9rem; margin-bottom: 8px; display: block; text-transform: uppercase;">Durasi Ban (Hari)</label>
+                    <select id="banDuration" class="form-input" style="cursor: pointer;">
+                        <option value="1">1 Hari</option>
+                        <option value="3">3 Hari</option>
+                        <option value="7">7 Hari</option>
+                        <option value="30">30 Hari</option>
+                        <option value="9999">Permanen</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="nb-btn" onclick="closeBanModal()" style="flex: 1;">Batal</button>
+                    <button type="submit" class="nb-btn nb-btn-primary" style="flex: 1; background: var(--primary-orange);">Ban User</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

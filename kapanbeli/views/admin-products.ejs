@@ -218,8 +218,8 @@
             margin-bottom: 35px; padding-bottom: 20px; border-bottom: 4px solid var(--border-color);
         }
         .modal-title { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 15px; }
-        .modal-close { font-size: 2.5rem; cursor: pointer; color: var(--text-main); line-height: 1; transition: transform 0.2s; background: none; border: none; }
-        .modal-close:hover { transform: rotate(90deg); color: var(--accent-red); }
+        .modal-close { font-size: 2.5rem; cursor: pointer; color: var(--text-main); line-height: 1; transition: color 0.2s; background: none; border: none; }
+        .modal-close:hover { color: var(--accent-red); }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .full-width { grid-column: span 2; }
@@ -397,27 +397,27 @@
 
     <!-- Product Edit/Add Modal -->
     <div class="modal" id="productModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">
-                    <i class="fas fa-box-open" style="color: var(--primary-blue);"></i>
+        <div class="modal-content" style="border: 4px solid #000; box-shadow: 10px 10px 0px #000; padding: 30px; max-width: 600px;">
+            <div class="modal-header" style="border-bottom: 4px solid #000; margin-bottom: 25px; padding-bottom: 15px;">
+                <h3 class="modal-title" id="modalTitle" style="font-size: 1.6rem; letter-spacing: -0.5px;">
+                    <i class="fas fa-box-open" style="color: var(--primary-blue); margin-right: 10px;"></i>
                     <span>Tambah Produk Baru</span>
                 </h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" onclick="closeModal()" style="font-size: 2.2rem;">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="productForm">
                     <input type="hidden" id="editProductId">
 
-                    <div class="form-group">
-                        <label for="productName"><i class="fas fa-heading"></i> Nama Produk *</label>
-                        <input type="text" id="productName" class="form-control" required minlength="3" placeholder="Contoh: Bawang Merah Super">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="productName" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">NAMA PRODUK <span style="color:var(--accent-red)">*</span></label>
+                        <input type="text" id="productName" class="form-control" style="border: 3px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 4px;" required minlength="3" placeholder="Contoh: Bawang Merah Super">
                     </div>
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="productCategory"><i class="fas fa-tags"></i> Kategori</label>
-                            <select id="productCategory" class="form-control">
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="productCategory" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">KATEGORI</label>
+                            <select id="productCategory" class="form-control" style="border: 3px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 4px; cursor: pointer;">
                                 <option value="Bumbu Dapur">Bumbu Dapur</option>
                                 <option value="Sayuran">Sayuran</option>
                                 <option value="Buah-buahan">Buah-buahan</option>
@@ -426,9 +426,9 @@
                                 <option value="Lainnya">Lainnya</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="productUnit"><i class="fas fa-balance-scale"></i> Satuan</label>
-                            <select id="productUnit" class="form-control">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="productUnit" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">SATUAN</label>
+                            <select id="productUnit" class="form-control" style="border: 3px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 4px; cursor: pointer;">
                                 <option value="kg">Kilogram (kg)</option>
                                 <option value="gram">Gram (gr)</option>
                                 <option value="pcs">Buah/Pcs</option>
@@ -438,37 +438,38 @@
                         </div>
                     </div>
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="productStock"><i class="fas fa-cubes"></i> Stok Saat Ini *</label>
-                            <input type="number" id="productStock" class="form-control" required min="0" step="0.01" placeholder="0.00">
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="productStock" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">STOK SAAT INI <span style="color:var(--accent-red)">*</span></label>
+                            <input type="number" id="productStock" class="form-control" style="border: 3px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 4px;" required min="0" step="0.01" placeholder="0">
                         </div>
-                        <div class="form-group">
-                            <label for="productMinStock"><i class="fas fa-exclamation-circle"></i> Stok Minimal *</label>
-                            <input type="number" id="productMinStock" class="form-control" required min="0" step="0.01" placeholder="0.00">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="productMinStock" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">STOK MINIMAL <span style="color:var(--accent-red)">*</span></label>
+                            <input type="number" id="productMinStock" class="form-control" style="border: 3px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 4px;" required min="0" step="0.01" placeholder="0">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="productExpiryDate"><i class="fas fa-calendar-times"></i> Tanggal Kadaluarsa</label>
-                        <input type="text" id="productExpiryDate" class="form-control" placeholder="Pilih tanggal...">
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label for="productExpiryDate" style="font-weight: 900; font-size: 0.85rem; letter-spacing: 0.5px;">TANGGAL KADALUARSA</label>
+                        <input type="text" id="productExpiryDate" class="form-control" style="border: 3px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 4px;" placeholder="Pilih tanggal...">
+                        
+                        <label class="checkbox-group" style="margin-top: 15px; background: rgba(0,0,0,0.02); border: 3px solid #000; box-shadow: 4px 4px 0px #000; padding: 10px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 4px;">
+                            <input type="checkbox" id="productNoExpiry" onchange="toggleExpiryDate()" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary-blue);">
+                            <span style="font-weight: 800; font-size: 0.85rem; color: #000; text-transform: uppercase;">Tidak pakai tanggal kadaluarsa</span>
+                        </label>
                     </div>
 
                     <div class="form-group">
-                        <label class="checkbox-group">
-                            <input type="checkbox" id="productIsActive" checked>
-                            <span>Aktifkan Produk (Dapat dilihat oleh pengguna)</span>
+                        <label class="checkbox-group" style="background: #f8f9fa; border: 3px solid #000; box-shadow: 4px 4px 0px #000; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-radius: 4px;">
+                            <input type="checkbox" id="productIsActive" checked style="width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary-blue);">
+                            <span style="font-weight: 900; font-size: 0.95rem; color: #000; flex: 1;">AKTIFKAN PRODUK <small style="display:block; font-weight:700; color:var(--text-muted); text-transform:none;">Dapat dilihat oleh pengguna</small></span>
                         </label>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal()">
-                    <i class="fas fa-times"></i> Batal
-                </button>
-                <button class="btn btn-primary" onclick="handleFormSubmit()" id="btnSubmit">
-                    <i class="fas fa-save"></i> Simpan Produk
-                </button>
+            <div class="modal-footer" style="display: flex; gap: 15px; margin-top: 30px;">
+                <button class="btn btn-outline" onclick="closeModal()" style="flex: 1; border: 3px solid #000; box-shadow: 4px 4px 0px #000; font-weight: 900; background: #fff;">BATAL</button>
+                <button class="btn btn-primary" onclick="handleFormSubmit()" id="btnSubmit" style="flex: 1; border: 3px solid #000; box-shadow: 4px 4px 0px #000; font-weight: 900; background: var(--primary-blue);">SIMPAN PRODUK</button>
             </div>
         </div>
     </div>
@@ -579,7 +580,7 @@
             loadProductStatistics();
 
             flatpickr("#productExpiryDate", {
-                dateFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
                 allowInput: true,
                 minDate: "today",
                 theme: "material_blue",
@@ -589,17 +590,23 @@
         });
 
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-            toast.innerHTML = `<i class="fas ${icon}"></i><span style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;">${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                customClass: { popup: 'nb-popup' },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            Toast.fire({
+                icon: type,
+                title: message
+            });
         }
 
         async function loadProductStatistics() {
@@ -656,18 +663,27 @@
 
             emptyState.style.display = 'none';
             tbody.innerHTML = products.map(p => {
-                const isLow = p.stock_quantity <= p.min_stock_level && p.stock_quantity > 0;
-                const isOut = p.stock_quantity <= 0;
+                const sq = parseFloat(p.stock_quantity) || 0;
+                const ms = parseFloat(p.min_stock_level) || 0;
+                const isLow = sq <= ms && sq > 0;
+                const isOut = sq <= 0;
                 const stockBadge = isOut ? 'badge-danger' : (isLow ? 'badge-warning' : 'badge-success');
                 const stockText = isOut ? 'Habis' : (isLow ? 'Rendah' : 'Aman');
+                const initials = p.name ? p.name.charAt(0).toUpperCase() : '?';
+                const productImg = (p.image_url && !p.image_url.includes('placeholder')) 
+                    ? `<img src="${p.image_url}" class="product-img" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=random&length=1&bold=true';">`
+                    : `<div class="product-img" style="display: flex; align-items: center; justify-content: center; background: var(--primary-orange); color: #000; font-size: 2rem; font-weight: 900; text-transform: uppercase;">${initials}</div>`;
                 
                 return `
                     <tr class="${p.is_active ? '' : 'deactivated-row'}">
                         <td>
                             <div class="product-info">
-                                <img src="${p.image_url || '/img/placeholder-product.png'}" class="product-img" onerror="this.src='/img/placeholder-product.png'">
+                                ${productImg}
                                 <div>
-                                    <div class="product-name">${p.name}</div>
+                                    <div class="product-name" style="display: flex; align-items: center; gap: 8px;">
+                                        ${p.name}
+                                        ${p.user_role === 'admin' ? '<span class="badge" style="background: var(--primary-blue); color: white; padding: 3px 6px; font-size: 0.65rem; box-shadow: 2px 2px 0px #000;">ADMIN</span>' : ''}
+                                    </div>
                                     <div class="product-meta">ID: ${p.id}</div>
                                 </div>
                             </div>
@@ -681,18 +697,22 @@
                         <td><span class="badge ${stockBadge}">${stockText}</span></td>
                         <td>
                             <div class="action-group">
-                                ${p.is_active ? `
-                                    <button class="btn-icon edit" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" title="Edit">
+                                ${p.user_role === 'admin' ? `
+                                    <button class="btn-icon edit" onclick="openEditModal(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${p.category_name}', '${p.unit}', ${p.stock_quantity}, ${p.min_stock_level}, '${p.expiry_date || ''}', ${p.is_active})" title="Edit Produk Admin">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-icon delete" onclick="openDeactivateModal('${p.id}', '${p.name}')" title="Nonaktifkan">
+                                    <button class="btn-icon delete" onclick="deleteAdminProduct(${p.id})" title="Hapus Produk Admin">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : (p.is_active ? `
+                                    <button class="btn-icon delete" onclick="openDeactivateModal('${p.id}', '${p.name.replace(/'/g, "\\'")}')" title="Nonaktifkan">
                                         <i class="fas fa-ban"></i>
                                     </button>
                                 ` : `
-                                    <button class="btn-icon" onclick="reactivateProduct('${p.id}', '${p.name}')" title="Aktifkan" style="color: var(--accent-green); border-color: var(--accent-green);">
+                                    <button class="btn-icon" onclick="reactivateProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}')" title="Aktifkan" style="color: var(--accent-green); border-color: var(--accent-green);">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                `}
+                                `)}
                             </div>
                         </td>
                     </tr>
@@ -753,34 +773,116 @@
             document.getElementById('modalTitle').querySelector('span').textContent = 'Tambah Produk Baru';
             document.getElementById('productForm').reset();
             document.getElementById('editProductId').value = '';
+            document.getElementById('btnSubmit').innerHTML = 'SIMPAN PRODUK';
+            
+            // Clear flatpickr input if exists
+            const expiryPicker = document.querySelector("#productExpiryDate")._flatpickr;
+            if (expiryPicker) {
+                expiryPicker.clear();
+                expiryPicker.altInput.disabled = false;
+                expiryPicker.altInput.style.opacity = '1';
+                expiryPicker.altInput.style.cursor = 'pointer';
+            }
+            
+            document.getElementById('productNoExpiry').checked = false;
+            
             document.getElementById('productModal').classList.add('active');
         }
 
-        function openEditModal(p) {
-            document.getElementById('modalTitle').querySelector('span').textContent = 'Edit Produk';
-            document.getElementById('editProductId').value = p.id;
-            document.getElementById('productName').value = p.name;
-            document.getElementById('productCategory').value = p.category_name;
-            document.getElementById('productUnit').value = p.unit;
-            document.getElementById('productStock').value = p.stock_quantity;
-            document.getElementById('productMinStock').value = p.min_stock_level;
-            document.getElementById('productIsActive').checked = p.is_active;
+        function openEditModal(id, name, category, unit, stock, minStock, expiryDate, isActive) {
+            document.getElementById('modalTitle').querySelector('span').textContent = 'Edit Produk Admin';
+            document.getElementById('productForm').reset();
             
-            if (p.expiry_date) {
-                const date = new Date(p.expiry_date);
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = date.getFullYear();
-                document.getElementById('productExpiryDate')._flatpickr.setDate(`${day}/${month}/${year}`);
-            } else {
-                document.getElementById('productExpiryDate')._flatpickr.clear();
+            document.getElementById('editProductId').value = id;
+            document.getElementById('productName').value = name;
+            
+            // Select dropdown options safely
+            const catSelect = document.getElementById('productCategory');
+            for(let i=0; i<catSelect.options.length; i++) {
+                if(catSelect.options[i].value === category) { catSelect.selectedIndex = i; break; }
             }
             
+            const unitSelect = document.getElementById('productUnit');
+            for(let i=0; i<unitSelect.options.length; i++) {
+                if(unitSelect.options[i].value === unit) { unitSelect.selectedIndex = i; break; }
+            }
+            
+            document.getElementById('productStock').value = stock;
+            document.getElementById('productMinStock').value = minStock;
+            
+            const expiryPicker = document.querySelector("#productExpiryDate")._flatpickr;
+            if (expiryPicker && expiryDate) {
+                expiryPicker.setDate(new Date(expiryDate));
+                document.getElementById('productNoExpiry').checked = false;
+                expiryPicker.altInput.disabled = false;
+                expiryPicker.altInput.style.opacity = '1';
+                expiryPicker.altInput.style.cursor = 'pointer';
+            } else if (expiryPicker) {
+                expiryPicker.clear();
+                document.getElementById('productNoExpiry').checked = true;
+                expiryPicker.altInput.disabled = true;
+                expiryPicker.altInput.style.opacity = '0.5';
+                expiryPicker.altInput.style.cursor = 'not-allowed';
+            }
+            
+            document.getElementById('productIsActive').checked = (isActive === 1 || isActive === true || isActive === '1');
+            document.getElementById('btnSubmit').innerHTML = 'UPDATE PRODUK';
+            
             document.getElementById('productModal').classList.add('active');
+        }
+
+        async function deleteAdminProduct(id) {
+            const confirm = await Swal.fire({
+                title: 'Hapus Produk?',
+                text: 'Produk ini akan dihapus secara permanen dari sistem.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#EF4444',
+                customClass: { popup: 'nb-popup', confirmButton: 'nb-btn', cancelButton: 'nb-btn' }
+            });
+
+            if (confirm.isConfirmed) {
+                try {
+                    document.getElementById('loadingOverlay').style.display = 'flex';
+                    const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if (data.success) {
+                        showToast('Produk admin berhasil dihapus', 'success');
+                        loadProducts(currentPage);
+                        loadProductStatistics();
+                    } else {
+                        Swal.fire('Error!', data.message || 'Gagal menghapus produk.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                }
+            }
         }
 
         function closeModal() {
             document.getElementById('productModal').classList.remove('active');
+        }
+
+        function toggleExpiryDate() {
+            const noExpiry = document.getElementById('productNoExpiry').checked;
+            const fp = document.querySelector("#productExpiryDate")._flatpickr;
+            if (fp) {
+                if (noExpiry) {
+                    fp.clear();
+                    fp.altInput.disabled = true;
+                    fp.altInput.style.opacity = '0.5';
+                    fp.altInput.style.cursor = 'not-allowed';
+                } else {
+                    fp.altInput.disabled = false;
+                    fp.altInput.style.opacity = '1';
+                    fp.altInput.style.cursor = 'pointer';
+                }
+            }
         }
 
         async function handleFormSubmit() {
@@ -789,13 +891,13 @@
                 name: document.getElementById('productName').value,
                 category: document.getElementById('productCategory').value,
                 unit: document.getElementById('productUnit').value,
-                stock: parseFloat(document.getElementById('productStock').value),
-                min_stock: parseFloat(document.getElementById('productMinStock').value),
-                expiry_date: document.getElementById('productExpiryDate').value,
+                stock_quantity: parseFloat(document.getElementById('productStock').value),
+                min_stock_level: parseFloat(document.getElementById('productMinStock').value),
+                expiry_date: document.getElementById('productNoExpiry').checked ? null : document.getElementById('productExpiryDate').value,
                 is_active: document.getElementById('productIsActive').checked
             };
 
-            if (!formData.name || isNaN(formData.stock) || isNaN(formData.min_stock)) {
+            if (!formData.name || isNaN(formData.stock_quantity) || isNaN(formData.min_stock_level)) {
                 showToast('Harap isi field yang wajib (*)', 'error');
                 return;
             }
@@ -816,17 +918,38 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
 
                 if (data.success) {
-                    showToast(id ? 'Produk diperbarui' : 'Produk ditambahkan', 'success');
+                    Swal.fire({
+                        title: id ? 'PRODUK DIPERBARUI!' : 'PRODUK DITAMBAHKAN!',
+                        html: `<p style="font-weight:700;">Produk <strong style="color:var(--primary-blue);">${formData.name}</strong> berhasil ${id ? 'diperbarui' : 'ditambahkan ke dalam sistem'}.</p>`,
+                        icon: 'success',
+                        confirmButtonText: 'MANTAP',
+                        confirmButtonColor: 'var(--primary-blue)',
+                        customClass: { popup: 'nb-popup', confirmButton: 'nb-btn' }
+                    });
                     closeModal();
                     loadProducts(currentPage);
                     loadProductStatistics();
                 } else {
-                    showToast(data.message || 'Gagal menyimpan produk', 'error');
+                    Swal.fire({
+                        title: 'GAGAL!',
+                        text: data.message || 'Gagal menyimpan produk',
+                        icon: 'error',
+                        confirmButtonText: 'TUTUP',
+                        confirmButtonColor: 'var(--accent-red)',
+                        customClass: { popup: 'nb-popup', confirmButton: 'nb-btn' }
+                    });
                 }
             } catch (error) {
                 console.error('Error save:', error);
                 document.getElementById('loadingOverlay').style.display = 'none';
-                showToast('Terjadi kesalahan', 'error');
+                Swal.fire({
+                    title: 'ERROR!',
+                    text: 'Terjadi kesalahan pada sistem.',
+                    icon: 'error',
+                    confirmButtonText: 'TUTUP',
+                    confirmButtonColor: 'var(--accent-red)',
+                    customClass: { popup: 'nb-popup', confirmButton: 'nb-btn' }
+                });
             }
         }
 

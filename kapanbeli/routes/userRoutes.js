@@ -160,6 +160,18 @@ router.post('/:id/profile-image', upload.single('profileImage'), userController.
 router.patch('/:id/toggle-status', userController.toggleUserStatus);
 
 /**
+ * @route POST /api/users/:id/ban
+ * @desc Ban user
+ */
+router.post('/:id/ban', userController.banUser);
+
+/**
+ * @route POST /api/users/:id/unban
+ * @desc Unban user
+ */
+router.post('/:id/unban', userController.unbanUser);
+
+/**
  * @route DELETE /api/users/:id
  * @desc Soft delete user (set to inactive)
  */

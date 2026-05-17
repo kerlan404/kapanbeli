@@ -613,6 +613,49 @@ const userService = {
     // ============================================
 
     /**
+     * Ban user
+     * @param {number} userId - User ID
+     * @param {string} reason - Reason for ban
+     * @param {string} banUntil - Ban end date
+     * @param {number} adminId - Admin ID
+     * @returns {Promise<Object>} Result
+     */
+    async banUser(userId, reason, banUntil, adminId) {
+        try {
+            const query = `
+                UPDATE users 
+                SET is_banned = TRUE, ban_reason = ?, ban_until = ?, banned_by = ?, banned_at = NOW(), account_status = 'banned', status = 'banned', updated_at = NOW()
+                WHERE id = ?
+            `;
+            await db.execute(query, [reason, banUntil || null, adminId || null, userId]);
+            return { success: true, message: 'User berhasil di-ban' };
+        } catch (error) {
+            console.error('Error banning user:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Unban user
+     * @param {number} userId - User ID
+     * @returns {Promise<Object>} Result
+     */
+    async unbanUser(userId) {
+        try {
+            const query = `
+                UPDATE users 
+                SET is_banned = FALSE, ban_reason = NULL, ban_until = NULL, banned_by = NULL, banned_at = NULL, account_status = 'active', status = 'active', updated_at = NOW()
+                WHERE id = ?
+            `;
+            await db.execute(query, [userId]);
+            return { success: true, message: 'User berhasil di-unban' };
+        } catch (error) {
+            console.error('Error unbanning user:', error);
+            throw error;
+        }
+    },
+
+    /**
      * Get user statistics
      * @returns {Promise<Object>} Statistics
      */
