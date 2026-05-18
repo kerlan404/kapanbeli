@@ -525,7 +525,7 @@ app.use('/dashboard', dashboardSSRRoutes);
 
 // Use profile routes (protected)
 app.post('/api/profile/photo', upload.single('profile_photo'), isAuthenticated, settingsController.uploadProfilePhoto);
-app.use('/api/profile', settingsRoutes);
+app.use('/api/profile', isAuthenticated, settingsRoutes);
 
 // Use settings API routes (protected)
 app.use('/api/settings', settingsApiRoutes);

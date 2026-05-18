@@ -36,8 +36,6 @@ const activityLogsService = {
         try {
             console.log('[ActivityLogsService.log] Logging activity:', { userId, activityType, description, ip });
             
-            // Set timezone ke Asia/Jakarta
-            await db.execute("SET time_zone = '+07:00'");
 
             const query = `
                 INSERT INTO activity_logs (user_id, activity_type, description, ip_address, user_agent)
@@ -98,9 +96,6 @@ const activityLogsService = {
                 activityType = '',
                 userId = ''
             } = options;
-
-            // Set timezone
-            await db.execute("SET time_zone = '+07:00'");
 
             // Build date filter
             let dateFilter = '';
@@ -214,8 +209,6 @@ const activityLogsService = {
      */
     async getStatistics(range = '7days') {
         try {
-            await db.execute("SET time_zone = '+07:00'");
-
             let dateFilter = '';
             switch (range) {
                 case 'today':

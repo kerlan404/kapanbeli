@@ -27,7 +27,6 @@ const analyticsController = {
             }
 
             const range = req.query.range || '7days';
-            await db.execute("SET time_zone = '+07:00'");
 
             const config = {
                 today: { days: 1, interval: 0, hourFormat: true },
@@ -208,8 +207,6 @@ const analyticsController = {
             if (!req.session?.user?.role || req.session.user.role !== 'admin') {
                 return res.status(403).json({ success: false, message: 'Akses ditolak.' });
             }
-
-            await db.execute("SET time_zone = '+07:00'");
 
             const [totalUsers, todayUsers, todayLogins, dau, onlineUsers] = await Promise.all([
                 db.execute('SELECT COUNT(*) as count FROM users'),
