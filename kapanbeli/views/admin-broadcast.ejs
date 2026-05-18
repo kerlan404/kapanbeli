@@ -263,6 +263,90 @@
             .top-bar { padding: 0 20px; }
             .content-container { padding: 25px; }
         }
+
+        /* SweetAlert2 Neubrutalism Custom Styles */
+        .nb-popup {
+            border: 4px solid var(--border-color) !important;
+            border-radius: 0px !important;
+            box-shadow: 8px 8px 0px var(--border-color) !important;
+            background: var(--bg-card) !important;
+            color: var(--text-main) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            padding: 30px !important;
+        }
+        .nb-popup .swal2-title {
+            color: var(--text-main) !important;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+            letter-spacing: -1px !important;
+            font-size: 1.8rem !important;
+            border-bottom: 4px solid var(--border-color) !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+        .nb-popup .swal2-html-container {
+            color: var(--text-main) !important;
+            font-family: inherit !important;
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: left !important;
+        }
+        .nb-popup .swal2-actions {
+            gap: 15px !important;
+            margin-top: 25px !important;
+            width: 100% !important;
+            justify-content: flex-end !important;
+        }
+        .nb-popup .swal2-loader {
+            border-color: var(--primary-blue) transparent var(--primary-blue) transparent !important;
+        }
+        
+        /* SweetAlert2 Buttons standard override */
+        .nb-popup .swal2-styled {
+            margin: 0 !important;
+        }
+        .nb-btn {
+            padding: 14px 28px !important;
+            border: 3px solid var(--border-color) !important;
+            border-radius: 0px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            box-shadow: 4px 4px 0px var(--border-color) !important;
+            transition: all 0.1s ease !important;
+            font-family: inherit !important;
+            font-size: 0.95rem !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+        .nb-btn:hover {
+            transform: translate(-2px, -2px) !important;
+            box-shadow: 6px 6px 0px var(--border-color) !important;
+        }
+        .nb-btn:active {
+            transform: translate(2px, 2px) !important;
+            box-shadow: 0px 0px 0px var(--border-color) !important;
+        }
+        .nb-btn-primary {
+            background: var(--primary-blue) !important;
+            color: white !important;
+        }
+        .nb-btn-success {
+            background: var(--accent-green) !important;
+            color: white !important;
+        }
+        .nb-btn-danger {
+            background: var(--accent-red) !important;
+            color: white !important;
+        }
+        .nb-btn-secondary {
+            background: var(--bg-card) !important;
+            color: var(--text-main) !important;
+        }
     </style>
 </head>
 <body>
@@ -554,20 +638,27 @@
             const result = await Swal.fire({
                 title: 'Kirim Pengumuman?',
                 html: `
-                    <div style="text-align: left; margin: 20px 0;">
-                        <p><strong>Judul:</strong> ${title}</p>
-                        <p><strong>Tipe:</strong> ${type.toUpperCase()}</p>
-                        <p><strong>Target:</strong> ${sendTo === 'all' ? 'Semua User' : 'User Aktif'}</p>
-                        <p><strong>Perkiraan penerima:</strong> ${sendTo === 'all' ? totalUsers : activeUsers} user</p>
+                    <div style="text-align: left; margin: 10px 0;">
+                        <p style="margin-bottom: 15px; font-weight: 700; color: var(--text-muted);">Apakah Anda yakin ingin mempublikasikan pengumuman ini ke seluruh penerima?</p>
+                        <div style="border: 3px solid var(--border-color); padding: 15px; background: rgba(0,0,0,0.03); box-shadow: 4px 4px 0px var(--border-color);">
+                            <div style="margin-bottom: 10px; font-size: 1rem;"><i class="fas fa-heading" style="color: var(--primary-blue); margin-right: 8px;"></i><strong>Judul:</strong> <span style="font-weight: 800;">${title}</span></div>
+                            <div style="margin-bottom: 10px; font-size: 1rem;"><i class="fas fa-tag" style="color: var(--primary-orange); margin-right: 8px;"></i><strong>Tipe:</strong> <span class="badge" style="background: ${type === 'info' ? 'var(--primary-blue)' : type === 'warning' ? 'var(--primary-orange)' : 'var(--accent-red)'}; color: white; padding: 2px 8px; border: 2px solid var(--border-color); font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); font-weight: 900; text-transform: uppercase;">${type}</span></div>
+                            <div style="margin-bottom: 10px; font-size: 1rem;"><i class="fas fa-users" style="color: var(--accent-green); margin-right: 8px;"></i><strong>Target:</strong> <span style="font-weight: 800;">${sendTo === 'all' ? 'Semua Pengguna' : 'Pengguna Aktif Saja'}</span></div>
+                            <div style="font-size: 1rem;"><i class="fas fa-paper-plane" style="color: var(--primary-blue); margin-right: 8px;"></i><strong>Penerima:</strong> <span style="font-weight: 800; color: var(--primary-blue);">${sendTo === 'all' ? totalUsers : activeUsers} Pengguna</span></div>
+                        </div>
                     </div>
                 `,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#2E86DE',
-                cancelButtonColor: '#6c757d',
                 confirmButtonText: '<i class="fas fa-paper-plane"></i> Ya, Kirim!',
                 cancelButtonText: 'Batal',
-                reverseButtons: true
+                reverseButtons: true,
+                customClass: {
+                    popup: 'nb-popup',
+                    confirmButton: 'nb-btn nb-btn-primary',
+                    cancelButton: 'nb-btn nb-btn-secondary'
+                },
+                buttonsStyling: false
             });
 
             if (!result.isConfirmed) {
@@ -577,10 +668,16 @@
             // Show loading
             Swal.fire({
                 title: 'Mengirim Pengumuman...',
-                html: 'Mohon tunggu sebentar',
+                html: `
+                    <div style="text-align: center; margin: 20px 0;">
+                        <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 15px;"></i>
+                        <p style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Sedang memproses pengiriman broadcast...</p>
+                    </div>
+                `,
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'nb-popup'
                 }
             });
 
@@ -604,23 +701,39 @@
                 if (data.success) {
                     // SUCCESS - Show SweetAlert
                     await Swal.fire({
-                        icon: 'success',
                         title: 'Pengumuman Berhasil Dikirim! 🎉',
                         html: `
-                            <div style="text-align: center; margin: 20px 0;">
-                                <p style="font-size: 1.1rem; margin-bottom: 15px;">
-                                    <i class="fas fa-check-circle" style="color: #1DD1A1; font-size: 2rem;"></i>
-                                </p>
-                                <p style="font-size: 1.2rem; font-weight: 600; color: #2E86DE; margin-bottom: 10px;">
-                                    Pengumuman berhasil dikirim ke seluruh user!
-                                </p>
-                                <p style="color: #6c757d;">
-                                    <i class="fas fa-users"></i> 
-                                    Diterima oleh <strong style="color: #2E86DE;">${data.sent_count}</strong> user
+                            <div style="text-align: center; margin: 15px 0;">
+                                <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; border: 4px solid var(--border-color); background: var(--accent-green); box-shadow: 4px 4px 0px var(--border-color); margin-bottom: 20px;">
+                                    <i class="fas fa-bullhorn" style="color: white; font-size: 2.2rem;"></i>
+                                </div>
+                                <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 12px; letter-spacing: -0.5px;">
+                                    Pesan Terkirim!
+                                </h3>
+                                <div style="border: 3px solid var(--border-color); padding: 15px; background: rgba(16, 185, 129, 0.08); box-shadow: 4px 4px 0px var(--border-color); margin-bottom: 10px; text-align: left;">
+                                    <div style="margin-bottom: 6px; font-weight: 800; font-size: 0.95rem;">
+                                        <i class="fas fa-check" style="color: var(--accent-green); margin-right: 8px;"></i>
+                                        Status: <span style="color: var(--accent-green);">SUKSES</span>
+                                    </div>
+                                    <div style="margin-bottom: 6px; font-weight: 800; font-size: 0.95rem;">
+                                        <i class="fas fa-paper-plane" style="color: var(--primary-blue); margin-right: 8px;"></i>
+                                        Metode: Broadcast Real-time
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 0.95rem;">
+                                        <i class="fas fa-users" style="color: var(--primary-orange); margin-right: 8px;"></i>
+                                        Penerima: <span style="color: var(--primary-blue); font-size: 1.1rem; font-weight: 900;">${data.sent_count}</span> Pengguna
+                                    </div>
+                                </div>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-top: 15px;">
+                                    * Pengumuman telah diterbitkan ke dashboard penerima
                                 </p>
                             </div>
                         `,
-                        confirmButtonColor: '#1DD1A1',
+                        customClass: {
+                            popup: 'nb-popup',
+                            confirmButton: 'nb-btn nb-btn-success'
+                        },
+                        buttonsStyling: false,
                         confirmButtonText: 'OK'
                     });
 
@@ -634,7 +747,11 @@
                         icon: 'error',
                         title: 'Gagal!',
                         text: data.message || 'Gagal mengirim pengumuman',
-                        confirmButtonColor: '#FF6B6B'
+                        customClass: {
+                            popup: 'nb-popup',
+                            confirmButton: 'nb-btn nb-btn-danger'
+                        },
+                        buttonsStyling: false
                     });
                 }
             } catch (error) {
@@ -643,7 +760,11 @@
                     icon: 'error',
                     title: 'Error!',
                     text: 'Terjadi kesalahan saat mengirim pengumuman',
-                    confirmButtonColor: '#FF6B6B'
+                    customClass: {
+                        popup: 'nb-popup',
+                        confirmButton: 'nb-btn nb-btn-danger'
+                    },
+                    buttonsStyling: false
                 });
             }
         }

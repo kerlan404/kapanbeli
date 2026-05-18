@@ -198,6 +198,59 @@
             .main-content { margin-left: 0; padding: 25px; }
             .menu-toggle { display: block; }
         }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .toast {
+            padding: 16px 24px;
+            border: 4px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--shadow-brutal-sm);
+            min-width: 320px;
+            font-weight: 800;
+            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .toast.success {
+            border-left: 12px solid var(--accent-green);
+        }
+        .toast.success i {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+        }
+        .toast.error {
+            border-left: 12px solid var(--accent-red);
+        }
+        .toast.error i {
+            color: var(--accent-red);
+            font-size: 1.2rem;
+        }
+        .toast.info {
+            border-left: 12px solid var(--primary-blue);
+        }
+        .toast.info i {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -292,7 +345,6 @@
                         <tr>
                             <th>User</th>
                             <th>Aktivitas</th>
-                            <th>IP Address</th>
                             <th>Waktu</th>
                         </tr>
                     </thead>
@@ -435,7 +487,6 @@
                                 ${isLogin ? 'Login' : 'Logout'}
                             </span>
                         </td>
-                        <td><code style="font-weight: 700; background: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 4px;">${log.ip_address || '-'}</code></td>
                         <td style="font-weight: 600;">${new Date(log.login_time || log.created_at).toLocaleString('id-ID')}</td>
                     </tr>
                 `;

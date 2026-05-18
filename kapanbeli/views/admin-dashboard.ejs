@@ -48,6 +48,34 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
+        /* Glowing Live pulse-dot */
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-green 2s infinite;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        @keyframes pulse-green {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
@@ -130,6 +158,11 @@
             gap: 20px;
         }
 
+        .stat-card:hover .stat-icon {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+        }
+
         .stat-icon {
             width: 64px;
             height: 64px;
@@ -139,6 +172,7 @@
             justify-content: center;
             font-size: 1.8rem;
             box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .stat-value {
@@ -157,19 +191,23 @@
         /* Charts Section */
         .charts-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr;
             gap: 24px;
             margin-bottom: 40px;
         }
 
-        @media (max-width: 1200px) {
+        @media (max-width: 1400px) {
+            .charts-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 992px) {
             .charts-grid { grid-template-columns: 1fr; }
         }
 
         /* Recent Activity & Previews */
         .previews-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 24px;
         }
 
@@ -180,10 +218,6 @@
             flex-direction: column;
         }
 
-        @media (max-width: 600px) {
-            .previews-grid { grid-template-columns: 1fr; }
-        }
-
         .preview-list {
             list-style: none;
             flex: 1;
@@ -192,15 +226,27 @@
         }
         
         /* Custom Scrollbar for Preview List */
-        .preview-list::-webkit-scrollbar { width: 6px; }
-        .preview-list::-webkit-scrollbar-track { background: var(--glass-bg); border-radius: 4px; }
-        .preview-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .preview-list::-webkit-scrollbar { width: 8px; }
+        .preview-list::-webkit-scrollbar-track { background: transparent; }
+        .preview-list::-webkit-scrollbar-thumb { 
+            background: var(--border-color); 
+            border: 2px solid var(--bg-card);
+        }
+        
         .preview-item {
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 15px 0;
+            padding: 14px 8px;
             border-bottom: 3px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .preview-item:hover {
+            background: rgba(59, 130, 246, 0.03);
+            transform: translateX(3px);
+        }
+        body.dark-mode-active .preview-item:hover {
+            background: rgba(59, 130, 246, 0.08);
         }
         .preview-item:last-child { border-bottom: none; }
 
@@ -213,6 +259,12 @@
             justify-content: center;
             font-size: 1.2rem;
             flex-shrink: 0;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .preview-item:hover .activity-icon {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--border-color);
         }
 
         .activity-info { flex: 1; min-width: 0; }
@@ -234,6 +286,77 @@
         .empty-state {
             text-align: center; padding: 40px 20px; color: var(--text-muted);
             font-weight: 800; text-transform: uppercase; font-size: 0.85rem;
+        }
+
+        /* Premium Table Styles */
+        .nb-table-container {
+            overflow-x: auto;
+            border: 4px solid var(--border-color);
+            background: var(--bg-card);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+            margin-top: 15px;
+            transition: all 0.2s ease;
+        }
+        .nb-table-container:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 8px 8px 0px var(--shadow-color);
+        }
+        .nb-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        .nb-table th {
+            background: var(--primary-blue);
+            color: #fff;
+            padding: 16px 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-bottom: 4px solid var(--border-color);
+            border-right: 3px solid var(--border-color);
+            text-align: left;
+        }
+        .nb-table th:last-child {
+            border-right: none;
+            text-align: center;
+        }
+        .nb-table td {
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-bottom: 3px solid var(--border-color);
+            border-right: 3px solid var(--border-color);
+            color: var(--text-main);
+            transition: background 0.1s ease;
+        }
+        .nb-table td:last-child {
+            border-right: none;
+        }
+        .nb-table tr:last-child td {
+            border-bottom: none;
+        }
+        .nb-table tr:hover td {
+            background: rgba(59, 130, 246, 0.04);
+        }
+        body.dark-mode-active .nb-table tr:hover td {
+            background: rgba(59, 130, 246, 0.12);
+        }
+
+        /* Custom Dropdown select override styling */
+        select.nb-btn {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 36px !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+        }
+        
+        body.dark-mode-active select.nb-btn {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
         }
 
         @media (max-width: 992px) {
@@ -311,102 +434,110 @@
         </div>
 
         <!-- Charts Grid -->
-        <div class="charts-grid" style="grid-template-columns: 2fr 1fr 1fr;">
-            <div class="nb-card">
-                <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-chart-line" style="color: var(--primary-blue);"></i>
-                    Pertumbuhan <span id="currentRangeLabel">7 Hari Terakhir</span>
-                </h3>
-                <div style="height: 350px;">
+        <div class="charts-grid">
+            <div class="nb-card" style="display: flex; flex-direction: column;">
+                <div style="padding-bottom: 15px; border-bottom: 4px solid var(--border-color); margin-bottom: 20px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+                        <i class="fas fa-chart-line" style="color: var(--primary-blue);"></i>
+                        Pertumbuhan <span id="currentRangeLabel" style="color: var(--primary-blue);">7 Hari Terakhir</span>
+                    </h3>
+                </div>
+                <div style="height: 350px; flex: 1;">
                     <canvas id="growthChart"></canvas>
                 </div>
             </div>
-            <div class="nb-card">
-                <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 20px;">
-                    Distribusi Role
-                </h3>
-                <div style="height: 350px; display: flex; align-items: center; justify-content: center;">
+            <div class="nb-card" style="display: flex; flex-direction: column;">
+                <div style="padding-bottom: 15px; border-bottom: 4px solid var(--border-color); margin-bottom: 20px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+                        <i class="fas fa-user-shield" style="color: var(--primary-orange);"></i>
+                        Distribusi Role
+                    </h3>
+                </div>
+                <div style="height: 350px; flex: 1; display: flex; align-items: center; justify-content: center;">
                     <canvas id="roleChart"></canvas>
                 </div>
             </div>
-            <div class="nb-card">
-                <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 20px;">
-                    Kategori Produk
-                </h3>
-                <div style="height: 350px; display: flex; align-items: center; justify-content: center;">
+            <div class="nb-card" style="display: flex; flex-direction: column;">
+                <div style="padding-bottom: 15px; border-bottom: 4px solid var(--border-color); margin-bottom: 20px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+                        <i class="fas fa-tags" style="color: var(--accent-green);"></i>
+                        Kategori Produk
+                    </h3>
+                </div>
+                <div style="height: 350px; flex: 1; display: flex; align-items: center; justify-content: center;">
                     <canvas id="categoryChart"></canvas>
                 </div>
             </div>
         </div>
-
         <!-- Monitoring Grid -->
-        <div class="previews-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-bottom: 40px;">
+        <div class="previews-grid" style="margin-bottom: 40px;">
             <!-- Global Activity Log -->
-            <div class="nb-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
-                        <i class="fas fa-history" style="color: var(--primary-blue); margin-right: 10px;"></i>
+            <div class="nb-card" style="border-top: 8px solid var(--primary-blue);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 4px solid var(--border-color); margin-bottom: 15px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-history" style="color: var(--primary-blue);"></i>
                         Aktivitas Global
                     </h3>
-                    <a href="/admin/activity-logs" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Lihat</a>
+                    <a href="/admin/activity-logs" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem; box-shadow: 2px 2px 0px var(--border-color);">Lihat</a>
                 </div>
                 <div id="activityLoading" style="text-align: center; padding: 20px;">
-                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <i class="fas fa-circle-notch fa-spin" style="color: var(--primary-blue);"></i>
                 </div>
                 <div id="activityList" class="preview-list"></div>
             </div>
 
             <!-- Notes Monitor -->
-            <div class="nb-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
-                        <i class="fas fa-sticky-note" style="color: var(--primary-orange); margin-right: 10px;"></i>
+            <div class="nb-card" style="border-top: 8px solid var(--primary-orange);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 4px solid var(--border-color); margin-bottom: 15px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-sticky-note" style="color: var(--primary-orange);"></i>
                         Catatan Monitor
                     </h3>
-                    <a href="/admin/notes" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Kelola</a>
+                    <a href="/admin/notes" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem; box-shadow: 2px 2px 0px var(--border-color);">Kelola</a>
                 </div>
                 <div id="notesLoading" style="text-align: center; padding: 20px;">
-                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <i class="fas fa-circle-notch fa-spin" style="color: var(--primary-orange);"></i>
                 </div>
                 <div id="notesMonitorList" class="preview-list"></div>
             </div>
 
             <!-- Shopping Suggestions -->
-            <div class="nb-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
-                        <i class="fas fa-shopping-basket" style="color: var(--accent-green); margin-right: 10px;"></i>
+            <div class="nb-card" style="border-top: 8px solid var(--accent-green);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 4px solid var(--border-color); margin-bottom: 15px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-shopping-basket" style="color: var(--accent-green);"></i>
                         Saran Pembelian
                     </h3>
-                    <a href="/admin/shopping-suggestions" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Cek</a>
+                    <a href="/admin/shopping-suggestions" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem; box-shadow: 2px 2px 0px var(--border-color);">Cek</a>
                 </div>
                 <div id="suggestionsLoading" style="text-align: center; padding: 20px;">
-                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <i class="fas fa-circle-notch fa-spin" style="color: var(--accent-green);"></i>
                 </div>
                 <div id="suggestionList" class="preview-list"></div>
             </div>
 
-            <!-- Login Activity -->
-            <div class="nb-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.1rem;">
-                        <i class="fas fa-sign-in-alt" style="color: #A855F7; margin-right: 10px;"></i>
-                        Aktivitas Login
+            <!-- Kontributor Teraktif -->
+            <div class="nb-card" style="border-top: 8px solid #A855F7;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 4px solid var(--border-color); margin-bottom: 15px;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-trophy" style="color: #A855F7;"></i>
+                        Kontributor Teraktif
                     </h3>
-                    <a href="/admin/activity-logs?type=LOGIN" class="nb-btn" style="padding: 6px 12px; font-size: 0.7rem;">Lihat</a>
                 </div>
-                <div id="loginActivityLoading" style="text-align: center; padding: 20px;">
-                    <i class="fas fa-circle-notch fa-spin"></i>
+                <div id="topUsersLoading" style="text-align: center; padding: 20px; flex: 1; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-circle-notch fa-spin" style="color: #A855F7; font-size: 1.5rem;"></i>
                 </div>
-                <div id="loginActivityList" class="preview-list"></div>
+                <div id="topUsersList" class="preview-list" style="display: none; flex: 1; overflow-y: auto;">
+                    <!-- User ranks list items -->
+                </div>
             </div>
         </div>
 
         <!-- Product Management Section -->
-        <div class="nb-card" style="margin-bottom: 40px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.2rem; display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 40px; height: 40px; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; border: 3px solid #000; box-shadow: 3px 3px 0 #000;">
+        <div class="nb-card" style="margin-bottom: 40px; border-top: 8px solid var(--primary-blue);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 4px solid var(--border-color); margin-bottom: 25px;">
+                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.25rem; display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 44px; height: 44px; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; border: 3px solid var(--border-color); box-shadow: 3px 3px 0 var(--border-color); transition: all 0.2s ease;">
                         <i class="fas fa-boxes"></i>
                     </div>
                     Manajemen Produk Terbaru
@@ -416,15 +547,15 @@
                 </a>
             </div>
             
-            <div style="overflow-x: auto; border: 4px solid #000; background: var(--bg-card);">
-                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+            <div class="nb-table-container">
+                <table class="nb-table">
                     <thead>
-                        <tr style="background: var(--primary-blue); border-bottom: 4px solid #000;">
-                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Produk</th>
-                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Kategori</th>
-                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Stok</th>
-                            <th style="padding: 15px; text-align: left; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border-right: 2px solid #000;">Pemilik</th>
-                            <th style="padding: 15px; text-align: center; color: white; font-weight: 900; text-transform: uppercase; font-size: 0.8rem;">Status</th>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Kategori</th>
+                            <th>Stok</th>
+                            <th>Pemilik</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="latestProductsTable">
@@ -461,10 +592,10 @@
             
             loadStats();
             loadActivities();
-            loadLoginActivities();
             loadNotesMonitor();
             loadSuggestions();
             loadLatestProducts();
+            loadTopUsers();
             initCharts(savedRange);
         });
 
@@ -525,34 +656,7 @@
             } catch (err) { console.error('Error activity:', err); }
         }
 
-        async function loadLoginActivities() {
-            try {
-                const res = await fetch('/api/activity-logs?activityType=LOGIN&limit=8', { credentials: 'same-origin' });
-                const result = await res.json();
-                document.getElementById('loginActivityLoading').style.display = 'none';
-                if (result.success && result.data) {
-                    const list = document.getElementById('loginActivityList');
-                    if (result.data.length === 0) {
-                        list.innerHTML = '<div class="empty-state">Belum ada aktivitas login</div>';
-                        return;
-                    }
-                    list.innerHTML = result.data.map(log => {
-                        return `
-                            <div class="preview-item">
-                                <div class="activity-icon" style="background: rgba(168, 85, 247, 0.1); border-color: #A855F7; color: #A855F7; width: 36px; height: 36px; font-size: 0.9rem;">
-                                    <i class="fas fa-sign-in-alt"></i>
-                                </div>
-                                <div class="activity-info">
-                                    <div class="activity-user" style="font-size: 0.7rem; font-weight: 900; color: #A855F7; margin-bottom: 2px;">${log.user_name}</div>
-                                    <div class="activity-title" style="font-size: 0.85rem; font-weight: 700;">${log.description}</div>
-                                    <div class="activity-time" style="font-size: 0.7rem;">${formatTimeAgo(log.created_at)}</div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            } catch (err) { console.error('Error login activity:', err); }
-        }
+
 
         async function loadNotesMonitor() {
             try {
@@ -610,6 +714,62 @@
             } catch (err) { console.error('Error suggestions:', err); }
         }
 
+        async function loadTopUsers() {
+            try {
+                const res = await fetch('/api/admin/analytics/top-users', { credentials: 'same-origin' });
+                const result = await res.json();
+                
+                const listContainer = document.getElementById('topUsersList');
+                const loadingElement = document.getElementById('topUsersLoading');
+                
+                if (result.success && result.users) {
+                    const users = result.users;
+                    loadingElement.style.display = 'none';
+                    listContainer.style.display = 'block';
+                    
+                    if (users.length === 0) {
+                        listContainer.innerHTML = '<div class="empty-state">Belum ada aktivitas pengguna</div>';
+                        return;
+                    }
+                    
+                    const medals = ['🥇', '🥈', '🥉'];
+                    
+                    listContainer.innerHTML = users.map((user, idx) => {
+                        const isTop3 = idx < 3;
+                        const rankBadge = isTop3 
+                            ? `<span style="font-size: 1.25rem; margin-right: 8px;">${medals[idx]}</span>`
+                            : `<span style="font-weight: 900; font-size: 0.85rem; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--border-color); background: var(--bg-body); border-radius: 50%; margin-right: 8px;">${idx + 1}</span>`;
+                        
+                        return `
+                            <div class="preview-item">
+                                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                                    ${rankBadge}
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px;">
+                                            ${user.name}
+                                            ${idx === 0 ? '<span class="status-badge" style="background: #FEF3C7; color: #D97706; border-color: #F59E0B; font-size: 0.55rem; padding: 1px 6px;">MVP</span>' : ''}
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${user.email}</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; flex-shrink: 0;">
+                                    <div style="font-weight: 900; font-size: 0.95rem; color: var(--primary-blue);">${user.total_products} Produk</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">${user.total_stock} Stok</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    loadingElement.innerHTML = '<span style="color: var(--accent-red); font-weight: 800;">Gagal memuat data</span>';
+                }
+            } catch (err) {
+                console.error('Error loadTopUsers:', err);
+                document.getElementById('topUsersLoading').innerHTML = '<span style="color: var(--accent-red); font-weight: 800;">Kesalahan Server</span>';
+            }
+        }
+
+
+
         function formatTimeAgo(dateString) {
             const now = new Date();
             const date = new Date(dateString);
@@ -641,27 +801,34 @@
                     }
 
                     tbody.innerHTML = products.map(p => {
-                        let stockColor = 'var(--text-primary)';
+                        let stockColor = 'var(--text-main)';
                         let stockLabel = 'Aman';
-                        if (p.stock_quantity <= 0) { stockColor = 'var(--accent-red)'; stockLabel = 'Habis'; }
-                        else if (p.stock_quantity <= p.min_stock_level) { stockColor = 'var(--primary-orange)'; stockLabel = 'Menipis'; }
+                        if (p.stock_quantity <= 0) { 
+                            stockColor = 'var(--accent-red)'; 
+                            stockLabel = 'Habis'; 
+                        } else if (p.stock_quantity <= p.min_stock_level) { 
+                            stockColor = 'var(--primary-orange)'; 
+                            stockLabel = 'Menipis'; 
+                        } else {
+                            stockColor = 'var(--accent-green)';
+                        }
 
                         return `
-                            <tr style="border-bottom: 2px solid #000;">
-                                <td style="padding: 15px; font-weight: 800; border-right: 2px solid #000;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div style="width: 32px; height: 32px; border: 2px solid #000; background: ${p.image_url ? `url(${p.image_url})` : 'var(--primary-blue)'}; background-size: cover; background-position: center;"></div>
-                                        <span>${p.name}</span>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 36px; height: 36px; border: 2px solid var(--border-color); background: ${p.image_url ? `url(${p.image_url})` : 'var(--primary-blue)'}; background-size: cover; background-position: center; box-shadow: 2px 2px 0px var(--border-color); flex-shrink: 0;"></div>
+                                        <span style="font-weight: 800;">${p.name}</span>
                                     </div>
                                 </td>
-                                <td style="padding: 15px; font-weight: 700; color: var(--text-muted); border-right: 2px solid #000;">${p.category_name || 'Lainnya'}</td>
-                                <td style="padding: 15px; font-weight: 900; color: ${stockColor}; border-right: 2px solid #000;">${p.stock_quantity} ${p.unit || ''}</td>
-                                <td style="padding: 15px; border-right: 2px solid #000;">
+                                <td style="color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 0.8rem;">${p.category_name || 'Lainnya'}</td>
+                                <td style="font-weight: 900; color: ${stockColor};">${p.stock_quantity} ${p.unit || ''}</td>
+                                <td>
                                     <div style="font-weight: 800; font-size: 0.85rem;">${p.user_name || 'System'}</div>
                                     <div style="font-size: 0.7rem; color: var(--text-muted);">${p.user_email || ''}</div>
                                 </td>
-                                <td style="padding: 15px; text-align: center;">
-                                    <span class="status-badge" style="background: ${stockColor}10; color: ${stockColor}; border-color: ${stockColor}; padding: 4px 10px; font-size: 0.65rem;">${stockLabel}</span>
+                                <td style="text-align: center;">
+                                    <span class="status-badge" style="background: ${stockColor}15; color: ${stockColor}; border: 2px solid ${stockColor}; padding: 6px 12px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; box-shadow: 2px 2px 0px ${stockColor}; display: inline-block;">${stockLabel}</span>
                                 </td>
                             </tr>
                         `;
@@ -740,21 +907,6 @@
                 'VIEW': 'fa-eye'
             };
             return icons[type] || 'fa-circle';
-        }
-
-        function formatTimeAgo(dateString) {
-            const now = new Date();
-            const date = new Date(dateString);
-            const seconds = Math.floor((now - date) / 1000);
-            
-            if (seconds < 60) return 'Baru saja';
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes} menit lalu`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours} jam lalu`;
-            const days = Math.floor(hours / 24);
-            if (days < 7) return `${days} hari lalu`;
-            return date.toLocaleDateString('id-ID');
         }
 
         async function initRoleChart() {
