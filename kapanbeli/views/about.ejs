@@ -19,45 +19,129 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>" type="image/x-icon">
 
     <style>
-        /* --- ULTRA-PREMIUM GLASSMORPHISM SYSTEM --- */
+        /* --- BRAND DESIGN SYSTEM & PALET KONSEP --- */
         :root {
-            --primary: #3B82F6;
-            --accent: #FF9F43;
-            --accent-red: #FF6B6B;
-            --text-main: #1E293B;
-            --text-muted: #64748B;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --glass-card: rgba(255, 255, 255, 0.6);
-            --overlay: linear-gradient(135deg, rgba(248, 250, 252, 0.85), rgba(248, 250, 252, 0.5));
-            --shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 30px 60px rgba(59, 130, 246, 0.15);
-            --radius-xl: 32px;
-            --radius-lg: 24px;
+            --primary: #4F46E5; /* Royal Indigo */
+            --primary-light: #818CF8;
+            --primary-glow: rgba(79, 70, 229, 0.12);
+            --accent: #FF9F43; /* Amber Gold */
+            --accent-glow: rgba(255, 159, 67, 0.12);
+            --accent-red: #FF6B6B; /* Coral Red */
+            --accent-red-glow: rgba(255, 107, 107, 0.12);
+            --accent-teal: #10B981; /* Emerald Teal */
+            --accent-teal-glow: rgba(16, 185, 129, 0.12);
+            
+            --bg-base: #F8FAFC;
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --text-sub: #64748B;
+            
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-card: rgba(255, 255, 255, 0.45);
+            --border-highlight: rgba(79, 70, 229, 0.08);
+            
+            --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.03), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+            --shadow-md: 0 10px 20px -3px rgba(15, 23, 42, 0.04), 0 4px 10px -4px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 20px 30px -5px rgba(15, 23, 42, 0.05), 0 10px 15px -5px rgba(15, 23, 42, 0.05);
+            --shadow-xl: 0 30px 60px -15px rgba(15, 23, 42, 0.08);
+            --shadow-hover: 0 35px 70px -15px rgba(79, 70, 229, 0.18);
+            
+            --radius-md: 18px;
+            --radius-lg: 28px;
+            --radius-xl: 40px;
+            
             --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-spring: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            
+            --overlay: linear-gradient(135deg, rgba(248, 250, 252, 0.75), rgba(241, 245, 249, 0.55));
         }
 
         body.dark-mode-active {
-            --text-main: #FFFFFF;
-            --text-muted: #94A3B8;
-            --glass-bg: rgba(15, 23, 42, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-card: rgba(255, 255, 255, 0.03);
-            --overlay: linear-gradient(135deg, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.7));
-            --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            --shadow-hover: 0 30px 60px rgba(59, 130, 246, 0.3);
+            --bg-base: #020617;
+            --text-main: #F8FAFC;
+            --text-muted: #E2E8F0;
+            --text-sub: #94A3B8;
+            
+            --glass-bg: rgba(15, 23, 42, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-card: rgba(255, 255, 255, 0.02);
+            --border-highlight: rgba(129, 140, 248, 0.12);
+            
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 10px 20px -3px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 20px 30px -5px rgba(0, 0, 0, 0.6);
+            --shadow-xl: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
+            --shadow-hover: 0 35px 70px -15px rgba(99, 102, 241, 0.45);
+            
+            --overlay: linear-gradient(135deg, rgba(2, 6, 23, 0.93), rgba(11, 17, 33, 0.83));
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            background: url('/images/bahan%20dapur.jpg') no-repeat center center fixed;
-            background-size: cover;
             position: relative;
+            min-height: 100vh;
+        }
+
+        /* --- DECORATIVE FLOATING BLOBS --- */
+        .blob-container {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.18;
+            transition: var(--transition);
+        }
+        body.dark-mode-active .blob {
+            opacity: 0.28;
+        }
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 45vw;
+            height: 45vw;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 80%);
+            animation: float-blob-1 25s infinite alternate ease-in-out;
+        }
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 80%);
+            animation: float-blob-2 30s infinite alternate ease-in-out;
+        }
+        .blob-3 {
+            top: 40%;
+            left: 50%;
+            width: 35vw;
+            height: 35vw;
+            background: radial-gradient(circle, var(--accent-red) 0%, transparent 80%);
+            animation: float-blob-3 35s infinite alternate ease-in-out;
+        }
+        @keyframes float-blob-1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(12%, 18%) scale(1.15); }
+        }
+        @keyframes float-blob-2 {
+            0% { transform: translate(0, 0) scale(1.1); }
+            100% { transform: translate(-18%, -12%) scale(0.9); }
+        }
+        @keyframes float-blob-3 {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-30%, -30%) rotate(360deg); }
         }
 
         body::before {
@@ -65,147 +149,509 @@
             position: fixed;
             inset: 0;
             background: var(--overlay);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: -1;
             transition: var(--transition);
         }
 
-        h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
 
-        /* ANIMATIONS */
-        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: var(--transition); }
-        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
-        .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; } .delay-3 { transition-delay: 0.3s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        /* --- SMOOTH SPRING SCROLL ANIMATIONS --- */
+        .animate-on-scroll { 
+            opacity: 0; 
+            transform: translateY(35px) scale(0.98); 
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
+        .animate-on-scroll.visible { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+        }
+        .delay-1 { transition-delay: 0.1s; } 
+        .delay-2 { transition-delay: 0.2s; } 
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
 
-        /* HERO SECTION */
+        /* --- HERO SECTION --- */
         .hero-section {
-            min-height: 70vh;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; padding: 120px 24px 60px; position: relative;
-        }
-
-        .hero-glow {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
-            filter: blur(60px); z-index: -1; animation: float 8s ease-in-out infinite;
+            min-height: 55vh;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            text-align: center; 
+            padding: 130px 24px 50px; 
+            position: relative;
         }
 
         .badge-premium {
-            background: var(--glass-card); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
-            padding: 10px 24px; border-radius: 100px; font-weight: 700; color: var(--accent);
-            margin-bottom: 24px; display: inline-flex; align-items: center; gap: 10px; box-shadow: var(--shadow);
+            background: var(--glass-card); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 8px 20px; 
+            border-radius: 100px; 
+            font-weight: 700; 
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 24px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: var(--shadow-sm);
         }
 
-        .hero-section h1 { font-size: clamp(3rem, 8vw, 5rem); font-weight: 800; line-height: 1.1; letter-spacing: -2px; margin-bottom: 24px; }
-        .hero-section h1 span { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-section p { font-size: clamp(1.1rem, 4vw, 1.25rem); color: var(--text-muted); max-width: 800px; }
-
-        /* SECTIONS & CARDS */
-        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
-
-        .glass-card {
-            background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-            padding: 60px; margin-bottom: 40px; box-shadow: var(--shadow); transition: var(--transition);
+        .hero-section h1 { 
+            font-size: clamp(2.5rem, 7vw, 4.5rem); 
+            font-weight: 800; 
+            line-height: 1.1; 
+            letter-spacing: -2.5px; 
+            margin-bottom: 24px; 
         }
-        .glass-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: rgba(59, 130, 246, 0.3); }
+        .hero-section h1 span { 
+            background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .hero-section p { 
+            font-size: clamp(1rem, 3vw, 1.2rem); 
+            color: var(--text-sub); 
+            max-width: 750px; 
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        /* --- BENTO GRID SYSTEM --- */
+        .content-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 24px 80px; 
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            margin-bottom: 50px;
+        }
+
+        .bento-card {
+            background: var(--glass-bg); 
+            backdrop-filter: blur(30px); 
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border); 
+            border-radius: var(--radius-lg);
+            padding: 40px; 
+            box-shadow: var(--shadow-md); 
+            transition: var(--transition-spring);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: var(--shadow-hover); 
+            border-color: var(--primary-light); 
+        }
+
+        /* Bento Grid Span Configurations */
+        .span-1 { grid-column: span 1; }
+        .span-2 { grid-column: span 2; }
+        .span-3 { grid-column: span 3; }
 
         .card-icon {
-            width: 80px; height: 80px; border-radius: 24px; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: white; margin-bottom: 32px; background: linear-gradient(135deg, var(--primary), #2563EB);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+            width: 60px; 
+            height: 60px; 
+            border-radius: 18px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.6rem; 
+            color: white; 
+            margin-bottom: 28px; 
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            box-shadow: 0 10px 20px var(--primary-glow);
+            transition: var(--transition);
+        }
+        .bento-card:hover .card-icon {
+            transform: rotate(-5deg) scale(1.05);
         }
 
-        .card-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 24px; letter-spacing: -1px; }
-        .card-text { font-size: 1.1rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 24px; }
+        .card-title { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            margin-bottom: 16px; 
+            letter-spacing: -0.8px; 
+            color: var(--text-main);
+        }
+        .card-text { 
+            font-size: 1.02rem; 
+            color: var(--text-muted); 
+            line-height: 1.7; 
+            font-weight: 500;
+        }
 
-        /* FEATURE BOXES */
-        .modern-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 48px; }
-        .feature-box { background: var(--glass-card); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border); transition: var(--transition); }
-        .feature-box:hover { transform: translateY(-5px) scale(1.02); border-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
-        .feature-box i { font-size: 1.8rem; color: var(--accent); margin-bottom: 20px; filter: drop-shadow(0 5px 10px rgba(255, 159, 67, 0.3)); }
-        .feature-box h4 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
-        .feature-box p { color: var(--text-muted); }
+        /* --- MULTI-ACCENT HOVER EFFCTS --- */
+        .card-orange .card-icon {
+            background: linear-gradient(135deg, var(--accent), #FFB775);
+            box-shadow: 0 10px 20px var(--accent-glow);
+        }
+        .card-orange:hover {
+            border-color: var(--accent);
+        }
 
-        /* TEAM SECTION */
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
+        .card-red .card-icon {
+            background: linear-gradient(135deg, var(--accent-red), #FF8E8E);
+            box-shadow: 0 10px 20px var(--accent-red-glow);
+        }
+        .card-red:hover {
+            border-color: var(--accent-red);
+        }
+
+        /* --- FEATURE CORES INSIDE BENTO --- */
+        .bento-features { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px; 
+            margin-top: 32px; 
+            width: 100%;
+        }
+        .bento-feature-box { 
+            background: var(--glass-card); 
+            padding: 24px; 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--glass-border); 
+            transition: var(--transition); 
+        }
+        .bento-feature-box:hover { 
+            transform: scale(1.03); 
+            border-color: var(--primary); 
+            background: var(--primary-glow); 
+        }
+        .bento-feature-box i { 
+            font-size: 1.4rem; 
+            color: var(--accent); 
+            margin-bottom: 14px; 
+            display: inline-block;
+        }
+        .bento-feature-box h4 { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            color: var(--text-main);
+        }
+        .bento-feature-box p { 
+            font-size: 0.88rem;
+            color: var(--text-sub); 
+            line-height: 1.5;
+        }
+
+        /* --- TECH GRID IN BENTO --- */
+        .tech-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-top: 28px;
+        }
+        .tech-box {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 24px 16px;
+            text-align: center;
+            transition: var(--transition-spring);
+        }
+        .tech-box:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            background: var(--primary-glow);
+        }
+        .tech-icon {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+        .tech-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-main);
+        }
+
+        /* --- TEAM DECK GRID --- */
+        .section-header {
+            text-align: center; 
+            margin: 90px 0 50px;
+        }
+        .section-header h2 { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+        .section-header p { 
+            color: var(--text-sub); 
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .team-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 28px; 
+        }
         .team-card {
-            background: var(--glass-bg); backdrop-filter: blur(24px); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-xl); padding: 50px 30px; text-align: center; transition: var(--transition);
-            position: relative; overflow: hidden; box-shadow: var(--shadow);
+            background: var(--glass-bg); 
+            backdrop-filter: blur(30px); 
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg); 
+            padding: 40px 24px; 
+            text-align: center; 
+            transition: var(--transition-spring);
+            position: relative; 
+            overflow: hidden; 
+            box-shadow: var(--shadow-md);
         }
         .team-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
-            opacity: 0; transition: var(--transition); z-index: 0;
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            left: -50%; 
+            width: 200%; 
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%);
+            opacity: 0; 
+            transition: var(--transition); 
+            z-index: 0;
+            pointer-events: none;
         }
         .team-card:hover::before { opacity: 1; transform: rotate(45deg); }
-        .team-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+        .team-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: var(--shadow-hover); 
+            border-color: var(--primary); 
+        }
 
         .avatar-circle {
-            width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 24px; position: relative; z-index: 1;
-            display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white;
+            width: 110px; 
+            height: 110px; 
+            border-radius: 50%; 
+            margin: 0 auto 20px; 
+            position: relative; 
+            z-index: 1;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 2.8rem; 
+            color: white;
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3); transition: var(--transition);
+            box-shadow: 0 10px 20px var(--primary-glow); 
+            transition: var(--transition-spring);
         }
-        .team-card:hover .avatar-circle { transform: scale(1.1) rotate(5deg); }
-        .team-card.manager .avatar-circle { background: linear-gradient(135deg, var(--accent-red), var(--accent)); box-shadow: 0 15px 30px rgba(255, 107, 107, 0.3); }
+        .team-card:hover .avatar-circle { 
+            transform: scale(1.1) rotate(6deg); 
+        }
+        .team-card.manager .avatar-circle { 
+            background: linear-gradient(135deg, var(--accent-red), var(--accent)); 
+            box-shadow: 0 10px 20px var(--accent-red-glow); 
+        }
 
-        .role-badge { display: inline-block; padding: 8px 24px; border-radius: 100px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; position: relative; z-index: 1; }
-        .role-badge.manager { background: rgba(255, 107, 107, 0.15); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.3); }
-        .role-badge.member { background: rgba(59, 130, 246, 0.15); color: var(--primary); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .role-badge { 
+            display: inline-block; 
+            padding: 6px 18px; 
+            border-radius: 100px; 
+            font-size: 0.78rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 0.8px; 
+            margin-bottom: 16px; 
+            position: relative; 
+            z-index: 1; 
+        }
+        .role-badge.manager { 
+            background: rgba(255, 107, 107, 0.12); 
+            color: #FF6B6B; 
+            border: 1px solid rgba(255, 107, 107, 0.25); 
+        }
+        .role-badge.member { 
+            background: var(--primary-glow); 
+            color: var(--primary); 
+            border: 1px solid rgba(79, 70, 229, 0.25); 
+        }
 
-        .team-name { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; position: relative; z-index: 1; }
-        .team-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; position: relative; z-index: 1; }
+        .team-name { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            margin-bottom: 10px; 
+            position: relative; 
+            z-index: 1; 
+            color: var(--text-main);
+        }
+        .team-desc { 
+            color: var(--text-sub); 
+            font-size: 0.92rem; 
+            margin-bottom: 22px; 
+            line-height: 1.5;
+            position: relative; 
+            z-index: 1; 
+        }
 
-        .team-social { display: flex; justify-content: center; gap: 16px; position: relative; z-index: 1; }
+        .team-social { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            position: relative; 
+            z-index: 1; 
+        }
         .team-social-link {
-            width: 44px; height: 44px; border-radius: 50%; background: var(--glass-card); border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 1.1rem;
-            transition: var(--transition); text-decoration: none;
+            width: 38px; 
+            height: 38px; 
+            border-radius: 50%; 
+            background: var(--glass-card); 
+            border: 1px solid var(--glass-border);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-main); 
+            font-size: 0.95rem;
+            transition: var(--transition); 
+            text-decoration: none;
         }
-        .team-social-link:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+        .team-social-link:hover { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary); 
+            transform: translateY(-4px); 
+            box-shadow: 0 8px 16px var(--primary-glow); 
+        }
 
-        /* GALLERY */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin-top: 40px; }
+        /* --- MOMENT GALLERY --- */
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 28px; 
+            margin-top: 30px; 
+        }
         .gallery-card {
-            background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-            padding: 16px; transition: var(--transition); text-align: center; overflow: hidden;
+            background: var(--glass-card); 
+            border: 1px solid var(--glass-border); 
+            border-radius: var(--radius-lg);
+            padding: 16px; 
+            transition: var(--transition-spring); 
+            text-align: center; 
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
-        .gallery-card img { width: 100%; border-radius: 20px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.5s ease; }
-        .gallery-card:hover img { transform: scale(1.05); }
-        .gallery-title { font-weight: 700; font-family: 'Outfit', sans-serif; font-size: 1.2rem; margin-bottom: 10px; }
+        .gallery-card img { 
+            width: 100%; 
+            height: 200px;
+            object-fit: cover;
+            border-radius: 20px; 
+            margin-bottom: 14px; 
+            box-shadow: var(--shadow-sm); 
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .gallery-card:hover img { 
+            transform: scale(1.05); 
+        }
+        .gallery-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-md);
+        }
+        .gallery-title { 
+            font-weight: 800; 
+            font-family: 'Outfit', sans-serif; 
+            font-size: 1.1rem; 
+        }
 
-        /* STATS */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin: 80px 0; }
-        .stat-item { text-align: center; padding: 40px; background: var(--glass-bg); border-radius: var(--radius-xl); border: 1px solid var(--glass-border); box-shadow: var(--shadow); transition: var(--transition); }
-        .stat-item:hover { transform: translateY(-10px); border-color: var(--primary); }
-        .stat-val { font-size: 4rem; font-family: 'Outfit', sans-serif; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; line-height: 1; }
-        .stat-label { font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
+        /* --- STATS COUNTER SYSTEM --- */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 24px; 
+            margin: 80px 0 20px; 
+        }
+        .stat-item { 
+            text-align: center; 
+            padding: 32px 20px; 
+            background: var(--glass-bg); 
+            border-radius: var(--radius-lg); 
+            border: 1px solid var(--glass-border); 
+            box-shadow: var(--shadow-md); 
+            transition: var(--transition-spring); 
+        }
+        .stat-item:hover { 
+            transform: translateY(-8px); 
+            border-color: var(--primary); 
+            box-shadow: var(--shadow-hover);
+        }
+        .stat-val { 
+            font-size: 3.5rem; 
+            font-family: 'Outfit', sans-serif; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: 6px; 
+            line-height: 1; 
+            filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.15));
+        }
+        body.dark-mode-active .stat-val {
+            filter: drop-shadow(0 4px 10px rgba(129, 140, 248, 0.3));
+        }
+        .stat-label { 
+            font-weight: 800; 
+            color: var(--text-sub); 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-size: 0.82rem; 
+        }
+
+        /* --- RESPONSIVENESS --- */
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .span-2 { grid-column: span 2; }
+            .span-1 { grid-column: span 1; }
+            .tech-bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
 
         @media (max-width: 768px) {
-            .hero-section { padding: 100px 20px 40px; }
-            .hero-section h1 { font-size: 2.5rem; }
-            .glass-card { padding: 40px 24px; }
+            .hero-section { padding: 110px 20px 30px; }
+            .hero-section h1 { font-size: 2.2rem; }
+            .bento-grid { grid-template-columns: 1fr; }
+            .span-2 { grid-column: span 1; }
+            .bento-card { padding: 30px 20px; }
+            .bento-features { grid-template-columns: 1fr; }
+            .tech-bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .stat-val { font-size: 3rem; }
+            .stat-val { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body class="<%= bodyClass %>">
 
-    <%- include('./partials/navbar') %>
+    <!-- NAV BAR -->
+    <%- include('./partials/navbar', { currentPage: 'about' }) %>
+
+    <!-- BACKGROUND EFFECTS -->
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
     <!-- HERO SECTION -->
     <section class="hero-section">
-        <div class="hero-glow"></div>
         <div class="badge-premium animate-on-scroll">
             <i class="fas fa-sparkles"></i>
             <span><%= __('about_hero_badge') %></span>
@@ -218,85 +664,113 @@
         </p>
     </section>
 
-    <!-- MAIN CONTENT -->
+    <!-- BENTO GRID SYSTEM -->
     <div class="content-container">
         
-        <!-- ABOUT CARD -->
-        <section class="glass-card animate-on-scroll">
-            <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
-            <h2 class="card-title"><%= __('about_what_is') %></h2>
-            <p class="card-text"><%= __('about_what_is_desc1') %></p>
-            <p class="card-text"><%= __('about_what_is_desc2') %></p>
+        <div class="bento-grid">
             
-            <div class="modern-features">
-                <div class="feature-box animate-on-scroll delay-1">
-                    <i class="fas fa-boxes"></i>
-                    <h4><%= __('about_feat_inv') %></h4>
-                    <p><%= __('about_feat_inv_desc') %></p>
+            <!-- Bento Box 1: What is Kapan Beli (Large) -->
+            <section class="bento-card span-2 animate-on-scroll">
+                <div>
+                    <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h2 class="card-title"><%= __('about_what_is') %></h2>
+                    <p class="card-text" style="margin-bottom: 18px;"><%= __('about_what_is_desc1') %></p>
+                    <p class="card-text"><%= __('about_what_is_desc2') %></p>
                 </div>
-                <div class="feature-box animate-on-scroll delay-2">
-                    <i class="fas fa-bell"></i>
-                    <h4><%= __('about_feat_alert') %></h4>
-                    <p><%= __('about_feat_alert_desc') %></p>
-                </div>
-                <div class="feature-box animate-on-scroll delay-3">
-                    <i class="fas fa-shopping-cart"></i>
-                    <h4><%= __('about_feat_list') %></h4>
-                    <p><%= __('about_feat_list_desc') %></p>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- MISSION SECTION -->
-        <section class="glass-card animate-on-scroll">
-            <div class="card-icon" style="background: linear-gradient(135deg, var(--accent), var(--accent-red));"><i class="fas fa-bullseye"></i></div>
-            <h2 class="card-title"><%= __('about_vision_mission') %></h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
-                <div class="feature-box">
-                    <h3 style="color: var(--accent); margin-bottom: 16px; font-size: 1.5rem;"><%= __('about_vision') %></h3>
-                    <p><%= __('about_vision_desc') %></p>
+            <!-- Bento Box 2: Vision (Small Accent Card) -->
+            <section class="bento-card span-1 card-orange animate-on-scroll delay-1">
+                <div>
+                    <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                    <h2 class="card-title" style="color: var(--accent);"><%= __('about_vision') %></h2>
+                    <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;"><%= __('about_vision_desc') %></p>
                 </div>
-                <div class="feature-box">
-                    <h3 style="color: var(--primary); margin-bottom: 16px; font-size: 1.5rem;"><%= __('about_mission') %></h3>
-                    <ul style="list-style: none; color: var(--text-muted);">
-                        <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-top: 5px;"></i> <span><%= __('about_mission_li1') %></span></li>
-                        <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-top: 5px;"></i> <span><%= __('about_mission_li2') %></span></li>
-                        <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-top: 5px;"></i> <span><%= __('about_mission_li3') %></span></li>
+            </section>
+
+            <!-- Bento Box 3: Mission (Small Primary Card) -->
+            <section class="bento-card span-1 animate-on-scroll">
+                <div>
+                    <div class="card-icon"><i class="fas fa-paper-plane"></i></div>
+                    <h2 class="card-title" style="color: var(--primary);"><%= __('about_mission') %></h2>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 14px;">
+                        <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; color: var(--text-muted);">
+                            <i class="fas fa-circle-check" style="color: var(--primary); margin-top: 3px; font-size: 1rem;"></i>
+                            <span><%= __('about_mission_li1') %></span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; color: var(--text-muted);">
+                            <i class="fas fa-circle-check" style="color: var(--primary); margin-top: 3px; font-size: 1rem;"></i>
+                            <span><%= __('about_mission_li2') %></span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; color: var(--text-muted);">
+                            <i class="fas fa-circle-check" style="color: var(--primary); margin-top: 3px; font-size: 1rem;"></i>
+                            <span><%= __('about_mission_li3') %></span>
+                        </li>
                     </ul>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- TECH STACK -->
-        <section class="glass-card animate-on-scroll">
-            <div class="card-icon" style="background: linear-gradient(135deg, #1E293B, #0F172A);"><i class="fas fa-code"></i></div>
-            <h2 class="card-title"><%= __('about_tech') %></h2>
-            <p class="card-text"><%= __('about_tech_desc') %></p>
-            
-            <div class="modern-features" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-                <div class="feature-box" style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 16px; filter: drop-shadow(0 5px 15px rgba(34, 197, 94, 0.4));">🟢</div>
-                    <div style="font-weight: 700; font-family: 'Outfit'; font-size: 1.2rem;">Node.js</div>
+            <!-- Bento Box 4: Core Features (Large) -->
+            <section class="bento-card span-2 card-red animate-on-scroll delay-1">
+                <div>
+                    <div class="card-icon"><i class="fas fa-sliders"></i></div>
+                    <h2 class="card-title"><%= __('about_vision_mission') %></h2>
+                    <p class="card-text">Dapur pintar Kapan Beli didukung oleh tiga pilar fitur inovatif yang bekerja harmonis:</p>
+                    
+                    <div class="bento-features">
+                        <div class="bento-feature-box">
+                            <i class="fas fa-boxes"></i>
+                            <h4><%= __('about_feat_inv') %></h4>
+                            <p><%= __('about_feat_inv_desc') %></p>
+                        </div>
+                        <div class="bento-feature-box">
+                            <i class="fas fa-bell"></i>
+                            <h4><%= __('about_feat_alert') %></h4>
+                            <p><%= __('about_feat_alert_desc') %></p>
+                        </div>
+                        <div class="bento-feature-box">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h4><%= __('about_feat_list') %></h4>
+                            <p><%= __('about_feat_list_desc') %></p>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-box" style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 16px; filter: drop-shadow(0 5px 15px rgba(59, 130, 246, 0.4));">💾</div>
-                    <div style="font-weight: 700; font-family: 'Outfit'; font-size: 1.2rem;">MySQL</div>
+            </section>
+
+            <!-- Bento Box 5: Tech Stack (Full Width) -->
+            <section class="bento-card span-3 animate-on-scroll">
+                <div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #1E293B, #0F172A);"><i class="fas fa-code"></i></div>
+                    <h2 class="card-title"><%= __('about_tech') %></h2>
+                    <p class="card-text" style="max-width: 800px;"><%= __('about_tech_desc') %></p>
+                    
+                    <div class="tech-bento-grid">
+                        <div class="tech-box">
+                            <span class="tech-icon" style="filter: drop-shadow(0 4px 8px rgba(34, 197, 94, 0.3));">🟢</span>
+                            <div class="tech-name">Node.js</div>
+                        </div>
+                        <div class="tech-box">
+                            <span class="tech-icon" style="filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));">💾</span>
+                            <div class="tech-name">MySQL</div>
+                        </div>
+                        <div class="tech-box">
+                            <span class="tech-icon" style="filter: drop-shadow(0 4px 8px rgba(234, 179, 8, 0.3));">⚡</span>
+                            <div class="tech-name">Express</div>
+                        </div>
+                        <div class="tech-box">
+                            <span class="tech-icon" style="filter: drop-shadow(0 4px 8px rgba(236, 72, 153, 0.3));">🎨</span>
+                            <div class="tech-name">EJS & CSS3</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-box" style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 16px; filter: drop-shadow(0 5px 15px rgba(234, 179, 8, 0.4));">⚡</div>
-                    <div style="font-weight: 700; font-family: 'Outfit'; font-size: 1.2rem;">Express</div>
-                </div>
-                <div class="feature-box" style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 16px; filter: drop-shadow(0 5px 15px rgba(236, 72, 153, 0.4));">🎨</div>
-                    <div style="font-weight: 700; font-family: 'Outfit'; font-size: 1.2rem;">EJS & CSS3</div>
-                </div>
-            </div>
-        </section>
+            </section>
+
+        </div>
 
         <!-- TEAM SECTION -->
-        <div style="text-align: center; margin: 100px 0 60px;" class="animate-on-scroll">
-            <h2 class="card-title" style="font-size: 3.5rem;"><%= __('about_team') %></h2>
-            <p class="card-text" style="max-width: 600px; margin: 0 auto;"><%= __('about_team_subtitle') %></p>
+        <div class="section-header animate-on-scroll">
+            <h2><%= __('about_team') %></h2>
+            <p><%= __('about_team_subtitle') %></p>
         </div>
 
         <div class="team-grid">
@@ -364,26 +838,24 @@
                     <a href="#" class="team-social-link"><i class="fas fa-envelope"></i></a>
                 </div>
             </div>
-
-
         </div>
 
         <!-- GALLERY SECTION -->
-        <div style="text-align: center; margin: 100px 0 40px;" class="animate-on-scroll">
-            <h2 class="card-title" style="font-size: 3rem;">Momen <span style="color: var(--primary);">Kolektif</span></h2>
-            <p class="card-text">Sekilas tentang perjalanan kreasi kami.</p>
+        <div class="section-header animate-on-scroll">
+            <h2>Momen <span style="color: var(--primary);">Kolektif</span></h2>
+            <p>Sekilas tentang perjalanan kreasi dan harmoni tim kami.</p>
         </div>
 
         <div class="gallery-grid">
-            <div class="gallery-card animate-on-scroll delay-1" style="animation: float 6s ease-in-out infinite;">
+            <div class="gallery-card animate-on-scroll delay-1">
                 <img src="/images/blehhhhhh.gif" alt="Team Moment">
                 <div class="gallery-title" style="color: var(--primary);">Energi Puncak</div>
             </div>
-            <div class="gallery-card animate-on-scroll delay-2" style="animation: float 6s ease-in-out infinite 1s;">
+            <div class="gallery-card animate-on-scroll delay-2">
                 <img src="/images/くるくるヘルタ.gif" alt="Team Moment">
                 <div class="gallery-title" style="color: var(--accent);">Loop Sistem</div>
             </div>
-            <div class="gallery-card animate-on-scroll delay-3" style="animation: float 6s ease-in-out infinite 2s;">
+            <div class="gallery-card animate-on-scroll delay-3">
                 <img src="/images/uma-musume-meep.gif" alt="Team Moment">
                 <div class="gallery-title" style="color: var(--accent-red);">Kortisol Rendah</div>
             </div>
@@ -410,16 +882,19 @@
         </div>
     </div>
 
+    <!-- FOOTER -->
     <%- include('./partials/footer') %>
 
     <script>
-        // --- SCROLL ANIMATIONS ---
-        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        // --- SMOOTH SPRING INTERSECTION OBSERVER ---
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -60px 0px" };
 
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
+                    // Stop observing once animated
+                    scrollObserver.unobserve(entry.target);
                 }
             });
         }, observerOptions);
@@ -428,8 +903,6 @@
             const animElements = document.querySelectorAll('.animate-on-scroll');
             animElements.forEach(el => scrollObserver.observe(el));
         });
-
-
     </script>
 </body>
 </html>

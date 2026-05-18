@@ -91,6 +91,8 @@
         
         .btn-primary { background: var(--primary-blue); color: white; }
         .btn-outline { background: var(--bg-card); color: var(--text-main); }
+        .btn-reset-filter { background: #ffffff; color: #000000; }
+        body.dark-mode-active .btn-reset-filter { background: #000000; color: #ffffff; }
         .theme-toggle { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 
         /* ========== FILTERS ========== */
@@ -229,10 +231,27 @@
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .loading-state, .empty-state { text-align: center; padding: 60px 20px; }
+        .loading-state { text-align: center; padding: 60px 20px; }
         .loading-state i { font-size: 3rem; color: var(--primary-blue); margin-bottom: 20px; animation: spin 1s linear infinite; }
-        .empty-state i { font-size: 4rem; color: var(--accent-green); margin-bottom: 20px; }
-        .empty-state h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+        
+        .empty-state { 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            padding: 50px 20px; 
+            border: 3px dashed var(--border-color); 
+            background: rgba(0, 0, 0, 0.02);
+            margin: 20px 0;
+            width: 100%;
+        }
+        body.dark-mode-active .empty-state {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .empty-state i { font-size: 4.5rem; margin-bottom: 20px; filter: drop-shadow(4px 4px 0px #000); }
+        .empty-state h3 { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; letter-spacing: -0.5px; }
+        .empty-state p { font-size: 1rem; color: var(--text-muted); font-weight: 700; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -283,7 +302,7 @@
                 <option value="Lainnya">Lainnya</option>
             </select>
             <button class="btn btn-primary" onclick="applyFilters()" style="margin-left:auto;"><i class="fas fa-search"></i> Filter</button>
-            <button class="btn" style="background:var(--border-color);color:var(--text-muted);" onclick="resetFilters()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="btn btn-reset-filter" onclick="resetFilters()"><i class="fas fa-sync-alt"></i> Reset</button>
         </div>
 
         <!-- Table -->
@@ -442,7 +461,21 @@
             const tbody = document.getElementById('expiredTableBody');
             document.getElementById('loadingState').style.display = 'none';
             if (!allData.length) {
-                document.getElementById('emptyState').style.display = 'flex';
+                const emptyState = document.getElementById('emptyState');
+                if (filterSearch || filterCategory) {
+                    emptyState.innerHTML = `
+                        <i class="fas fa-search" style="color: var(--primary-orange);"></i>
+                        <h3>Bahan Tidak Ditemukan!</h3>
+                        <p>Tidak ada bahan kadaluarsa yang cocok dengan kata kunci pencarian Anda.</p>
+                    `;
+                } else {
+                    emptyState.innerHTML = `
+                        <i class="fas fa-check-circle" style="color: var(--accent-green);"></i>
+                        <h3>Semua Bahan Aman!</h3>
+                        <p>Hebat! Tidak ada bahan makanan yang kadaluarsa saat ini.</p>
+                    `;
+                }
+                emptyState.style.display = 'flex';
                 document.getElementById('tableWrapper').style.display = 'none';
                 return;
             }

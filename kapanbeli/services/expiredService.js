@@ -12,7 +12,9 @@ const expiredService = {
     async getExpiredItems(options = {}) {
         try {
             const { page = 1, limit = 20, search = '', category = '' } = options;
-            const offset = (page - 1) * limit;
+            const pageNum = parseInt(page) || 1;
+            const limitNum = parseInt(limit) || 20;
+            const offsetNum = (pageNum - 1) * limitNum;
 
             const whereClauses = ['p.expiry_date IS NOT NULL', 'p.expiry_date < CURDATE()'];
             const params = [];
@@ -37,7 +39,7 @@ const expiredService = {
                 JOIN users u ON p.user_id = u.id
                 WHERE ${whereClause}
             `;
-            const [countResult] = await db.execute(countQuery, params);
+            const [countResult] = await db.query(countQuery, params);
             const total = countResult[0].total;
 
             // Get expired items with user info
@@ -56,7 +58,7 @@ const expiredService = {
                 ORDER BY p.expiry_date ASC
                 LIMIT ? OFFSET ?
             `;
-            const [dataResult] = await db.execute(dataQuery, [...params, limit, offset]);
+            const [dataResult] = await db.query(dataQuery, [...params, limitNum, offsetNum]);
 
             // Get all categories for filter (not just expired ones)
             const [catResult] = await db.execute(`
@@ -68,10 +70,10 @@ const expiredService = {
                 data: dataResult,
                 categories: catResult.map(c => c.name),
                 pagination: {
-                    total, page: parseInt(page), limit: parseInt(limit),
-                    totalPages: Math.ceil(total / limit),
-                    hasNext: page < Math.ceil(total / limit),
-                    hasPrev: page > 1
+                    total, page: pageNum, limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum),
+                    hasNext: pageNum < Math.ceil(total / limitNum),
+                    hasPrev: pageNum > 1
                 }
             };
         } catch (error) {

@@ -142,7 +142,9 @@ const adminService = {
                 role = ''
             } = options;
 
-            const offset = (page - 1) * limit;
+            const pageNum = parseInt(page) || 1;
+            const limitNum = parseInt(limit) || 20;
+            const offsetNum = (pageNum - 1) * limitNum;
 
             // Build WHERE clause
             const whereClauses = [];
@@ -175,7 +177,7 @@ const adminService = {
                 FROM users u
                 ${whereClause}
             `;
-            const [countResult] = await db.execute(countQuery, params);
+            const [countResult] = await db.query(countQuery, params);
             const total = countResult[0].total;
 
             // Get users with login stats
@@ -197,18 +199,18 @@ const adminService = {
                 ORDER BY u.created_at DESC
                 LIMIT ? OFFSET ?
             `;
-            const [dataResult] = await db.execute(dataQuery, [...params, limit, offset]);
+            const [dataResult] = await db.query(dataQuery, [...params, limitNum, offsetNum]);
 
             return {
                 success: true,
                 data: dataResult,
                 pagination: {
                     total,
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    totalPages: Math.ceil(total / limit),
-                    hasNext: page < Math.ceil(total / limit),
-                    hasPrev: page > 1
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum),
+                    hasNext: pageNum < Math.ceil(total / limitNum),
+                    hasPrev: pageNum > 1
                 }
             };
         } catch (error) {
@@ -268,7 +270,7 @@ const adminService = {
                 ORDER BY created_at DESC
                 LIMIT ?
             `;
-            const [result] = await db.execute(query, [limit]);
+            const [result] = await db.query(query, [limit]);
             return result;
         } catch (error) {
             console.error('[AdminService] Error getting recent registrations:', error);
@@ -295,7 +297,7 @@ const adminService = {
                 ORDER BY total_logins DESC
                 LIMIT ?
             `;
-            const [result] = await db.execute(query, [limit]);
+            const [result] = await db.query(query, [limit]);
             return result;
         } catch (error) {
             console.error('[AdminService] Error getting most active users:', error);

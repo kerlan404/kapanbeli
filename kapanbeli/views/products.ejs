@@ -819,7 +819,7 @@
         }
 
         async function handleEdit(id) {
-            // First check if product is deactivated
+            // First check if product is deactivated or needs attention
             try {
                 const res = await fetch(`/api/products/${id}`);
                 const data = await res.json();
@@ -835,11 +835,86 @@
                             html: `
                                 <p>Produk ini telah <strong>dinonaktifkan oleh admin</strong>.</p>
                                 ${product.deactivated_reason ? `<p style="color: #FF6B6B; margin-top: 10px;"><strong>Alasan:</strong> ${product.deactivated_reason}</p>` : ''}
-                                <p style="color: #636E72; margin-top: 10px;">Menunggu konfirmasi admin untuk mengaktifkan kembali.</p>
+                                <p style="color: #636E72; margin-top: 10px;">Hubungi Admin untuk mengaktifkan kembali.</p>
                             `,
                             confirmButtonText: 'OK',
                             confirmButtonColor: '#2E86DE'
                         });
+                        return;
+                    }
+
+                    // Check for expired, out of stock, or low stock conditions
+                    const stockNum = parseFloat(product.stock_quantity) || 0;
+                    const minStockNum = parseFloat(product.min_stock_level) || 0;
+                    
+                    let isExpired = false;
+                    let isExpiringSoon = false;
+                    let expiryMessage = '';
+                    
+                    if (product.expiry_date) {
+                        const d = new Date(product.expiry_date);
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                        const diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+                        
+                        if (diffDays < 0) {
+                            isExpired = true;
+                            expiryMessage = 'Bahan ini sudah kadaluarsa.';
+                        } else if (diffDays <= 30) {
+                            isExpiringSoon = true;
+                            if (diffDays === 0) {
+                                expiryMessage = 'Bahan ini kadaluarsa hari ini!';
+                            } else {
+                                expiryMessage = `Bahan ini akan kadaluarsa dalam ${diffDays} hari.`;
+                            }
+                        }
+                    }
+                    
+                    const isOutOfStock = stockNum <= 0;
+                    const isLowStock = stockNum > 0 && stockNum <= minStockNum;
+                    
+                    // If product is expired, out of stock, expiring soon, or low stock
+                    if (isExpired || isExpiringSoon || isOutOfStock || isLowStock) {
+                        let alertTitle = 'Bahan Perlu Perhatian!';
+                        let alertText = '';
+                        let iconType = 'info';
+                        
+                        if (isExpired) {
+                            alertTitle = 'Bahan Kadaluarsa!';
+                            alertText = `Bahan dapur <strong>"${product.name}"</strong> Anda sudah kadaluarsa.`;
+                            iconType = 'error';
+                        } else if (isOutOfStock) {
+                            alertTitle = 'Stok Habis!';
+                            alertText = `Stok bahan <strong>"${product.name}"</strong> Anda sudah habis.`;
+                            iconType = 'warning';
+                        } else if (isExpiringSoon) {
+                            alertTitle = 'Hampir Kadaluarsa!';
+                            alertText = `Bahan <strong>"${product.name}"</strong> mendekati tanggal kadaluarsanya (${expiryMessage}).`;
+                            iconType = 'warning';
+                        } else if (isLowStock) {
+                            alertTitle = 'Stok Menipis!';
+                            alertText = `Stok bahan <strong>"${product.name}"</strong> berada di bawah batas minimum (${stockNum} tersisa).`;
+                            iconType = 'info';
+                        }
+                        
+                        await Swal.fire({
+                            title: alertTitle,
+                            html: `
+                                <div style="text-align: center; font-family: 'Poppins', sans-serif;">
+                                    <p style="margin-bottom: 15px; font-size: 1rem; line-height: 1.5;">${alertText}</p>
+                                    <p style="color: #64748B; font-size: 0.85rem; line-height: 1.4;">Anda akan diarahkan ke halaman <strong>Saran Pembelian</strong> untuk membelinya kembali.</p>
+                                </div>
+                            `,
+                            icon: iconType,
+                            showCancelButton: false,
+                            showDenyButton: false,
+                            confirmButtonColor: '#3B82F6', // Blue color requested
+                            confirmButtonText: '<span style="color: #000000; font-weight: 700;">🛒 Saran Pembelian</span>', // Black text requested
+                            background: document.body.classList.contains('dark-mode-active') ? '#1e293b' : '#fff',
+                            color: document.body.classList.contains('dark-mode-active') ? '#fff' : '#1E293B'
+                        });
+                        
+                        window.location.href = '/suggestions';
                         return;
                     }
                 }
@@ -847,7 +922,7 @@
                 console.error('Error checking product status:', error);
             }
             
-            // If not deactivated, proceed to edit
+            // If normal/safe, proceed directly to edit
             window.location.href = `/products/edit/${id}`;
         }
 

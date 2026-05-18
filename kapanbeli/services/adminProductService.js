@@ -120,7 +120,7 @@ const adminProductService = {
                 ${whereClause}
             `;
 
-            const [countResult] = await db.execute(countQuery, params);
+            const [countResult] = await db.query(countQuery, params);
             const total = countResult[0].total;
 
             // Get ALL products from ALL users with user info
@@ -156,7 +156,7 @@ const adminProductService = {
                 LIMIT ? OFFSET ?
             `;
 
-            const [dataResult] = await db.execute(dataQuery, [...params, limit, offset]);
+            const [dataResult] = await db.query(dataQuery, [...params, limit, offset]);
 
             // Format stock quantity and weight for each product
             const formattedData = dataResult.map(p => ({
